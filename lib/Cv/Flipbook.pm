@@ -1,0 +1,200 @@
+# -*- mode: perl; coding: utf-8; tab-width: 4; -*-
+
+package Cv::Flipbook;
+
+use 5.008008;
+use strict;
+use warnings;
+use Carp;
+use File::Basename;
+use Cv;
+
+our $VERSION = '0.14';
+
+require Exporter;
+
+our @ISA = qw(Exporter);
+
+our %EXPORT_TAGS = ( 'all' => [ qw(
+	
+) ] );
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+our @EXPORT = qw(
+	
+);
+
+sub AUTOLOAD { &Cv::autoload };
+
+# Preloaded methods go here.
+
+{
+	package Cv;
+	sub CaptureFromFlipbook {
+		my $class = shift;
+		Cv::Flipbook->new(@_);
+	}
+}
+
+{
+	package Cv::Capture;
+	*FromFlipbook = \&Cv::CaptureFromFlipbook;
+}
+
+sub new {
+    my $class = shift;
+	my $dir = shift || ".";
+	my $flags = shift;
+	$flags = &Cv::CV_LOAD_IMAGE_COLOR unless defined $flags;
+	my $pattern = shift || [
+		"*.bmp", "*.BMP", "*.jpg", "*.JPG", "*.png", "*.PNG",
+		];
+	my $self;
+	if (-d $dir) {
+		if (my $list = list($dir, $pattern)) {
+			$self = bless {
+				dir => $dir,
+				files => $list,
+				flags => $flags,
+				pattern => $pattern,
+			}, $class;
+			$self->{&Cv::CV_CAP_PROP_FRAME_COUNT} = scalar @$list;
+			$self->{&Cv::CV_CAP_PROP_FPS} = 0;
+			$self->{&Cv::CV_CAP_PROP_POS_FRAMES} = 0;
+			$self->{&Cv::CV_CAP_PROP_POS_MSEC} = 0;
+		}
+	}
+	$self;
+}
+
+sub list { 
+	my $dir = shift;
+	my @files = ();
+	foreach (@_) {
+		if (ref $_) {
+			if (my $list = list($dir, @{$_})) {
+				push(@files, @$list);
+			}
+		} else {
+			push(@files, map { $_->[0] } sort { $a->[1] <=> $b->[1] } map {
+				basename($_) =~ /\d+/; [ $_, $& ];
+				 } glob("$dir/$_"));
+		}
+	}
+	return undef unless @files && -f $files[0];
+	wantarray ? @files : \@files;
+}
+
+sub DESTROY {
+	undef;
+}
+
+{ *Grab = \&GrabFrame }
+sub GrabFrame {
+	my $self = shift;
+	my $i = $self->{&Cv::CV_CAP_PROP_POS_FRAMES};
+	if ($i >= 0 && $i < $self->{&Cv::CV_CAP_PROP_FRAME_COUNT}) {
+		$self->{file} = ${$self->{files}}[$i];
+	} else {
+		$self->{file} = undef;
+	}
+}
+
+sub NextFrame {
+	my $self = shift;
+	$self->{&Cv::CV_CAP_PROP_POS_FRAMES}++;
+}
+
+{ *Retrieve = \&RetrieveFrame }
+sub RetrieveFrame {
+	my $self = shift;
+	if ($self->{file}) {
+		if (my $image = Cv->LoadImage($self->{file}, $self->{flags})) {
+			if ($self->{&Cv::CV_CAP_PROP_FPS}) {
+				$self->{&Cv::CV_CAP_PROP_POS_MSEC} =
+					1000 * $self->{&Cv::CV_CAP_PROP_POS_FRAMES} /
+					$self->{&Cv::CV_CAP_PROP_FPS};
+			}
+			$self->{&Cv::CV_CAP_PROP_FRAME_WIDTH} = $image->width;
+			$self->{&Cv::CV_CAP_PROP_FRAME_HEIGHT} = $image->height;
+			$self->NextFrame;
+			return $image;
+		}
+	}
+	undef;
+}
+
+{ *Query = \&QueryFrame }
+sub QueryFrame {
+	my $self = shift;
+	$self->GrabFrame && $self->RetrieveFrame;
+}
+
+{ *GetProperty = \&GetCaptureProperty }
+sub GetCaptureProperty {
+	my $self = shift;
+	my $property = shift;
+	$self->{$property};
+}
+
+{ *SetProperty = \&SetCaptureProperty }
+sub SetCaptureProperty {
+	my $self = shift;
+	my $property = shift;
+	my $value = shift;
+	$self->{$property} = $value;
+}
+
+1;
+__END__
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+Cv::Flipbook - Perl extension for blah blah blah
+
+=head1 SYNOPSIS
+
+  use Cv::Flipbook;
+  blah blah blah
+
+=head1 DESCRIPTION
+
+Stub documentation for Cv::Flipbook, created by h2xs. It looks like the
+author of the extension was negligent enough to leave the stub
+unedited.
+
+Blah blah blah.
+
+=head2 EXPORT
+
+None by default.
+
+
+
+=head1 SEE ALSO
+
+Mention other useful documentation such as the documentation of
+related modules or operating system documentation (such as man pages
+in UNIX), or any relevant external documentation such as RFCs or
+standards.
+
+If you have a mailing list set up for your module, mention it here.
+
+If you have a web site set up for your module, mention it here.
+
+=head1 AUTHOR
+
+KUBO Koichi, E<lt>k@obuk.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by KUBO Koichi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

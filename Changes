@@ -1,0 +1,134 @@
+Revision history for Cv.pm
+
+0.14 - 2012-05-16
+     * use AutoLoader
+     * use EXPORT_* for importing
+     * added ExtUtils::MM_Cygwin as rebase
+     * fixed using dims of arr instead of dims of arg(idx)
+     * rewrite cvSeq(Push|Pop)*(), cv(Cvt|Get)Seq*()
+     * removed cvGetSeqElem_*(), CvSeqBlock
+     * rewrote cvMakeSeqHeaderForArray
+     * added Cv::ContourScanner and related functions
+     * replaced GetHistValue() with Ptr()
+     * replaced QueryHistValue() with GetReal()
+     * added cv::error() to make hook erros using eval (without CC=cc)
+     * rewrote cv(Set|Get)Err*(), cvRedirectError()
+     * removed cv(NulDev|StdErr|GuiBox)Report(), cvAlloc(), cvFree()
+     * fixed dst matrix in GetRows(), GetCols(), GetSubRect()
+     * fixed Cv/Flipbook.pm flags, properties
+     * supported CvAttrList as perl hash; sample/contours.pl
+     * (experimental) replaced some newSVpvn() with readonly SV
+     	* cvPtr*D(), cvGetRawData(), etc
+
+0.12 - 2011-10-22
+
+     * added cvMatchTemplate
+     * added cvDecodeImage, cvEncodeImage
+     * added cvPtr*D (experimental)
+     * replaced cvGet[1-3]D with cvGetND.
+     * also replaced cv(GetReal|Set|SetReal|Ptr)[1-3]D with cv${1}ND.
+     * calling videowriter without CV_FOURCC
+     * added some tips 
+     * fixed $$.c exit-code in Cv/Config.pm
+     * fixed cvInitMatHeader's step in cvDecodeImage* when CC=cc
+
+0.11 - 2011-10-11
+
+     * split Cv-xs.inc to Cv-*.inc
+     * $img->new inherit ommited parameters
+     * added Cv/StereoSGBM.pm
+     * added Cv/VideoWriter.pm
+     * added Cv/Seq/Circle.pm
+     * added sample/stereo_match.pl, sample/chamfer.pl.
+     * added sample/video.pl, sample/video-thread.pl.
+     * added readByName, chamerMatching
+     * fixed amd64; int to IV
+     * tested OpenCV 2.3.1
+
+0.10 - 2011-08-30
+
+     * fixed tersters report 0.09
+       - Can't locate ExtUtils/PkgConfig.pm in @INC
+
+0.09 - 2011-08-25
+
+     * fixed tersters report 0.08
+       - Can't locate Cv/Config.pm in @INC
+
+0.07 - 2011-08-17
+
+     * tested OpenCV 2.2.0 and 2.3.0 
+     * decided to remove keyword parameter.
+     * The argument was along reference manual C in the OpenCV documentation.
+     * Added the configuration to use Inline C.
+     * added some sample scripts
+       - sample/convexhull-arr.pl
+       - sample/convexhull-seq.pl
+       - sample/fback_c.pl
+       - sample/find_obj.pl
+       - sample/flipbook.pl
+       - sample/houghlines-prob.pl
+       - sample/houghlines-stan.pl
+       - sample/mser_sample.pl
+       - sample/polar_transforms-linear.pl
+       - sample/polar_transforms-log.pl
+       - sample/tiehash.pl
+     * added modules
+       - lib/Cv/BGCodeBookModel.pm
+       - lib/Cv/ChildMemStorage.pm
+       - lib/Cv/Font.pm
+       - lib/Cv/Graph.pm
+       - lib/Cv/GraphScanner.pm
+       - lib/Cv/MatND.pm
+       - lib/Cv/MatND/Ghost.pm
+       - lib/Cv/String.pm
+       - lib/Cv/SeqReader.pm
+       - lib/Cv/Set.pm
+       - lib/Cv/SparseMat.pm
+       - lib/Cv/SparseMat/Ghost.pm
+     * deleted modules
+       - lib/Cv/Arr/C1.pm
+       - lib/Cv/Arr/C2.pm
+       - lib/Cv/Arr/C3.pm
+       - lib/Cv/Arr/C4.pm
+       - lib/Cv/Arr/Cx.pm
+       - lib/Cv/BGCodebook.pm
+       - lib/Cv/CxCore.pm
+       - lib/Cv/HaarDetectObjects.pm
+       - lib/Cv/HoughCircles.pm
+       - lib/Cv/HoughLines.pm
+       - lib/Cv/HoughLines2.pm
+       - lib/Cv/HuMoments.pm
+       - lib/Cv/MotionHistory.pm
+       - lib/Cv/Seq/Reader.pm
+       - lib/Cv/Subdiv2D/Edge.pm
+       - lib/Cv/Text.pm
+       - lib/Cv/TieArr.pm
+       - lib/Cv/Window.pm
+
+0.04 - 2010-05-30
+
+     * support for i386-freebsd 8.0-release
+
+0.03 - 2010-05-08
+
+     * tested OpenCV 1.0.0 and 2.1.0 
+     * added README.cygwin+opencv2xx
+     * added some sample scripts
+       - delaunay.pl
+       - ffilldemo.pl
+       - polar_transforms.pl
+     * added 
+       - lib/Cv/Arr/C1.pm
+       - lib/Cv/Arr/C2.pm
+       - lib/Cv/Arr/C3.pm
+       - lib/Cv/Arr/C4.pm
+       - lib/Cv/Arr/Cx.pm
+       - lib/Cv/Subdiv2D
+       - lib/Cv/Subdiv2D.pm
+       - lib/Cv/Subdiv2D/Edge.pm
+       - lib/Cv/TieArr.pm
+ 
+0.02 - 2010-03-31
+
+     * Initial release
