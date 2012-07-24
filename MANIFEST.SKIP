@@ -5,10 +5,8 @@
 ^support
 ^\.|/\.
 ^\#|/\#
-
 \.(a|o|bak|new|old|tmp)$
 \~$
-
 lib/Cv/(perl|pp|sv)\.h$
 ^Cv\.(bs|c|o)$
 ^const-(c|xs).inc$
@@ -17,5 +15,4 @@ MYMETA\.yml$
 ^camera\.xml$
 ^sample\.avi$
 ^a$
-Seq-ja.pod$
-Point-ja.pod$
+t/ref*.pm$
