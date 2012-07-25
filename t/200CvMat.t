@@ -1,18 +1,19 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
+use strict;
+# use Test::More qw(no_plan);
+use Test::More tests => 227;
 
 BEGIN {
 	use_ok('Cv');
 }
 
+# structure member
 if (1) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
 	isa_ok($arr, "Cv::Mat");
 	my $type_name = Cv->TypeOf($arr)->type_name;
-	is($type_name, 'opencv-matrix');
-
+	is($type_name, CV_TYPE_NAME_MAT);
 	is($arr->height, 240);
 	is($arr->rows, 240);
 	is($arr->width, 320);
@@ -26,6 +27,7 @@ if (1) {
 	is($sizes[1], 320);
 }
 
+# types
 if (2) {
 	my @types;
 	foreach my $depth (CV_8U, CV_8S, CV_16S, CV_16U, CV_32S, CV_32F, CV_64F) {
@@ -47,14 +49,40 @@ if (2) {
 	}
 }
 
-
+# inherit
 if (3) {
+	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
+	isa_ok($arr, "Cv::Mat");
+	my $arr2 = $arr->new;
+	isa_ok($arr2, ref $arr);
+	my $arr3 = $arr->new(CV_8UC1);
+	isa_ok($arr3, ref $arr);
+}
+
+# Cv::Mat::Ghost
+if (4) {
+	no warnings;
+	no strict 'refs';
+	my $destroy = 0;
+	my $destroy_ghost = 0;
+	local *{Cv::Mat::DESTROY} = sub { $destroy++; };
+	local *{Cv::Mat::Ghost::DESTROY} = sub { $destroy_ghost++; };
+	my $mat = Cv::Mat->new([ 240, 320 ], CV_8UC1);
+	isa_ok($mat, 'Cv::Mat');
+	bless $mat, join('::', ref $mat, 'Ghost');
+	$mat = undef;
+	is($destroy, 0);
+	is($destroy_ghost, 1);
+}
+
+# has data
+if (5) {
 	my $rows = 8;
 	my $cols = 8;
 	my $cn = 4;
 	my $step = $cols * $cn;
 	my $data = chr(0) x ($rows * $step);
-	my $mat = Cv::Mat->new([ $rows, $cols ], eval("CV_8UC$cn"), $data);
+	my $mat = Cv::Mat->new([ $rows, $cols ], CV_8UC($cn), $data);
 	is(substr($data, 0 + $_, 1), chr(0)) for 0 .. $cn - 1;
 	$mat->set([0, 0], [ map { 0x41 + $_ } 0 .. $cn - 1 ]);
 	is(substr($data, 0 + $_, 1), chr(0x41 + $_)) for 0 .. $cn - 1;

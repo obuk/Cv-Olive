@@ -216,14 +216,14 @@ SKIP: {
 			my $pm = dirname($0) . "/ref-$a.$b.$c.pm";
 			$refpm ||= $pm;
 			if (eval { require $pm }) {
-				diag "use $pm"; last;
+				diag $pm; last;
 			}
 			if (--$c < 0) {
 				last unless --$b >= 0;
 				$c = 9;
 			}
 		}
-		diag("no $refpm (run ./support/ref2pl-all.pl |sh) ")
+		diag("no $refpm (make ref)")
 			unless $c >= 0;
 	}
 	for (@C_ARGS) {

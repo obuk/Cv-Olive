@@ -1,12 +1,14 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
+use strict;
+# use Test::More qw(no_plan);
+use Test::More tests => 313;
 
 BEGIN {
 	use_ok('Cv');
 }
 
+# structure member
 if (1) {
 	my $arr = Cv::Image->new([240, 320], CV_8UC3);
 	isa_ok($arr, "Cv::Image");
@@ -32,6 +34,7 @@ if (1) {
 	is($arr->origin, 0);
 }
 
+# types
 if (2) {
 	my @types;
 	foreach my $depth (CV_8U, CV_8S, CV_16S, CV_16U, CV_32S, CV_32F, CV_64F) {
@@ -54,31 +57,46 @@ if (2) {
 }
 
 
+# inherit
 if (3) {
 	my $arr = Cv::Image->new([240, 320], CV_8UC3);
 	isa_ok($arr, "Cv::Image");
 	my $arr2 = $arr->new;
+	isa_ok($arr2, ref $arr);
+	my $arr3 = $arr->new(CV_8UC1);
+	isa_ok($arr3, ref $arr);
 }
 
-
+# Cv::Image::Ghost
 if (4) {
-	my $rows = 240;
-	my $cols = 320;
-	my $cn = 4;
-	if (0) {
-		my $step = $cols * $cn;
-		my $data = chr(0) x ($rows * $step);
-		my $mat = Cv::Image->new([ $rows, $cols ], eval("CV_8UC$cn"), $data);
-		is(substr($data, 0 + $_, 1), chr(0)) for 0 .. $cn - 1;
-		$mat->set([0, 0], [ map { 0x41 + $_ } 0 .. $cn - 1 ]);
-		is(substr($data, 0 + $_, 1), chr(0x41 + $_)) for 0 .. $cn - 1;
-		is($mat->get([0, 0])->[$_], 0x41 + $_) for 0 .. $cn - 1;
-	} else {
-		my $data = undef;
-		my $mat = Cv::Image->new([ $rows, $cols ], eval("CV_8UC$cn"), $data);
-	}
+	no warnings;
+	no strict 'refs';
+	my $destroy = 0;
+	my $destroy_ghost = 0;
+	local *{Cv::Image::DESTROY} = sub { $destroy++; };
+	local *{Cv::Image::Ghost::DESTROY} = sub { $destroy_ghost++; };
+	my $mat = Cv::Image->new([ 240, 320 ], CV_8UC1);
+	isa_ok($mat, 'Cv::Image');
+	bless $mat, join('::', ref $mat, 'Ghost');
+	$mat = undef;
+	is($destroy, 0);
+	is($destroy_ghost, 1);
 }
 
+# has data
+if (5) {
+	my ($cols, $rows) = (240, 320);
+	my $cn = 4;
+	my $data = Cv->alloc($cols * $rows * $cn);
+	my $img1 = Cv::Image->new([ $cols, $rows ], CV_8UC($cn), $data);
+	my $img2 = Cv::Image->new([ $cols, $rows ], CV_8UC($cn), undef);
+}
+
+# no depth
+if (6) {
+	eval { Cv::Image->new([240, 320], 7) };
+	like($@, qr/usage:/);
+}
 
 # ------------------------------------------------------------
 # CvRect cvGetImageROI(const IplImage* image)
@@ -86,7 +104,7 @@ if (4) {
 # void cvSetImageROI(IplImage* image, CvRect rect)
 # ------------------------------------------------------------
 
-if (1) {
+if (10) {
 	my $image = Cv::Image->new([240, 320], CV_8UC3);
 	ok($image);
 	ok($image->isa("Cv::Image"));
@@ -96,7 +114,7 @@ if (1) {
 	is($roi2->[$_], $roi->[$_]) for 0 .. 3;
 }
 
-if (1) {
+if (11) {
 	my $image = Cv::Image->new([240, 320], CV_8UC3);
 	isa_ok($image, 'Cv::Image');
 	$image->SetImageROI(my $roi = [10, 20, 30, 40]);
@@ -104,7 +122,7 @@ if (1) {
 	is($roi2->[$_], $roi->[$_]) for 0 .. 3;
 }
 
-if (1) {
+if (12) {
 	my $image = Cv::Image->new([240, 320], CV_8UC3);
 	isa_ok($image, 'Cv::Image');
 	$image->roi(my $roi = [10, 20, 30, 40]);
@@ -122,7 +140,7 @@ if (1) {
 # void cvSetImageCOI(IplImage* image, int coi)
 # ------------------------------------------------------------
 
-if (1) {
+if (21) {
 	my $arr = Cv::Image->new([3, 4], CV_8UC3);
 	isa_ok($arr, 'Cv::Image');
 	$arr->fill([1, 2, 3]);
@@ -146,3 +164,4 @@ if (1) {
 		}
 	}
 }
+

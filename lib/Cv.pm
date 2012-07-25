@@ -111,7 +111,7 @@ sub new {
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_? shift : $self->type;
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
-	Cv::croak "usage: Cv::Image->new(sizes, type)" unless defined $depth;
+	Cv::croak "usage: Cv::Image->new(sizes, type)" unless $depth;
 	my $image;
 	if (@_) {
 		$image = Cv::cvCreateImageHeader([reverse @$sizes], $depth, $channels);
@@ -273,7 +273,8 @@ sub assoc {
 
 
 sub alias {
-	shift if @_ && $_[0] eq __PACKAGE__;
+	return undef unless @_;
+	shift if $_[0] eq __PACKAGE__;
 	# my $package = shift;
 	my ($package, $filename, $line) = caller;
 	my $subr; $subr = pop if (ref $_[-1] eq 'CODE');

@@ -5,11 +5,14 @@ use strict;
 use Test::More tests => 3;
 BEGIN { use_ok('Cv') }
 
+{ package Cv; our %OpenCV_modules; }
+
 SKIP: {
 	skip('can\'t call GetBuildInformation', 2)
-		unless Cv->GetBuildInformation();
+		unless Cv->can('cvGetBuildInformation');
 	is(scalar Cv->hasModule('core'), 1);
 	is(scalar Cv->hasModule('Core'), 0);
+	diag("OpenCV modules: ", join(", ", keys %Cv::OpenCV_modules));
 }
 
 package Cv;
@@ -40,8 +43,8 @@ sub HasModule {
 		}
 		my $m = $x{q(OpenCV modules)};
 		$OpenCV_modules{$_}++ for split(/\s+/, $m->{'To be built'});
-		$OpenCV_modules{$_} = undef for split(/\s+/, $m->{Disabled});
-		$OpenCV_modules{$_} = undef for split(/\s+/, $m->{Unavailable});
+		delete $OpenCV_modules{$_} for split(/\s+/, $m->{Disabled});
+		delete $OpenCV_modules{$_} for split(/\s+/, $m->{Unavailable});
 	}
 	grep { $OpenCV_modules{$_} } @_ ? @_ : keys %OpenCV_modules;
 }

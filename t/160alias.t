@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More tests => 11;
 use Cv;
 
 {
@@ -28,7 +28,21 @@ if (2) {
 }
 
 if (3) {
-	{ package Cv; Cv->alias(qw(Foo)); }
+	{ package Cv; Cv::alias(qw(Foo)) }
 	eval { Cv->Foo() };
 	like($@, qr/TBD/);
+	eval { Cv->foo() };
+	like($@, qr/TBD/);
+}
+
+if (4) {
+	{ package Cv; Cv::alias(qw(Bar), sub { die "xxx" }) }
+	eval { Cv->Bar() };
+	like($@, qr/^xxx at/);
+	eval { Cv->bar() };
+	like($@, qr/^xxx at/);
+}
+
+if (4) {
+	is(&Cv::alias(), undef);
 }

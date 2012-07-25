@@ -2137,8 +2137,11 @@ CODE:
 #TBD# int cvStdErrReport(int status, const char* func_name, const char* err_msg, const char* file_name, int line, VOID* userdata)
 #TBD# int cvGuiBoxReport(int status, const char* func_name, const char* err_msg, const char* file_name, int line, VOID* userdata)
 
-#TBD# VOID* cvAlloc(size_t size)
-#TBD# void cvFree(VOID* &ptr)
+VOID*
+cvAlloc(size_t size)
+
+void
+cvFree(VOID* &ptr)
 
 #if _CV_VERSION() >= _VERSION(2,3,0)
 
