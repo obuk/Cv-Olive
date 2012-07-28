@@ -11,8 +11,8 @@ BEGIN {
 my $stor = Cv::MemStorage->new;
 
 if (1) {
-	my $destroy = 0;
 	no warnings;
+	my $destroy = 0;
 	local *{Cv::Seq::DESTROY} = sub { $destroy++; };
 	foreach my $cn (1 .. 4) {
 		my $type = CV_MAKETYPE(CV_32S, $cn);
@@ -28,7 +28,21 @@ if (1) {
 		is($n, $cn);
 	}
 	is($destroy, 4);
+
+	my $new = 0;
+	local *{Cv::Seq::new} = sub { $new++; };
+	Cv->CreateSeq();
+	is($new, 1);
+
+	my $Cv = bless [], 'Cv';
+	eval { $Cv->CreateSeq() };
+	like($@, qr/class name needed/);
+
+	my $Cv_Seq = bless [], 'Cv::Seq';
+	eval { $Cv_Seq->CreateSeq() };
+	like($@, qr/class name needed/);
 }
+
 
 if (2) {
 	my $cn = 3;
@@ -78,15 +92,3 @@ if (3) {
 	is($pt3[0], 111);
 	is($pt3[1], 222);
 }
-
-# eval { Cv::Seq::Circle->new; };
-# like($@, qr/TBD/);
-
-# eval { Cv::Seq::Rect->new; };
-# like($@, qr/TBD/);
-
-# eval { Cv::Seq::SURFPoint->new; };
-# like($@, qr/TBD/);
-
-# eval { Cv::Seq::Seq->new; };
-# like($@, qr/TBD/);
