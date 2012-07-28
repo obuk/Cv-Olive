@@ -49,14 +49,14 @@ sub d {
 
 &d(q(Cv::));
 
-my $wiki = 0;
+my $mediawiki = 1;
 
-if ($wiki) {
+if ($mediawiki) {
 	print (
-		"{| border=1 cellpadding=5 cellspacing=0 width=90% align=center\n",
-		"! module || grep ocv::cfunction *.rst\n",
-		"! defined/total\n",
-		"! width=50% | note\n",
+		"{|\n",
+		"! rst\n",
+		"! defined\n",
+		"! not defined\n",
 		);
 }
 my $sum_defined;
@@ -79,12 +79,12 @@ foreach my $file (sort keys %file) {
 	my $total = scalar @ok + scalar @tbd;
 
 	my $percent = sprintf("%5.1f%%", $defined / $total * 100);
-	if ($wiki) {
+	if ($mediawiki) {
 		print (
 			"|- valign=top\n",
 			"| $file\n",
-			"| align=right | <span style=\"white-space: nowrap;\">$defined/$total ($percent)</span>\n",
-			"| ", @tbd? 'tbd: <toggledisplay> ' . join(', ', @tbd) . ' </toggledisplay>' : '', "\n",
+			"| ", join(', ', sort @ok), "\n",
+			"| ", join(', ', sort @tbd), "\n",
 			);
 	} else {
 		my $tbd = scalar @tbd;
@@ -101,13 +101,13 @@ foreach my $file (sort keys %file) {
 	$sum_total += $total;
 }
 
-if ($wiki) {
+if ($mediawiki) {
 	my $percent = sprintf("%5.1f%%", $sum_defined / $sum_total * 100);
 	print (
 		"|- valign=top\n",
-		"| colspan=2 |\n",
-		"| align=right | <span style=\"white-space: nowrap;\">$sum_defined/$sum_total ($percent)</span>\n",
-		"|\n",
+		"| &nbsp;\n",
+		"| $sum_defined\n",
+		"| $sum_total\n",
 		"|}\n",
 		);
 } else {

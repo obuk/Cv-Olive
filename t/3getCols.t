@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 21;
+use Test::More tests => 22;
 
 BEGIN {
 	use_ok('Cv');
@@ -73,12 +73,12 @@ if (6) {
 }
 
 SKIP: {
-	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
+	skip("need v2.0.0+", 3) unless cvVersion() >= 2.000000;
 	Cv->setErrMode(1);
 	my $can_hook = Cv->getErrMode() == 1;
 	$can_hook = 0 if $^O eq 'cygwin';
 	Cv->setErrMode(0);
-	skip("can't hook cv:error", 2) unless $can_hook;
+	skip("can't hook cv:error", 3) unless $can_hook;
 
 	if (11) {
 		my $src = Cv::Mat->new([240, 320], CV_8UC3);
@@ -92,4 +92,10 @@ SKIP: {
 		ok($@);
 	}
 
+	if (13) {
+		my $src = Cv::Mat->new([240, 320], CV_8UC3);
+		local *Cv::Mat::new = sub { undef };
+		my $submat = eval { $src->GetCols(100, 200) };
+		like($@, qr/submat is not of type CvMat/);
+	}
 }

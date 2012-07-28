@@ -15,7 +15,6 @@ require "hackcv.pm";
 my @TBD = (
 	qw(cv3dTrackerCalibrateCameras),
 	qw(cv3dTrackerLocateObjects),
-	qw(cvAlloc),
 	qw(cvBackProjectPCA),
 	qw(cvCalcCovarMatrixEx),
 	qw(cvCalcDecompCoeff),
@@ -54,7 +53,6 @@ my @TBD = (
 	qw(cvFindGraphEdge),
 	qw(cvFindGraphEdgeByPtr),
 	qw(cvFindRuns),
-	qw(cvFree),
 	# qw(cvGetCol),
 	qw(cvGetGraphVtx),
 	qw(cvGetSetElem),

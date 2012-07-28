@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
-use Scalar::Util qw(blessed);
+use strict;
+# use Test::More qw(no_plan);
+use Test::More tests => 141;
 
 BEGIN {
 	use_ok('Cv');
@@ -56,10 +56,22 @@ if (1) {
 		}
 	}
 
+	Cv->Merge($b, $g, $r, \0, my $bgr4 = Cv::Image->new($b->sizes, CV_8UC3));
+	foreach my $row (0 .. $bgr4->rows - 1) {
+		foreach my $col (0 .. $bgr4->cols - 1) {
+			my $x = $bgr3->Get([$row, $col]);
+			is($x->[0], 1);
+			is($x->[1], 2);
+			is($x->[2], 3);
+		}
+	}
 }
 
-if (1) {
+if (2) {
 	eval { Cv->Merge; };
 	like($@, qr/usage:/);
+	my $cv = bless [], 'Cv';
+	eval { $cv->Merge; };
+	like($@, qr/class name needed/);
 }
 

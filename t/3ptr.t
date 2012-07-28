@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 33;
+# use Test::More qw(no_plan);
+use Test::More tests => 11;
 BEGIN { use_ok('Cv') }
 
 if (1) {
@@ -37,10 +37,10 @@ if (4) {
 	is(length($s), 2);
 }
 
-if (0) {
+if (5) {
 	my $mat = Cv::Mat->new([3, 1], CV_8UC1);
-	substr($mat->Ptr, 0) = "ABC";
-	is(${$mat->Get([0])}[0], ord("A"));
-	is(${$mat->Get([1])}[0], ord("B"));
-	is(${$mat->Get([2])}[0], ord("C"));
+	$mat->Set([$_ - ord('A')], cvScalar($_)) for ord('A') .. ord('C');
+	is($mat->Ptr, "ABC");
+	my $s = $mat->Ptr([1]);
+	is(length($s), 2);
 }
