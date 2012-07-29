@@ -9,7 +9,7 @@ while (<$dir/OpenCV-1.*>) {
     print (
 	"mkdir ./cv$$ ./cv$$/opencv\n",
 	"cp -r $_/*/include/ $_/otherlibs/*/ ./cv$$/opencv\n",
-	"./support/dumpconst.pl ./cv$$/ -v ",
+	"./tools/dumpconst.pl ./cv$$/ -v ",
 	">fallback/Constant.pm-$version\n",
 	"rm -rf ./cv$$\n",
 	);
@@ -19,6 +19,6 @@ while (<$dir/OpenCV-2.*>) {
     next unless /OpenCV-(\d+\.\d+\.\d+)$/;
     my $version = $1;
     my $flags = $flags{$version} || $flags_default;
-    print ("./support/dumpconst.pl $_/include/ $_/modules/*/include/ -v ",
+    print ("./tools/dumpconst.pl $_/include/ $_/modules/*/include/ -v ",
 	">fallback/Constant.pm-$version\n");
 }

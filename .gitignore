@@ -3,6 +3,7 @@ Cv.c
 Makefile
 blib/
 cover_db/
+evidences/
 lib/Cv/Constant.pm
 lib/Cv/Nihongo.pod
 lib/Cv/perl.h
@@ -14,4 +15,5 @@ _Inline/
 *.[oa]
 *.old
 *.tmp
+*.bak
 *~

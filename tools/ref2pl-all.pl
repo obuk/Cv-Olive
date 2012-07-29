@@ -18,5 +18,5 @@ while (<$dir/OpenCV-*>) {
     next unless /OpenCV-(\d+\.\d+\.\d+)$/;
     my $version = $1;
     my $flags = $flags{$version} || $flags_default;
-    print "./support/ref2pl.pl $flags -d=full $_/ >./t/ref-$version.pm\n";
+    print "./tools/ref2pl.pl $flags -d=full $_/ >./t/ref-$version.pm\n";
 }

@@ -67,8 +67,8 @@ sub getCvVersion {
 }
 
 sub getSvnRevision {
-    open(SVN, "svn status -v|") or die "can't run svn status";
-    my $rev = 0;
+    open(SVN, "svn status -v|");
+    my $rev = "unknown";
     while (<SVN>) {
 	next unless /^...\s+(\d+)/;
 	$rev = $1 if $1 > $rev;

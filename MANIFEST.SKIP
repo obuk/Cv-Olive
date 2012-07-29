@@ -2,7 +2,7 @@
 ^blib
 ^cover_db
 ^pm_to_blib
-^support
+\.skip/
 ^\.|/\.
 ^\#|/\#
 \.(a|o|bak|new|old|tmp)$

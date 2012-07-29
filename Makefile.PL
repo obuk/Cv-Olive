@@ -41,23 +41,28 @@ sub decr (\@) {
 	}
 }
 
-if (&dumpconst(qw(-v -o a.pm), @{$cf->{include}}) == 0) {
-	if (!-f "lib/Cv/Constant.pm" || &cmp(qw(-s a.pm lib/Cv/Constant.pm)) != 0) {
-		&mv(qw(lib/Cv/Constant.pm lib/Cv/Constant.pm.bak));
-		&mv(qw(a.pm lib/Cv/Constant.pm));
-	}
-} else {
-	my @v = map { $_ + 0 } ($cf->version =~ /(\d+)\.(\d{3})(\d{3})/);
-	for (; $v[0] >= 0; decr(@v)) {
-		if (-f (my $f = "./fallback/Constant.pm-".join('.', @v))) {
-			&cp($f, qw(lib/Cv/Constant.pm));
-			last;
+
+# make lib/Cv/Constant.pm
+{
+	my $dst = "lib/Cv/Constant.pm";
+	my $tmp = "a.pm";
+	unless (&dumpconst('-v', '-o', $tmp, @{$cf->{include}}) == 0) {
+		my @v = map { $_ + 0 } ($cf->version =~ /(\d+)\.(\d{3})(\d{3})/);
+		for (; $v[0] >= 0; decr(@v)) {
+			if (-f (my $f = "./fallback/Constant.pm-".join('.', @v))) {
+				$tmp = $f;
+				last;
+			}
 		}
+		die "$0: can't make $dst\n" unless $v[0] >= 0;
 	}
-	die "$0: can't make lib/Cv/Constant.pm\n" unless $v[0] >= 0;
+	if (!-f $dst || &cmp('-s', $tmp, $dst) != 0) {
+		&mv($dst, "$dst.bak") if -f $dst;
+		&cp($tmp, $dst);
+	}
+	&rm('-f', $tmp);
 }
 
-&rm(qw(-f a.pm));
 
 my $PREREQ_PM = {
 	Data::Dumper => 0,
@@ -98,6 +103,7 @@ WriteMakefile(
 			'_Inline', 'cover_db',
 			'camera.xml', 'contours.xml', 'sample.avi', '*.tmp',
 			'auto', @perl_h_patched,
+			't/ref-*.pm',
 			'lib/Cv/Constant.pm',
 			] },
 	);
@@ -107,10 +113,10 @@ sub MY::postamble {
 Cv.xs:	lib/Cv/typemap.h
 
 ref:
-	./support/ref2pl-all.pl |sh -x
+	./tools/ref2pl-all.pl |sh -x
 
 const:
-	./support/dumpconst-all.pl |sh -x
+	./tools/dumpconst-all.pl |sh -x
 
 cover:
 	cover -delete
@@ -128,7 +134,7 @@ sub AUTOLOAD {
 	our $AUTOLOAD;
 	(my $program = $AUTOLOAD) =~ s/.*:://;
 	my @program = grep { -x $_ } (
-		"./support/$program.pl",
+		"./tools/$program.pl",
 		"/usr/local/bin/$program",
 		"/usr/bin/$program",
 		"/bin/$program",
