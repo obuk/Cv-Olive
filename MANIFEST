@@ -16,6 +16,8 @@ lib/Cv/Constant.pm
 lib/Cv/Flipbook.pm
 lib/Cv/Nihongo.pod
 lib/Cv/Pango.pm
+lib/Cv/Seq/Circle.pm
+lib/Cv/Seq/Point2.pm
 lib/Cv/typemap
 lib/Cv/typemap.h
 Makefile.PL

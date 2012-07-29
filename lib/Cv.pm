@@ -246,6 +246,8 @@ sub assoc {
 	my $family = shift;
 	my $short = shift;
 	my @names;
+	my $verbose = 0;
+	# my $verbose = $short =~ /new/i;
 	if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
 		(my $caps = $short) =~ s/^[a-z]/\U$&/;
 		push(@names, $caps);
@@ -255,9 +257,11 @@ sub assoc {
 	} else {
 		push(@names, "cv$short");
 	}
+	push(@names, $short);
 	foreach (@names) {
 		no strict 'refs';
 		if (my $subr = $family->can($_)) {
+			print STDERR "assoc: found $_ in $family\n" if $verbose;
 			if ($family eq 'Cv' && $_ =~ /^cv[A-Zm]/) {
 				return sub {
 					# shift unless defined $_[0] && ref $_[0] && blessed $_[0];
@@ -267,6 +271,7 @@ sub assoc {
 			}
 			return $subr;
 		}
+		print STDERR "assoc: can't $_ in $family\n" if $verbose;
 	}
 	return undef;
 }
@@ -287,21 +292,24 @@ sub alias {
 			$subr = sub { Cv::croak "TBD: ${package}::$_[0]" };
 		}
 	}
+	my $verbose = 0;
 	for my $upper (@_) {
 		(my $lower = $upper) =~ s/^[A-Z]+/\L$&/;
 		for ($upper, $lower) {
 			no strict 'refs';
-			*{"${package}::$_"} = $subr unless $package->can($_);	
+			unless ($package->can($_)) {
+				print STDERR "Cv::alias *{${package}::$_}\n" if $verbose;
+				*{"${package}::$_"} = $subr;
+			}
 		}
 	}
+	$subr;
 }
 
 package Cv::Seq;              our @ISA = qw(Cv::Arr);
 package Cv::Seq::Point;       our @ISA = qw(Cv::Seq);
-package Cv::Seq::Circle;      our @ISA = qw(Cv::Seq::Point);
 package Cv::Seq::Rect;        our @ISA = qw(Cv::Seq::Point);
 package Cv::Seq::SURFPoint;   our @ISA = qw(Cv::Seq::Point);
-package Cv::Seq::Point2;      our @ISA = qw(Cv::Seq::Point);
 package Cv::Seq::Seq;         our @ISA = qw(Cv::Seq);
 package Cv::ContourScanner;   our @ISA = qw(Cv::Seq::Point);
 
@@ -385,19 +393,12 @@ sub ROI {
 	$roi;
 }
 
-{ *GetROI = \&GetImageROI }
-{ *SetROI = \&SetImageROI }
-{ *ResetROI = \&ResetImageROI }
-
 sub COI {
 	my $self = shift;
 	my $coi = cvGetImageCOI($self);
 	cvSetImageCOI($self, @_) if @_;
 	$coi;
 }
-
-{ *GetCOI = \&GetImageCOI }
-{ *SetCOI = \&SetImageCOI }
 
 
 =item *
@@ -1048,17 +1049,6 @@ sub Transpose {
 }
 
 
-{ *Clear = \&ClearND }
-
-package Cv::Image;
-{ *Clone = *CloneImage = \&cvCloneImage }
-package Cv::Mat;
-{ *Clone = *CloneMat = \&cvCloneMat }
-package Cv::MatND;
-{ *Clone = *CloneMatND = \&cvCloneMatND }
-package Cv::SparseMat;
-{ *Clone = *CloneSparseMat = \&cvCloneSparseMat }
-
 package Cv::Arr;
 Cv::alias qw(GetDims);
 
@@ -1066,11 +1056,6 @@ Cv::alias qw(GetDims);
 # package Cv::Mat; Cv::alias qw(InitMatHeader);
 # package Cv::MatND; Cv::alias qw(InitMatNDHeader);
 # package Cv::SparseMat; Cv::alias qw(InitSparseMatIterator);
-
-package Cv::RNG;
-{ *Arr = \&RandArr }
-{ *Int = \&RandInt }
-{ *Real = \&RandReal }
 
 =pod
 
@@ -1373,36 +1358,6 @@ sub UnpackMulti {
 }
 
 
-package Cv::Seq::Circle;
-
-sub Pack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	CORE::pack($t, @{$_[0]}, @_[1..$#_]);
-}
-
-
-sub Unpack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	no warnings 'uninitialized';
-	my ($x, $y, $r) = CORE::unpack($t, $_[0]);
-	my @elem = ([ $x, $y ], $r);
-	wantarray? @elem : \@elem;
-}
-
-
-sub UnpackMulti {
-	my $self = CORE::shift;
-	my ($t, $c) = $self->template;
-	no warnings 'uninitialized';
-	my @data = CORE::unpack("($t)*", $_[1]);
-	while (my ($x, $y, $r) = CORE::splice(@data, 0, $c)) {
-		CORE::push(@{$_[0]}, [[$x, $y], $r]);
-	}
-}
-
-
 package Cv::Seq::Rect;
 
 sub template {
@@ -1448,63 +1403,21 @@ sub UnpackMulti {
 	}
 }
 
-
-package Cv::Seq::Point2;
-
-sub template {
-	my $self = CORE::shift;
-	my ($t, $c) = ("i4", 4);
-	wantarray? ($t, $c) : $t;
-}
-
-
-sub Pack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	CORE::pack($t, @{$_[0]}, @{$_[1]},);
-}
-
-
-sub Unpack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	no warnings 'uninitialized';
-	my ($x1, $y1, $x2, $y2) = CORE::unpack($t, $_[0]);
-	my @elem = ([$x1, $y1], [$x2, $y2]);
-	wantarray? @elem : \@elem;
-}
-
-
-sub UnpackMulti {
-	my $self = CORE::shift;
-	my ($t, $c) = $self->template;
-	no warnings 'uninitialized';
-	my @data = CORE::unpack("($t)*", $_[1]);
-	while (my ($x1, $y1, $x2, $y2) = CORE::splice(@data, 0, $c)) {
-		CORE::push(@{$_[0]}, [[$x1, $y1], [$x2, $y2]]);
-	}
-}
-
-
 package Cv::MemStorage;
 { *new = \&Cv::CreateMemStorage }
-{ *AllocString = \&MemStorageAllocString }
 
 package Cv::Seq::Seq;
 { *Get = \&GetSeqElem }
 
 package Cv::Seq;
-{ *Clear = \&ClearSeq }
-{ *Clone = \&CloneSeq }
-
 { *cvCvtSeqToArray = \&Cv::Arr::cvCvtSeqToArray }
 { *cvGetSeqElem = \&Cv::Arr::cvGetSeqElem }
 { *cvSetSeqElem = \&Cv::Arr::cvSetSeqElem }
 { *cvSeqInvert = \&Cv::Arr::cvSeqInvert }
 
 { *ToArray = \&CvtSeqToArray }
-{ *Get = *GetSeqElem = \&GetSeqElem }
-{ *Set = *SetSeqElem = \&SetSeqElem }
+{ *Get = \&GetSeqElem }
+{ *Set = \&SetSeqElem }
 { *Invert = *Reverse = *SeqInvert = \&SeqInvert }
 
 package Cv::Arr;
@@ -1545,7 +1458,6 @@ for ([ qw(CV_TYPE_NAME_GRAPH Cv::Graph) ],
 }
 
 package Cv::FileStorage;
-
 { *new = \&Cv::OpenFileStorage }
 
 sub fsbless {
@@ -1666,7 +1578,6 @@ sub QueryHistValue {
 	my $self = shift;
 	$self->bins->GetReal(@_);
 }
-
 
 { *Calc = \&CalcHist }
 { *Clear = \&ClearHist }

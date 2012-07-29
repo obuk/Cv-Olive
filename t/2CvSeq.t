@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
+# use Test::More qw(no_plan);
+use Test::More tests => 75;
 
 BEGIN {
 	use_ok('Cv');

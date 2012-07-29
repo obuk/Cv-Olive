@@ -4,6 +4,7 @@ use Test::More qw(no_plan);
 
 BEGIN {
 	use_ok('Cv');
+	use_ok('Cv::Seq::Circle');
 }
 
 my $verbose = Cv->hasGUI;

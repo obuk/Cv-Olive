@@ -503,22 +503,27 @@ cvCeil(double value)
 MODULE = Cv	PACKAGE = Cv::Arr
 void
 cvClearND(CvArr* arr, int* idx)
+ALIAS: cvClear = 1
 
 MODULE = Cv	PACKAGE = Cv::Image
 IplImage*
 cvCloneImage(const IplImage* image)
+ALIAS: cvClone = 1
 
 MODULE = Cv	PACKAGE = Cv::Mat
 CvMat*
 cvCloneMat(const CvMat* mat)
+ALIAS: cvClone = 1
 
 MODULE = Cv	PACKAGE = Cv::MatND
 CvMatND*
 cvCloneMatND(const CvMatND* mat)
+ALIAS: cvClone = 1
 
 MODULE = Cv	PACKAGE = Cv::SparseMat
 CvSparseMat*
 cvCloneSparseMat(const CvSparseMat* mat)
+ALIAS: cvClone = 1
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
@@ -720,9 +725,11 @@ cvGetImage(const CvArr* arr, IplImage* imageHeader)
 
 int
 cvGetImageCOI(const IplImage* image)
+ALIAS: cvGetCOI = 1
 
 CvRect
 cvGetImageROI(IplImage* image)
+ALIAS: cvGetROI = 1
 
 CvMat*
 cvGetMat(const CvArr* arr, CvMat* header, int* coi=NULL, int allowND=0)
@@ -1030,15 +1037,18 @@ CODE:
 
 void
 cvRandArr(CvRNG* rng, CvArr* arr, int distType, CvScalar param1, CvScalar param2)
+ALIAS: cvArr = 1
 POSTCALL:
 	ST(0) = ST(1);
 	XSRETURN(1);
 
 unsigned
 cvRandInt(CvRNG* rng)
+ALIAS: cvInt = 1
 
 double
 cvRandReal(CvRNG* rng)
+ALIAS: cvReal = 1
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
@@ -1090,6 +1100,7 @@ POSTCALL:
 
 void
 cvResetImageROI(IplImage* image)
+ALIAS: cvResetROI = 1
 
 CvMat*
 cvReshape(const CvArr* arr, CvMat* header, int newCn, int newRows=0)
@@ -1113,9 +1124,11 @@ POSTCALL:
 
 void
 cvSetImageCOI(IplImage* image, int coi)
+ALIAS: cvSetCOI = 1
 
 void
 cvSetImageROI(IplImage* image, CvRect rect)
+ALIAS: cvSetROI = 1
 POSTCALL:
 	XSRETURN(1);
 
@@ -1432,16 +1445,19 @@ MODULE = Cv	PACKAGE = Cv
 MODULE = Cv	PACKAGE = Cv::MemStorage
 void
 cvClearMemStorage(CvMemStorage* storage)
+ALIAS: cvClear = 1
 
 MODULE = Cv	PACKAGE = Cv::Seq
 void
 cvClearSeq(CvSeq* seq)
+ALIAS: cvClear = 1
 
 #TBD# void cvClearSet(CvSet* setHeader)
 #TBD# CvGraph* cvCloneGraph(const CvGraph* graph, CvMemStorage* storage)
 
 CvSeq*
 cvCloneSeq(const CvSeq* seq, CvMemStorage* storage=NULL)
+ALIAS: cvClone = 1
 
 MODULE = Cv	PACKAGE = Cv::MemStorage
 CvMemStorage*
@@ -1557,6 +1573,7 @@ cvMemStorageAlloc(CvMemStorage* storage, size_t size)
 
 CvString
 cvMemStorageAllocString(CvMemStorage* storage, SV* ptr, int len=-1)
+ALIAS: cvAllocString = 1
 C_ARGS:
 	storage, SvPV_nolen(ptr), len >= 0? len : SvCUR(ptr)
 
@@ -4313,7 +4330,6 @@ OUTPUT:
 MODULE = Cv		PACKAGE = Cv
 # ====================
 
-#ifdef __cplusplus
 CvBGCodeBookModel*
 cvCreateBGCodeBookModel()
 
@@ -4344,8 +4360,9 @@ AV*
 modMin(CvBGCodeBookModel* model, AV* value = NO_INIT)
 INIT:
 	RETVAL = newAV();
+	int i;
 CODE:
-	for (int i = 0; i < DIM(model->modMin); i++) {
+	for (i = 0; i < DIM(model->modMin); i++) {
 		av_push(RETVAL, newSViv(model->modMin[i]));
 		if (items == 2 && i <= av_len(value))
 			model->modMin[i] = SvIV((SV*)(*av_fetch(value, i, 0)));
@@ -4357,8 +4374,9 @@ AV*
 modMax(CvBGCodeBookModel* model, AV* value = NO_INIT)
 INIT:
 	RETVAL = newAV();
+	int i;
 CODE:
-	for (int i = 0; i < DIM(model->modMax); i++) {
+	for (i = 0; i < DIM(model->modMax); i++) {
 		av_push(RETVAL, newSViv(model->modMax[i]));
 		if (items == 2 && i <= av_len(value))
 			model->modMax[i] = SvIV((SV*)(*av_fetch(value, i, 0)));
@@ -4370,8 +4388,9 @@ AV*
 cbBounds(CvBGCodeBookModel* model, AV* value = NO_INIT)
 INIT:
 	RETVAL = newAV();
+	int i;
 CODE:
-	for (int i = 0; i < DIM(model->cbBounds); i++) {
+	for (i = 0; i < DIM(model->cbBounds); i++) {
 		av_push(RETVAL, newSViv(model->cbBounds[i]));
 		if (items == 2 && i <= av_len(value))
 			model->cbBounds[i] = SvIV((SV*)(*av_fetch(value, i, 0)));
@@ -4385,8 +4404,6 @@ CODE:
 	RETVAL = model->t;
 OUTPUT:
 	RETVAL
-
-#endif
 
 #if _CV_VERSION() >= _VERSION(2,2,0)
 #ifdef __cplusplus
