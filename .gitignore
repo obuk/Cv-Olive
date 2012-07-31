@@ -10,6 +10,7 @@ lib/Cv/perl.h
 lib/Cv/pp.h
 lib/Cv/sv.h
 pm_to_blib
+t/flipbook
 t/ref*.pm
 _Inline/
 *.[oa]

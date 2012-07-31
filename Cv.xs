@@ -3505,6 +3505,27 @@ cvGetWindowName(VOID* windowHandle)
 
 #TBD# int cvInitSystem(int argc, char** argv)
 
+int
+cvInitSystem(AV* argv)
+CODE:
+#if !WITH_QT
+	XSRETURN_UNDEF;
+#endif
+	if (av_len(argv) >= 0) {
+		char **av = (char**)alloca(sizeof(char*) * (av_len(argv) + 2)); int ac;
+		if (av == NULL) XSRETURN_UNDEF;
+		for (ac = 0; ac <= av_len(argv); ac++) {
+			av[ac] = SvPV_nolen((SV*)(*av_fetch(argv, ac, 0)));
+		}
+		av[ac++] = 0;
+		RETVAL = cvInitSystem(ac, av);
+	} else {
+		RETVAL = cvInitSystem(0, NULL);
+	}
+OUTPUT:
+	RETVAL
+
+
 MODULE = Cv	PACKAGE = Cv
 void
 cvMoveWindow(const char* name, int x, int y)

@@ -49,7 +49,7 @@ package Cv;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our @EXPORT_MISC = grep { Cv->can($_) } ( qw( cvCbrt cvCeil
+our @EXPORT_MISC = grep { Cv->UNIVERSAL::can($_) } ( qw( cvCbrt cvCeil
 	cvFastArctan cvFloor cvMSERParams cvPoint cvPoint2D32f
 	cvPointTo32f cvPoint3D32f cvPoint2D64f cvPointTo64f cvPoint3D64f
 	cvRealScalar cvRect cvRound cvSURFParams cvScalar cvScalarAll
@@ -63,6 +63,55 @@ our %EXPORT_TAGS = (
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = ( );
+
+sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
+sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
+sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
+
+=xxx
+
+our %OpenCV_modules;
+
+sub HasModule {
+	ref (my $class = shift) and Cv::croak 'class name needed';
+	my @m = @_;
+	print STDERR "hasModule: ", join(', ', @m), "\n";
+	if (Cv->version() >= 2.004) {
+		unless (%OpenCV_modules) {
+			my %x = ();
+			for (Cv->getBuildInformation()) {
+				my $g = '';
+				for (split(/\n/)) {
+					s/^\s+//;
+					s/\s+$//;
+					if (s/([^\:]+):\s*//) {
+						my $k = $1;
+						if (/^$/) {
+							$g = $k;
+						} elsif ($g) {
+							$x{$g}{$k} = $_;
+						} else {
+							$x{$k} = $_;
+						}
+					} else {
+						$g = undef;
+					}
+				}
+			}
+			my $m = $x{q(OpenCV modules)};
+			$OpenCV_modules{lc $_}++ for split(/\s+/, $m->{'To be built'});
+			delete $OpenCV_modules{lc $_} for split(/\s+/, $m->{Disabled});
+			delete $OpenCV_modules{lc $_} for split(/\s+/, $m->{Unavailable});
+		}
+		print STDERR "hasModule:2: ", join(', ', @m), "\n";
+		print STDERR "$_\n" for keys %OpenCV_modules;
+		@m = grep { $OpenCV_modules{lc $_} } @m ? @m : keys %OpenCV_modules;
+	}
+	print STDERR "hasModule:3: ", join(', ', @m), "\n";
+	@m;
+}
+
+=cut
 
 sub import {
 	my $self = shift;
@@ -221,6 +270,9 @@ sub autoload {
 	if (my $code = assoc($package, $short)) {
 		*$$autoload = $code;
 		goto &$$autoload;
+	} elsif ($short =~ /^assoc$/) {
+		*$$autoload = \&Cv::assoc;
+		goto &$$autoload;
 	}
 	die "${package}::AUTOLOAD can't call $$autoload $at.\n";
 }
@@ -260,7 +312,7 @@ sub assoc {
 	push(@names, $short);
 	foreach (@names) {
 		no strict 'refs';
-		if (my $subr = $family->can($_)) {
+		if (my $subr = $family->UNIVERSAL::can($_)) {
 			print STDERR "assoc: found $_ in $family\n" if $verbose;
 			if ($family eq 'Cv' && $_ =~ /^cv[A-Zm]/) {
 				return sub {
@@ -283,7 +335,7 @@ sub alias {
 	# my $package = shift;
 	my ($package, $filename, $line) = caller;
 	my $subr; $subr = pop if (ref $_[-1] eq 'CODE');
-	$subr ||= $package->can($_[0]);
+	$subr ||= $package->UNIVERSAL::can($_[0]);
 	unless ($subr) {
 		if (my $code = assoc($package, $_[0])) {
 			$subr = $code;
@@ -297,7 +349,7 @@ sub alias {
 		(my $lower = $upper) =~ s/^[A-Z]+/\L$&/;
 		for ($upper, $lower) {
 			no strict 'refs';
-			unless ($package->can($_)) {
+			unless ($package->UNIVERSAL::can($_)) {
 				print STDERR "Cv::alias *{${package}::$_}\n" if $verbose;
 				*{"${package}::$_"} = $subr;
 			}
@@ -1154,7 +1206,7 @@ sub template {
 
 		}
 	}
-	return undef unless ref $self && $self->can('mat_type');
+	return undef unless ref $self && $self->UNIVERSAL::can('mat_type');
 	wantarray ? @{$TEMPLATE{$self->mat_type}} : $TEMPLATE{$self->mat_type}[0];
 }
 
@@ -1508,10 +1560,6 @@ sub Cv::String::DESTROY {}
 # ============================================================
 
 package Cv;
-
-sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
-sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
-sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
 Cv::alias qw(Version);
 
@@ -2119,8 +2167,70 @@ package Cv::VideoWriter;
 
 package Cv;
 
+sub GetBuildInformation {
+	ref (my $class = shift) and Cv::croak 'class name needed';
+	our $BuildInformation = '';
+	if (Cv->version >= 2.004) {
+		$BuildInformation ||= cvGetBuildInformation();
+	}
+	our %BuildInformation = ();
+	unless (%BuildInformation) {
+		for ($BuildInformation) {
+			my $g = '';
+			for (split(/\n/)) {
+				s/^\s+//;
+				s/\s+$//;
+				if (s/([^\:]+):\s*//) {
+					my $k = $1;
+					if (/^$/) {
+						$g = $k;
+					} elsif ($g) {
+						$BuildInformation{$g}{$k} = $_;
+					} else {
+						$BuildInformation{$k} = $_;
+					}
+				} else {
+					$g = undef;
+				}
+			}
+		}
+	}
+	wantarray? %BuildInformation : $BuildInformation;
+}
+
+sub HasModule {
+	ref (my $class = shift) and Cv::croak 'class name needed';
+	our %OpenCV_modules;
+	unless (%OpenCV_modules) {
+		my %x = Cv->GetBuildInformation();
+		if (my $m = $x{q(OpenCV modules)}) {
+			$OpenCV_modules{$_}++ for split(/\s+/, $m->{'To be built'});
+			delete $OpenCV_modules{$_} for split(/\s+/, $m->{Disabled});
+			delete $OpenCV_modules{$_} for split(/\s+/, $m->{Unavailable});
+		}
+	}
+	grep { $OpenCV_modules{$_} } @_ ? @_ : keys %OpenCV_modules;
+}
+
 sub cvHasQt {
-	__PACKAGE__->can('cvFontQt');
+	my $hasQt;
+	if (Cv->can('cvFontQt')) {
+		my %x = Cv->GetBuildInformation;
+		while (my ($k, $v) = each %{$x{GUI}}) {
+			$hasQt = $k if ($k =~ /^QT \d\.\w+$/i && $v =~ /^YES\.*/i)
+		}
+	}
+	$hasQt;
+}
+
+unless (Cv->hasQt) {
+	*Cv::cvSetWindowProperty =
+	*Cv::cvGetWindowProperty =
+	*Cv::cvFontQt =
+	*Cv::Arr::cvAddText =
+	*Cv::cvDisplayOverlay =
+	*Cv::cvDisplayStatusBar =
+	*Cv::cvCreateOpenGLCallback = sub { croak "no Qt" };
 }
 
 
