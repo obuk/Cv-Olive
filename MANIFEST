@@ -12,7 +12,6 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 lib/Cv.pm
 lib/Cv/Config.pm
-lib/Cv/Constant.pm
 lib/Cv/Flipbook.pm
 lib/Cv/Nihongo.pod
 lib/Cv/Pango.pm
