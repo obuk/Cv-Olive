@@ -68,51 +68,6 @@ sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
 sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
 sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
-=xxx
-
-our %OpenCV_modules;
-
-sub HasModule {
-	ref (my $class = shift) and Cv::croak 'class name needed';
-	my @m = @_;
-	print STDERR "hasModule: ", join(', ', @m), "\n";
-	if (Cv->version() >= 2.004) {
-		unless (%OpenCV_modules) {
-			my %x = ();
-			for (Cv->getBuildInformation()) {
-				my $g = '';
-				for (split(/\n/)) {
-					s/^\s+//;
-					s/\s+$//;
-					if (s/([^\:]+):\s*//) {
-						my $k = $1;
-						if (/^$/) {
-							$g = $k;
-						} elsif ($g) {
-							$x{$g}{$k} = $_;
-						} else {
-							$x{$k} = $_;
-						}
-					} else {
-						$g = undef;
-					}
-				}
-			}
-			my $m = $x{q(OpenCV modules)};
-			$OpenCV_modules{lc $_}++ for split(/\s+/, $m->{'To be built'});
-			delete $OpenCV_modules{lc $_} for split(/\s+/, $m->{Disabled});
-			delete $OpenCV_modules{lc $_} for split(/\s+/, $m->{Unavailable});
-		}
-		print STDERR "hasModule:2: ", join(', ', @m), "\n";
-		print STDERR "$_\n" for keys %OpenCV_modules;
-		@m = grep { $OpenCV_modules{lc $_} } @m ? @m : keys %OpenCV_modules;
-	}
-	print STDERR "hasModule:3: ", join(', ', @m), "\n";
-	@m;
-}
-
-=cut
-
 sub import {
 	my $self = shift;
 	push(@_, ":std") unless @_;
@@ -431,10 +386,10 @@ The members of structure are same as function.
 
 But we can't use as lvalue.
 
- my $roi = $img->roi;          # GetImageROI($img)
- $img->roi($roi);              # SetImageROI($img, $roi)
- my $coi = $img->coi;          # GetImageCOI($img)
- $img->coi($coi);              # SetImageCOI($img, $coi)
+ my $roi = $img->roi;              # GetImageROI($img)
+ $img->roi($roi);                  # SetImageROI($img, $roi)
+ my $coi = $img->coi;              # GetImageCOI($img)
+ $img->coi($coi);                  # SetImageCOI($img, $coi)
 
 =cut
 
@@ -455,21 +410,19 @@ sub COI {
 
 =item *
 
-要素をアクセスする関数 cvGet1D(), cvGet2D(), cvGet3D(), cvGetND() は
-Get() に統合しました。 同様に cvSet1D(), ... は Set() に統合しました。
-従って、1つの要素で配列を埋める cvSet() は Fill() という名前で呼びます。
+There are functions Get() and Set(). They access an elements.  You can
+call Get() as cvGetND(), and Set() as cvSetND().  So, you have to to
+call Fill() instead of calling the cvSetND().
 
-XXXXX
-
- my $x = $mat->Get($i, $j);    # cvGetND($mat, [$i, $j])
- my $x = $mat->Get(\@idx);     # cvGetND($mat, \@idx);
+ my $x = $mat->Get($i, $j);        # cvGetND($mat, [$i, $j])
+ my $x = $mat->Get(\@idx);         # cvGetND($mat, \@idx);
 
 When the number of indexes is less than the number of the dimensions,
 0 is complemented as indexes.  
 
- $mat->Set([$i, $j, ...], $x); # cvSetND($mat, [$i, $j, ...], $x)
- $mat->Set(\@idx, $x);         # cvSetND($mat, \@idx, $x)
- $mat->Fill($x);               # cvSet($mat, $x)
+ $mat->Set([$i, $j, ...], $x);     # cvSetND($mat, [$i, $j, ...], $x)
+ $mat->Set(\@idx, $x);             # cvSetND($mat, \@idx, $x)
+ $mat->Fill($x);                   # cvSet($mat, $x)
 
 =cut
 
@@ -541,15 +494,6 @@ the line.  Parameters are same as Get().
  my $str = $mat->Ptr($row, $col);  # cvPtrND($mat, [$row, $col]);
  my $str = $mat->Ptr($row);        # cvPtrND($mat, [$row]);
 
-If you want to output images in your CGI without saving to the files,
-you can use EncodeImage as following.
-
- use Cv;
- my $img = Cv::Image->new([240, 320], CV_8UC3);
- $img->zero->circle([ 100, 100 ], 100, CV_RGB(255, 100, 100));
- print "Content-type: image/jpg\n\n";
- print $img->encodeImage(".jpg")->ptr;
-
 =cut
 
 sub Ptr {
@@ -572,9 +516,6 @@ There are functions to split per channel and merge them.
  $rgb->Split($r, $g, $b);          # cvSplit($rgb, $r, $g, $b)
  my ($r, $g, $b) = $rgb->Split;    # cvSplit($rgb, $r, $g, $b)
  my $rgb = Cv->Merge($r, $g, $b);  # cvMerge([$r, $g, $b], $rgb);
-
-# Split の使い方には、もう少し戻り値を工夫することで使やすくするヒント
-# が隠れているような気がする。
 
 =cut
 
@@ -623,16 +564,12 @@ sub Merge {
 }
 
 
-=item *
-
-次の関数は、$submat が与えられないとき C<CreateなんとかHeader()> を呼び、
-ヘッダを作成します。
-
- my $submat = $src->GetCols($startCol, $endCol);
- my $submat = $src->GetRows($startRow, $endRow, $deltaRow);
- my $submat = $src->GetSubRect($rect);
-
-=cut
+# The following functions call the CreatelSomethingHeader() if $submat
+# is not given.
+#
+#  my $submat = $src->GetCols($startCol, $endCol);
+#  my $submat = $src->GetRows($startRow, $endRow, $deltaRow);
+#  my $submat = $src->GetSubRect($rect);
 
 { *GetCol = \&GetCols }
 sub GetCols {
@@ -683,21 +620,18 @@ sub GetSubRect {
 
 =item *
 
-cvAddS() and cvAdd() are integrated into Add().  Because we can
-identify them.
+cvAddS() and cvAdd() are integrated into Add().  The function which
+can be identified by the argument.
 
-OpenCV には cvなんとか() と cvなんとかS() のような対の関数がある。たと
-えば次の cvAdd() と cvAddS() がそうである。これらは引数の違いで区別でき
-るので、1つに統合した。
+ my $ar2 = Cv->CreateImage();      # ref Cv::Image
+ my $sc2 = cvScalar();             # ref ARRAY
+ my $d = $ar->Add($ar2);           # cvAdd($ar, $ar2)
+ my $d = $ar->Add($sc2);           # cvAddS($ar, $sc2)
 
- my $ar2 = Cv->CreateImage();
- my $sc2 = cvScalar();
- my $d = $ar->Add($ar2);  # cvAdd($ar, $ar2)
- my $d = $ar->Add($sc2);  # cvAddS($ar, $sc2)
+The integrated function as follows.
 
-統合した関数は次のとおり。
-
- AbsDiff()、Add()、And()、Cmp()、InRange()、Max()、Min()、Or()、Sub()、Xor()
+ AbsDiff(), Add(), And(), Cmp(), InRange(), Max(), Min(), Or(), Sub(),
+ Xor()
 
 =cut
 
@@ -1102,6 +1036,10 @@ sub Transpose {
 
 
 package Cv::Arr;
+
+# The GetDims needs alias before calling.  The function called via
+# AUTOLOAD will not know the context of the caller.
+
 Cv::alias qw(GetDims);
 
 # package Cv::Image; Cv::alias qw(InitImageHeader);
@@ -1121,12 +1059,18 @@ Cv::alias qw(GetDims);
 
 =head3 Use Perl Array
 
-OpenCV のシーケンスは、点、矩形、円など様々なデータを格納し、Perl の配
-列と類似性が見られる。そこで格納されるデータ型を意識せずに扱うスーパク
-ラス Cv::Seq と、特定のデータ型を扱う派生クラス Cv::Seq::Point、
-Cv::Seq::Rect という構成にした。そして、格納されるデータに合わせたパッ
-ケージで bless して使う。次の例は、facedetect の一部である。取り出され
-るシーケンスは、Perl で扱いやすい形に変換されている。
+The Sequence of OpenCV stores the various data, e.g. points,
+rectangles, and circles.  And it has also similarity with the sequence
+of Perl.  However, its handling is a little difficult.  So we made a
+superclass Cv::Seq that handles all data without regard to the type of
+data to be stored in the sequence.  And we made derived class to
+handle specific data types,​e.g. Cv::Seq::Point, Cv::Seq::Rect.  Then,
+we bless with derived classes to fit the data to be stored.  It is
+similar to the cast in the language C.
+
+There is a part of the facedetect as follows.  We can use only a
+string data if we don't know the data type of the sequence.  But we
+can convert using pack/unpack indirectly if we know that.
 
   my $faces = bless $image->HaarDetectObjects(
 	$cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
@@ -1135,12 +1079,11 @@ Cv::Seq::Rect という構成にした。そして、格納されるデータに
     ...
   }
 
-OpenCV のシーケンスは Perl の配列に似ているので、シーケンスを操作するた
-めに、Push(), Pop(), Shift(), Unshift(), Splice() を用意した。
-
-点のシーケンス Cv::Seq::Point はよく使うので、new も用意した。次の例は、
-Perl の点の配列をシーケンスに直して MinEnclosingCircle() を呼ぶ。
-$center に [ 150, 150 ] が求まる。
+We made the functions​Push(), Pop(), Shift(), Unshift(), and and
+Splice() to mimic the functions to manipulate sequences that operate
+on an array of Perl.  Cv::Seq::Point handles the sequence of points,
+and that is often used, so we also made new.  The following example
+calculates $center and $radius from the Perl data.
 
  my @points = ([ 100, 100 ], [ 100, 200 ], [ 200, 100 ]);
  Cv::Seq::Point->new(&Cv::CV_32SC2)->push(@points)
@@ -1266,19 +1209,15 @@ sub CreateSeq {
 }
 
 
-=head3 Use Parl Array (2)
+=pod
 
- ToArray()
-
-ToArray() は、シーケンスやマトリクスを Perl の配列に変換する。たとえば、
-いくつかの円がシーケンス $circles に格納されているとき、すべて描画する
-なら次のとおり。
+ToArray() convert from the sequence to the Perl array.  The following
+code draws all circles stored in the sequence $circles.
 
  $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
 	for $circles->toArray;
 
-toArray() で @{} をオーバロードした。それで少し簡単に、次のとおり書くこ
-とができる。
+ToArray() overrides @{}, so you can write it more easily.
 
  $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
 	for @$circles;
@@ -2290,117 +2229,34 @@ package Cv::BGCodeBookModel;
 1;
 __END__
 
-=head3 XXXXX
-
-異なるパッケージに別名を置いたもの
-
-いくつかの関数は、第1番目の引数から連想できるパッケージでなく、異なるパッ
-ケージに置いた。たとえば、Cv に別名があるものは次のコマンドで分る。
-
- $ perl -lne '/ALIAS:\s*Cv::\w+\s*=/ && print ' Cv.xs
-
-引数の並びを変更したものは、次のとおり。これをどのように説明するか。
-
-  n: AbsDiffS(src, dst, value)
-  o: AbsDiffS(src, value, dst)
-  n: CalcBackProject(hist, images, backProject)
-  o: CalcBackProject(images, backProject, hist)
-  n: CalcBackProjectPatch(hist, images, dst, patchSize, method, factor)
-  o: CalcBackProjectPatch(images, dst, patchSize, hist, method, factor)
-  n: CalcCovarMatrix(vects, covMat, avg, flags)
-  o: CalcCovarMatrix(vects, count, covMat, avg, flags)
-  n: CalcHist(hist, image, accumulate, mask)
-  o: CalcHist(image, hist, accumulate, mask)
-  n: CalcOpticalFlowPyrLK(prev, curr, prevPyr, currPyr, prevFeatures, currFeatures, winSize, level, status, track_error, criteria, flags)
-  o: CalcOpticalFlowPyrLK(prev, curr, prevPyr, currPyr, prevFeatures, currFeatures, count, winSize, level, status, track_error, criteria, flags)
-  n: CreateHist(sizes, type, ranges, uniform)
-  o: CreateHist(dims, sizes, type, ranges, uniform)
-  n: CreateMatND(sizes, type)
-  o: CreateMatND(dims, sizes, type)
-  n: CreateMatNDHeader(sizes, type)
-  o: CreateMatNDHeader(dims, sizes, type)
-  n: CreateSparseMat(sizes, type)
-  o: CreateSparseMat(dims, sizes, type)
-  n: DrawChessboardCorners(image, patternSize, corners, patternWasFound)
-  o: DrawChessboardCorners(image, patternSize, corners, count, patternWasFound)
-  n: EncodeImage(arr, ext, params)
-  o: EncodeImage(ext, arr, params)
-  n: FillConvexPoly(img, pts, color, lineType, shift)
-  o: FillConvexPoly(img, pts, npts, color, lineType, shift)
-  n: FillPoly(img, pts, color, lineType, shift)
-  o: FillPoly(img, pts, npts, contours, color, lineType, shift)
-  n: FindChessboardCorners(image, patternSize, corners, flags)
-  o: FindChessboardCorners(image, patternSize, corners, cornerCount, flags)
-  n: FindCornerSubPix(image, corners, win, zeroZone, criteria)
-  o: FindCornerSubPix(image, corners, count, win, zeroZone, criteria)
-  n: FindStereoCorrespondenceBM(state, left, right, disparity)
-  o: FindStereoCorrespondenceBM(left, right, disparity, state)
-  n: FindStereoCorrespondenceGC(state, left, right, dispLeft, dispRight, useDisparityGuess)
-  o: FindStereoCorrespondenceGC(left, right, dispLeft, dispRight, state, useDisparityGuess)
-  n: GetTextSize(font, textString, textSize, baseline)
-  o: GetTextSize(textString, font, textSize, baseline)
-  n: InitFont(fontFace, hscale, vscale, shear, thickness, lineType)
-  o: InitFont(font, fontFace, hscale, vscale, shear, thickness, lineType)
-  n: MakeSeqHeaderForArray(seqType, headerSize, elemSize, elements, seq, block)
-  o: MakeSeqHeaderForArray(seqType, headerSize, elemSize, elements, total, seq, block)
-  n: Merge(srcs, dst)
-  o: Merge(src0, src1, src2, src3, dst)
-  n: MixChannels(src, dst, fromTo)
-  o: MixChannels(src, srcCount,dst, dstCount, fromTo, pairCount)
-  n: PolyLine(img, pts, isClosed, color, thickness, lineType, shift)
-  o: PolyLine(img, pts, npts, contours, isClosed, color, thickness, lineType, shift)
-  n: SaveImage(image, filename, params)
-  o: SaveImage(filename, image, params)
-  n: ShowImage(image, name, flags)
-  o: ShowImage(name, image)
-  n: SliceLength(seq, slice)
-  o: SliceLength(slice, seq)
-
 =head2 EXPORT
 
-Cv の利用でインポートされる定数や関数は、use Cv の後に指定する。(Cv-0.14)
+You put names after use Cv, constants, functions ... to be
+imported. (Cv-0.14)
 
 =over 4
 
 =item *
 
-次の 2行は、C<CV> や C<IPL> ではじまる定数や cvScalar() のような関数
-(マクロ) をインポートする。
+For example, the following two lines to import functions such as
+cvScalar() and the constants starting with C<IPL> and C<CV>.
 
  use Cv qw(:std);
- use Cv;			# 何も指定しないと :std が指定されたものとみなす
+ use Cv;			# considering :std
 
 =item *
 
-次の 2行は、Cv のすべての定数や関数をインポートする。
+For example, the following two lines to import all variables and
+functions of Cv.
 
  use Cv qw(:all);
  use Cv qw(/^(CV|IPL|cv)/);
 
 =item *
 
-何もインポートしたくないときには、空のリストを置く。
+If you do not want to import anything, put an empty list.
 
  use Cv qw( );
-
-=item *
-
-いままで上記 C<:std> 相当の定数や関数が無条件にインポートされていたが、
-インポートされるものを指定すると、それ以外はインポートされなくなるので
-注意する。
-
-=item *
-
-ゆうくんと話をしているとき、cvLoadImage() や cvDestroyWindow() のように
-ネームスペース Cv:: にある名前はエクスポートされる。しかし、cvAdd() や
-cvAnd() のように、Cv::Arr:: のような Cv:: 以外のネームスペースにあるも
-のはエクスポートされないと気がついた。
-
-アルゴリズムの開発に Perl を使い、それがうまくできたら C言語で書き直し
-たいと思ったら、次のように書きたいかもしれないが、それはできない。どう
-すればいいか。
-
-	cvAdd($src1, $src2, $dst);
 
 =back
 
@@ -2422,24 +2278,10 @@ your CGI without saving to the files.
  print "Content-type: image/jpg\n\n";
  print $img->encodeImage(".jpg")->ptr;
 
-これは上に書いた。
-
 You can use that to convert for Imager.
 
  use Imager;
  my $imager = Imager->new(data => $img->encodeImage(".ppm")->ptr);
-
-=item *
-
-You can attach the C<Cv> header to the data defined in the Perl world.
-It is not a good manner, but you can get the way to access to that.
-
- my $data = pack("C*", 0 .. 255);
- my $mat = Cv::Mat->new([16, 16], CV_8UC1, $data);
- substr($data, 0x41, 1) = 'x';
- print chr($mat->get([4, 1])->[0]), "\n";
-
-この例は、ちょっとあぶないから、止めようかな。
 
 =item *
 
@@ -2483,12 +2325,9 @@ Threshold() is as follows:
 
 =item *
 
-定数は、OpenCV のヘッダファイルを h2ph で変換し、結果が定数らしく見える
-ものを fallback/Constant.pm-* にまとめ、インストールされている OpenCV
-のバージョンに近いものを使うようにしている。もし定数に不足がある場合は、
-次のコマンドで新しい Constant.pm を作ることもできる。
-
- $ ./support/dumpconst -i /usr/local/include >lib/Cv/Constant.pm
+Constants used in the Perl world is converted into lib/Cv/Constant.pm
+from the header file using h2ph.  If it failed, the version of the
+installed OpenCV is checked, and copied from the fallback/.
 
 =cut
 
@@ -2505,27 +2344,25 @@ On cygwin, it is necessary to compile OpenCV.
 
 =item *
 
-以下は、昔の Cv で利用できた別名の類だが、もとの C<CV_> の方が短いので
-廃止した。(Cv-0.13)
+The following names that are the kind of alias are obsolete.  Use the
+original names C<CV_SOMETHING> because they are shorter.  (Cv-0.13)
 
  Cv::MAKETYPE, Cv::MAT_DEPTH, Cv::MAT_CN, Cv::MAT_TYPE, Cv::ELEM_SIZE,
  Cv::NODE_TYPE, Cv::IS_SET_ELEM, Cv::SIZEOF
 
 =item *
 
-CV_SIZEOF は、次のとおりサイズを求める OpenCV の構造体名の名前を書くこ
-とにした。(Cv-0.13)
+Usage of the CV_SIZEOF has changed.  Write the name of structure of
+OpenCV that you want to know the size as follows. (Cv-0.13)
 
  CV_SIZEOF('CvContour')
-
-代表的な構造体しか扱えないので、もし他に使いたい構造体の名前があったら
-知らせてください。(これは、別のところに)
 
 =back
 
 =head1 SEE ALSO
 
-http://sourceforge.net/projects/opencvlibrary/
+http://github.com/obuk/Cv-Olive
+
 
 =head1 AUTHOR
 
