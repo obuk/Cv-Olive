@@ -115,6 +115,7 @@ SKIP: {
 
 	if (13) {
 		my $src = Cv::Mat->new([240, 320], CV_8UC3);
+		no warnings 'redefine';
 		local *Cv::Mat::new = sub { undef };
 		my $submat = eval { $src->GetRows(100, 200) };
 		like($@, qr/submat is not of type CvMat/);

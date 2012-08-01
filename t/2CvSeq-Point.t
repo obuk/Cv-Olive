@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 114;
+use Test::More tests => 122;
 
 BEGIN {
 	use_ok('Cv');
@@ -84,11 +84,11 @@ if (2) {
 	ok(equal($arr3[$_], $pts3[$_])) for 0 .. $#pts3;
 
 	my $arr3 = $seq->toArray($slice3);
-	ok(equal($arr3->[$_], $pts3[$_])) for 0 .. $#pts2;
+	ok(equal($arr3->[$_], $pts3[$_])) for 0 .. $#pts3;
 
 	# overload
-	my @arr3 = @$seq;
-	ok(equal($arr3->[$_], $pts3[$_])) for 0 .. $#pts2;
+	@arr = @$seq;
+	ok(equal($arr[$_], $pts[$_])) for 0 .. $#pts;
 }
 
 
