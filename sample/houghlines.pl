@@ -46,10 +46,9 @@ if ($HOUGH_STANDARD) {
 			);
     }
 } else {
-	my $lines = $dst->HoughLines2(
+	my $lines = bless $dst->HoughLines2(
 		$storage, CV_HOUGH_PROBABILISTIC, 1, &CV_PI / 180, 50, 50, 10,
-		);
-	bless $lines, 'Cv::Seq::Point2';
+		), 'Cv::Seq::Point2';
 	$color_dst->Line($_->[0], $_->[1], CV_RGB(255, 0, 0), 3, CV_AA, 0)
 		for @$lines;
 }

@@ -10,19 +10,7 @@ use Cv;
 
 our $VERSION = '0.14';
 
-require Exporter;
-
 our @ISA = qw(Exporter Cv::Seq::Point);
-
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
 
 sub AUTOLOAD { &Cv::autoload };
 
