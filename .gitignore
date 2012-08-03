@@ -5,7 +5,6 @@ blib/
 cover_db/
 evidences/
 lib/Cv/Constant.pm
-lib/Cv/Nihongo.pod
 lib/Cv/perl.h
 lib/Cv/pp.h
 lib/Cv/sv.h

@@ -1057,10 +1057,10 @@ Cv::alias qw(GetDims);
 #  core. The Core Functionality: Dynamic Structures
 # ============================================================
 
-=head3 Use Perl Array
+=head2 Use Perl Array
 
 The Sequence of OpenCV stores the various data, e.g. points,
-rectangles, and circles.  And it has also similarity with the sequence
+rectangles, and circles.  And it has also similarity with the array
 of Perl.  However, its handling is a little difficult.  So we made a
 superclass Cv::Seq that handles all data without regard to the type of
 data to be stored in the sequence.  And we made derived class to
@@ -1502,9 +1502,7 @@ package Cv;
 
 Cv::alias qw(Version);
 
-=head3 Error Handling
-
- RedirectError()
+=head2 Error Handling
 
 C<Cv> is now possible to detect errors that occur in the block
 protected as eval { ... }. (Cv-0.13)

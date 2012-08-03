@@ -1,0 +1,320 @@
+=encoding utf8
+
+=head1 名前
+
+Cv - 何かコンピュータビジョンでやってみるとき、あなたの助けになるように
+
+=head1 概要
+
+ use Cv;
+ 
+ my $image = Cv->LoadImage("/path/to/image");
+ $image->ShowImage("image");
+ Cv->WaitKey;
+ 
+ my $capture = Cv->CaptureFromCAM(0);
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
+
+=head1 説明
+
+C<Cv> は OpenCV コンピュータビジョンライブラリの Perl インタフェースで
+す。コンピュータビジョンは少し難しいので、Perl のスローガンに則り「簡単
+なことは簡単に、難しいこともそれなりに」を心掛けて作っています。
+
+C<Cv> の特徴は次のとおり。
+
+=over 4
+
+=item *
+
+OpenCV の C言語のリファレンスに合わせて作成しました。個々の関数の説明は
+http://opencv.willowgarage.com/ を参照してください。
+
+=item *
+
+コンストラクタとして C<Createなんとか()> を使うことができます。
+
+ my $img = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
+ my $mat = Cv->CreateMat(240, 320, CV_8UC4);
+
+=item *
+
+コンストラクタとして C<new> も使えます。C<Cv::Image-E<gt>new> は
+C<Cv-E<gt>CreateImage()>、C<Cv::Mat-E<gt>new> は
+C<Cv-E<gt>CreateMat()> です。呼び出し形式は、CreateImage() と
+CreateMat() で少し違いがありますが。しかし、C<Cv::Something-E<gt>new>
+では違いはありません。これは、C<Cv::Arr> の中で、元のオブジェクトのこと
+を知らなくても同じオブジェクトを作れるようにしています。
+
+ my $img = Cv::Image->new([ 240, 320 ], CV_8UC3);
+ my $mat = Cv::Mat->new([ 240, 320 ], CV_8UC4);
+
+引数は省略でき、元のオブジェクトを引き継ぎます。
+
+ my $sameone = $img->new;
+ my $gray = $color->new(CV_8UC1);
+
+=item *
+
+OpenCV の C言語のプログラムでは、画像のオブジェクトを解放するとき、
+C<cvReleaseImage()> を呼ばなければなりません。しかし、C<Cv> ではその必
+要はありません、Perl がオブジェクトを解放するとき C<DESTROY> を呼ぶから
+です。そのため C<DESTROY> は、しばしば C<cvReleaseなんとか()> の別名と
+して定義しています。
+
+いくつか C<cvQueryFrame()> のように開放できないポインタを返すものがあり
+ます。このときは、C<Cv::なんとか::Ghost> で bless して区別し、その解放
+を抑止しています。
+
+=item *
+
+メソッドの名前は、OpenCV の関数名の頭の C<cv> を省いた名前と、名前のは
+じめの大文字を小文字に直したものが使えます。次の 2つの例はどちらも
+C<cvCreateMat()> を呼び出します。
+
+ my $mat = Cv->CreateMat(240, 320, CV_8UC3);
+ my $mat = Cv->createMat(240, 320, CV_8UC3);
+
+=item *
+
+出力先の画像やマトリクス (C<dst> として表わされることが多い) が省略されたとき、
+それが補える場合には補うようにしています。
+
+ my $dst = $src->Add($src2);
+ my $dst = $src->Add($src2, $mask);  # can't omit dst
+
+この場合には、次のように $dst を作ります。
+
+ my $dst = $src->Add($src2, $src->new, $mask); 
+
+=item *
+
+OpenCV は、インプレース処理が可能な関数では出力先の画像やマトリクス
+C<dst> に C<NULL> を指定し、入力画像を出力先としても使います。
+C<Cv> ではこの C<NULL> を表わすために C<\0> を使います。
+
+ my $dst = $src->Flip(\0);
+
+=item *
+
+構造体のメンバと同じ名前の関数を用意しました。
+
+ my ($c, $d) = ($img->channels, $img->depth);
+ my ($h, $w) = ($img->height, $img->width);
+ my ($r, $c) = ($img->rows, $img->cols);
+ my @sz = $img->sizes;
+
+=item *
+
+C<cvAdd()> と C<cvAddS()> のような類似した関数は C<Add()>
+にまとめました。関数は引数で区別できます。
+
+ my $ar2 = Cv->CreateImage();      # ref Cv::Image
+ my $sc2 = cvScalar();             # ref ARRAY
+ my $d = $ar->Add($ar2);           # cvAdd($ar, $ar2)
+ my $d = $ar->Add($sc2);           # cvAddS($ar, $sc2)
+
+統合した関数は次のとおり。
+
+ AbsDiff(), Add(), And(), Cmp(), InRange(), Max(), Min(), Or(), Sub(),
+ Xor()
+
+=back
+
+=head2 Use Perl Array
+
+OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。Perl
+の配列に似ていますが、その取り扱いは少し難しいのです。そこで、格納され
+たデータ型を意識せずに扱うスーパクラス Cv::Seq と、データ型に合わせて
+pack/unpack で変換する派生クラス Cv::Seq::Point, Cv::Seq::Rect を作り、
+データ型に合わせて bless して使うことにしました。C言語のキャストと同様
+の使い方です。以下、facedetect の一部を示します。取り出されるシーケンス
+は、Perl で扱いやすい形になります。
+
+  my $faces = bless $image->HaarDetectObjects(
+	$cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+	cvSize(30, 30)), "Cv::Seq::Rect";
+  while (my @rect = $faces->shift) {
+    ...
+  }
+
+OpenCV のシーケンスは Perl の配列に似ているので、シーケンスを操作するた
+めに、Push(), Pop(), Shift(), Unshift(), Splice() を用意した。点のシー
+ケンス Cv::Seq::Point はよく使うので、new も用意しました。次の例は、
+Perl の点の配列をシーケンスに直して MinEnclosingCircle() を呼びます。
+$center と $radius が求まります。
+
+ my @points = ([ 100, 100 ], [ 100, 200 ], [ 200, 100 ]);
+ Cv::Seq::Point->new(&Cv::CV_32SC2)->push(@points)
+	->minEnclosingCircle(my $center, my $radius);
+
+ToArray() は、シーケンスを Perl の配列に変換します。次のコードは、
+シーケンス $circles に格納されたすべての円を描きます。
+
+ $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
+	for $circles->toArray;
+
+ToArray() でオーバライドされた @{} を使うと、もう少し簡単に書けます。
+
+ $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
+	for @$circles;
+
+=head2 Error Handling
+
+eval { ... } で保護したブロックの中のエラーを検出できるようになりました。
+(Cv-0.13)
+
+ my $img = eval { Cv->createImage([-1, -1], 8, 3) };
+ if ($@) {
+    print STDERR "*** got error ***";
+ }
+
+ただし、C<Cv> をインストールするとき、c++ でコンパイルしておく必要があります。
+エラーを掴まえるだけでなく、自前で用意したエラー処理に向けることもできます。
+
+ Cv->redirectError(
+   sub { my ($status, $funcName, $errMsg, $fileName, $line, $data) = @_;
+       ...
+   },
+   my $data = ...;
+ );
+
+=head2 エクスポート
+
+=over 4
+
+=item *
+
+Cv によってインポートされる名前は、use Cv の後に指定できます。(Cv-0.14)
+
+次の 2行は、C<CV> や C<IPL> ではじまる定数やマクロと cvScalarAll()
+のようないくつかの関数をインポートします。
+
+ use Cv qw(:std);
+ use Cv;			# 何も指定しないとき :std が補われる
+
+次の 2行は、Cv のすべての名前をインポートします。
+
+ use Cv qw(:all);
+ use Cv qw(/^(CV|IPL|cv)/);
+
+何もインポートしないときは、空のリストを続けます。
+
+ use Cv qw( );
+
+=back
+
+=head1 ヒント
+
+Cv を使っている方から、ちょっといい使い方を教えて戴きました。
+
+=over 4
+
+=item *
+
+Cv で作成した画像を CGI で直接出力するとき、
+EncodeImage() と Ptr() を使うことができます。
+画像をファイルに保存する必要がありません。
+
+ use Cv;
+ my $img = Cv::Image->new([240, 320], CV_8UC3);
+ $img->zero->circle([ 100, 100 ], 100, CV_RGB(255, 100, 100));
+ print "Content-type: image/jpg\n\n";
+ print $img->encodeImage(".jpg")->ptr;
+
+これは Imager 向けの変換にも使えます。
+
+ use Imager;
+ my $imager = Imager->new(data => $img->encodeImage(".ppm")->ptr);
+
+=item *
+
+Perl のデータに Cv のヘッダを付けることができます。
+行儀が良いとは言えませんが、
+Cv で Perl のデータを直接操作できるようになります。
+
+ my $data = pack("C*", 0 .. 255);
+ my $mat = Cv::Mat->mew([16, 16], CV_8UC1, $data);
+ substr($data, 0x41, 1) = 'x';
+ print chr($mat->get([4, 1])->[0]), "\n";
+
+=item *
+
+C<Inline C> を使うためのコンフィギュレーションを用意しました。
+これは、いろいろな実験や拡張を容易にしてくれます。
+使い方は次のとおり簡単です。
+
+ use Cv::Config;
+ use Inline C => Config => %Cv::Config::C;
+
+=back
+
+=head1 サンプル
+
+OpenCV に付属しているサンプルを、いくつか C<Cv> で書き直しました。
+C<sample/> にあります。
+
+=over 4
+
+=item
+
+ bgfg_codebook.pl calibration.pl camshiftdemo.pl capture.pl chamfer.pl
+ contours.pl convexhull.pl delaunay.pl demhist.pl dft.pl distrans.pl
+ drawing.pl edge.pl facedetect.pl fback_c.pl ffilldemo.pl find_obj.pl
+ fitellipse.pl houghlines.pl image.pl imager.pl inpaint.pl kalman.pl
+ kmeans.pl laplace.pl lkdemo.pl minarea.pl morphology.pl motempl.pl
+ mser_sample.pl polar_transforms.pl pyramid_segmentation.pl squares.pl
+ stereo_calib.pl stereo_match.pl tiehash.pl video-thread.pl
+ watershed.pl
+
+=back
+
+=head1 バグ
+
+=over 4
+
+=item *
+
+新しい定数が使いたくなったら C<Cv::Constant> に書かなければなりません。
+
+=item *
+
+バージョン 0.07 で名前付きの引数を諦めました。
+名前付きの引数を処理するためのオーバヘッドが大きかったからです。
+この版では C<Cv::TieHash> と C<Cv::TieArr> も削除しました。
+C<Cv::TieHash> は C<sample/tiehash.pl> を参照してください。
+
+
+=item *
+
+バージョン 0.14 で別名を整理しました。
+CV_MAKETYPE() のようなマクロのいくつかには Cv::MAKETYPE()
+のような別名もありましたが、もとの名前の方が短いので、
+別名を止めることにしました。
+
+=item *
+
+EncodeImage() は、2.4 では c のインタフェースが動かない。
+c++ のコードを xs に展開したものでは動作する。(TBD)
+
+
+=back
+
+=head1 参考
+
+http://sourceforge.net/projects/opencvlibrary/
+
+=head1 著作権
+
+Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+
+Copyright (c) 2010, 2011, 2012 by Yuta MASUDA.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
