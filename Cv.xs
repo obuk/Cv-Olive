@@ -4458,17 +4458,19 @@ MODULE = Cv	PACKAGE = Cv
 # ====================
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
-#ifdef __cplusplus
 
 const char*
 cvGetBuildInformation()
 CODE:
+#ifdef __cplusplus
 	string s = cv::getBuildInformation();
 	RETVAL = s.c_str();
+#else
+	XSRETURN_UNDEF;
+#endif
 OUTPUT:
 	RETVAL
 
-#endif
 #endif
 
 double
