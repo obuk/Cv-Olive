@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-# use Test::More qw(no_plan);
-use Test::More tests => 227;
+use Test::More qw(no_plan);
+# use Test::More tests => 227;
 
 BEGIN {
 	use_ok('Cv');
@@ -87,4 +87,35 @@ if (5) {
 	$mat->set([0, 0], [ map { 0x41 + $_ } 0 .. $cn - 1 ]);
 	is(substr($data, 0 + $_, 1), chr(0x41 + $_)) for 0 .. $cn - 1;
 	is($mat->get([0, 0])->[$_], 0x41 + $_) for 0 .. $cn - 1;
+}
+
+# has data
+if (5) {
+	my $rows = 8;
+	my $cols = 8;
+	my $cn = 4;
+	my $step = $cols * $cn;
+	my $data = chr(0) x ($rows * $step);
+	my $mat = Cv::Mat->new([ $rows, $cols ], CV_8UC($cn), $data);
+	is(substr($data, 0 + $_, 1), chr(0)) for 0 .. $cn - 1;
+	$mat->set([0, 0], [ map { 0x41 + $_ } 0 .. $cn - 1 ]);
+	is(substr($data, 0 + $_, 1), chr(0x41 + $_)) for 0 .. $cn - 1;
+	is($mat->get([0, 0])->[$_], 0x41 + $_) for 0 .. $cn - 1;
+}
+
+# has data #2
+if (6) {
+	my $sizes = [8, 8];
+	my $type = CV_8UC(4);
+	my $step = $sizes->[1] * CV_MAT_CN($type);
+	my @data = map { int rand 256 } 1 .. $sizes->[0] * $step;
+	my $mat = Cv::Mat->new($sizes, $type, join('', map { chr $_ } @data));
+	for my $i (0 .. $mat->rows - 1) {
+		for my $j (0 .. $mat->cols - 1) {
+			for my $k (0 .. CV_MAT_CN($mat->type) - 1) {
+				is($mat->get([$i, $j])->[$k],
+				   $data[($i * $mat->cols + $j) * CV_MAT_CN($mat->type) + $k]);
+			}
+		}
+	}
 }

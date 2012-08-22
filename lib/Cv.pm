@@ -121,7 +121,7 @@ sub new {
 	my $image;
 	if (@_) {
 		$image = Cv::cvCreateImageHeader([reverse @$sizes], $depth, $channels);
-		$image->setData($_[0], $channels * $sizes->[1]) if $_[0];
+		$image->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
 	} else {
 		$image = Cv::cvCreateImage([reverse @$sizes], $depth, $channels);
 	}
@@ -138,7 +138,7 @@ sub new {
 	my $type = @_? shift : $self->type;
 	if (@_) {
 		my $mat = Cv::cvCreateMatHeader(@$sizes, $type);
-		$mat->setData($_[0], &Cv::CV_MAT_CN($type) * $sizes->[1]) if $_[0];
+		$mat->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
 		$mat;
 	} else {
 		Cv::cvCreateMat(@$sizes, $type);
@@ -1938,15 +1938,28 @@ sub MinEnclosingCircle {
 	wantarray? ($center, $radius) : [$center, $radius];
 }
 
+sub ContourArea {
+	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	my $stor = Cv::Seq::stor(@_);
+	my $points = Cv::Seq::Point->new(&Cv::CV_32SC2 | CV_SEQ_POLYLINE, $stor);
+	$points->Push(@_ > 1 ? @_ : @{$_[0]});
+	$points->ContourArea;
+}
+
 
 package Cv::Arr;
 
 { *ToArray = \&CvtMatToArray }
 sub CvtMatToArray {
 	my $mat = shift;
-	my $seq = &cvPointSeqFromMat($mat, $mat->type, my $header, my $block);
-	my $arr = Cv::Seq::Point::CvtSeqToArray($seq);
-	wantarray? @$arr : $arr;
+	if (Cv::CV_MAT_CN($mat->type) == 1) {
+		my @arr = unpack("f*", $mat->ptr);
+		wantarray? @arr : \@arr;
+	} else {
+		my $seq = &cvPointSeqFromMat($mat, $mat->type, my $header, my $block);
+		my $arr = Cv::Seq::Point::CvtSeqToArray($seq);
+		wantarray? @$arr : $arr;
+	}
 }
 
 
