@@ -28,6 +28,7 @@ sample/aloeL.jpg
 sample/aloeR.jpg
 sample/baboon.jpg
 sample/bgfg_codebook.pl
+sample/binarize.pl
 sample/box.png
 sample/box_in_scene.png
 sample/calibration.pl
@@ -167,6 +168,7 @@ t/3setZero.t
 t/3split.t
 t/3sum.t
 t/4encode.t
+t/4initSystem.t
 t/4loadImage.t
 t/4mouse.t
 t/4saveImage.t
@@ -174,6 +176,7 @@ t/4trackbar.t
 t/5boxPoints.t
 t/5contour.t
 t/5fitEllipse.t
+t/5fitLine.t
 t/5font.t
 t/5histogram.t
 t/5houghCircle.t
