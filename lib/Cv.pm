@@ -38,7 +38,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Cv::Constant qw(:all);
 
@@ -1249,7 +1249,7 @@ ToArray() overrides @{}, so you can write it more easily.
 	}
 
 	sub overload_nomethod {
-		Cv::carp "$0: can't overload ", ref $_[0], "::", $_[3]
+		Cv::croak "$0: can't overload ", ref $_[0], "::", $_[3]
 	}
 
 }
@@ -1629,6 +1629,22 @@ sub MorphologyEx {
 	# MorphologyEx(src, dst, temp, element, operation, [iterations])
 	my $src = shift;
 	my $dst = dst(@_) || $src->new;
+	if (@_) {
+		my $temp = dst(@_);
+		if (@_) {
+			my $element = shift;
+			if (@_) {
+				my $operation = shift;
+				if ($operation == &Cv::CV_MOP_TOPHAT ||
+					$operation == &Cv::CV_MOP_BLACKHAT) {
+					$temp ||= $src->new;
+				}
+				unshift(@_, $operation);
+			}
+			unshift(@_, $element);
+		}
+		unshift(@_, $temp);
+	}
 	unshift(@_, $src, $dst);
 	goto &cvMorphologyEx;
 }
@@ -1910,6 +1926,26 @@ sub Threshold {
 # ============================================================
 
 package Cv;
+
+sub FitLine {
+	# cvFitLine(points, dist_type, param, reps, aeps, line)
+	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	my $points = shift;
+	unless (ref $points eq 'ARRAY' && ref $points->[0] eq 'ARRAY' &&
+			((scalar @{$points->[0]} == 2) || (scalar @{$points->[0]} == 3))) {
+		Cv::croak "usage: Cv->FitLine(points, ..., line)";
+	}
+	my $line = pop;
+	my $dist_type = shift || Cv::CV_DIST_L2;
+	my $param = shift || 0;
+	my $reps = shift || 0.01;
+	my $aeps = shift || 0.01;
+	my $len = scalar @$points;
+	my $mat = Cv->CreateMat($len, 1, &Cv::CV_32FC(scalar @{$points->[0]}));
+	$mat->Set([$_], $points->[$_]) for 0 .. $len - 1;
+	unshift(@_, $mat, $dist_type, $param, $reps, $aeps, $line);
+	goto &Cv::Arr::cvFitLine;
+}
 
 { *FitEllipse = \&FitEllipse2 }
 sub FitEllipse2 {
