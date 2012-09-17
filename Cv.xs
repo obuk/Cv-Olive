@@ -2679,7 +2679,19 @@ cvFitEllipse2(const CvArr* points)
 ALIAS: cvFitEllipse = 1
 
 void
-cvFitLine(const CvArr* points, int dist_type, double param, double reps, double aeps, float* line)
+cvFitLine(const CvArr* points, int dist_type, double param, double reps, double aeps, line)
+INPUT:
+	float* line = NO_INIT
+INIT:
+	int type = cvGetElemType(points);
+	int cn = CV_MAT_CN(type);
+	int length(line) = cn * 2;
+	line = (float*)alloca(sizeof(float)*6);
+	if (SvTYPE(ST(5)) == SVt_NULL) {
+		sv_setsv(ST(5), newRV((SV*)newAV()));
+	}
+OUTPUT:
+	line
 
 MODULE = Cv	PACKAGE = Cv::Moments
 double
