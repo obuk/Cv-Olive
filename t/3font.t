@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
+# use Test::More qw(no_plan);
+use Test::More tests => 3;
 
 BEGIN {
 	use_ok('Cv');
@@ -22,14 +22,6 @@ if (1) {
 	}
 }
 
-if (Cv->hasQt) {
-	my $font = Cv->fontQt("Alias", 20);
-	isa_ok($font, 'Cv::Font');
-	my $img = Cv->CreateImage([320, 240], 8, 3);
-	$img->fill(cvScalarAll(255));
-	$img->addText("Hello, Qt", [ 50, 50 ], $font);
-	if ($verbose) {
-		$img->show("Font");
-		Cv->waitKey(1000);
-	}
+if (2) {
+	ok(!Cv->hasQt);
 }

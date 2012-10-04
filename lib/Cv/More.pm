@@ -6,6 +6,19 @@ use 5.008008;
 use strict;
 use warnings;
 
+use lib qw(blib/lib blib/arch);
+use Cv qw( );
+
+package Cv::Seq::Point;     our @ISA = qw(Cv::Seq);
+package Cv::Seq::Rect;      our @ISA = qw(Cv::Seq::Point);
+package Cv::Seq::SURFPoint; our @ISA = qw(Cv::Seq::Point);
+package Cv::ContourScanner; our @ISA = qw(Cv::Seq::Point);
+
+for (qw(cv::Seq::Point Cv::Seq::Rect Cv::Seq::SURFPoint Cv::ContourScanner)) {
+	no warnings 'redefine';
+	eval "{ package $_; sub AUTOLOAD { &Cv::autoload } }";
+}
+
 # ============================================================
 #  core. The Core Functionality: Dynamic Structures
 # ============================================================
@@ -44,57 +57,6 @@ calculates $center and $radius from the Perl data.
 
 =cut
 
-=xxx
-
-package Cv;
-
-sub is_cvmem { blessed $_[0] && $_[0]->isa('Cv::MemStorage') }
-
-package Cv::Seq;
-
-our $STORAGE;
-
-sub STORAGE {
-	$STORAGE ||= Cv::MemStorage->new();
-}
-
-sub stor (\@) {
-	my $storage;
-	for (my $i = 0; $i < @{$_[0]}; $i++) {
-		($storage) = splice(@{$_[0]}, $i, 1), last
-			if Cv::is_cvmem(${$_[0]}[$i]);
-	}
-	$storage ||= &STORAGE;
-}
-
-sub Cv::CreateSeq {
-	ref (my $class = shift) and Cv::croak 'class name needed';
-	Cv::Seq->new(@_)
-}
-
-{ *new = \&CreateSeq }
-sub CreateSeq {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $stor = stor(@_);
-	my $seqFlags = CORE::shift;
-	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
-	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
-	my $elemSize = CORE::shift || &Cv::CV_ELEM_SIZE($seqFlags);
-	bless Cv::cvCreateSeq($seqFlags, $headerSize, $elemSize, $stor), $class;
-}
-
-
-sub MakeSeqHeaderForArray {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $seqFlags = CORE::shift;
-	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
-	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
-	my $elemSize = CORE::shift || &Cv::CV_ELEM_SIZE($seqFlags);
-	bless Cv::cvMakeSeqHeaderForArray($seqFlags, $headerSize, $elemSize, @_), $class;
-}
-
-=cut
-
 package Cv::Seq;
 
 our %TEMPLATE;
@@ -118,55 +80,6 @@ sub template {
 }
 
 
-=xxx
-
-sub Pop {
-	my $self = CORE::shift;
-	$self->cvSeqPop;
-}
-
-
-sub Push {
-	my $self = CORE::shift;
-	$self->cvSeqPush($_) for @_;
-	$self;
-}
-
-
-sub Shift {
-	my $self = CORE::shift;
-	$self->cvSeqPopFront;
-}
-
-
-sub Unshift {
-	my $self = CORE::shift;
-	$self->cvSeqPushFront($_) for @_;
-	$self;
-}
-
-
-sub Splice {
-	# splice($array, $offset, $length, @list)
-	# splice($array, $offset, $length)
-	# splice($array, $offset)
-	my $array = CORE::shift;
-	my $offset = CORE::shift;
-	my $length = @_? CORE::shift : $array->total - $offset;
-	my @le = ();
-	foreach (0 .. $offset - 1) {
-		CORE::push(@le, scalar $array->Shift);
-	}
-	my @ce = ();
-	foreach (0 .. $length - 1) {
-		CORE::push(@ce, scalar $array->Shift);
-	}
-	$array->Unshift(@le, @_);
-	wantarray? @ce : \@ce;
-}
-
-=cut
-
 package Cv::Seq::Point;
 
 { *new = \&CreateSeq }
@@ -174,7 +87,6 @@ sub CreateSeq {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
 	$class->SUPER::new(@_);
 }
-
 
 =pod
 
@@ -190,34 +102,6 @@ ToArray() overrides @{}, so you can write it more easily.
 	for @$circles;
 
 =cut
-
-{
-	package Cv::Arr;
-
-	use overload
-		'@{}' => sub { $_[0]->ToArray },
-		bool => sub { $_[0] },
-		'<=>' => \&overload_cmp,
-		cmp => \&overload_cmp,
-		fallback => undef,
-		nomethod => \&overload_nomethod;
-
-	sub overload_cmp {
-		my ($l, $r) = @_;
-		my ($lc, $rc) = (ref $l, ref $r);
-		bless $l, 'overload::dummy';
-		bless $r, 'overload::dummy';
-		my $cmp = $l cmp $r;
-		bless $l, $lc;
-		bless $r, $rc;
-		$cmp;
-	}
-
-	sub overload_nomethod {
-		Cv::croak "$0: can't overload ", ref $_[0], "::", $_[3]
-	}
-
-}
 
 { *ToArray = \&CvtSeqToArray }
 sub CvtSeqToArray {
@@ -361,27 +245,6 @@ sub UnpackMulti {
 	}
 }
 
-# package Cv::MemStorage;
-# { *new = \&Cv::CreateMemStorage }
-
-package Cv::Seq::Seq;
-{ *Get = \&GetSeqElem }
-
-package Cv::Seq;
-# { *cvCvtSeqToArray = \&Cv::Arr::cvCvtSeqToArray }
-# { *cvGetSeqElem = \&Cv::Arr::cvGetSeqElem }
-# { *cvSetSeqElem = \&Cv::Arr::cvSetSeqElem }
-# { *cvSeqInvert = \&Cv::Arr::cvSeqInvert }
-
-# { *ToArray = \&CvtSeqToArray }
-# { *Get = \&GetSeqElem }
-# { *Set = \&SetSeqElem }
-# { *Invert = *Reverse = *SeqInvert = \&SeqInvert }
-
-# package Cv::Arr;
-# { *Get = \&GetND }
-# { *Set = \&SetND }
-
 
 package Cv;
 
@@ -452,18 +315,29 @@ sub ContourArea {
 
 package Cv::Arr;
 
-{ *ToArray = \&CvtMatToArray }
-sub CvtMatToArray {
-	my $mat = shift;
-	if (Cv::CV_MAT_CN($mat->type) == 1) {
-		my @arr = unpack("f*", $mat->ptr);
-		wantarray? @arr : \@arr;
-	} else {
-		my $seq = &cvPointSeqFromMat($mat, $mat->type, my $header, my $block);
-		my $arr = Cv::Seq::Point::CvtSeqToArray($seq);
-		wantarray? @$arr : $arr;
-	}
+use overload
+	'@{}' => sub { $_[0]->ToArray },
+	bool => sub { $_[0] },
+	'<=>' => \&overload_cmp,
+	cmp => \&overload_cmp,
+	fallback => undef,
+	nomethod => \&overload_nomethod;
+
+sub overload_cmp {
+	my ($l, $r) = @_;
+	my ($lc, $rc) = (ref $l, ref $r);
+	bless $l, 'overload::dummy';
+	bless $r, 'overload::dummy';
+	my $cmp = $l cmp $r;
+	bless $l, $lc;
+	bless $r, $rc;
+	$cmp;
 }
+
+sub overload_nomethod {
+	Cv::croak "$0: can't overload ", ref $_[0], "::", $_[3]
+}
+
 
 # ============================================================
 #  highgui. High-level GUI and Media I/O: Qt new functions

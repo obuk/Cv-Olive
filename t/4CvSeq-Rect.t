@@ -2,10 +2,11 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 21;
+use Test::More tests => 22;
 
 BEGIN {
 	use_ok('Cv');
+	use_ok('Cv::More');
 }
 
 my $stor = Cv::MemStorage->new;

@@ -2683,7 +2683,8 @@ cvFitLine(const CvArr* points, int dist_type, double param, double reps, double 
 INPUT:
 	float* line = NO_INIT
 INIT:
-	int type = cvGetElemType(points);
+	int type = CV_IS_SEQ(points)? CV_MAT_TYPE(((CvSeq*)points)->flags) :
+		cvGetElemType(points);
 	int cn = CV_MAT_CN(type);
 	int length(line) = cn * 2;
 	line = (float*)alloca(sizeof(float)*6);

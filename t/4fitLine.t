@@ -2,11 +2,12 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
+use Test::More tests => 12;
 # use List::Util qw(sum min max);
 
 BEGIN {
 	use_ok('Cv 0.15');
+	use_ok('Cv::More');
 }
 
 if (1) {
@@ -39,7 +40,7 @@ if (3) {
 }
 
 if (4) {
-	Cv->FitLine([[1, 2, 1], [2, 3, 1.5], [3, 4, 2]], CV_DIST_L2, my $line = []);
+	Cv->FitLine([[1, 2, 1], [2, 3, 1.5], [3, 4, 2]], CV_DIST_L2, my $line);
 	my ($vx, $vy, $vz, $x0, $y0, $z0) = @$line;
 	cmp_ok(abs(1.0 - ($vy / $vx)), '<', 1e-6);
 	cmp_ok(abs(0.5 - ($vz / $vx)), '<', 1e-6);

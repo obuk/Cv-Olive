@@ -4,6 +4,7 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use Cv::More;
 use Cv::Seq::Point2;
 use File::Basename;
 use List::Util qw(min);

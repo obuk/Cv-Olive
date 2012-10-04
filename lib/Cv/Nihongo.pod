@@ -143,14 +143,18 @@ pack/unpack で変換する派生クラス Cv::Seq::Point, Cv::Seq::Rect を作�
   }
 
 OpenCV のシーケンスは Perl の配列に似ているので、シーケンスを操作するた
-めに、Push(), Pop(), Shift(), Unshift(), Splice() を用意した。点のシー
-ケンス Cv::Seq::Point はよく使うので、new も用意しました。次の例は、
+めに、Push(), Pop(), Shift(), Unshift(), Splice() も用意しました。
+点のシーケンス Cv::Seq::Point はよく使うので、new もあります。次の例は、
 Perl の点の配列をシーケンスに直して MinEnclosingCircle() を呼びます。
 $center と $radius が求まります。
 
  my @points = ([ 100, 100 ], [ 100, 200 ], [ 200, 100 ]);
  Cv::Seq::Point->new(&Cv::CV_32SC2)->push(@points)
 	->minEnclosingCircle(my $center, my $radius);
+
+同様に FitLine() でも Perl の配列を使うことができます。(Cv-0.15)
+
+ Cv->FitLine(\@points, my $line);
 
 ToArray() は、シーケンスを Perl の配列に変換します。次のコードは、
 シーケンス $circles に格納されたすべての円を描きます。

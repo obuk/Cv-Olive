@@ -7,6 +7,7 @@ use Scalar::Util qw(blessed);
 
 BEGIN {
 	use_ok('Cv');
+	use_ok('Cv::More');
 }
 
 sub xy {

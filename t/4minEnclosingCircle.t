@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
+# use Test::More qw(no_plan);
+use Test::More tests => 6;
 use Scalar::Util qw(blessed);
 
 BEGIN {
 	use_ok('Cv');
+	use_ok('Cv::More');
 }
 
 sub xy {

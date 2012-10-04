@@ -6,6 +6,7 @@ use Test::More tests => 22;
 
 BEGIN {
 	use_ok('Cv');
+	# use_ok('Cv::More');
 }
 
 my $verbose = Cv->hasGUI;
@@ -65,15 +66,16 @@ if (4) {
 	$fs->write($type_name, $obj);
 }
 
-if (5) {
+if (1) {
+	# use Cv::More;
 	my $type_name = 'opencv-sequence-tree';
-	my $obj = Cv::Seq::Point->new(CV_32SC2);
+	my $obj = Cv::Seq->new(CV_32SC2);
 	my $info = Cv->TypeOf($obj);
 	is(ref $info, 'Cv::TypeInfo');
 	is($info->type_name, $type_name);
 	is(ref Cv->findType($type_name), 'Cv::TypeInfo');
 	is(Cv->findType($type_name)->type_name, $type_name);
-	$obj->Push(map { [ $_ * 10 + 1, $_ * 10 + 2 ] } 1 .. 10);
+	$obj->Push(pack("i2", $_ * 10 + 1, $_ * 10 + 2)) for 1 .. 10;
 	$fs->write($type_name, $obj);
 }
 

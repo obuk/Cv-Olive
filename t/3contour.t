@@ -37,9 +37,15 @@ sub draw {
 		if (my $inner = $contour->v_next) {
 			$count += &draw($cimg, $inner);
 		}
-		bless $contour, 'Cv::Seq::Point';
+		# bless $contour, 'Cv::Seq::Point';
 		my $color = [ map { 128 + int rand 128 } 1..3 ];
-		$cimg->polyLine([scalar $contour->toArray], -1, $color, 3, CV_AA);
+		$contour->CvtSeqToArray(my $points);
+		my @tmp = unpack("i*", $points);
+		my @points;
+		while (@tmp) {
+			push(@points, [splice(@tmp, 0, 2)]);
+		}
+		$cimg->polyLine([\@points], -1, $color, 3, CV_AA);
 		$count++;
 	}
 	$count;

@@ -3,7 +3,6 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use Scalar::Util qw(blessed);
 
 my $capture;
 my $videoSource;

@@ -51,7 +51,7 @@ $img->findContours(
 
 {
     Cv->Save("contours.xml", $contours, \0, \0, [recursive => 1]);
-    $contours = bless Cv->Load("contours.xml", $storage), 'Cv::Seq';
+	$contours = Cv->Load("contours.xml", $storage);
 }
 
 # comment this out if you do not want approximation

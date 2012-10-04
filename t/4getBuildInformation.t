@@ -2,8 +2,11 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 3;
-BEGIN { use_ok('Cv') }
+use Test::More tests => 4;
+BEGIN {
+	use_ok('Cv');
+	use_ok('Cv::More');
+}
 
 SKIP: {
 	skip('version 2.4.0+', 2)
