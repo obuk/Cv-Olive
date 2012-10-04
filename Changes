@@ -1,5 +1,8 @@
 Revision history for Cv.pm
 
+0.16 - 2012-10-04
+     * separating experimental code
+
 0.15 - 2012-10-01
      * fixed cvFitLine()
      * fixed stor(), and dst()

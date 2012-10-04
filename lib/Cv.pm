@@ -38,7 +38,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Cv::Constant qw(:all);
 
