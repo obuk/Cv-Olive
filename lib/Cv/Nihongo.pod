@@ -3,6 +3,7 @@
 =head1 名前
 
 Cv - 何かコンピュータビジョンでやってみるとき、あなたの助けになるように
+(只今、書き直し中)
 
 =head1 概要
 
@@ -22,53 +23,110 @@ Cv - 何かコンピュータビジョンでやってみるとき、あなたの
 =head1 説明
 
 C<Cv> は OpenCV コンピュータビジョンライブラリの Perl インタフェースで
-す。コンピュータビジョンは少し難しいので、Perl のスローガンに則り「簡単
-なことは簡単に、難しいこともそれなりに」を心掛けて作っています。
+す。できるだけ OpenCV の C言語のリファレンスに合わせたので、基本的には
+http://opencv.willowgarage.com/ の説明を参照してください。とは言え、異
+なる部分もあるので、少しずつ文書にまとめています。
 
-C<Cv> の特徴は次のとおり。
+中途半端で申し訳ありません。
 
-=over 4
+コンピュータビジョンは少し難しいので、Perl のスローガンに則り「簡単なこ
+とは簡単に、難しいこともそれなりに」を心掛けています。
 
-=item *
+=head2 オブジェクト
 
-OpenCV の C言語のリファレンスに合わせて作成しました。個々の関数の説明は
-http://opencv.willowgarage.com/ を参照してください。
+=head3 オブジェクトの作成と解放
 
-=item *
-
-コンストラクタとして C<Createなんとか()> を使うことができます。
+OpenCV の画像やマトリクスのオブジェクトは、C<Createなんとか()> を使って
+作成します。
 
  my $img = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
  my $mat = Cv->CreateMat(240, 320, CV_8UC4);
 
-=item *
+オブジェクトを作るために C<new> も使えます。CreateImage() と
+CreateMat() は、上の例のとおり呼び出し形式が違いますが。C<new> はどれも
+同じです。
 
-コンストラクタとして C<new> も使えます。C<Cv::Image-E<gt>new> は
-C<Cv-E<gt>CreateImage()>、C<Cv::Mat-E<gt>new> は
-C<Cv-E<gt>CreateMat()> です。呼び出し形式は、CreateImage() と
-CreateMat() で少し違いがありますが。しかし、C<Cv::Something-E<gt>new>
-では違いはありません。これは、C<Cv::Arr> の中で、元のオブジェクトのこと
-を知らなくても同じオブジェクトを作れるようにしています。
+ my $arr = Cv::Image->new($size, $type);
+ my $arr = Cv::Mat->new($size, $type);
+ my $arr = Cv::MatND->new($size, $type);
+ my $arr = Cv::SparseMat->new($size, $type);
 
- my $img = Cv::Image->new([ 240, 320 ], CV_8UC3);
- my $mat = Cv::Mat->new([ 240, 320 ], CV_8UC4);
-
-引数は省略でき、元のオブジェクトを引き継ぎます。
+オブジェクトを作るとき、元のオブジェクトがあれば引数を省略することがで
+きます。そのとき指定しなかった引数は元のオブジェクトから引き継がれます。
 
  my $sameone = $img->new;
  my $gray = $color->new(CV_8UC1);
 
-=item *
+C言語のプログラムでは、画像やマトリクスを解放するとき、
+C<cvReleaseImage()> を呼ばなければなりませんが、C<Cv> ではその必要はあ
+りません、Perl がオブジェクトを解放するとき C<DESTROY> を呼ぶので、
+C<DESTROY> を C<cvReleaseなんとか()> の別名として定義しています。
 
-OpenCV の C言語のプログラムでは、画像のオブジェクトを解放するとき、
-C<cvReleaseImage()> を呼ばなければなりません。しかし、C<Cv> ではその必
-要はありません、Perl がオブジェクトを解放するとき C<DESTROY> を呼ぶから
-です。そのため C<DESTROY> は、しばしば C<cvReleaseなんとか()> の別名と
-して定義しています。
+=head3 OpenCVのデータ型とCvのクラス名
 
-いくつか C<cvQueryFrame()> のように開放できないポインタを返すものがあり
-ます。このときは、C<Cv::なんとか::Ghost> で bless して区別し、その解放
-を抑止しています。
+OpenCV には C<CvImage>, C<CvMat>, C<CvMatND>, C<CvSparseMat> といった複
+数のデータ型があり、クラス名は型名に対応しています。C<Cv> のオブジェク
+トは、これらのデータのポインタを、単にクラス名で bless しただけのもので
+す。
+
+OpenCV には、いろいろな画像やマトリクスの型がありますが、これらは
+C<CvArr*> を介して画像やマトリクスを操作する関数に渡さるように作られて
+います。Cv も同様にスーパクラスとして C<Cv::Arr> を作り、メソッドは、こ
+こに置きました。もちろん例外もありますが。
+
+OpenCV には更にシーケンスと呼ばれる動的なデータ型もあります。これについ
+ては、Cv::More を参照してください。
+
+=head3 Perlの配列とOpenCVのマトリクス
+
+Perl の配列から OpenCV のマトリクスを作るには、オブジェクトの作成時に、
+その初期値として指定します。大きさは初期値から分るので、次のとおり書き
+ます。(Cv-0.16)
+
+ my $cmat = Cv::Mat->new([ ], CV_32FC1,
+    [ $fx,   0, $cx ],
+    [   0, $fy, $cy ],
+    [   0,   0,   1 ],
+    );
+
+要素が複数の値を持つ 2次元や、3次元の点の集りなら次のとおり書きます。こ
+れは 3x1 の大きさのマトリクスです。
+
+ my $pts = Cv::Mat->new([ ], CV_32FC3,
+    [ $x0, $y0, $z0 ],
+    [ $x1, $y1, $z1 ],
+    [ $x2, $y2, $z2 ],
+    );
+
+=head3 データ領域の共有
+
+(バージョンによって違いがあるのかな)
+
+オブジェクトを作成するとき、データ領域を指定すると、Perl のデータに
+OpenCV のヘッダを付加したり、ヘッダだけのオブジェクトが得られます。
+
+ my $arr = Cv::Mat->new([length($data)], CV_8UC1, $data); # これはやめる
+ my $arr = Cv::Mat->new([$rows, $cols], $type, undef);
+
+前者は別のシステムで作成した画像やマトリクスを扱うとき、データ変換の手
+間を減らせるかもしれないと考えたものですが、積極的には使っていません。
+また残念ながら Cv::Image では動きません。後者は GetRows(), GetCols() の
+ようなデータを共有するところで使っています。
+
+=head3 OpenCVの構造体
+
+構造体のメンバ名と同じ名前の関数を用意しました。
+
+ my ($c, $d) = ($img->channels, $img->depth);
+ my ($h, $w) = ($img->height, $img->width);
+ my ($r, $c) = ($img->rows, $img->cols);
+ my @sz = $img->sizes;
+
+どのくらい作ったのかな、、、
+
+=head2 メソッド
+
+=head3 メソッドの名前、関数の統合
 
 =item *
 
@@ -78,6 +136,23 @@ C<cvCreateMat()> を呼び出します。
 
  my $mat = Cv->CreateMat(240, 320, CV_8UC3);
  my $mat = Cv->createMat(240, 320, CV_8UC3);
+
+=item *
+
+C<cvAdd()> と C<cvAddS()> のような類似した関数は C<Add()>
+にまとめました。関数は引数で区別できます。
+
+ my $ar2 = Cv->CreateImage();      # ref Cv::Image
+ my $sc2 = cvScalar();             # ref ARRAY
+ my $d = $ar->Add($ar2);           # cvAdd($ar, $ar2)
+ my $d = $ar->Add($sc2);           # cvAddS($ar, $sc2)
+
+統合した関数は次のとおり。
+
+ AbsDiff(), Add(), And(), Cmp(), InRange(), Max(), Min(), Or(), Sub(),
+ Xor()
+
+=head3 引数の順序、出力先、インプレース、戻り値
 
 =item *
 
@@ -99,33 +174,29 @@ C<Cv> ではこの C<NULL> を表わすために C<\0> を使います。
 
  my $dst = $src->Flip(\0);
 
-=item *
 
-構造体のメンバと同じ名前の関数を用意しました。
+=head2 エラー処理
 
- my ($c, $d) = ($img->channels, $img->depth);
- my ($h, $w) = ($img->height, $img->width);
- my ($r, $c) = ($img->rows, $img->cols);
- my @sz = $img->sizes;
+eval { ... } で保護したブロックの中のエラーを検出できるようになりました。
+(Cv-0.13)
 
-=item *
+ my $img = eval { Cv->createImage([-1, -1], 8, 3) };
+ if ($@) {
+    print STDERR "*** got error ***";
+ }
 
-C<cvAdd()> と C<cvAddS()> のような類似した関数は C<Add()>
-にまとめました。関数は引数で区別できます。
+ただし、C<Cv> をインストールするとき、c++ でコンパイルしておく必要があります。
+エラーを掴まえるだけでなく、自前で用意したエラー処理に向けることもできます。
 
- my $ar2 = Cv->CreateImage();      # ref Cv::Image
- my $sc2 = cvScalar();             # ref ARRAY
- my $d = $ar->Add($ar2);           # cvAdd($ar, $ar2)
- my $d = $ar->Add($sc2);           # cvAddS($ar, $sc2)
+ Cv->redirectError(
+   sub { my ($status, $funcName, $errMsg, $fileName, $line, $data) = @_;
+       ...
+   },
+   my $data = ...;
+ );
 
-統合した関数は次のとおり。
 
- AbsDiff(), Add(), And(), Cmp(), InRange(), Max(), Min(), Or(), Sub(),
- Xor()
-
-=back
-
-=head2 Use Perl Array
+=head2 Use Perl Array (これは Cv::More に移す)
 
 OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。Perl
 の配列に似ていますが、その取り扱いは少し難しいのです。そこで、格納され
@@ -167,127 +238,6 @@ ToArray() でオーバライドされた @{} を使うと、もう少し簡単�
  $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
 	for @$circles;
 
-=head2 Error Handling
-
-eval { ... } で保護したブロックの中のエラーを検出できるようになりました。
-(Cv-0.13)
-
- my $img = eval { Cv->createImage([-1, -1], 8, 3) };
- if ($@) {
-    print STDERR "*** got error ***";
- }
-
-ただし、C<Cv> をインストールするとき、c++ でコンパイルしておく必要があります。
-エラーを掴まえるだけでなく、自前で用意したエラー処理に向けることもできます。
-
- Cv->redirectError(
-   sub { my ($status, $funcName, $errMsg, $fileName, $line, $data) = @_;
-       ...
-   },
-   my $data = ...;
- );
-
-=head2 オブジェクト
-
-=head3 オブジェクトを作る
-
-OpenCV の画像やマトリクスのオブジェクトは、C<Createなんとか()> を使って
-作成します。
-
- my $arr = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
- my $arr = Cv->CreateMat(240, 320, CV_8UC4);
-
-オブジェクトは C<new> で作ることもできます。
-
- my $arr = Cv::Image->new($size, $type);
- my $arr = Cv::Mat->new($size, $type);
- my $arr = Cv::MatND->new($size, $type);
- my $arr = Cv::SparseMat->new($size, $type);
-
-OpenCV には C<CvImage>, C<CvMat>, C<CvMatND>, C<CvSparseMat> といった複
-数のデータ型があり、クラス名は型名に対応しています。オブジェクトを作成
-するには、大きさ $size と要素の型 $type を指定し、大きさを指定する
-$size は、2次元なら [$rows, $cols] の順になります。これは、どのクラスで
-も同じです。
-
- my $arr = Cv::Image->new([$rows, $cols], $type);
- my $arr = Cv::Mat->new([$rows, $cols], $type);
-
-オブジェクトを作るとき、元のオブジェクトがあれば引数を省略することがで
-きます。そのとき指定しなかった引数は元のオブジェクトから引き継がれます。
-
- my $sameone = $img->new;
- my $gray = $color->new(CV_8UC1);
-
-OpenCV には更にシーケンスと呼ばれる動的なデータ型もあります。これについ
-ては、Cv::More を参照してください。
-
-=head3 データ領域を指定してオブジェクトを作る
-
-オブジェクトを作成するとき、データ領域を指定すると、Perl のデータに
-OpenCV のヘッダを付加したり、ヘッダだけのオブジェクトが得られます。
-
- my $arr = Cv::Mat->new([length($data)], CV_8UC1, $data);
- my $arr = Cv::Mat->new([$rows, $cols], $type, undef);
-
-前者は別のシステムで作成した画像やマトリクスを扱うとき、データ変換の手
-間を減らせるかもしれないと考えたものですが、積極的には使っていません。
-また残念ながら Cv::Image では動きません。後者は GetRows(), GetCols() の
-ようなデータを共有するところで使っています。
-
-=head3 初期値のあるオブジェクトを作る
-
-カメラのマトリクスのように小さなマトリクスは初期値を与えてオブジェクト
-を作ることができます。大きさには空の配列 [] を指定し、初期値から求まる
-大きさを使います。(Cv-0.16)
-
- my $cmat = Cv::Mat->new([ ], CV_32FC1,
-    [ $fx,   0, $cx ],
-    [   0, $fy, $cy ],
-    [   0,   0,   1 ],
-    );
-
-この要素が複数の値を持つ 2次元や、3次元の点の集りなら次のとおり。これは
-3x1 の大きさのマトリクスになります。
-
- my $pts = Cv::Mat->new([ ], CV_32FC3,
-    [ $x0, $y0, $z0 ],
-    [ $x1, $y1, $z1 ],
-    [ $x2, $y2, $z2 ],
-    );
-
-=head3 要素にアクセスする
-
-要素にアクセスすることはあまりないかもしれませんが、
-
- my $x = $arr->get($pos);
- $arr->set($pos, $x);
- $arr->getReal
- $arr->setReal
- $arr->ptr
- $arr->getRawData
-
-=head3 データの部分を操作する
-
- my $submat = $src->GetCols($startCol, $endCol);
- my $submat = $src->GetRows($startRow, $endRow, $deltaRow);
- my $submat = $src->GetSubRect($rect);
-
-
-=head3 Merge と SPlit
-
-
-=head3 構造体のメンバ
-
-
-=head3 画像やマトリクスのスーパクラス
-
-上記のとおり、OpenCV にはいろいろな型がありますが、これらは C<CvArr*>
-を介して画像やマトリクスを操作する関数に渡さるように作られているので、
-同じようにスーパクラスとして C<Cv::Arr> を作り、メソッドは、問題がない
-限り、ここに置きました。
-
-=back
 
 =head2 エクスポート
 
