@@ -1526,20 +1526,7 @@ sub Affine {
 	my $src = shift;
 	my $dst = dst(@_) || $src->new;
 	my $mat = shift;
-#	my $matrix = Cv::Mat->new([ ], &Cv::CV_32FC1, @_);
-
-# =xxx
-
-	my ($rows, $cols, @m) = &matrix($mat);
-	my $matrix = Cv->CreateMat($rows, $cols, &Cv::CV_32FC1);
-	foreach my $r (0 .. $rows - 1) {
-		foreach my $c (0 .. $cols - 1) {
-			$matrix->Set([$r, $c], [ shift(@m) ]);
-		}
-	}
-
-# =cut
-
+	my $matrix = Cv::Mat->new([ ], &Cv::CV_32FC1, @$mat);
 	unshift(@_, $src, $dst, $matrix);
 	goto &GetQuadrangleSubPix;
 }
