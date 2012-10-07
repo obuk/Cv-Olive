@@ -110,45 +110,77 @@ You can omit parameters and that will be inherited.
 
 =cut
 
-package Cv::Image;
-
-sub new {
+sub Cv::Image::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_? shift : $self->type;
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
-	Cv::croak "usage: Cv::Image->new(sizes, type)" unless $depth;
+	Carp::croak "usage: Cv::Image->new(sizes, type)" unless $depth;
 	my $image;
-	if (@_) {
-		$image = Cv::cvCreateImageHeader([reverse @$sizes], $depth, $channels);
-		$image->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
-	} else {
-		$image = Cv::cvCreateImage([reverse @$sizes], $depth, $channels);
+	if (@$sizes) {
+		my ($rows, $cols) = @$sizes;
+		if (@_) {
+			$image = Cv::cvCreateImageHeader([$cols, $rows], $depth, $channels);
+			$image->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
+		} else {
+			$image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
+		}
+		$image->origin($self->origin) if ref $self;
 	}
-	$image->origin($self->origin) if ref $self;
 	$image;
 }
 
 
-package Cv::Mat;
-
-sub new {
+sub Cv::Mat::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_? shift : $self->type;
-	if (@_) {
-		my $mat = Cv::cvCreateMatHeader(@$sizes, $type);
-		$mat->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
-		$mat;
-	} else {
-		Cv::cvCreateMat(@$sizes, $type);
+	my $mat;
+	if (@$sizes) {
+		my ($rows, $cols) = @$sizes; $cols ||= 1;
+		if (@_) {
+			my ($data, $step) = @_; $step ||= &Cv::CV_AUTOSTEP;
+			$mat = Cv::cvCreateMatHeader($rows, $cols, $type);
+			$mat->setData($data, $step) if $data;
+		} else {
+			$mat = Cv::cvCreateMat($rows, $cols, $type);
+		}
+	} elsif (@_) {
+		my @idx; my @data = @_;
+		while (@data) {
+			push(@idx, scalar @data);
+			last unless ref $data[0];
+			@data = @{$data[0]};
+		}
+		return undef unless @idx;
+		push(@idx, 1) while @idx < 2;
+		pop(@idx) if $idx[-1] == &Cv::CV_MAT_CN($type);
+		my ($rows, $cols) = @idx; $cols ||= 1;
+		$mat = Cv::cvCreateMat($rows, $cols, $type);
+		eval {
+			if (@idx == 1) {
+				foreach my $r (0 .. $rows - 1) {
+					$mat->Set([$r, 0], $_[$r]);
+				}
+			} else {
+				foreach my $r (0 .. $rows - 1) {
+					foreach my $c (0 .. $cols - 1) {
+						$mat->Set([$r, $c], $_[$r]->[$c]);
+					}
+				}
+			}
+		};
+		if (my $err = $@) {
+			chop($err);
+			1 while ($err =~ s/ at .*$//);
+			Carp::croak $err;
+		}
 	}
+	$mat;
 }
 
 
-package Cv::MatND;
-
-sub new {
+sub Cv::MatND::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_? shift : $self->type;
@@ -162,9 +194,7 @@ sub new {
 }
 
 
-package Cv::SparseMat;
-
-sub new {
+sub Cv::SparseMat::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_? shift : $self->type;
@@ -188,14 +218,14 @@ C<Cv::Somthing::Ghost>, and identified. And disable destroying.
 =cut
 
 package Cv::Arr;                                            sub DESTROY {}
-package Cv::Image;            our @ISA = qw(Cv::Arr);
-package Cv::Image::Ghost;     our @ISA = qw(Cv::Image);     sub DESTROY {}
 package Cv::Mat;              our @ISA = qw(Cv::Arr);
 package Cv::Mat::Ghost;       our @ISA = qw(Cv::Mat);       sub DESTROY {}
 package Cv::MatND;            our @ISA = qw(Cv::Mat);
 package Cv::MatND::Ghost;     our @ISA = qw(Cv::MatND);     sub DESTROY {}
 package Cv::SparseMat;        our @ISA = qw(Cv::MatND);
 package Cv::SparseMat::Ghost; our @ISA = qw(Cv::SparseMat); sub DESTROY {}
+package Cv::Image;            our @ISA = qw(Cv::Mat);
+package Cv::Image::Ghost;     our @ISA = qw(Cv::Image);     sub DESTROY {}
 
 =item *
 
@@ -275,7 +305,7 @@ sub assoc {
 			if ($family eq 'Cv' && $_ =~ /^cv[A-Zm]/) {
 				return sub {
 					# shift unless defined $_[0] && ref $_[0] && blessed $_[0];
-					ref (my $class = shift) and Cv::croak 'class name needed';
+					ref (my $class = shift) and Carp::croak 'class name needed';
 					goto &$subr;
 				};
 			}
@@ -299,7 +329,7 @@ sub alias {
 			$subr = $code;
 		} else {
 			# warn "can't alias ${package}::$_[0]";
-			$subr = sub { Cv::croak "TBD: ${package}::$_[0]" };
+			$subr = sub { Carp::croak "TBD: ${package}::$_[0]" };
 		}
 	}
 	my $verbose = 0;
@@ -446,6 +476,7 @@ sub SetND {
 	my $idx = ref $_[0] eq 'ARRAY'? shift : [ splice(@_, 0) ];
 	push(@$idx, (0) x ($src->dims - @$idx));
 	unshift(@_, $src, $idx);
+	$value = [ $value ] unless ref $value;
 	push(@_, $value);
 	goto &cvSetND;
 }
@@ -530,7 +561,7 @@ sub Split {
 
 
 sub Cv::Merge {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	if (ref $_[0] eq 'ARRAY') {
 		Cv::Arr::Merge(@_);
 	} elsif (Cv::is_cvarr($_[0])) {
@@ -541,7 +572,7 @@ sub Cv::Merge {
 			Cv::Arr::Merge(\@_, $dst);
 		}
 	} else {
-		Cv::croak "usage: Merge([src0, src1, ...], dst)"
+		Carp::croak "usage: Merge([src0, src1, ...], dst)"
 	}
 }
 
@@ -1077,13 +1108,13 @@ sub stor (\@) {
 package Cv::Seq;
 
 sub Cv::CreateSeq {
-	ref (my $class = shift) and Cv::croak 'class name needed';
+	ref (my $class = shift) and Carp::croak 'class name needed';
 	Cv::Seq->new(@_)
 }
 
 { *new = \&CreateSeq }
 sub CreateSeq {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	my $stor = stor(@_);
 	my $seqFlags = CORE::shift;
 	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
@@ -1094,7 +1125,7 @@ sub CreateSeq {
 
 
 sub MakeSeqHeaderForArray {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	my $seqFlags = CORE::shift;
 	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
 	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
@@ -1157,7 +1188,7 @@ package Cv::Seq;
 { *cvGetSeqElem = \&Cv::Arr::cvGetSeqElem }
 { *cvSetSeqElem = \&Cv::Arr::cvSetSeqElem }
 { *cvSeqInvert = \&Cv::Arr::cvSeqInvert }
-{ *ToArray = \&CvtSeqToArray }
+# { *ToArray = \&CvtSeqToArray }
 { *Get = \&GetSeqElem }
 { *Set = \&SetSeqElem }
 { *Invert = *Reverse = *SeqInvert = \&SeqInvert }
@@ -1169,16 +1200,16 @@ package Cv::Arr;
 
 { *ToArray = \&CvtMatToArray }
 sub CvtMatToArray {
-	my $mat = shift;
-	if (Cv::CV_MAT_CN($mat->type) == 1) {
-		my @arr = unpack("f*", $mat->ptr);
-		wantarray? @arr : \@arr;
-	} else {
-		my $seq = &cvPointSeqFromMat($mat, $mat->type, my $header, my $block);
-		my $arr = Cv::Seq::Point::CvtSeqToArray($seq);
-		wantarray? @$arr : $arr;
+	my $mat = shift; my @arr;
+	if ($mat->cols == 1) {
+		@arr = map { $mat->get([$_, 0]) } 0 .. $mat->rows - 1;
 	}
+	if ($mat->rows == 1) {
+		@arr = map { $mat->get([0, $_]) } 0 .. $mat->cols - 1;
+	}
+	wantarray? @arr : \@arr;
 }
+
 
 # ============================================================
 #  core. The Core Functionality: Drawing Functions
@@ -1229,13 +1260,13 @@ sub fsbless {
 
 
 sub Cv::Load {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	Cv::FileStorage->Load(@_)
 }
 
 
 sub Load {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	fsbless Cv::cvLoad(@_);
 }
 
@@ -1246,7 +1277,7 @@ sub Read {
 
 sub ReadByName {
 	my ($fs, $map, $name) = splice(@_, 0, 3);
-	Cv::croak "instance variable needed" unless ref $fs;
+	Carp::croak "instance variable needed" unless ref $fs;
 	$fs->Read($fs->getFileNodeByName($map, $name), @_);
 }
 
@@ -1491,11 +1522,14 @@ sub GetQuadrangleSubPix {
 	goto &cvGetQuadrangleSubPix;
 }
 
-
 sub Affine {
 	my $src = shift;
 	my $dst = dst(@_) || $src->new;
 	my $mat = shift;
+#	my $matrix = Cv::Mat->new([ ], &Cv::CV_32FC1, @_);
+
+# =xxx
+
 	my ($rows, $cols, @m) = &matrix($mat);
 	my $matrix = Cv->CreateMat($rows, $cols, &Cv::CV_32FC1);
 	foreach my $r (0 .. $rows - 1) {
@@ -1503,10 +1537,12 @@ sub Affine {
 			$matrix->Set([$r, $c], [ shift(@m) ]);
 		}
 	}
+
+# =cut
+
 	unshift(@_, $src, $dst, $matrix);
 	goto &GetQuadrangleSubPix;
 }
-
 
 sub matrix {
 	my $matrix = shift;
@@ -1606,7 +1642,7 @@ sub CvtColor {
 	my $code = shift;
 	unless ($dst) {
 		if (!defined $code) {
-			Cv::croak "Usage: Cv->CvtColor(src, dst, code)";
+			Carp::croak "Usage: Cv->CvtColor(src, dst, code)";
 		} elsif ($code == &Cv::CV_BGR2GRAY  || $code == &Cv::CV_RGB2GRAY) {
 			$dst = $src->new($src->sizes, &Cv::CV_MAKETYPE($src->type, 1));
 		} elsif ($code == &Cv::CV_GRAY2BGR  || $code == &Cv::CV_GRAY2RGB  ||
@@ -1874,7 +1910,7 @@ package Cv::StereoGCState;
 package Cv::StereoSGBM;
 
 sub Cv::CreateStereoSGBM {
-	ref (my $class = shift) and Cv::croak 'class name needed';
+	ref (my $class = shift) and Carp::croak 'class name needed';
 	Cv::StereoSGBM->new(@_);
 }
 

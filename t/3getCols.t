@@ -83,7 +83,7 @@ SKIP: {
 	if (11) {
 		my $src = Cv::Mat->new([240, 320], CV_8UC3);
 		my $submat = eval { $src->GetCols(10, 10) };
-		ok($@);
+		is($@, '');
 	}
 
 	if (12) {

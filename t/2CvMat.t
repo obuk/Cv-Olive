@@ -76,21 +76,7 @@ if (4) {
 }
 
 # has data
-if (5) {
-	my $rows = 8;
-	my $cols = 8;
-	my $cn = 4;
-	my $step = $cols * $cn;
-	my $data = chr(0) x ($rows * $step);
-	my $mat = Cv::Mat->new([ $rows, $cols ], CV_8UC($cn), $data);
-	is(substr($data, 0 + $_, 1), chr(0)) for 0 .. $cn - 1;
-	$mat->set([0, 0], [ map { 0x41 + $_ } 0 .. $cn - 1 ]);
-	is(substr($data, 0 + $_, 1), chr(0x41 + $_)) for 0 .. $cn - 1;
-	is($mat->get([0, 0])->[$_], 0x41 + $_) for 0 .. $cn - 1;
-}
-
-# has data
-if (5) {
+if (0 * 5) {
 	my $rows = 8;
 	my $cols = 8;
 	my $cn = 4;
@@ -118,4 +104,108 @@ if (6) {
 			}
 		}
 	}
+}
+
+# has data #3
+if (7) {
+	my $data = pack("c*", map { $_ } ord('a') .. ord('z'));
+	my $arr = Cv::Mat->new([length($data)], CV_8UC1, $data);
+	for my $i (0 .. length($data) - 1) {
+		is($arr->get([$i])->[0], $i + ord('a'));
+		is($arr->getReal([$i]), $i + ord('a'));
+	}
+}
+
+if (10) {
+	my $arr = Cv::Mat->new([], CV_32FC1);
+	ok(!$arr);
+}
+
+if (10) {
+	my $arr = Cv::Mat->new([], CV_32FC1, 1);
+	ok($arr);
+	is($arr->rows, 1);
+	is($arr->cols, 1);
+	my $x = $arr->sum;
+	is($x->[0], 1);
+}
+
+if (11) {
+	my $arr = Cv::Mat->new([], CV_32FC1, 1, 2, 3);
+	ok($arr);
+	is($arr->rows, 3);
+	is($arr->cols, 1);
+	my $x = $arr->sum;
+	is($x->[0], 1 + 2 + 3);
+}
+
+if (11) {
+	my $arr = Cv::Mat->new([], CV_32FC1, [1, 2, 3]);
+	ok($arr);
+	is($arr->rows, 1);
+	is($arr->cols, 3);
+	my $x = $arr->sum;
+	is($x->[0], 1 + 2 + 3);
+}
+
+if (12) {
+	my $arr = Cv::Mat->new([], CV_32FC1, [[1], [2], [3]]);
+	ok($arr);
+	is($arr->rows, 1);
+	is($arr->cols, 3);
+	my $x = $arr->sum;
+	is($x->[0], 1 + 2 + 3);
+}
+
+if (12) {
+	my $arr = Cv::Mat->new([], CV_32FC3, [1, 2, 3]);
+	ok($arr);
+	is($arr->rows, 1);
+	is($arr->cols, 1);
+	my $x = $arr->sum;
+	is($x->[0], 1);
+	is($x->[1], 2);
+	is($x->[2], 3);
+}
+
+if (13) {
+	my $arr = Cv::Mat->new([], CV_32FC1,
+						   [1, 2, 3],
+						   [1, 2, 3],
+		);
+	ok($arr);
+	is($arr->rows, 2);
+	is($arr->cols, 3);
+	my $x = $arr->sum;
+	is($x->[0], (1 + 2 + 3) * 2);
+}
+
+if (14) {
+	my $arr = Cv::Mat->new([], CV_32FC3,
+						   [1, 2, 3],
+						   [1, 2, 3],
+		);
+	ok($arr);
+	is($arr->rows, 2);
+	is($arr->cols, 1);
+	my $x = $arr->sum;
+	is($x->[0], 1 * 2);
+	is($x->[1], 2 * 2);
+	is($x->[2], 3 * 2);
+}
+
+if (14) {
+	my $arr = Cv::Mat->new([], CV_32FC3,
+						   [
+							[1, 2, 3],
+							[1, 2, 3],
+						   ],
+		);
+	ok($arr);
+	is($arr->rows, 1);
+	is($arr->cols, 2);
+	my $x = $arr->sum;
+	is($x->[0], 1 * 2);
+	is($x->[1], 2 * 2);
+	is($x->[2], 3 * 2);
 }

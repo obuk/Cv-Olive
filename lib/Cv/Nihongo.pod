@@ -187,6 +187,108 @@ eval { ... } で保護したブロックの中のエラーを検出できるよ�
    my $data = ...;
  );
 
+=head2 オブジェクト
+
+=head3 オブジェクトを作る
+
+OpenCV の画像やマトリクスのオブジェクトは、C<Createなんとか()> を使って
+作成します。
+
+ my $arr = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
+ my $arr = Cv->CreateMat(240, 320, CV_8UC4);
+
+オブジェクトは C<new> で作ることもできます。
+
+ my $arr = Cv::Image->new($size, $type);
+ my $arr = Cv::Mat->new($size, $type);
+ my $arr = Cv::MatND->new($size, $type);
+ my $arr = Cv::SparseMat->new($size, $type);
+
+OpenCV には C<CvImage>, C<CvMat>, C<CvMatND>, C<CvSparseMat> といった複
+数のデータ型があり、クラス名は型名に対応しています。オブジェクトを作成
+するには、大きさ $size と要素の型 $type を指定し、大きさを指定する
+$size は、2次元なら [$rows, $cols] の順になります。これは、どのクラスで
+も同じです。
+
+ my $arr = Cv::Image->new([$rows, $cols], $type);
+ my $arr = Cv::Mat->new([$rows, $cols], $type);
+
+オブジェクトを作るとき、元のオブジェクトがあれば引数を省略することがで
+きます。そのとき指定しなかった引数は元のオブジェクトから引き継がれます。
+
+ my $sameone = $img->new;
+ my $gray = $color->new(CV_8UC1);
+
+OpenCV には更にシーケンスと呼ばれる動的なデータ型もあります。これについ
+ては、Cv::More を参照してください。
+
+=head3 データ領域を指定してオブジェクトを作る
+
+オブジェクトを作成するとき、データ領域を指定すると、Perl のデータに
+OpenCV のヘッダを付加したり、ヘッダだけのオブジェクトが得られます。
+
+ my $arr = Cv::Mat->new([length($data)], CV_8UC1, $data);
+ my $arr = Cv::Mat->new([$rows, $cols], $type, undef);
+
+前者は別のシステムで作成した画像やマトリクスを扱うとき、データ変換の手
+間を減らせるかもしれないと考えたものですが、積極的には使っていません。
+また残念ながら Cv::Image では動きません。後者は GetRows(), GetCols() の
+ようなデータを共有するところで使っています。
+
+=head3 初期値のあるオブジェクトを作る
+
+カメラのマトリクスのように小さなマトリクスは初期値を与えてオブジェクト
+を作ることができます。大きさには空の配列 [] を指定し、初期値から求まる
+大きさを使います。(Cv-0.16)
+
+ my $cmat = Cv::Mat->new([ ], CV_32FC1,
+    [ $fx,   0, $cx ],
+    [   0, $fy, $cy ],
+    [   0,   0,   1 ],
+    );
+
+この要素が複数の値を持つ 2次元や、3次元の点の集りなら次のとおり。これは
+3x1 の大きさのマトリクスになります。
+
+ my $pts = Cv::Mat->new([ ], CV_32FC3,
+    [ $x0, $y0, $z0 ],
+    [ $x1, $y1, $z1 ],
+    [ $x2, $y2, $z2 ],
+    );
+
+=head3 要素にアクセスする
+
+要素にアクセスすることはあまりないかもしれませんが、
+
+ my $x = $arr->get($pos);
+ $arr->set($pos, $x);
+ $arr->getReal
+ $arr->setReal
+ $arr->ptr
+ $arr->getRawData
+
+=head3 データの部分を操作する
+
+ my $submat = $src->GetCols($startCol, $endCol);
+ my $submat = $src->GetRows($startRow, $endRow, $deltaRow);
+ my $submat = $src->GetSubRect($rect);
+
+
+=head3 Merge と SPlit
+
+
+=head3 構造体のメンバ
+
+
+=head3 画像やマトリクスのスーパクラス
+
+上記のとおり、OpenCV にはいろいろな型がありますが、これらは C<CvArr*>
+を介して画像やマトリクスを操作する関数に渡さるように作られているので、
+同じようにスーパクラスとして C<Cv::Arr> を作り、メソッドは、問題がない
+限り、ここに置きました。
+
+=back
+
 =head2 エクスポート
 
 =over 4

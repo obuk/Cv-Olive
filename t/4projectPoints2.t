@@ -337,25 +337,11 @@ if (3) {
 }
 
 sub Matrix {
-	my $type = ref $_[0] eq 'ARRAY' ? CV_32F : shift;
-	my ($rows, $cols, @m) = Cv::Arr::matrix(\@_);
-	my $matrix = Cv::Mat->new([$rows, $cols], $type);
-	foreach my $r (0 .. $rows - 1) {
-		foreach my $c (0 .. $cols - 1) {
-			$matrix->Set([$r, $c], [ shift(@m) ]);
-		}
-	}
-	$matrix;
+	Cv::Mat->new([], CV_32FC1, @_);
 }
 
 sub Points {
 	my $type = ref $_[0] eq 'ARRAY' ? CV_32F : shift;
 	my ($rows, $cols, @m) = Cv::Arr::matrix(\@_);
-	my $matrix = Cv::Mat->new(
-		[$rows, 1], CV_MAKETYPE(CV_MAT_DEPTH($type), $cols)
-		);
-	foreach my $r (0 .. $rows - 1) {
-		$matrix->Set([$r, 0], cvScalar(splice(@m, 0, $cols)));
-	}
-	$matrix;
+	Cv::Mat->new([ ], CV_MAKETYPE(CV_MAT_DEPTH($type), $cols), @_);
 }

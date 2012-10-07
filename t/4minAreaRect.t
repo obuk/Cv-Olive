@@ -36,5 +36,5 @@ if ($verbose) {
 	Cv->waitKey(1000);
 }
 
-my @vtx2 = Sort(Cv->boxPoints(Cv->minAreaRect(\@points, Cv::MemStorage->new)));
+my @vtx2 = Sort(Cv->boxPoints(Cv->minAreaRect(\@points)));
 is(xy($vtx[$_]), xy($points[$_])) for 0 .. 3;

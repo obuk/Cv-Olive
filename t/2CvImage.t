@@ -85,11 +85,6 @@ if (4) {
 
 # has data
 if (5) {
-	my ($cols, $rows) = (240, 320);
-	my $cn = 4;
-	my $data = Cv->alloc($cols * $rows * $cn);
-	my $img1 = Cv::Image->new([ $cols, $rows ], CV_8UC($cn), $data);
-	my $img2 = Cv::Image->new([ $cols, $rows ], CV_8UC($cn), undef);
 }
 
 # no depth
