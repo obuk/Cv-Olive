@@ -36,15 +36,14 @@ http://opencv.willowgarage.com/ の説明を参照してください。とは言
 
 =head3 オブジェクトの作成と解放
 
-OpenCV の画像やマトリクスのオブジェクトは、C<Createなんとか()> を使って
-作成します。
+OpenCV の画像やマトリクスのオブジェクトは、C言語と同様に
+C<Createなんとか()> で作成できます。
 
  my $img = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
  my $mat = Cv->CreateMat(240, 320, CV_8UC4);
 
-オブジェクトを作るために C<new> も使えます。CreateImage() と
-CreateMat() は、上の例のとおり呼び出し形式が違いますが。C<new> はどれも
-同じです。
+オブジェクトを作るには C<new> も使えます。CreateImage() と CreateMat()
+は、上の例のとおり呼び出し形式が違いますが。C<new> は同じです。
 
  my $arr = Cv::Image->new($size, $type);
  my $arr = Cv::Mat->new($size, $type);
@@ -52,30 +51,27 @@ CreateMat() は、上の例のとおり呼び出し形式が違いますが。C<
  my $arr = Cv::SparseMat->new($size, $type);
 
 オブジェクトを作るとき、元のオブジェクトがあれば引数を省略することがで
-きます。そのとき指定しなかった引数は元のオブジェクトから引き継がれます。
+きます。
 
  my $sameone = $img->new;
  my $gray = $color->new(CV_8UC1);
 
-C言語のプログラムでは、画像やマトリクスを解放するとき、
-C<cvReleaseImage()> を呼ばなければなりませんが、C<Cv> ではその必要はあ
-りません、Perl がオブジェクトを解放するとき C<DESTROY> を呼ぶので、
-C<DESTROY> を C<cvReleaseなんとか()> の別名として定義しています。
-
 =head3 OpenCVのデータ型とCvのクラス名
 
-OpenCV には C<CvImage>, C<CvMat>, C<CvMatND>, C<CvSparseMat> といった複
-数のデータ型があり、クラス名は型名に対応しています。C<Cv> のオブジェク
-トは、これらのデータのポインタを、単にクラス名で bless しただけのもので
-す。
+OpenCV には画像やマトリクスのデータ型として C<CvImage>, C<CvMat>,
+C<CvMatND>, C<CvSparseMat> など、いろいろな型があります。Cv では、この
+データ型をクラス名に対応させています。対応は、名前から推測できるもので、
+たとえば、C<CvImage> は C<Cv::Image> に、C<CvMat> は C<Cv::Mat> に対応
+しています。C<Cv> のオブジェクトは、これらのデータのポインタをクラス名
+で bless しただけのものです。
 
-OpenCV には、いろいろな画像やマトリクスの型がありますが、これらは
-C<CvArr*> を介して画像やマトリクスを操作する関数に渡さるように作られて
-います。Cv も同様にスーパクラスとして C<Cv::Arr> を作り、メソッドは、こ
-こに置きました。もちろん例外もありますが。
+OpenCV の画像やマトリクス C<CvMat>、C<CvImage> は、C<CvArr> から導出さ
+れた形がとられており、いろいろな画像やマトリクスは C<CvArr> を介して関
+数に渡されます。従って、Cv にもスーパクラス C<Cv::Arr> を作り、メソッド
+はここに置きました。もちろん例外もありますが。
 
-OpenCV には更にシーケンスと呼ばれる動的なデータ型もあります。これについ
-ては、Cv::More を参照してください。
+OpenCV には更にシーケンスと呼ばれる動的なデータ型もありますが、これにつ
+いては、C<Cv::More> を参照してください。
 
 =head3 Perlの配列とOpenCVのマトリクス
 
