@@ -4,6 +4,7 @@ Revision history for Cv.pm
      * separating experimental code into Cv/More.pm
      * added initializer Cv::Mat
      * rewriting Nihongo.pod
+     * fixed Cv::Flipbook has memory leak
 
 0.15 - 2012-10-01
      * fixed cvFitLine()
