@@ -248,6 +248,8 @@ sub UnpackMulti {
 
 package Cv;
 
+our $USE_SEQ = 0;				# XXXXX
+
 sub FitLine {
 	# cvFitLine(points, dist_type, param, reps, aeps, line)
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
@@ -262,23 +264,15 @@ sub FitLine {
 	my $reps = @_ >= 2 && shift || 0.01;
 	my $aeps = @_ >= 2 && shift || 0.01;
 	unshift(@_, $dist_type, $param, $reps, $aeps);
-
-=xxx
-	if (0) {
-		my $type = &Cv::CV_32FC(scalar @{$arr->[0]});
-		my $points = Cv::Seq::Point->new($type, &Cv::Seq::STORAGE);
+	my $type = &Cv::CV_32FC(scalar @{$arr->[0]});
+	my $points;
+	if ($USE_SEQ) {
+		$points = Cv::Seq::Point->new($type, &Cv::Seq::STORAGE);
 		$points->Push(@$arr);
-		unshift(@_, $points);
 	} else {
 		my $type = &Cv::CV_32FC(scalar @{$arr->[0]});
-		my $len = scalar @$arr;
-		my $points = Cv->CreateMat($len, 1, $type);
-		$points->Set([$_], $arr->[$_]) for 0 .. $len - 1;
-		unshift(@_, $points);
+		$points = Cv::Mat->new([], $type, $arr);
 	}
-=cut
-	my $type = &Cv::CV_32FC(scalar @{$arr->[0]});
-	my $points = Cv::Mat->new([], $type, $arr);
 	unshift(@_, $points);
 	goto &Cv::Arr::cvFitLine;
 }
@@ -286,64 +280,56 @@ sub FitLine {
 { *FitEllipse = \&FitEllipse2 }
 sub FitEllipse2 {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
-
-=xxx
-
-	my $stor = Cv::Seq::stor(@_);
-	my $points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
-	$points->Push(@_ > 1 ? @_ : @{$_[0]});
-
-=cut
-
+	my $points;
+	if ($USE_SEQ) {
+		my $stor = Cv::Seq::stor(@_);
+		$points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
+		$points->Push(@_ > 1 ? @_ : @{$_[0]});
+	} else {
+		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	}
 	$points->FitEllipse2;
 }
 
 { *MinAreaRect = \&MinAreaRect2 }
 sub MinAreaRect2 {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	my $points;
+	if ($USE_SEQ) {
+		my $stor = Cv::Seq::stor(@_);
+		$points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
+		$points->Push(@_ > 1 ? @_ : @{$_[0]});
+		unshift(@_, $stor);
+	} else {
+		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	}
 	$points->minAreaRect2;
-
-=xxx
-
-	my $stor = Cv::Seq::stor(@_);
-	my $points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
-	$points->Push(@_ > 1 ? @_ : @{$_[0]});
-	$points->minAreaRect2($stor);
-
-=cut
-
 }
 
 sub MinEnclosingCircle {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
-
-=xxx
-
-	my $stor = Cv::Seq::stor(@_);
-	my $points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
-	$points->Push(@_ > 1 ? @_ : @{$_[0]});
-
-=cut
-
+	my $points;
+	if ($USE_SEQ) {
+		my $stor = Cv::Seq::stor(@_);
+		$points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
+		$points->Push(@_ > 1 ? @_ : @{$_[0]});
+	} else {
+		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	}
 	$points->minEnclosingCircle(my $center, my $radius);
 	wantarray? ($center, $radius) : [$center, $radius];
 }
 
 sub ContourArea {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
-
-=xxx
-
-	my $stor = Cv::Seq::stor(@_);
-	my $points = Cv::Seq::Point->new(&Cv::CV_32SC2 | CV_SEQ_POLYLINE, $stor);
-	$points->Push(@_ > 1 ? @_ : @{$_[0]});
-
-=cut
-
+	my $points;
+	if ($USE_SEQ) {
+		my $stor = Cv::Seq::stor(@_);
+		$points = Cv::Seq::Point->new(&Cv::CV_32SC2 | CV_SEQ_POLYLINE, $stor);
+		$points->Push(@_ > 1 ? @_ : @{$_[0]});
+	} else {
+		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	}
 	$points->ContourArea;
 }
 

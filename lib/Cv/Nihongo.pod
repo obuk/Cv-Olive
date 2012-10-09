@@ -232,49 +232,6 @@ eval { ... } で保護したブロックの中のエラーを検出できるよ�
  );
 
 
-=head2 Use Perl Array (これは Cv::More に移す)
-
-OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。Perl
-の配列に似ていますが、その取り扱いは少し難しいのです。そこで、格納され
-たデータ型を意識せずに扱うスーパクラス Cv::Seq と、データ型に合わせて
-pack/unpack で変換する派生クラス Cv::Seq::Point, Cv::Seq::Rect を作り、
-データ型に合わせて bless して使うことにしました。C言語のキャストと同様
-の使い方です。以下、facedetect の一部を示します。取り出されるシーケンス
-は、Perl で扱いやすい形になります。
-
-  my $faces = bless $image->HaarDetectObjects(
-	$cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
-	cvSize(30, 30)), "Cv::Seq::Rect";
-  while (my @rect = $faces->shift) {
-    ...
-  }
-
-OpenCV のシーケンスは Perl の配列に似ているので、シーケンスを操作するた
-めに、Push(), Pop(), Shift(), Unshift(), Splice() も用意しました。
-点のシーケンス Cv::Seq::Point はよく使うので、new もあります。次の例は、
-Perl の点の配列をシーケンスに直して MinEnclosingCircle() を呼びます。
-$center と $radius が求まります。
-
- my @points = ([ 100, 100 ], [ 100, 200 ], [ 200, 100 ]);
- Cv::Seq::Point->new(&Cv::CV_32SC2)->push(@points)
-	->minEnclosingCircle(my $center, my $radius);
-
-同様に FitLine() でも Perl の配列を使うことができます。(Cv-0.15)
-
- Cv->FitLine(\@points, my $line);
-
-ToArray() は、シーケンスを Perl の配列に変換します。次のコードは、
-シーケンス $circles に格納されたすべての円を描きます。
-
- $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
-	for $circles->toArray;
-
-ToArray() でオーバライドされた @{} を使うと、もう少し簡単に書けます。
-
- $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
-	for @$circles;
-
-
 =head2 エクスポート
 
 Cv によってインポートされる名前は、use Cv の後に指定できます。(Cv-0.14)
