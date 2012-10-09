@@ -27,8 +27,6 @@ our @EXPORT = qw(
 
 sub AUTOLOAD { &Cv::autoload };
 
-# Preloaded methods go here.
-
 {
 	package Cv;
 	sub CaptureFromFlipbook {
