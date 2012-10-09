@@ -1,6 +1,12 @@
-#!/bin/sh -x
+#!/bin/sh
 LANG=ja_JP.UTF-8; export LANG
-destdir=$HOME/public_html/Cv
-test -d $destdir || mkdir $destdir
-pod2html lib/Cv.pm >$destdir/Cv.html
-pod2html lib/Cv/Nihongo.pod >$destdir/Nihongo.html 
+poddir=$HOME/public_html/pod
+pod2html="pod2html --htmlroot=/~obuk/pod"
+for pm in `(cd lib; find . -name '*pm' -o -name '*pod')`; do
+  destdir=`dirname $poddir/$pm`
+  test -d $destdir || mkdirhier $destdir
+  basename=`basename $poddir/$pm .pm`
+  basename=`basename $basename .pod`
+  html=$basename.html
+  $pod2html --infile=lib/$pm --outfile=$destdir/$html
+done
