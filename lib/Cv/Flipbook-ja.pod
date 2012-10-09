@@ -1,0 +1,133 @@
+# -*- mode: perl; coding: utf-8; tab-width: 4; -*-
+=encoding utf8
+
+=head1 名前
+
+Cv::Flipbook - パラパラ漫画をビデオとして扱う
+
+=head1 概要
+
+ use Cv;
+ use Cv::Flipbook;
+ 
+ my $capture = Cv->CaptureFromFlipbook("/path/to/flipbook");
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
+
+=head1 説明
+
+C<Cv::Flipbook> は、画像ファイルをひとつのディレクトリにまとめ、それを
+順番に読み込んでビデオ入力の代わりとして扱います。画像ファイルは、次の
+点に注意する必要があります。(1) すべての画像の大きさを揃える。(2) ファ
+イル名に順序付けのための番号を含める。
+
+=head2 メソッド
+
+=over 4
+
+=item Cv::Flipbook->new($dir, $flags, $pattern)
+
+パラパラ画像をビデオ入力にするオブジェクトを返します。new の代りに
+C<Cv-E<gt>CaptureFromFlipbook> と C<Cv::Capture-E<gt>FromFlipbook> も使
+えます。
+
+=over
+
+=item $dir
+
+パラパラ漫画の画像ファイルをまとめたディレクトリです。省略時は、
+カレントディレクトリを対象として扱います。
+
+=item $flags
+
+画像ファイルの読み込みで LoadImage のフラグとして使います。省略時は、
+CV_LOAD_IMAGE_COLOR を使いれます。
+
+=item $pattern
+
+$dir と合わせて画像ファイルの一覧を得るためのパターンとして使います。ス
+カラかリストを指定します。省略したときには、いくつかの画像ファイルの拡
+張子が指定されたものとみなします。
+
+ glob("$dir/$pattern")               # scalar
+ map { glob("$dir/$_") } @$pattern   # list
+
+=back
+
+=item GrabFrame()
+
+次フレームの画像ファイルを準備します。次のフレーム番号は、
+CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
+
+=item NextFrame()
+
+フレーム番号を 1つ進めます。
+
+=item RetrieveFrame()
+
+フレームを読み込んで返します。フレーム番号は 1つ進みます。次のプロパティ
+を更新します。
+
+ CV_CAP_PROP_FRAME_WIDTH
+ CV_CAP_PROP_FRAME_HEIGHT
+ CV_CAP_PROP_POS_MSEC      # CV_CAP_PROP_FPS が定義済なら
+
+3つ目の CV_CAP_PROP_POS_MSEC は、秒あたりのフレーム数 CV_CAP_PROP_FPS
+が C<SetCaptureProperty> で与えられていれば更新します。最後のフレームを
+越えると undef を返します。
+
+=item QueryFrame()
+
+次のフレームを読み込み、それを返します。
+
+=item GetCaptureProperty($property_id)
+
+パラパラビデオ入力のプロパティ $property_id を取得します。
+取り扱えるプロパティは次のとおり。
+
+ CV_CAP_PROP_FPS
+ CV_CAP_PROP_POS_MSEC
+ CV_CAP_PROP_POS_FRAMES
+ CV_CAP_PROP_FPS
+ CV_CAP_PROP_FRAME_WIDTH
+ CV_CAP_PROP_FRAME_HEIGHT
+
+詳細は OpenCV のリファレンスを参照してください。
+
+=item SetCaptureProperty($property_id, $value)
+
+パラパラビデオ入力のプロパティ $property_id に $value を与えます。
+
+=back
+
+=head2 エクスポート
+
+ありません。
+
+=head1 バグ
+
+=over
+
+=item *
+
+=item *
+
+=back
+
+=head1 参考
+
+L<Cv::Nihongo|Cv::Nihongo>
+
+=head1 著作権
+
+Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+
+Copyright (c) 2010, 2011, 2012 by Yuta MASUDA.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
