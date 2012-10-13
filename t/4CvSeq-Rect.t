@@ -2,10 +2,11 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 22;
+use Test::More tests => 23;
 
 BEGIN {
 	use_ok('Cv');
+	use_ok('Cv::Seq::Rect');
 	use_ok('Cv::More');
 }
 
