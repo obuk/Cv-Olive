@@ -45,7 +45,6 @@ use Cv::Constant qw(:all);
 require XSLoader;
 XSLoader::load('Cv', $VERSION);
 
-package Cv;
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -64,17 +63,21 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = ( );
 
+sub import {
+	my $self = shift;
+	push(@_, ":std") unless @_;
+	$self->export_to_level(1, $self, @_);
+}
+
 sub DESTROY { }
 
 sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
 sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
 sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
-sub import {
-	my $self = shift;
-	push(@_, ":std") unless @_;
-	$self->export_to_level(1, $self, @_);
-}
+Cv::alias(qw(Version));
+
+# use Cv::Seq;
 
 =over 4
 
@@ -146,30 +149,14 @@ sub Cv::Mat::new {
 			$mat = Cv::cvCreateMat($rows, $cols, $type);
 		}
 	} elsif (@_) {
-		my @idx; my @data = @_;
-		while (@data) {
-			push(@idx, scalar @data);
-			last unless ref $data[0];
-			@data = @{$data[0]};
-		}
-		return undef unless @idx;
-		push(@idx, 1) while @idx < 2;
-		pop(@idx) if $idx[-1] == &Cv::CV_MAT_CN($type);
-		my ($rows, $cols) = @idx; $cols ||= 1;
+		return undef unless Cv->can('m_dims') && Cv::Arr->can('m_set');
+		my @dims = m_dims(@_);
+		return undef unless @dims;
+		# push(@dims, 1) while @dims < 2;
+		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
+		my ($rows, $cols) = @dims; $cols ||= 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
-		eval {
-			if (@idx == 1) {
-				foreach my $r (0 .. $rows - 1) {
-					$mat->Set([$r, 0], $_[$r]);
-				}
-			} else {
-				foreach my $r (0 .. $rows - 1) {
-					foreach my $c (0 .. $cols - 1) {
-						$mat->Set([$r, $c], $_[$r]->[$c]);
-					}
-				}
-			}
-		};
+		eval { $mat->m_set([], \@_) };
 		if (my $err = $@) {
 			chop($err);
 			1 while ($err =~ s/ at .*$//);
@@ -346,13 +333,6 @@ sub alias {
 	$subr;
 }
 
-package Cv::Seq;              our @ISA = qw(Cv::Arr);
-package Cv::Seq::Seq;         our @ISA = qw(Cv::Seq);
-#package Cv::Seq::Point;       our @ISA = qw(Cv::Seq);
-#package Cv::Seq::Rect;        our @ISA = qw(Cv::Seq::Point);
-#package Cv::Seq::SURFPoint;   our @ISA = qw(Cv::Seq::Point);
-#package Cv::ContourScanner;   our @ISA = qw(Cv::Seq::Point);
-
 =item *
 
 When you omit the destination image or matrix (often named "dst"),
@@ -380,7 +360,18 @@ package Cv;
 sub is_null { ref $_[0] eq 'SCALAR' && ${$_[0]} == 0 }
 sub is_cvarr { blessed $_[0] && $_[0]->isa('Cv::Arr') }
 
+
+# ============================================================
+#  core. The Core Functionality: Operations on Arrays
+# ============================================================
+
 package Cv::Arr;
+
+# The GetDims needs alias before calling.  The function called via
+# AUTOLOAD will not know the context of the caller.
+
+Cv::alias qw(GetDims);
+Cv::alias qw(Size), \&cvGetSize;
 
 sub dst (\@) {
 	my $dst = undef;
@@ -391,13 +382,6 @@ sub dst (\@) {
 	}
 	$dst;
 }
-
-
-# ============================================================
-#  core. The Core Functionality: Operations on Arrays
-# ============================================================
-
-package Cv::Arr;
 
 =item *
 
@@ -476,7 +460,6 @@ sub SetND {
 	my $idx = ref $_[0] eq 'ARRAY'? shift : [ splice(@_, 0) ];
 	push(@$idx, (0) x ($src->dims - @$idx));
 	unshift(@_, $src, $idx);
-	$value = [ $value ] unless ref $value;
 	push(@_, $value);
 	goto &cvSetND;
 }
@@ -1061,13 +1044,6 @@ sub Transpose {
 }
 
 
-package Cv::Arr;
-
-# The GetDims needs alias before calling.  The function called via
-# AUTOLOAD will not know the context of the caller.
-
-Cv::alias qw(GetDims);
-
 # package Cv::Image; Cv::alias qw(InitImageHeader);
 # package Cv::Mat; Cv::alias qw(InitMatHeader);
 # package Cv::MatND; Cv::alias qw(InitMatNDHeader);
@@ -1087,128 +1063,8 @@ package Cv;
 
 sub is_cvmem { blessed $_[0] && $_[0]->isa('Cv::MemStorage') }
 
-package Cv::Seq;
-
-our %TEMPLATE;
-our $STORAGE;
-
-sub STORAGE {
-	$STORAGE ||= Cv::MemStorage->new();
-}
-
-sub stor (\@) {
-	my $storage;
-	for (my $i = 0; $i < @{$_[0]}; $i++) {
-		($storage) = splice(@{$_[0]}, $i, 1), last
-			if Cv::is_cvmem(${$_[0]}[$i]);
-	}
-	$storage ||= &STORAGE;
-}
-
-package Cv::Seq;
-
-sub Cv::CreateSeq {
-	ref (my $class = shift) and Carp::croak 'class name needed';
-	Cv::Seq->new(@_)
-}
-
-{ *new = \&CreateSeq }
-sub CreateSeq {
-	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	my $stor = stor(@_);
-	my $seqFlags = CORE::shift;
-	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
-	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
-	my $elemSize = CORE::shift || &Cv::CV_ELEM_SIZE($seqFlags);
-	bless Cv::cvCreateSeq($seqFlags, $headerSize, $elemSize, $stor), $class;
-}
-
-
-sub MakeSeqHeaderForArray {
-	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	my $seqFlags = CORE::shift;
-	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
-	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
-	my $elemSize = CORE::shift || &Cv::CV_ELEM_SIZE($seqFlags);
-	bless Cv::cvMakeSeqHeaderForArray($seqFlags, $headerSize, $elemSize, @_), $class;
-}
-
-
-sub Pop {
-	my $self = CORE::shift;
-	$self->cvSeqPop;
-}
-
-
-sub Push {
-	my $self = CORE::shift;
-	$self->cvSeqPush($_) for @_;
-	$self;
-}
-
-
-sub Shift {
-	my $self = CORE::shift;
-	$self->cvSeqPopFront;
-}
-
-
-sub Unshift {
-	my $self = CORE::shift;
-	$self->cvSeqPushFront($_) for @_;
-	$self;
-}
-
-
-sub Splice {
-	# splice($array, $offset, $length, @list)
-	# splice($array, $offset, $length)
-	# splice($array, $offset)
-	my $array = CORE::shift;
-	my $offset = CORE::shift;
-	my $length = @_? CORE::shift : $array->total - $offset;
-	my @le = ();
-	foreach (0 .. $offset - 1) {
-		CORE::push(@le, scalar $array->Shift);
-	}
-	my @ce = ();
-	foreach (0 .. $length - 1) {
-		CORE::push(@ce, scalar $array->Shift);
-	}
-	$array->Unshift(@le, @_);
-	wantarray? @ce : \@ce;
-}
-
-
 package Cv::MemStorage;
 { *new = \&Cv::CreateMemStorage }
-
-package Cv::Seq;
-{ *cvCvtSeqToArray = \&Cv::Arr::cvCvtSeqToArray }
-{ *cvGetSeqElem = \&Cv::Arr::cvGetSeqElem }
-{ *cvSetSeqElem = \&Cv::Arr::cvSetSeqElem }
-{ *cvSeqInvert = \&Cv::Arr::cvSeqInvert }
-# { *ToArray = \&CvtSeqToArray }
-{ *Get = \&GetSeqElem }
-{ *Set = \&SetSeqElem }
-{ *Invert = *Reverse = *SeqInvert = \&SeqInvert }
-
-package Cv::Seq::Seq;
-{ *Get = \&GetSeqElem }
-
-package Cv::Arr;
-
-{ *ToArray = \&CvtMatToArray }
-sub CvtMatToArray {
-	my $mat = shift; my @arr;
-	if ($mat->cols == 1) {
-		@arr = map { $mat->get([$_, 0]) } 0 .. $mat->rows - 1;
-	}
-	if ($mat->rows == 1) {
-		@arr = map { $mat->get([0, $_]) } 0 .. $mat->cols - 1;
-	}
-	wantarray? @arr : \@arr;
-}
 
 
 # ============================================================
@@ -1294,8 +1150,6 @@ sub Cv::String::DESTROY {}
 # ============================================================
 
 package Cv;
-
-Cv::alias qw(Version);
 
 =head2 Error Handling
 
