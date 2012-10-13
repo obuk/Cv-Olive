@@ -12,7 +12,7 @@ Cv::Pango - Pango を使っていろいろな文字を描く
 
  my $img = Cv::Mat->new([240, 320], CV_8UC4);
  $img->putText(
-    "\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
+	"\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
 	[20, 200], 'Sans Serif 42',
 	);
  $img->showImage;
@@ -20,8 +20,8 @@ Cv::Pango - Pango を使っていろいろな文字を描く
 
 =head1 説明
 
-C<Cv::Pango> は、Pango を使用して、いろいろな文字が描けるように
-Cv::Arr::PutText() を上書きます。
+C<Cv::Pango> は、Pango を使用して、いろいろな文字を描きます。
+Cv::Arr::PutText() そのものを置き換えます。
 
 =head2 メソッド
 
@@ -30,8 +30,9 @@ Cv::Arr::PutText() を上書きます。
 =item $img->putText($text, $org, $font, $color)
 
 $img は Cv::Arr のオブジェクトです。$font は Pango::FontDescription の
-オブジェクトかフォントを識別するための文字列を指定します。putText のそ
-の他のパラメータの詳細は OpenCV の cvPutText() を参照してください。
+オブジェクトかフォントを識別するための文字列を指定します。InitFont() で
+作成したフォントも使えます。PutText のその他のパラメータの詳細は
+OpenCV の cvPutText() を参照してください。
 
 フォントを識別するための文字列は次のとおり。
 
@@ -68,8 +69,8 @@ $img は Cv::Arr のオブジェクトです。$font は Pango::FontDescription 
 =item *
 
 このパッケージは、フォントが Pango::FontDescription のオブジェクトにな
-るので、ここに cvGetTextSize() も作ります。もっと上手なパッチのあて方を
-ご存知の方は教えてください。
+るので、この名前空間に cvGetTextSize() を置きます。もっと上手なパッチの
+あて方をご存知の方は教えてください。
 
 =back
 
