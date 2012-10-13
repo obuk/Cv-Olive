@@ -4,7 +4,8 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use Cv::More;
+# use Cv::More;
+use Cv::Seq::SURFPoint;
 use File::Basename;
 
 my $USE_FLANN = 1;

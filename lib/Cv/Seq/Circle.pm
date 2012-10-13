@@ -5,12 +5,10 @@ package Cv::Seq::Circle;
 use 5.008008;
 use strict;
 use warnings;
-use Cv;
-# use Cv::Seq::Point;
 
-our $VERSION = '0.14';
+use Cv::Seq::Point;
 
-our @ISA = qw(Exporter Cv::Seq::Point);
+our @ISA = qw(Cv::Seq::Point);
 
 sub AUTOLOAD { &Cv::autoload };
 
