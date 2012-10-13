@@ -3,7 +3,11 @@
 use strict;
 use Test::More qw(no_plan);
 # use Test::More tests => 66;
-use Cv;
+
+BEGIN {
+	use_ok('Cv');
+	use_ok('Cv::Seq');			# xxxxx
+}
 
 {
 	package Cv::Something;
