@@ -1,12 +1,12 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-# use Test::More qw(no_plan);
-use Test::More tests => 22;
+use Test::More qw(no_plan);
+# use Test::More tests => 22;
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
+	use_ok('Cv::Seq');			# xxxxx
 }
 
 my $verbose = Cv->hasGUI;
@@ -67,7 +67,6 @@ if (4) {
 }
 
 if (1) {
-	# use Cv::More;
 	my $type_name = 'opencv-sequence-tree';
 	my $obj = Cv::Seq->new(CV_32SC2);
 	my $info = Cv->TypeOf($obj);
