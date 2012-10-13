@@ -3,7 +3,10 @@
 use strict;
 use Test::More qw(no_plan);
 #use Test::More tests => 11;
-BEGIN { use_ok('Cv') };
+BEGIN {
+	use_ok('Cv');
+	use_ok('Cv::More');
+}
 
 my $verbose = Cv->hasGUI;
 
