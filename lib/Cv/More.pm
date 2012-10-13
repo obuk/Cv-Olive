@@ -6,18 +6,102 @@ use 5.008008;
 use strict;
 use warnings;
 
-use lib qw(blib/lib blib/arch);
-use Cv qw( );
+use Cv::Seq::Point;
 
-package Cv::Seq::Point;     our @ISA = qw(Cv::Seq);
-package Cv::Seq::Rect;      our @ISA = qw(Cv::Seq::Point);
-package Cv::Seq::SURFPoint; our @ISA = qw(Cv::Seq::Point);
-package Cv::ContourScanner; our @ISA = qw(Cv::Seq::Point);
+package Cv;
 
-for (qw(Cv::Seq::Point Cv::Seq::Rect Cv::Seq::SURFPoint Cv::ContourScanner)) {
-	no warnings 'redefine';
-	eval "{ package $_; sub AUTOLOAD { &Cv::autoload } }";
+sub m_dims {
+	if (@_) {
+		if (ref $_[0]) {
+			(scalar(@_), m_dims(@{$_[0]}));
+		} else {
+			(scalar(@_));
+		}
+	} else {
+		();
+	}
 }
+
+package Cv::Arr;
+
+sub m_set {
+	my $mat = shift;
+	my $idx = shift;
+	my $value = shift;
+	my @dims = $mat->getDims;
+	if (@$idx == @dims) {
+		$value = [ $value ] unless ref $value;
+		$mat->Set($idx, $value);
+	} elsif (@$idx == @dims - 1 && $dims[-1] == 1 &&
+			 ref $value && &Cv::CV_MAT_CN($mat->type) == @$value) {
+		$mat->Set($idx, $value);
+	} else {
+		$mat->m_set([@$idx, $_], $value->[$_]) for 0 .. $#{$value};
+	}
+	$mat;
+}
+
+
+{ *ToArray = \&CvtMatToArray }
+sub CvtMatToArray {
+	my $mat = shift; my @arr;
+	if ($mat->cols == 1) {
+		@arr = map { $mat->get([$_, 0]) } 0 .. $mat->rows - 1;
+	}
+	if ($mat->rows == 1) {
+		@arr = map { $mat->get([0, $_]) } 0 .. $mat->cols - 1;
+	}
+	wantarray? @arr : \@arr;
+}
+
+package Cv::Seq::Point;
+
+{ *ToArray = \&CvtSeqToArray }
+sub CvtSeqToArray {
+	# @array = cvtSeqToArray($seq)
+	# @array = cvtSeqToArray($seq, $slice)
+	# cvtSeqToArray($seq, \@array)
+	# cvtSeqToArray($seq, \@array, $slice)
+	my $self = CORE::shift;
+	my $slice = ref $_[-1] eq 'ARRAY' && @{$_[-1]} == 2?
+		CORE::pop : &Cv::CV_WHOLE_SEQ;
+	$self->SUPER::CvtSeqToArray(my $string, $slice);
+	if (@_ >= 1 && ref $_[0] eq 'ARRAY') {
+		@{$_[0]} = ();
+	} else {
+		$_[0] = [];
+	}
+	$self->UnpackMulti($_[0], $string);
+	wantarray? @{$_[0]} : $_[0];
+}
+
+package Cv::Arr;
+
+use overload
+	'@{}' => sub { $_[0]->ToArray },
+	bool => sub { $_[0] },
+	'<=>' => \&overload_cmp,
+	cmp => \&overload_cmp,
+	fallback => undef,
+	nomethod => \&overload_nomethod;
+
+sub overload_cmp {
+	my ($l, $r) = @_;
+	my ($lc, $rc) = (ref $l, ref $r);
+	bless $l, 'overload::dummy';
+	bless $r, 'overload::dummy';
+	my $cmp = $l cmp $r;
+	bless $l, $lc;
+	bless $r, $rc;
+	$cmp;
+}
+
+sub overload_nomethod {
+	Carp::croak "$0: can't overload ", ref $_[0], "::", $_[3]
+}
+
+
+package Cv;
 
 # ============================================================
 #  core. The Core Functionality: Dynamic Structures
@@ -55,41 +139,6 @@ calculates $center and $radius from the Perl data.
  Cv::Seq::Point->new(&Cv::CV_32SC2)->push(@points)
 	->minEnclosingCircle(my $center, my $radius);
 
-=cut
-
-package Cv::Seq;
-
-our %TEMPLATE;
-
-sub template {
-	my $self = CORE::shift;
-	unless (defined $TEMPLATE{&Cv::CV_32SC2}) {
-		foreach my $cn (1 .. 4) {
-			$TEMPLATE{&Cv::CV_8SC(  $cn )} = [ "c$cn", $cn ];
-			$TEMPLATE{&Cv::CV_8UC(  $cn )} = [ "C$cn", $cn ];
-			$TEMPLATE{&Cv::CV_16SC( $cn )} = [ "s$cn", $cn ];
-			$TEMPLATE{&Cv::CV_16UC( $cn )} = [ "S$cn", $cn ];
-			$TEMPLATE{&Cv::CV_32SC( $cn )} = [ "i$cn", $cn ];
-			$TEMPLATE{&Cv::CV_32FC( $cn )} = [ "f$cn", $cn ];
-			$TEMPLATE{&Cv::CV_64FC( $cn )} = [ "d$cn", $cn ];
-
-		}
-	}
-	return undef unless ref $self && $self->UNIVERSAL::can('mat_type');
-	wantarray ? @{$TEMPLATE{$self->mat_type}} : $TEMPLATE{$self->mat_type}[0];
-}
-
-
-package Cv::Seq::Point;
-
-{ *new = \&CreateSeq }
-sub CreateSeq {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	$class->SUPER::new(@_);
-}
-
-=pod
-
 ToArray() convert from the sequence to the Perl array.  The following
 code draws all circles stored in the sequence $circles.
 
@@ -102,151 +151,6 @@ ToArray() overrides @{}, so you can write it more easily.
 	for @$circles;
 
 =cut
-
-{ *ToArray = \&CvtSeqToArray }
-sub CvtSeqToArray {
-	# @array = cvtSeqToArray($seq)
-	# @array = cvtSeqToArray($seq, $slice)
-	# cvtSeqToArray($seq, \@array)
-	# cvtSeqToArray($seq, \@array, $slice)
-	my $self = CORE::shift;
-	my $slice = ref $_[-1] eq 'ARRAY' && @{$_[-1]} == 2?
-		CORE::pop : &Cv::CV_WHOLE_SEQ;
-	$self->SUPER::CvtSeqToArray(my $string, $slice);
-	if (@_ >= 1 && ref $_[0] eq 'ARRAY') {
-		@{$_[0]} = ();
-	} else {
-		$_[0] = [];
-	}
-	$self->UnpackMulti($_[0], $string);
-	wantarray? @{$_[0]} : $_[0];
-}
-
-
-{ *Get = \&GetSeqElem }
-sub GetSeqElem {
-	my $self = CORE::shift;
-	my $index = CORE::shift;
-	my @pt = $self->Unpack($self->SUPER::GetSeqElem($index));
-	wantarray? @pt : \@pt;
-}
-
-
-{ *Set = \&SetSeqElem }
-sub SetSeqElem {
-	my $self = CORE::shift;
-	my $index = CORE::shift;
-	$self->SUPER::SetSeqElem($index, $self->Pack(@_));
-}
-
-
-sub Push {
-	my $self = CORE::shift;
-	$self->SUPER::Push($self->Pack(@$_)) for @_;
-	$self;
-}
-
-
-sub Pop {
-	my $self = CORE::shift;
-	my @pt = $self->Unpack($self->SUPER::Pop);
-	wantarray? @pt : \@pt;
-}
-
-
-sub Shift {
-	my $self = CORE::shift;
-	my @pt = $self->Unpack($self->SUPER::Shift);
-	wantarray? @pt : \@pt;
-}
-
-
-sub Unshift {
-	my $self = CORE::shift;
-	$self->SUPER::Unshift($self->Pack(@$_)) for @_;
-	$self;
-}
-
-
-sub MakeSeqHeaderForArray {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	$class->SUPER::MakeSeqHeaderForArray(@_);
-}
-
-
-sub Pack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	CORE::pack($t, map { ref $_ ? @$_ : $_ } @_);
-}
-
-
-sub Unpack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	no warnings 'uninitialized';
-	CORE::unpack($t, $_[0]);
-}
-
-
-sub UnpackMulti {
-	my $self = CORE::shift;
-	my ($t, $c) = $self->template;
-	no warnings 'uninitialized';
-	my @data = CORE::unpack("($t)*", $_[1]);
-	while (my @elem = CORE::splice(@data, 0, $c)) {
-		CORE::push(@{$_[0]}, \@elem);
-	}
-}
-
-
-package Cv::Seq::Rect;
-
-sub template {
-	my $self = CORE::shift;
-	my ($t, $c) = ("i4", 4);
-	wantarray? ($t, $c) : $t;
-}
-
-
-package Cv::Seq::SURFPoint;
-
-sub template {
-	my $self = CORE::shift;
-	my ($t, $c) = ("f2i2f2", 6);
-	wantarray? ($t, $c) : $t;
-}
-
-
-sub Pack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	CORE::pack($t, @{$_[0]}, @_[1..$#_]);
-}
-
-
-sub Unpack {
-	my $self = CORE::shift;
-	my $t = $self->template;
-	no warnings 'uninitialized';
-	my ($x, $y, @r) = CORE::unpack($t, $_[0]);
-	my @elem = ([ $x, $y ], @r);
-	wantarray? @elem : \@elem;
-}
-
-
-sub UnpackMulti {
-	my $self = CORE::shift;
-	my ($t, $c) = $self->template;
-	no warnings 'uninitialized';
-	my @data = CORE::unpack("($t)*", $_[1]);
-	while (my ($x, $y, @r) = CORE::splice(@data, 0, $c)) {
-		CORE::push(@{$_[0]}, [[$x, $y], @r]);
-	}
-}
-
-
-package Cv;
 
 our $USE_SEQ = 0;				# XXXXX
 
@@ -334,37 +238,9 @@ sub ContourArea {
 }
 
 
-package Cv::Arr;
-
-use overload
-	'@{}' => sub { $_[0]->ToArray },
-	bool => sub { $_[0] },
-	'<=>' => \&overload_cmp,
-	cmp => \&overload_cmp,
-	fallback => undef,
-	nomethod => \&overload_nomethod;
-
-sub overload_cmp {
-	my ($l, $r) = @_;
-	my ($lc, $rc) = (ref $l, ref $r);
-	bless $l, 'overload::dummy';
-	bless $r, 'overload::dummy';
-	my $cmp = $l cmp $r;
-	bless $l, $lc;
-	bless $r, $rc;
-	$cmp;
-}
-
-sub overload_nomethod {
-	Cv::croak "$0: can't overload ", ref $_[0], "::", $_[3]
-}
-
-
 # ============================================================
 #  highgui. High-level GUI and Media I/O: Qt new functions
 # ============================================================
-
-package Cv;
 
 sub GetBuildInformation {
 	ref (my $class = shift) and Cv::croak 'class name needed';
@@ -425,7 +301,6 @@ sub HasModule {
 	}
 }
 
-
 unless (Cv->hasQt) {
 	*Cv::cvSetWindowProperty =
 	*Cv::cvGetWindowProperty =
@@ -436,6 +311,4 @@ unless (Cv->hasQt) {
 	*Cv::cvCreateOpenGLCallback = sub { croak "no Qt" };
 }
 
-
 1;
-__END__
