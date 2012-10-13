@@ -4,6 +4,7 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use Cv::Seq;
 use Time::HiRes qw(gettimeofday);
 use Data::Dumper;
 
