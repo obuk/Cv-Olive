@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 562;
+use Test::More tests => 523;
 
 BEGIN {
 	use_ok('Cv');
@@ -114,98 +114,4 @@ if (7) {
 		is($arr->get([$i])->[0], $i + ord('a'));
 		is($arr->getReal([$i]), $i + ord('a'));
 	}
-}
-
-if (10) {
-	my $arr = Cv::Mat->new([], CV_32FC1);
-	ok(!$arr);
-}
-
-if (10) {
-	my $arr = Cv::Mat->new([], CV_32FC1, 1);
-	ok($arr);
-	is($arr->rows, 1);
-	is($arr->cols, 1);
-	my $x = $arr->sum;
-	is($x->[0], 1);
-}
-
-if (11) {
-	my $arr = Cv::Mat->new([], CV_32FC1, 1, 2, 3);
-	ok($arr);
-	is($arr->rows, 3);
-	is($arr->cols, 1);
-	my $x = $arr->sum;
-	is($x->[0], 1 + 2 + 3);
-}
-
-if (11) {
-	my $arr = Cv::Mat->new([], CV_32FC1, [1, 2, 3]);
-	ok($arr);
-	is($arr->rows, 1);
-	is($arr->cols, 3);
-	my $x = $arr->sum;
-	is($x->[0], 1 + 2 + 3);
-}
-
-if (12) {
-	my $arr = Cv::Mat->new([], CV_32FC1, [[1], [2], [3]]);
-	ok($arr);
-	is($arr->rows, 1);
-	is($arr->cols, 3);
-	my $x = $arr->sum;
-	is($x->[0], 1 + 2 + 3);
-}
-
-if (12) {
-	my $arr = Cv::Mat->new([], CV_32FC3, [1, 2, 3]);
-	ok($arr);
-	is($arr->rows, 1);
-	is($arr->cols, 1);
-	my $x = $arr->sum;
-	is($x->[0], 1);
-	is($x->[1], 2);
-	is($x->[2], 3);
-}
-
-if (13) {
-	my $arr = Cv::Mat->new([], CV_32FC1,
-						   [1, 2, 3],
-						   [1, 2, 3],
-		);
-	ok($arr);
-	is($arr->rows, 2);
-	is($arr->cols, 3);
-	my $x = $arr->sum;
-	is($x->[0], (1 + 2 + 3) * 2);
-}
-
-if (14) {
-	my $arr = Cv::Mat->new([], CV_32FC3,
-						   [1, 2, 3],
-						   [1, 2, 3],
-		);
-	ok($arr);
-	is($arr->rows, 2);
-	is($arr->cols, 1);
-	my $x = $arr->sum;
-	is($x->[0], 1 * 2);
-	is($x->[1], 2 * 2);
-	is($x->[2], 3 * 2);
-}
-
-if (14) {
-	my $arr = Cv::Mat->new([], CV_32FC3,
-						   [
-							[1, 2, 3],
-							[1, 2, 3],
-						   ],
-		);
-	ok($arr);
-	is($arr->rows, 1);
-	is($arr->cols, 2);
-	my $x = $arr->sum;
-	is($x->[0], 1 * 2);
-	is($x->[1], 2 * 2);
-	is($x->[2], 3 * 2);
 }
