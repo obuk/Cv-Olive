@@ -18,6 +18,7 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use Cv::Seq;
 use File::Basename;
 
 my $FITELLIPSE2 = 1;
