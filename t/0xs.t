@@ -1,9 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More tests => 2;
-# use Test::More qw(no_plan);
-BEGIN { use_ok('Cv'); }
+use Test::More qw(no_plan);
+# use Test::More tests => 3;
+
+BEGIN {
+	use_ok('Cv');
+	use_ok('Cv::Seq');			# xxxxx
+}
 
 use File::Basename;
 
