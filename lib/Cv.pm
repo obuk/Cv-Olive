@@ -458,10 +458,38 @@ sub SetND {
 	my $src = shift;
 	my $value = pop;
 	my $idx = ref $_[0] eq 'ARRAY'? shift : [ splice(@_, 0) ];
-	push(@$idx, (0) x ($src->dims - @$idx));
-	unshift(@_, $src, $idx);
-	push(@_, $value);
-	goto &cvSetND;
+
+=xxx
+
+	if ($src->can('m_set')) {
+		# $src->m_set(@_);
+		my @dims = $src->getDims;
+		if (@$idx == @dims) {
+			$value = [ $value ] unless ref $value;
+			# $src->Set($idx, $value);
+			unshift(@_, $src, $idx);
+			push(@_, $value);
+			goto &cvSetND;
+		} elsif (@$idx == @dims - 1 && $dims[-1] == 1 &&
+				 ref $value && &Cv::CV_MAT_CN($src->type) == @$value) {
+			# $src->Set($idx, $value);
+			unshift(@_, $src, $idx);
+			push(@_, $value);
+			goto &cvSetND;
+		} else {
+			$src->m_set([@$idx, $_], $value->[$_]) for 0 .. $#{$value};
+			$src;
+		}
+	} else
+
+=cut
+
+	{
+		push(@$idx, (0) x ($src->dims - @$idx));
+		unshift(@_, $src, $idx);
+		push(@_, $value);
+		goto &cvSetND;
+	}
 }
 
 

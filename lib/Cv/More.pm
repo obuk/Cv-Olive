@@ -107,51 +107,6 @@ package Cv;
 #  core. The Core Functionality: Dynamic Structures
 # ============================================================
 
-=head2 Use Perl Array
-
-The Sequence of OpenCV stores the various data, e.g. points,
-rectangles, and circles.  And it has also similarity with the array
-of Perl.  However, its handling is a little difficult.  So we made a
-superclass Cv::Seq that handles all data without regard to the type of
-data to be stored in the sequence.  And we made derived class to
-handle specific data types,​e.g. Cv::Seq::Point, Cv::Seq::Rect.  Then,
-we bless with derived classes to fit the data to be stored.  It is
-similar to the cast in the language C.
-
-There is a part of the facedetect as follows.  We can use only a
-string data if we don't know the data type of the sequence.  But we
-can convert using pack/unpack indirectly if we know that.
-
-  my $faces = bless $image->HaarDetectObjects(
-	$cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
-	cvSize(30, 30)), "Cv::Seq::Rect";
-  while (my @rect = $faces->shift) {
-    ...
-  }
-
-We made the functions​Push(), Pop(), Shift(), Unshift(), and and
-Splice() to mimic the functions to manipulate sequences that operate
-on an array of Perl.  Cv::Seq::Point handles the sequence of points,
-and that is often used, so we also made new.  The following example
-calculates $center and $radius from the Perl data.
-
- my @points = ([ 100, 100 ], [ 100, 200 ], [ 200, 100 ]);
- Cv::Seq::Point->new(&Cv::CV_32SC2)->push(@points)
-	->minEnclosingCircle(my $center, my $radius);
-
-ToArray() convert from the sequence to the Perl array.  The following
-code draws all circles stored in the sequence $circles.
-
- $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
-	for $circles->toArray;
-
-ToArray() overrides @{}, so you can write it more easily.
-
- $img->circle($_->[0], $_->[1], CV_RGB(0, 255, 0), 3)
-	for @$circles;
-
-=cut
-
 our $USE_SEQ = 0;				# XXXXX
 
 sub FitLine {
