@@ -31,11 +31,25 @@ sub m_set {
 	my @dims = $mat->getDims;
 	if (@$idx == @dims) {
 		$value = [ $value ] unless ref $value;
-		$mat->Set($idx, $value);
+		# $mat->Set($idx, $value);
+		push(@$idx, (0) x ($mat->dims - @$idx));
+		unshift(@_, $mat, $idx);
+		push(@_, $value);
+		goto &cvSetND;
 	} elsif (@$idx == @dims - 1 && $dims[-1] == 1 &&
 			 ref $value && &Cv::CV_MAT_CN($mat->type) == @$value) {
-		$mat->Set($idx, $value);
+		# $mat->Set($idx, $value);
+		push(@$idx, (0) x ($mat->dims - @$idx));
+		unshift(@_, $mat, $idx);
+		push(@_, $value);
+		goto &cvSetND;
 	} else {
+		my @vdims = Cv::m_dims($value);
+		pop(@vdims) if $vdims[-1] == &Cv::CV_MAT_CN($mat->type);
+		while (@dims - @$idx > @vdims) {
+			last unless @dims[scalar @$idx] == 1;
+			push(@$idx, 0);
+		}
 		$mat->m_set([@$idx, $_], $value->[$_]) for 0 .. $#{$value};
 	}
 	$mat;

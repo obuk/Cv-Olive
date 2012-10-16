@@ -149,8 +149,8 @@ sub Cv::Mat::new {
 			$mat = Cv::cvCreateMat($rows, $cols, $type);
 		}
 	} elsif (@_) {
-		return undef unless Cv->can('m_dims') && Cv::Arr->can('m_set');
-		my @dims = m_dims(@_);
+		return undef unless Cv::Arr->can('m_set');
+		my @dims = Cv::m_dims(@_);
 		return undef unless @dims;
 		# push(@dims, 1) while @dims < 2;
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
@@ -448,6 +448,8 @@ sub GetND {
 	goto &cvGetND;
 }
 
+our $USE_m_set = 0;
+
 { *Set = \&SetND }
 sub SetND {
 	# Set($src, $idx0, $value);
@@ -459,37 +461,23 @@ sub SetND {
 	my $value = pop;
 	my $idx = ref $_[0] eq 'ARRAY'? shift : [ splice(@_, 0) ];
 
-=xxx
-
-	if ($src->can('m_set')) {
-		# $src->m_set(@_);
-		my @dims = $src->getDims;
-		if (@$idx == @dims) {
-			$value = [ $value ] unless ref $value;
-			# $src->Set($idx, $value);
-			unshift(@_, $src, $idx);
-			push(@_, $value);
-			goto &cvSetND;
-		} elsif (@$idx == @dims - 1 && $dims[-1] == 1 &&
-				 ref $value && &Cv::CV_MAT_CN($src->type) == @$value) {
-			# $src->Set($idx, $value);
-			unshift(@_, $src, $idx);
-			push(@_, $value);
-			goto &cvSetND;
+	if ($USE_m_set) {
+		if ($src->can('m_set')) {
+			my $cn = Cv::CV_MAT_CN($src->type);
+			$value = [@{$value}[0 .. $cn - 1]] unless @$value == $cn;
+			$src->m_set($idx, $value);
 		} else {
-			$src->m_set([@$idx, $_], $value->[$_]) for 0 .. $#{$value};
-			$src;
+			push(@$idx, (0) x ($src->dims - @$idx));
+			unshift(@_, $src, $idx);
+			push(@_, $value);
+			goto &cvSetND;
 		}
-	} else
-
-=cut
-
-	{
-		push(@$idx, (0) x ($src->dims - @$idx));
-		unshift(@_, $src, $idx);
-		push(@_, $value);
-		goto &cvSetND;
 	}
+
+	push(@$idx, (0) x ($src->dims - @$idx));
+	unshift(@_, $src, $idx);
+	push(@_, $value);
+	goto &cvSetND;
 }
 
 
