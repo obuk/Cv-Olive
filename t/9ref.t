@@ -4,8 +4,8 @@ use strict;
 # use Test::More tests => 1210;
 use Test::More qw(no_plan);
 BEGIN {
-	use_ok('Cv');
-	use_ok('Cv::Seq');			# xxxxx
+	use_ok('Cv', qw(:nomore));
+	# use_ok('Cv::Seq');			# xxxxx
 }
 
 use File::Basename;

@@ -3,7 +3,9 @@
 use strict;
 use Test::More qw(no_plan);
 # use Test::More tests => 10;
-BEGIN {	use_ok('Cv'); }
+BEGIN {
+	use_ok('Cv', qw(:nomore));
+}
 
 if (1) {
 	my @av;

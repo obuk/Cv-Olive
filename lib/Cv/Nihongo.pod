@@ -1,3 +1,4 @@
+# -*- mode: pod; coding: utf-8; tab-width: 4; -*-
 =encoding utf8
 
 =head1 名前
@@ -287,8 +288,8 @@ CV_MAKETYPE() のようなマクロのいくつかには Cv::MAKETYPE()
 
 =item *
 
-バージョン 0.16 で C<Cv> を分け、拡張したコードを分離して C<Cv::More>
-に置くことにしました。
+バージョン 0.16 で C<Cv> を分け、拡張したコードを分離して
+L<Cv::More-ja|Cv::More> に置くことにしました。
 
 =back
 

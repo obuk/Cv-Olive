@@ -5,7 +5,7 @@ use strict;
 use Test::More tests => 24;
 
 BEGIN {
-	use_ok('Cv');
+	use_ok('Cv', qw(:nomore));
 }
 
 is(CV_8U, 0);

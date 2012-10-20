@@ -2,11 +2,11 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 172;
+use Test::More tests => 171;
 
 BEGIN {
 	use_ok('Cv');
-	use_ok('Cv::More');
+	# use_ok('Cv::More');
 }
 
 for my $type (CV_8UC3, CV_16SC4, CV_32SC2, CV_32FC2, CV_64FC1) {

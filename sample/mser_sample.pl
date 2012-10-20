@@ -5,7 +5,6 @@ use strict;
 use lib qw(blib/lib blib/arch);
 
 use Cv;
-use Cv::More;
 use File::Basename;
 
 my @colors = (

@@ -2,12 +2,12 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 33;
+use Test::More tests => 32;
 
 BEGIN {
 	use_ok('Cv');
 	use_ok('Cv::Seq::SURFPoint');
-	use_ok('Cv::More');
+	# use_ok('Cv::More');
 }
 
 my $stor = Cv::MemStorage->new;

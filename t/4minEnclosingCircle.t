@@ -2,12 +2,12 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Scalar::Util qw(blessed);
 
 BEGIN {
 	use_ok('Cv');
-	use_ok('Cv::More');
+	# use_ok('Cv::More');
 }
 
 sub xy {

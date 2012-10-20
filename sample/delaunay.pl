@@ -4,7 +4,6 @@
 use lib qw(blib/lib blib/arch);
 use strict;
 use Cv;
-use Cv::Seq;
 
 {
 	package Cv::SeqReader::Edge;

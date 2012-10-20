@@ -46,10 +46,10 @@ while (1) {
 			my $color = [ ($comp_count + 1) x 3 ]; $comp_count++;
 			$markers->drawContours($contour, $color, $color, -1, -1, 8);
 		}
-		my $color_tab = Cv::Mat->new([1, 256], CV_8UC3)->zero;
-		$color_tab->set([0, 0], [ 80, 80, 80 ]);
-		$color_tab->set([0, 1], [ 255, 255, 255 ]);
-		$color_tab->set([0, $_], [ map { rand(180) + 50 } 1..3 ])
+		my $color_tab = Cv::Mat->new([256, 1], CV_8UC3)->zero;
+		$color_tab->set([0], [ 80, 80, 80 ]);
+		$color_tab->set([1], [ 255, 255, 255 ]);
+		$color_tab->set([$_], [ map { rand(180) + 50 } 1..3 ])
 			foreach (2 .. $comp_count + 1);
 		my $t = Cv->GetTickCount();
 		$img0->watershed($markers);

@@ -5,7 +5,7 @@ use Test::More qw(no_plan);
 # use Test::More tests => 10;
 
 BEGIN {
-	use_ok('Cv');
+	use_ok('Cv', qw(:nomore));
 }
 
 my $src = Cv::Mat->new([ 3, 3 ], CV_8UC4);

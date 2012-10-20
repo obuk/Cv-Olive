@@ -22,35 +22,73 @@ sub m_dims {
 	}
 }
 
+
+{
+	no warnings 'redefine';
+	sub Cv::Mat::new { goto &m_new }
+}
+
+sub m_new {
+	my $self = shift;
+	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
+	my $type = @_? shift : $self->type;
+	my $mat;
+	if (@$sizes) {
+		my ($rows, $cols) = @$sizes; $cols ||= 1;
+		if (@_) {
+			my ($data, $step) = @_; $step ||= &Cv::CV_AUTOSTEP;
+			$mat = Cv::cvCreateMatHeader($rows, $cols, $type);
+			$mat->setData($data, $step) if $data;
+		} else {
+			$mat = Cv::cvCreateMat($rows, $cols, $type);
+		}
+	} elsif (@_) {
+		my @dims = m_dims(@_);
+		return undef unless @dims;
+		# push(@dims, 1) while @dims < 2;
+		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
+		my ($rows, $cols) = @dims; $cols ||= 1;
+		$mat = Cv::cvCreateMat($rows, $cols, $type);
+		eval { $mat->m_set([], \@_) };
+		if (my $err = $@) {
+			chop($err);
+			1 while ($err =~ s/ at .*$//);
+			Carp::croak $err;
+		}
+	}
+	$mat;
+}
+
 package Cv::Arr;
+
+{
+	no warnings 'redefine';
+	*Set = *set = sub {
+		my $RETVAL = &m_set;
+		if (my $err = $@) {
+			chop($err);
+			1 while ($err =~ s/ at .*$//);
+			Carp::croak $err;
+		}
+		$RETVAL;
+	}
+}
 
 sub m_set {
 	my $mat = shift;
-	my $idx = shift;
-	my $value = shift;
+	my $value = pop;
+	my $idx = ref $_[0] eq 'ARRAY'? shift : [ splice(@_, 0) ];
 	my @dims = $mat->getDims;
-	if (@$idx == @dims) {
+	if (@dims <= @$idx) {
 		$value = [ $value ] unless ref $value;
-		# $mat->Set($idx, $value);
-		push(@$idx, (0) x ($mat->dims - @$idx));
-		unshift(@_, $mat, $idx);
-		push(@_, $value);
+		unshift(@_, $mat, $idx, $value);
 		goto &cvSetND;
-	} elsif (@$idx == @dims - 1 && $dims[-1] == 1 &&
-			 ref $value && &Cv::CV_MAT_CN($mat->type) == @$value) {
-		# $mat->Set($idx, $value);
-		push(@$idx, (0) x ($mat->dims - @$idx));
-		unshift(@_, $mat, $idx);
-		push(@_, $value);
-		goto &cvSetND;
-	} else {
-		my @vdims = Cv::m_dims($value);
-		pop(@vdims) if $vdims[-1] == &Cv::CV_MAT_CN($mat->type);
-		while (@dims - @$idx > @vdims) {
-			last unless @dims[scalar @$idx] == 1;
-			push(@$idx, 0);
-		}
+	} elsif (ref $value && ref $value->[0] ||
+			 ref $value && @$value > 1 && $dims[-1] > 1 &&
+			 	Cv::CV_MAT_CN($mat->type) == 1) {
 		$mat->m_set([@$idx, $_], $value->[$_]) for 0 .. $#{$value};
+	} else {
+		$mat->m_set([@$idx, 0], $value);
 	}
 	$mat;
 }
@@ -207,9 +245,31 @@ sub ContourArea {
 }
 
 
+package Cv::Arr;
+
+sub Affine {
+	my $src = shift;
+	my $dst = dst(@_) || $src->new;
+	my $mat = shift;
+	my $matrix = Cv::Mat->new([ ], &Cv::CV_32FC1, @$mat);
+	unshift(@_, $src, $dst, $matrix);
+	goto &GetQuadrangleSubPix;
+}
+
+sub matrix {
+	my $matrix = shift;
+	my $rows = @$matrix;
+	my $cols = @{$matrix->[0]};
+	my @m = map @$_, @$matrix;
+	($rows, $cols, @m);
+}
+
+
 # ============================================================
 #  highgui. High-level GUI and Media I/O: Qt new functions
 # ============================================================
+
+package Cv;
 
 sub GetBuildInformation {
 	ref (my $class = shift) and Cv::croak 'class name needed';
@@ -277,7 +337,7 @@ unless (Cv->hasQt) {
 	*Cv::Arr::cvAddText =
 	*Cv::cvDisplayOverlay =
 	*Cv::cvDisplayStatusBar =
-	*Cv::cvCreateOpenGLCallback = sub { croak "no Qt" };
+	*Cv::cvCreateOpenGLCallback = sub { Carp::croak "no Qt" };
 }
 
 1;

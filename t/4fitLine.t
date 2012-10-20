@@ -2,12 +2,12 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 11;
 # use List::Util qw(sum min max);
 
 BEGIN {
 	use_ok('Cv 0.15');
-	use_ok('Cv::More');
+	# use_ok('Cv::More');
 }
 
 if (1) {

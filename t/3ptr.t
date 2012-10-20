@@ -3,7 +3,9 @@
 use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
-BEGIN { use_ok('Cv') }
+BEGIN {
+	use_ok('Cv', qw(:nomore));
+}
 
 if (1) {
 	my $mat = Cv::Mat->new([3, 1], CV_8UC1);

@@ -6,7 +6,7 @@ use Test::More qw(no_plan);
 
 BEGIN {
 	use_ok('Cv');
-	use_ok('Cv::More');
+	# use_ok('Cv::More');
 }
 
 my $verbose = 0;

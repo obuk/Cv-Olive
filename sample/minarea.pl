@@ -5,7 +5,6 @@ use strict;
 use lib qw(blib/lib blib/arch);
 
 use Cv;
-use Cv::More;
 
 my $img = Cv->CreateMat(500, 500, CV_8UC3);
 while (1) {

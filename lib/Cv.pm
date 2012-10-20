@@ -65,8 +65,18 @@ our @EXPORT = ( );
 
 sub import {
 	my $self = shift;
-	push(@_, ":std") unless @_;
-	$self->export_to_level(1, $self, @_);
+	my @std = ();
+	my %auto = (more => 'Cv::More', seq => 'Cv::Seq');
+	for (@_) {
+		if (/^:no(\w+)$/) {
+			delete $auto{lc $1};
+		} else {
+			push(@std, $_);
+		}
+	}
+	eval "use $_" for values %auto;
+	push(@std, ":std") unless @std;
+	$self->export_to_level(1, $self, @std);
 }
 
 sub DESTROY { }
@@ -120,16 +130,14 @@ sub Cv::Image::new {
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
 	Carp::croak "usage: Cv::Image->new(sizes, type)" unless $depth;
 	my $image;
-	if (@$sizes) {
-		my ($rows, $cols) = @$sizes;
-		if (@_) {
-			$image = Cv::cvCreateImageHeader([$cols, $rows], $depth, $channels);
-			$image->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
-		} else {
-			$image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
-		}
-		$image->origin($self->origin) if ref $self;
+	my ($rows, $cols) = @$sizes;
+	if (@_) {
+		$image = Cv::cvCreateImageHeader([$cols, $rows], $depth, $channels);
+		$image->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
+	} else {
+		$image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
 	}
+	$image->origin($self->origin) if ref $self;
 	$image;
 }
 
@@ -138,32 +146,15 @@ sub Cv::Mat::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_? shift : $self->type;
-	my $mat;
-	if (@$sizes) {
-		my ($rows, $cols) = @$sizes; $cols ||= 1;
-		if (@_) {
-			my ($data, $step) = @_; $step ||= &Cv::CV_AUTOSTEP;
-			$mat = Cv::cvCreateMatHeader($rows, $cols, $type);
-			$mat->setData($data, $step) if $data;
-		} else {
-			$mat = Cv::cvCreateMat($rows, $cols, $type);
-		}
-	} elsif (@_) {
-		return undef unless Cv::Arr->can('m_set');
-		my @dims = Cv::m_dims(@_);
-		return undef unless @dims;
-		# push(@dims, 1) while @dims < 2;
-		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
-		my ($rows, $cols) = @dims; $cols ||= 1;
-		$mat = Cv::cvCreateMat($rows, $cols, $type);
-		eval { $mat->m_set([], \@_) };
-		if (my $err = $@) {
-			chop($err);
-			1 while ($err =~ s/ at .*$//);
-			Carp::croak $err;
-		}
+	my ($rows, $cols) = @$sizes; $cols ||= 1;
+	if (@_) {
+		my ($data, $step) = @_; $step ||= &Cv::CV_AUTOSTEP;
+		my $mat = Cv::cvCreateMatHeader($rows, $cols, $type);
+		$mat->setData($data, $step) if $data;
+		$mat;
+	} else {
+		Cv::cvCreateMat($rows, $cols, $type);
 	}
-	$mat;
 }
 
 
@@ -448,9 +439,7 @@ sub GetND {
 	goto &cvGetND;
 }
 
-our $USE_m_set = 0;
-
-{ *Set = \&SetND }
+{ *Set = *set = \&SetND }
 sub SetND {
 	# Set($src, $idx0, $value);
 	# Set($src, $idx0, $idx1, $value);
@@ -460,23 +449,8 @@ sub SetND {
 	my $src = shift;
 	my $value = pop;
 	my $idx = ref $_[0] eq 'ARRAY'? shift : [ splice(@_, 0) ];
-
-	if ($USE_m_set) {
-		if ($src->can('m_set')) {
-			my $cn = Cv::CV_MAT_CN($src->type);
-			$value = [@{$value}[0 .. $cn - 1]] unless @$value == $cn;
-			$src->m_set($idx, $value);
-		} else {
-			push(@$idx, (0) x ($src->dims - @$idx));
-			unshift(@_, $src, $idx);
-			push(@_, $value);
-			goto &cvSetND;
-		}
-	}
-
 	push(@$idx, (0) x ($src->dims - @$idx));
-	unshift(@_, $src, $idx);
-	push(@_, $value);
+	unshift(@_, $src, $idx, $value);
 	goto &cvSetND;
 }
 
@@ -1391,24 +1365,6 @@ sub GetQuadrangleSubPix {
 	unshift(@_, $src, $dst);
 	goto &cvGetQuadrangleSubPix;
 }
-
-sub Affine {
-	my $src = shift;
-	my $dst = dst(@_) || $src->new;
-	my $mat = shift;
-	my $matrix = Cv::Mat->new([ ], &Cv::CV_32FC1, @$mat);
-	unshift(@_, $src, $dst, $matrix);
-	goto &GetQuadrangleSubPix;
-}
-
-sub matrix {
-	my $matrix = shift;
-	my $rows = @$matrix;
-	my $cols = @{$matrix->[0]};
-	my @m = map @$_, @$matrix;
-	($rows, $cols, @m);
-}
-
 
 sub LinearPolar {
 	# LinearPolar(src, dst, center, maxRadius, [flags]);

@@ -5,8 +5,8 @@ use Test::More qw(no_plan);
 # use Test::More tests => 63;
 
 BEGIN {
-	use_ok('Cv');
-	use_ok('Cv::Seq');			# xxxxx
+	use_ok('Cv', qw(:nomore));
+	# use_ok('Cv::Seq');			# xxxxx
 }
 
 my $stor = Cv::MemStorage->new;

@@ -4,7 +4,6 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use Cv::More;
 
 my $ARRAY = 0;					# 1: Cv:Mat, 0: Cv::Seq
 $ARRAY = 1 if $0 =~ /-arr/;
@@ -21,7 +20,7 @@ while (1) {
 	if (!$ARRAY) {
         $p = Cv::Seq::Point->new(CV_32SC2, $storage);
 	} else {
-        $p = Cv::Mat->new([1, $count], CV_32SC2);
+        $p = Cv::Mat->new([$count, 1], CV_32SC2);
 	}
 
 	foreach (0 .. $count - 1) {
@@ -29,7 +28,7 @@ while (1) {
 		if (!$ARRAY) {
 			$p->Push($pt);
 		} else {
-			$p->Set([0, $_], $pt);
+			$p->Set([$_], $pt);
 		}
 	}
 
@@ -37,7 +36,7 @@ while (1) {
 	if (!$ARRAY) {
 		$hull = bless $p->ConvexHull2, "Cv::Seq::Point";
 	} else {
-		$hull = Cv::Mat->new([ 1, $count ], CV_32SC1);
+		$hull = Cv::Mat->new([ $count, 1 ], CV_32SC1);
         $p->ConvexHull2($hull);
 	}
 
@@ -47,7 +46,7 @@ while (1) {
 		if (!$ARRAY) {
 			$pt = $p->Get($_);
 		} else {
-			$pt = $p->Get([0, $_]);
+			$pt = $p->Get([$_]);
 		}
 		$img->Circle($pt, 2, CV_RGB(255, 0, 0), CV_FILLED, CV_AA, 0);
 	}
@@ -55,7 +54,7 @@ while (1) {
 		if (!$ARRAY) {
 			[ $hull->Get($_) ];
 		} else {
-			[ @{ $p->Get( [ 0, ${ $hull->Get([0, $_]) }[0] ] ) }[0..1] ];
+			[ @{ $p->Get( [ ${ $hull->Get([$_]) }[0] ] ) }[0..1] ];
 		}
 	} (0 .. $hull->total - 1);
 	$img->polyLine([\@pts], -1, CV_RGB(0, 255, 0), 1, CV_AA, 0);

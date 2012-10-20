@@ -6,7 +6,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-use Cv;
+use Cv qw(:nomore);
 use Cv::Seq::Seq;
 
 our @ISA = qw(Cv::Arr);
@@ -129,7 +129,7 @@ sub Splice {
 { *cvSeqInvert = \&Cv::Arr::cvSeqInvert }
 # { *ToArray = \&CvtSeqToArray }
 { *Get = \&GetSeqElem }
-{ *Set = \&SetSeqElem }
+{ *Set = *set = \&SetSeqElem }
 { *Invert = *Reverse = *SeqInvert = \&SeqInvert }
 
 1;

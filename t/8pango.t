@@ -12,8 +12,10 @@ if ($@) {
 	plan qw(no_plan);
 }
 
-use Cv;
-use_ok('Cv::Pango');
+BEGIN {
+	use_ok('Cv', qw(:nomore));
+	use_ok('Cv::Pango');
+}
 
 my $verbose = Cv->hasGUI;
 

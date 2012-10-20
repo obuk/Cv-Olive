@@ -3,7 +3,9 @@
 use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 33;
-BEGIN { use_ok('Cv') }
+BEGIN {
+	use_ok('Cv', qw(:nomore));
+}
 
 # ------------------------------------------------------------
 # double cvGetReal1D(const CvArr* arr, int idx0)
@@ -67,7 +69,7 @@ SKIP: {
 		my $m = Cv::Mat->new([240, 320], CV_64FC($n));
 		my $v = cvScalar(map { rand 1 } 1..$n);
 		my $i = [map { int rand $_ } @{$m->sizes}];
-		$m->set($i, $v);
+		eval { $m->set($i, $v) };
 		if ($n == 1) {
 			is($m->getReal($i), $v->[0]);
 		} else {

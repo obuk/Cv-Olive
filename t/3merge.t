@@ -5,7 +5,7 @@ use strict;
 use Test::More tests => 141;
 
 BEGIN {
-	use_ok('Cv');
+	use_ok('Cv', qw(:nomore));
 }
 
 if (1) {

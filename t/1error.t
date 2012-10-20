@@ -5,7 +5,7 @@ use strict;
 use Test::More tests => 26;
 
 BEGIN {
-	use_ok('Cv');
+	use_ok('Cv', qw(:nomore));
 }
 
 use Data::Dumper;

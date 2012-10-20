@@ -4,8 +4,10 @@ use strict;
 use Test::More qw(no_plan);
 # use Test::More tests => 10;
 
-BEGIN {	use_ok('Cv');}
-BEGIN {	use_ok('Cv::Flipbook');}
+BEGIN {
+	use_ok('Cv', qw(:nomore));
+	use_ok('Cv::Flipbook');
+}
 
 use File::Basename;
 use List::Util qw(min max);

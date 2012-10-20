@@ -2,12 +2,12 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 3;
+use Test::More tests => 2;
 use List::Util qw(sum min max);
 
 BEGIN {
 	use_ok('Cv');
-	use_ok('Cv::More');
+	# use_ok('Cv::More');
 }
 
 my $verbose = Cv->hasGUI;

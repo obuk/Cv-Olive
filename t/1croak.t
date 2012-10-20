@@ -2,8 +2,10 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 2;
-use Cv qw(/^cv/);
+use Test::More tests => 3;
+BEGIN {
+	use_ok('Cv', qw(:nomore /^cv/));
+}
 
 if (1) {
 	my $at;
