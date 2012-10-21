@@ -1,0 +1,95 @@
+# -*- mode: pod; coding: utf-8; tab-width: 4; -*-
+=encoding utf8
+
+=head1 名前
+
+Cv::Seq - OpenCV のシーケンスを取り扱う。
+
+=head1 概要
+
+=head1 説明
+
+OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。Perl
+の配列に似ていますが、柔軟な分だけその取り扱いは少し難しいと思います。
+そこで、格納されたデータ型を意識せずに扱うスーパクラス
+L<Cv::Seq|Cv::Seq-ja> と、データ型に合わせた変換を行う派生クラス
+L<Cv::Seq::Point|Cv::Seq::Point-ja>,
+L<Cv::Seq::Rect|Cv::Seq::Rect-ja>, ... を用意し、データ型に合わせて
+bless して使うことにしました。C言語のキャストのようなものです。
+
+いろいろなものを格納する Cv::Seq のデータは、Perl では文字列で表わし、
+派生クラスはその文字列を pack/unpack で Perl の配列に変換するという分
+担です。
+
+facedetect の一部を示します。HaarDetectObjects() は、検出した顔を複数の
+CvRect 型のデータのリストにして返します。次の例は、シーケンスを
+C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
+
+  my $faces = bless $image->HaarDetectObjects(
+    $cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+    cvSize(30, 30)), "Cv::Seq::Rect";
+  while (my @rect = $faces->shift) {
+    my ($x, $y, $w, $h) = @rect;
+    ...
+  }
+
+同じ部分を C言語で書いて並べておきます。見比べやすくするために、
+余分なものは省いてあります。
+
+  CvSeq* faces = cvHaarDetectObjects(
+    image, cascade, storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+    cvSize(30, 30));
+  for (;;) {
+    CvRect rect;
+    cvSeqPopFront(faces, &rect);
+    ...
+  }
+
+OpenCV のシーケンスは Perl の配列に似ているので、シーケンスを操作するメ
+ソッドとして C<Push>, C<Pop>, C<Shift>, C<Unshift> を用意しました。
+
+=head2 メソッド
+
+=over
+
+=item Cv->CreateSeq()
+
+=item CreateSeq($seqFlags, $headerSize, $elemSize, $stor)
+
+=item Cv::Seq->MakeSeqHeaderForArray($seqFlags, $headerSize, $elemSize, $stor)
+
+=item Cv::Seq->new($seqFlags, $headerSize, $elemSize, $stor)
+
+=item $seq->Push(@elem)
+
+=item $seq->Pop()
+
+=item $seq->Unshift(@elem)
+
+=item $seq->Shift()
+
+=item $seq->Splice()
+
+	# splice($array, $offset, $length, @list)
+	# splice($array, $offset, $length)
+	# splice($array, $offset)
+
+=back
+
+=head1 バグ
+
+=head1 参考
+
+L<Cv::Nihongo|Cv::Nihongo>,
+L<Cv::More|Cv::More-ja>
+
+=head1 著作権
+
+Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+
+Copyright (c) 2012 by Yuta MASUDA.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
