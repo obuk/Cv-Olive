@@ -14,6 +14,7 @@ lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
+lib/Cv/More-ja.pod
 lib/Cv/More.pm
 lib/Cv/Nihongo.pod
 lib/Cv/Pango-ja.pod
@@ -167,7 +168,6 @@ t/3matchTemplate.t
 t/3merge.t
 t/3minMaxLoc.t
 t/3mixChannels.t
-t/3moments.t
 t/3mouse.t
 t/3polyLine.t
 t/3ptr.t
@@ -181,6 +181,7 @@ t/3sum.t
 t/3threshold.t
 t/3trackbar.t
 t/4contour.t
+t/4CvMat-More.t
 t/4CvSeq-Circle.t
 t/4CvSeq-Point.t
 t/4CvSeq-Rect.t
@@ -194,6 +195,7 @@ t/4houghCircle.t
 t/4makeSeqHeaderForArray.t
 t/4minAreaRect.t
 t/4minEnclosingCircle.t
+t/4moments.t
 t/4overload.t
 t/4pointSeqFromMat.t
 t/4projectPoints2.t

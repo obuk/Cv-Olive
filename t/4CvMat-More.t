@@ -6,11 +6,10 @@ use Test::More qw(no_plan);
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
 }
 
 if (1) {
-	my $arr = Cv::Mat->new([], CV_32FC1);
+	my $arr = eval { Cv::Mat->new([], CV_32FC1) };
 	ok(!$arr);
 }
 

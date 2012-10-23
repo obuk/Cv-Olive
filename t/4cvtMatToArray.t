@@ -6,7 +6,6 @@ use Test::More tests => 21;
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
 }
 
 if (1) {

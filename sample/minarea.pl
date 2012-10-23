@@ -15,7 +15,9 @@ while (1) {
 	$img->circle($_, 3, cvScalar(0, 0, 255), CV_FILLED, CV_AA) for @points;
 	my $box = Cv->minAreaRect(@points);
 	$img->polyLine([[Cv->boxPoints($box)]], -1, cvScalar(0, 255, 0), 1, CV_AA);
-	my ($center, $radius) = Cv->minEnclosingCircle(@points);
+	# my ($center, $radius) = Cv->minEnclosingCircle(@points);
+	my $center_radius = Cv->minEnclosingCircle(@points); # XXXXX
+	my ($center, $radius) = @$center_radius;
 	$img->circle($center, $radius, cvScalar(0, 255, 255), 1, CV_AA); 
 	$img->show("rect & circle");
 	my $key = Cv->waitKey;

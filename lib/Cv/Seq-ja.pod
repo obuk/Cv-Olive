@@ -9,17 +9,11 @@ Cv::Seq - OpenCV のシーケンスを取り扱う。
 
 =head1 説明
 
-OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。Perl
-の配列に似ていますが、柔軟な分だけその取り扱いは少し難しいと思います。
-そこで、格納されたデータ型を意識せずに扱うスーパクラス
-L<Cv::Seq|Cv::Seq-ja> と、データ型に合わせた変換を行う派生クラス
-L<Cv::Seq::Point|Cv::Seq::Point-ja>,
-L<Cv::Seq::Rect|Cv::Seq::Rect-ja>, ... を用意し、データ型に合わせて
-bless して使うことにしました。C言語のキャストのようなものです。
-
-いろいろなものを格納する Cv::Seq のデータは、Perl では文字列で表わし、
-派生クラスはその文字列を pack/unpack で Perl の配列に変換するという分
-担です。
+OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。格納さ
+れたデータを型なしで扱うスーパクラス L<Cv::Seq|Cv::Seq-ja> と、データに
+合わせた変換を行う派生クラス L<Cv::Seq::Point|Cv::Seq::Point-ja>,
+L<Cv::Seq::Rect|Cv::Seq::Rect-ja>, ... に分け、データに合わせて bless
+して使います。C言語のキャストのようなものです。
 
 facedetect の一部を示します。HaarDetectObjects() は、検出した顔を複数の
 CvRect 型のデータのリストにして返します。次の例は、シーケンスを
@@ -33,8 +27,8 @@ C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
     ...
   }
 
-同じ部分を C言語で書いて並べておきます。見比べやすくするために、
-余分なものは省いてあります。
+同じ部分の C言語のコードを並べておきます。比べやすくするために、余分な
+ものは省きました。
 
   CvSeq* faces = cvHaarDetectObjects(
     image, cascade, storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
@@ -44,9 +38,6 @@ C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
     cvSeqPopFront(faces, &rect);
     ...
   }
-
-OpenCV のシーケンスは Perl の配列に似ているので、シーケンスを操作するメ
-ソッドとして C<Push>, C<Pop>, C<Shift>, C<Unshift> を用意しました。
 
 =head2 メソッド
 

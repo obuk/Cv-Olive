@@ -3,7 +3,7 @@
 
 use strict;
 use lib qw(blib/lib blib/arch);
-use Cv qw(:nomore :noseq);
+use Cv;
 use File::Basename;
 
 my $imagename = shift || dirname($0) . "/lena.jpg";

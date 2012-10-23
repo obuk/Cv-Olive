@@ -6,9 +6,21 @@ use 5.008008;
 use strict;
 use warnings;
 
+# use Cv qw( );
 use Cv::Seq::Point;
 
 package Cv;
+
+sub ec (&) {
+	my $code = shift;
+	my $r;
+	eval { $r = &$code };
+	if (my $e = $@) {
+		chop($e); 1 while ($e =~ s/ at .*$//g);
+		Carp::croak $e;
+	}
+	$r;
+}
 
 sub m_dims {
 	if (@_) {
@@ -49,12 +61,8 @@ sub m_new {
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
 		my ($rows, $cols) = @dims; $cols ||= 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
-		eval { $mat->m_set([], \@_) };
-		if (my $err = $@) {
-			chop($err);
-			1 while ($err =~ s/ at .*$//);
-			Carp::croak $err;
-		}
+		my $init = \@_;
+		ec { $mat->m_set([], $init) };
 	}
 	$mat;
 }
@@ -64,13 +72,8 @@ package Cv::Arr;
 {
 	no warnings 'redefine';
 	*Set = *set = sub {
-		my $RETVAL = &m_set;
-		if (my $err = $@) {
-			chop($err);
-			1 while ($err =~ s/ at .*$//);
-			Carp::croak $err;
-		}
-		$RETVAL;
+		my $args = \@_;
+		Cv::ec { &m_set(@$args) };
 	}
 }
 
@@ -152,96 +155,158 @@ sub overload_nomethod {
 	Carp::croak "$0: can't overload ", ref $_[0], "::", $_[3]
 }
 
+package Cv::Arr;
+
+sub ContourArea {
+	# ContourArea(IN points)
+	my $args = \@_;
+	Cv::ec { cvContourArea(@$args) };
+}
+
+sub FitLine {
+	# FitLine(IN points, IN dist_type, IN param, IN reps, IN aeps, OUT line)
+	my $points = shift;
+	my $rline = \ [];			# dummy
+	if (@_ && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
+		$rline = \ $_[-1]; pop;
+	}
+	my $distType = @_ && shift || &Cv::CV_DIST_L2;
+	my $param    = @_ && shift || 0;
+	my $reps     = @_ && shift || 0.01;
+	my $aeps     = @_ && shift || 0.01;
+	Cv::ec {
+		cvFitLine($points, $distType, $param, $reps, $aeps, $$rline);
+		$$rline;
+	};
+}
+
+
+sub FitEllipse2 {
+	# FitEllipse2(IN points, OUT box)
+	my $points = shift;
+	my $xbox;					# dummy
+	my $rbox = \ $xbox;
+	if (@_ >= 1 && !defined $_[-1]) {
+		$rbox = \ $_[-1]; pop;
+	}
+	Cv::ec {
+		@$$rbox = @{ cvFitEllipse2($points) };
+		$$rbox;
+	};
+}
+
+
+sub MinAreaRect2 {
+	# MinAreaRect2(IN points, OUT box)
+	my $points = shift;
+	my $xbox;					# dummy
+	my $rbox = \ $xbox;
+	if (@_ >= 1 && !defined $_[-1]) {
+		$rbox = \ $_[-1]; pop;
+	}
+	Cv::ec {
+		@$$rbox = @{ cvMinAreaRect2($points) };
+		$$rbox;
+	};
+}
+
+
+sub MinEnclosingCircle {
+	# MinEnclosingCircle(IN points, OUT center OUT radius)
+	my $points = shift;
+	my ($xcenter, $xradius);	# dummy
+	my ($rcenter, $rradius) = (\$xcenter, \$xradius);
+	if (@_ >= 2 &&
+		# undef or scalar
+		(!defined $_[-2] || !ref $_[-2]) &&
+		(!defined $_[-1] || !ref $_[-1])) {
+		($rcenter, $rradius) = (\$_[-2], \$_[-1]);
+		pop; pop;
+	}
+	Cv::ec {
+		cvMinEnclosingCircle($points, $$rcenter, $$rradius)?
+			[$$rcenter, $$rradius] : undef;
+	};
+}
+
 
 package Cv;
-
-# ============================================================
-#  core. The Core Functionality: Dynamic Structures
-# ============================================================
-
-our $USE_SEQ = 0;				# XXXXX
 
 sub FitLine {
 	# cvFitLine(points, dist_type, param, reps, aeps, line)
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $arr = shift;
-	unless (ref $arr eq 'ARRAY' && ref $arr->[0] eq 'ARRAY' &&
-			((scalar @{$arr->[0]} == 2) || (scalar @{$arr->[0]} == 3)) &&
-			@_ >= 1) {
-		Cv::croak "usage: Cv->FitLine(points, ..., line)";
+	my $init = shift;
+	my $rline = \ [];			# dummy
+	if (@_ >= 1 && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
+		$rline = \ $_[-1]; pop;
 	}
-	my $dist_type = @_ >= 2 && shift || Cv::CV_DIST_L2;
-	my $param = @_ >= 2 && shift || 0;
-	my $reps = @_ >= 2 && shift || 0.01;
-	my $aeps = @_ >= 2 && shift || 0.01;
-	unshift(@_, $dist_type, $param, $reps, $aeps);
-	my $type = &Cv::CV_32FC(scalar @{$arr->[0]});
-	my $points;
-	if ($USE_SEQ) {
-		$points = Cv::Seq::Point->new($type, &Cv::Seq::STORAGE);
-		$points->Push(@$arr);
-	} else {
-		my $type = &Cv::CV_32FC(scalar @{$arr->[0]});
-		$points = Cv::Mat->new([], $type, $arr);
-	}
-	unshift(@_, $points);
-	goto &Cv::Arr::cvFitLine;
+	my @dims = m_dims(@$init);
+	my $params = \@_;
+	Cv::ec {
+		my $points = Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$init);
+		Cv::Arr::FitLine($points, @$params, $$rline);
+	};
 }
+
 
 { *FitEllipse = \&FitEllipse2 }
 sub FitEllipse2 {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points;
-	if ($USE_SEQ) {
-		my $stor = Cv::Seq::stor(@_);
-		$points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
-		$points->Push(@_ > 1 ? @_ : @{$_[0]});
-	} else {
-		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	my $xbox;					# dummy
+	my $rbox = \ $xbox;
+	if (@_ >= 1 && !defined $_[-1]) {
+		$rbox = \ $_[-1]; pop;
 	}
-	$points->FitEllipse2;
+	my $init = \@_;
+	Cv::ec {
+		my $points = Cv::Mat->new([], &Cv::CV_32SC2, @$init);
+		Cv::Arr::FitEllipse2($points, $$rbox);
+	};
 }
+
 
 { *MinAreaRect = \&MinAreaRect2 }
 sub MinAreaRect2 {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points;
-	if ($USE_SEQ) {
-		my $stor = Cv::Seq::stor(@_);
-		$points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
-		$points->Push(@_ > 1 ? @_ : @{$_[0]});
-		unshift(@_, $stor);
-	} else {
-		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	my $xbox;					# dummy
+	my $rbox = \ $xbox;
+	if (@_ >= 1 && !defined $_[-1]) {
+		$rbox = \ $_[-1]; pop;
 	}
-	$points->minAreaRect2;
+	my $init = \@_;
+	Cv::ec {
+		my $points = Cv::Mat->new([], &Cv::CV_32SC2, @$init);
+		Cv::Arr::MinAreaRect2($points, $$rbox);
+	};
 }
+
 
 sub MinEnclosingCircle {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points;
-	if ($USE_SEQ) {
-		my $stor = Cv::Seq::stor(@_);
-		$points = Cv::Seq::Point->new(&Cv::CV_32SC2, $stor);
-		$points->Push(@_ > 1 ? @_ : @{$_[0]});
-	} else {
-		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+	my ($xcenter, $xradius);	# dummy
+	my ($rcenter, $rradius) = (\$xcenter, \$xradius);
+	if (@_ >= 2 &&
+		# undef or scalar
+		(!defined $_[-2] || !ref $_[-2]) &&
+		(!defined $_[-1] || !ref $_[-1])) {
+		($rcenter, $rradius) = (\$_[-2], \$_[-1]);
+		pop; pop;
 	}
-	$points->minEnclosingCircle(my $center, my $radius);
-	wantarray? ($center, $radius) : [$center, $radius];
+	my $init = \@_;
+	Cv::ec {
+		my $points = Cv::Mat->new([], &Cv::CV_32SC2, @$init);
+		&Cv::Arr::MinEnclosingCircle($points, $$rcenter, $$rradius);
+	};
 }
+
 
 sub ContourArea {
 	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points;
-	if ($USE_SEQ) {
-		my $stor = Cv::Seq::stor(@_);
-		$points = Cv::Seq::Point->new(&Cv::CV_32SC2 | CV_SEQ_POLYLINE, $stor);
-		$points->Push(@_ > 1 ? @_ : @{$_[0]});
-	} else {
-		$points = Cv::Mat->new([], &Cv::CV_32SC2, @_);
-	}
-	$points->ContourArea;
+	my $init = \@_;
+	Cv::ec {
+		my $points = Cv::Mat->new([], &Cv::CV_32SC2, @$init);
+		&Cv::Arr::ContourArea($points);
+	};
 }
 
 

@@ -5,11 +5,11 @@ use 5.008000;
 use strict;
 use warnings;
 use lib qw(blib/lib blib/arch);
+use Cv;
 
 package Cv::TieHash;
 
 use Tie::Hash;
-use Cv;
 
 our @ISA = qw(Tie::Hash);
 
@@ -33,7 +33,8 @@ sub STORE {
 	my ($self, $key, $value) = @_;
 	my $arr = $self->[0];
 	if (ref $key eq 'ARRAY') {
-		$arr->set($key, $value);
+		# $arr->set($key, $value);
+		$arr->SetND($key, $value);
 	} else {
 		$arr->$key($value);
 	}
@@ -42,7 +43,7 @@ sub STORE {
 
 package main;
 
-use Cv;
+# use Cv qw(:nomore);
 use Time::HiRes qw(gettimeofday);
 use Data::Dumper;
 

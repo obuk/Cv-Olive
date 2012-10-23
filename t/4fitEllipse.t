@@ -7,7 +7,6 @@ use List::Util qw(sum min max);
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
 }
 
 my $verbose = Cv->hasGUI;
@@ -30,9 +29,6 @@ if (1) {
 	my @b4 = Cv->BoxPoints($box);
 	$img->polyLine([\@b4], -1, &color, 1, CV_AA);
 	$img->EllipseBox($box, &color, 1, CV_AA);
-	my $seq = Cv::Seq::Point->new(CV_32FC2)->push(@b4);
-	# my $ok = sum(map { $seq->pointPolygonTest($_, 0) } @points);
-	# ok($ok > 0);
 	if ($verbose) {
 		$img->show;
 		Cv->waitKey(1000);
@@ -56,9 +52,30 @@ if (2) {
 	my @b4 = Cv->BoxPoints($box);
 	$img->polyLine([\@b4], -1, &color, 1, CV_AA);
 	$img->EllipseBox($box, &color, 1, CV_AA);
-	my $seq = Cv::Seq::Point->new(CV_32FC2)->push(@b4);
-	# my $ok = sum(map { $seq->pointPolygonTest($_, 0) } $points->toArray);
-	# ok($ok > 0);
+	if ($verbose) {
+		$img->show;
+		Cv->waitKey(1000);
+	}
+}
+
+$img->zero;
+
+# Cv-0.16
+if (10) {
+	my @points;
+	my $a = $img->height / $img->width;
+	foreach (1 .. 100) {
+		my $b = ((rand 0.2) - 0.10) * $img->height;
+		my $x = ((rand 0.5) + 0.25) * $img->width;
+		my $y = $a * $x + $b;
+		push(@points, [$x, $y]);
+	}
+	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
+	Cv->fitEllipse(\@points, my $box);
+	$_ *= 1.3 for @{$box->[1]};	# size * 1.2
+	my @b4 = Cv->BoxPoints($box);
+	$img->polyLine([\@b4], -1, &color, 1, CV_AA);
+	$img->EllipseBox($box, &color, 1, CV_AA);
 	if ($verbose) {
 		$img->show;
 		Cv->waitKey(1000);

@@ -6,10 +6,18 @@ use 5.008008;
 use strict;
 use warnings;
 
-use Cv qw(:nomore);
-use Cv::Seq::Seq;
+use Cv qw( );
 
-our @ISA = qw(Cv::Arr);
+# use Cv::Seq::Seq;
+# our @ISA = qw(Cv::Arr);
+
+package Cv::Seq::Seq;
+
+# our @ISA = qw(Cv::Seq);
+
+{ *Get = \&GetSeqElem }
+
+package Cv::Seq;
 
 {
 	no warnings 'redefine';

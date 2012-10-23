@@ -6,7 +6,6 @@ use Test::More tests => 17;
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
 	use_ok('Cv::Seq::Circle');
 }
 

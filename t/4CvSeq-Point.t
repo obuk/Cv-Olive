@@ -6,7 +6,6 @@ use Test::More tests => 122;
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
 }
 
 sub equal($$) {

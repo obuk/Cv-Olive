@@ -66,7 +66,10 @@ our @EXPORT = ( );
 sub import {
 	my $self = shift;
 	my @std = ();
-	my %auto = (more => 'Cv::More', seq => 'Cv::Seq');
+	my %auto = (
+		more => 'Cv::More',
+		seq => 'Cv::Seq',
+		);
 	for (@_) {
 		if (/^:no(\w+)$/) {
 			delete $auto{lc $1};
@@ -74,7 +77,8 @@ sub import {
 			push(@std, $_);
 		}
 	}
-	eval "use $_" for values %auto;
+	eval "use $auto{$_}" for
+		grep { defined $auto{$_} } qw(seq more);
 	push(@std, ":std") unless @std;
 	$self->export_to_level(1, $self, @std);
 }
@@ -204,6 +208,9 @@ package Cv::SparseMat;        our @ISA = qw(Cv::MatND);
 package Cv::SparseMat::Ghost; our @ISA = qw(Cv::SparseMat); sub DESTROY {}
 package Cv::Image;            our @ISA = qw(Cv::Mat);
 package Cv::Image::Ghost;     our @ISA = qw(Cv::Image);     sub DESTROY {}
+package Cv::Seq;              our @ISA = qw(Cv::Arr);
+package Cv::Seq::Seq;         our @ISA = qw(Cv::Seq);
+package Cv::ContourScanner;   our @ISA = qw(Cv::Seq);
 
 =item *
 

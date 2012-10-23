@@ -6,7 +6,6 @@ use Test::More qw(no_plan);
 
 BEGIN {
 	use_ok('Cv');
-	# use_ok('Cv::More');
 	use_ok('Cv::Seq::Circle');
 }
 
@@ -29,6 +28,7 @@ my $storage = Cv->createMemStorage;
 my $circles = bless $gray->houghCircles(
 	$storage, CV_HOUGH_GRADIENT, 2, $gray->height/4, 200, 100
 	),	"Cv::Seq::Circle";
+can_ok($circles, 'total');
 
 my @circles = $circles->toArray;
 $img->circle($_->[0], 3, CV_RGB(0, 255, 0), 3) for @circles;
@@ -40,6 +40,7 @@ if ($circles->total > 0) {
 	is($circle->[0]->[1], $center->[1]);
 	is($circle->[1], $radius);
 }
+
 ok($circles->total >= 1);
 
 $circles->push(my $x = [[10, 20], 30]);
