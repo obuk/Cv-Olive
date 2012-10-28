@@ -8,7 +8,7 @@ Revision history for Cv.pm
      * added Cv/Flipbook-ja.pod, Cv/Pango-ja.pod
      * added Cv/More-ja.pod
      * fixed cvBoxPoints retval
-     * added wornings Cv::More::fashion
+     * added warnings Cv::More::fashion
 
 0.15 - 2012-10-01
      * fixed cvFitLine()
