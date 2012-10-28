@@ -43,14 +43,51 @@ if (2) {
 
 
 # Cv-0.16
-if (3) {
+if (10) {
 	Cv->minEnclosingCircle(@points, my $center, my $radius);
 	is(xy($center), xy([150, 150]));
 	ok(abs($radius - 50*sqrt(2)) < 3);
 }
 
-if (4) {
+if (11) {
 	Cv->minEnclosingCircle(\@points, my $center, my $radius);
 	is(xy($center), xy([150, 150]));
 	ok(abs($radius - 50*sqrt(2)) < 3);
+}
+
+SKIP: {
+	skip "can't use Capture::Tiny", 10 unless eval {
+		require Capture::Tiny;
+		sub capture (&;@) { goto &Capture::Tiny::capture };
+	};
+	my ($stdout, $stderr) = capture {
+		use warnings 'Cv::More::fashion';
+		my @list = Cv->minEnclosingCircle(@points);
+		is(scalar @list, 1);	# 1
+	};
+	is($stdout, '');			# 2
+	like($stderr, qr/but .* scaler/); # 3
+
+	($stdout, $stderr) = capture {
+		use warnings 'Cv::More::fashion';
+		my $list = Cv->minEnclosingCircle(@points);
+
+	};
+	is($stdout, '');			# 4
+	is($stderr, '');			# 5
+
+	($stdout, $stderr) = capture {
+		no warnings 'Cv::More::fashion';
+		my @list = Cv->minEnclosingCircle(@points);
+		is(scalar @list, 2);	# 6
+	};
+	is($stdout, '');			# 7
+	is($stderr, '');			# 8
+
+	($stdout, $stderr) = capture {
+		no warnings 'Cv::More::fashion';
+		my $list = Cv->minEnclosingCircle(@points);
+	};
+	is($stdout, '');			# 9
+	is($stderr, '');			# 10
 }

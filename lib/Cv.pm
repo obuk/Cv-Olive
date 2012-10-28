@@ -1543,6 +1543,15 @@ sub Threshold {
 #  imgproc. Image Processing: Structural Analysis and Shape Descriptors
 # ============================================================
 
+package Cv;
+
+sub BoxPoints {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	cvBoxPoints($_[0], my $pts);
+	@{ $_[1] //= [] } = @$pts if @_ >= 2;
+	wantarray? @$pts : $pts;
+}
+
 
 # ============================================================
 #  imgproc. Image Processing: Planar Subdivisions

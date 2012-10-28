@@ -122,7 +122,7 @@ sub dumpsub {
 
 &dumpsub(qw(main::));
 print &preamble;
-print "\n# Following constants was made from OpenCV Version: ",
+print "\n# Following constants were made from OpenCV Version: ",
 	join('.', &CV_MAJOR_VERSION, &CV_MINOR_VERSION,  &CV_SUBMINOR_VERSION),
 	".\n\n";
 print &macros;

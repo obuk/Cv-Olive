@@ -2603,18 +2603,17 @@ cvBoundingRect(CvArr* points, int update=0)
 
 
 MODULE = Cv	PACKAGE = Cv
-void
-cvBoxPoints(CvBox2D box)
-PPCODE:
-	CvPoint2D32f pts[4]; int i;
-	cvBoxPoints(box, pts);
-	EXTEND(SP, 4);
-	for (i = 0; i < 4; i++) {
-		SV* sv = sv_newmortal();
-		XS_pack_CvPoint2D32f(sv, pts[i]);
-		PUSHs(sv);
-	}
 
+void
+cvBoxPoints(CvBox2D box, pts)
+INPUT:
+	CvPoint2D32f* pts = NO_INIT
+INIT:
+	int length(pts) = 4;
+	pts = (CvPoint2D32f*)alloca(sizeof(CvPoint2D32f) * length(pts));
+	sv_setsv(ST(1), newRV((SV*)newAV())); // XXXXX
+OUTPUT:
+	pts
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void

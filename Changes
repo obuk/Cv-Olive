@@ -1,12 +1,14 @@
 Revision history for Cv.pm
 
-0.16 - 2012-10-20 (working)
+0.16 - 2012-10-27 (working)
      * separating experimental code into Cv/More.pm
      * added initializer Cv::Mat in More.pm
      * rewriting Nihongo.pod
      * fixed Cv::Flipbook has memory leak
      * added Cv/Flipbook-ja.pod, Cv/Pango-ja.pod
      * added Cv/More-ja.pod
+     * fixed cvBoxPoints retval
+     * added wornings Cv::More::fashion
 
 0.15 - 2012-10-01
      * fixed cvFitLine()

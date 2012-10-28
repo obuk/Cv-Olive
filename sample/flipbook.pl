@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
-package main;
-
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
 use Cv::Flipbook;
+use warnings qw(Cv::More::fashion);
 
 Cv->NamedWindow("Cv", 0);
 foreach my $dir (@ARGV) {

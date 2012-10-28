@@ -5,6 +5,7 @@ use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
 use Cv::Seq::SURFPoint;
+use warnings qw(Cv::More::fashion);
 use File::Basename;
 
 my $USE_FLANN = 1;

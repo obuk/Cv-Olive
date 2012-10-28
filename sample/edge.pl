@@ -3,8 +3,8 @@
 
 use strict;
 use lib qw(blib/lib blib/arch);
-
 use Cv;
+use warnings qw(Cv::More::fashion);
 use File::Basename;
 
 my $filename = @ARGV > 0 ? shift : dirname($0).'/'."fruits.jpg";

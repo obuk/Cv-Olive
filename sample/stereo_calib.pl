@@ -31,12 +31,12 @@
 # ************************************************** */
 
 use strict;
-use lib qw(blib/lib blib/arch);
-
 use IO::File;
 use File::Basename;
 use List::Util qw(max min);
+use lib qw(blib/lib blib/arch);
 use Cv;
+use warnings qw(Cv::More::fashion);
 
 &StereoCalib("stereo_calib.txt", 9, 6, 1);
 exit;

@@ -3,8 +3,8 @@
 
 use strict;
 use lib qw(blib/lib blib/arch);
-
 use Cv;
+use warnings qw(Cv::More::fashion);
 
 my $img = Cv->CreateMat(500, 500, CV_8UC3);
 while (1) {

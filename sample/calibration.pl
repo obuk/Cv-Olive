@@ -6,6 +6,7 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use warnings qw(Cv::More::fashion);
 use IO::File;
 use File::Basename;
 

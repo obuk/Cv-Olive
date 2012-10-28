@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
-use lib qw(blib/lib blib/arch);
 use strict;
+use lib qw(blib/lib blib/arch);
 use Cv;
+use warnings qw(Cv::More::fashion);
 
 {
 	package Cv::SeqReader::Edge;

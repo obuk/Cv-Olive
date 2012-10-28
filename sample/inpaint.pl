@@ -4,6 +4,7 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use warnings qw(Cv::More::fashion);
 use File::Basename;
 use Data::Dumper;
 

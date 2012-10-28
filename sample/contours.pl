@@ -4,6 +4,7 @@
 use strict;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use warnings qw(Cv::More::fashion);
 
 my $w = 500;
 my $img = Cv::Image->new([$w, $w], CV_8UC1)->Zero;

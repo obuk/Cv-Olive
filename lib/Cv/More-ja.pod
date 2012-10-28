@@ -12,11 +12,10 @@ Cv::More - L<Cv|Cv::Nihongo> をもう少し Perl で使いやすくしたいね
 
 C<Cv::More> は、L<Cv|Cv::Nihongo> から実験的な機能を切り離して整理する
 ためのパッケージです。C<Cv> が拡張しやすくなると考えています。
-C<Cv::More> は、もともと C<Cv> の一部だったので、次のとおり積極的に使わ
-ないことを明示しない限り、C<Cv> を use 文で使ったときに C<Cv::More> も
-間接的に取り込まれます。
+C<Cv::More> は、もともと C<Cv> の一部だったので、使わないことを明示しな
+い限り C<Cv::More> も取り込まれます。
 
- use Cv;              # Cv::More の拡張や実験も使う
+ use Cv;              # Cv::More を使う
  use Cv qw(:nomore);  # Cv::More を使わない
 
 =head2 Perlの配列を使う
@@ -26,8 +25,9 @@ Perl で 2次元の点のリストは、おそらく次のようなものにな�
  my @pts = ( [ $x0, $y0 ], [ $x1, $y1 ], [ $x2, $y2 ] );
 
 OpenCV には、こうしたデータを処理する関数がいくつもあります。使用するに
-は、OpenCV のマトリクスやシーケンスに変換しなければなりません。はじめは、
-このあたりから C<Cv> を使いやすくするということについて考えましょう。
+は、このようなリストを OpenCV のマトリクスやシーケンスに変換しなければ
+なりません。はじめはこのあたりから C<Cv> を使いやすくするということにつ
+いて考えてみましょう。
 
 =over
 
@@ -51,9 +51,10 @@ L<http://docs.opencv.org/modules/imgproc/doc/structural_analysis_and_shape_descr
  $mat->set([ 2, 0 ], [ $x2, $y2 ]);
 
 これは、C<Cv::Mat-E<gt>new()> にオブジェクトの作成だけでなく、初期値を
-設定する機能を持たせて、次のとおり 1つにまとめられます。大きさは初期値
-から分ります。大きさを省略する (初期値から得られる大きさを使う) という
-ことを C<[ ]> で表わすことにしましょう。
+設定する機能を持たせて、次のとおり 1つにまとめてしまいましょう。大きさ
+は初期値から分ります。しかし、大きさを指定したくなりそうな気もするので、
+省略 (初期値から得られる大きさを使うということ) を C<[ ]> で示すことに
+しておきます。
 
  my $pts = Cv::Mat->new([ ], CV_32FC2,
     [ $x0, $y0 ], [ $x1, $y1 ], [ $x2, $y2 ],
@@ -68,9 +69,9 @@ L<http://docs.opencv.org/modules/imgproc/doc/structural_analysis_and_shape_descr
     [   0,   0,   1 ],
     );
 
-書き方にも依りますが、直感的だと思います。この拡張は、C<Cv::Mat::new>
-を上書きする C<m_new()> で試し、もしうまく行ったら他のクラスへの適用も
-考えましょう。
+書き方にもよりますが、代入文を並べるより直感的だと思います。この拡張は、
+C<Cv::More> で C<Cv::Mat::new> を再定義して実験し、もし使いやすければ、
+他のクラスへの適用も考えましょう。 XXXXX
 
 =head3 マトリクスに要素を代入する
 
@@ -82,53 +83,41 @@ L<http://docs.opencv.org/modules/imgproc/doc/structural_analysis_and_shape_descr
  $mat->set([ 2, 1 ], $pts[1]);
  $mat->set([ 2, 2 ], $pts[2]);
 
-このコードは要素を 1つずつ代入しており、インデクス C<[ 2, 0 ]>, C<[ 2,
-1 ]>, C<[ 2, 2 ]> と値 C<$pts[0]>, C<$pts[1]>, C<$pts[2]> をバラで使っ
-ています。3行を1行にまとめましょう。
+このコードは要素を 1つずつ代入します。 C<Cv> は、C言語のリファレンスを
+そのまま実装したので、要素の代入しか出来ません。要素を修飾するマトリク
+スのインデクスは、要素 C<$pts[0]>, C<$pts[1]>, C<$pts[2]> に合わせて
+C<[ 2, 0 ]>, C<[ 2, 1 ]>, C<[ 2, 2 ]> になり、少々、冗長です。3行を
+1行にまとめましょう。
 
  $mat->set([ 2 ], [ $pts[0], $pts[1], $pts[2] ]);
  $mat->set([ 2 ], \@pts);
 
-すっきりしました。ただ、このインデクス C<[ 2 ]> は、いまの C<Cv> の
-C<Set()> が少し違う意味で使っています。
-
-いまの C<Cv> の C<Set()> は、C<Ptr()> と同様に省略されたインデクスに 0
-を補います。これは、1次元のリストを 2次元の Nx1 のマトリクス
-C<Cv::Mat> に格納したとき、いつも 0 になるインデクスを省き C<[ 2, 0 ]>
-を C<[ 2 ]> と書けるようにしています。
+すっきりしました。ただ、このインデクスを C<[ 2 ]> と書く省略した表現は、
+実は、すでに C<Set()> において少し違う意味で使っています。いまの
+C<Set()> は、省略したインデクスを単に 0で補います。これは、1次元のリス
+トを 2次元の C<Cv::Mat> を Nx1 で使うので、いつも 0 になるインデクスが
+できてしまうという問題の対処になっています。
 
  my $points = Cv::Mat->new([ 3, 1 ], CV_32FC2);
  $points->set([ 2 ], [ $x, $y ]);
 
-つまり C<[ 2 ]> には、C<[ 2, x ]> をまとめたものと C<[ 2, 0 ]> を省略し
-たものの意味があります。従って、インデクスの意味を解釈するには、場面
-(文脈) の参照も必要になります。
-
-=over
-
-=item
-
-私たちはいろいろな場面でそこに合った省略を使っており、決まっていること、
-分っていることは、それを省略できる場面ではそうしています。しかし、もう
-一方において、このような曖昧な表現が間違いを見付けにくくすることも経験
-しています。これは、後でこのパッケージを use したときに再定義される
-C<Cv::Arr> の m_set() において、もう少し正確に定義しましょう。
-
-=back
+というわけで、使いやすくしようとしたとき C<[ 2 ]> に C<[ 2, x ]> の要素
+をまとめた代入先という意味と、C<[ 2, 0 ]> の 0 の省略という 2つの意味を
+持たせることになります。これは C<Cv::Mat::new> を再定義する m_set() で、
+詳細について考えましょう。
 
 =head3 Perlの配列とOpenCVのシーケンス
 
 OpenCV には多数の同じ要素を格納するマトリクスと異なる要素を格納するシー
-ケンスというデータ構造があります。どちらを使っても点のリストを表現でき
-るます。マトリクスを使った点のリストは上の例で議論したので、少し視点を
-変えて、シーケンスの方から考えてみましょう。(これは
-L<Cv::Seq|Cv::Seq-ja> へ)
+ケンスというデータ構造があります。どちらでも点のリストは表現できます。
+少し視点を変えて、OpenCV に用意されているシーケンスの利用について考えて
+みましょう。(これはL<Cv::Seq|Cv::Seq-ja> へ)
 
-=head3 マトリクスやシーケンスを Perl の配列にする
+=head3 マトリクスを Perl の配列に戻す
 
-OpenCV のデータを Perl の配列に変換する場面を考えましょう。点を格納した
-Nx1 のマトリクスから順番に要素を取り出すためのコードは次のとおり書くこ
-とができます。
+それでは次に OpenCV のデータを Perl の配列に変換する、戻すということに
+ついて考えてみましょう。点を格納した Nx1 のマトリクスから順番に要素を取
+り出すためのコードは次のとおり。
 
  for (my $i = 0; $i < $mat->rows; $i++) {
    my $x = $mat->get([$i, 0]);
@@ -136,28 +125,30 @@ Nx1 のマトリクスから順番に要素を取り出すためのコードは�
  }
 
 インデクス $i は要素を取り出す場面でしか使われないことが多いので、少し
-工夫すれば次のとおり書けます。
+工夫すれば次のとおり書くことができます。
 
  for ($mat->ToArray) {
      ...
  }
 
-これは、更に C<@{}> をオーバロードして、C<ToArray()> が呼ばれるようにす
-れば、もっと簡単になります。たとえば、C<polyLine()> に点のリストを渡す
-場面は次のとおり。
+更に C<@{}> をオーバロードして C<ToArray()> を呼び出せるようにすれば、
+Perl の点の配列を扱うところで利用者の負担を減らすことができます。たとえ
+ば、点のリストを入力にする C<PolyLine()> では次のとおり。
 
- $img->polyLine([ [ @$mat ] ], -1, ...);
+ $img->polyLine([ [ @$mat ] ], ...); # もっと可能性があると思う。
 
-=head2 引数と戻り値を揃える
+=head2 メソッドに歩み寄ってもらう
 
-L</Perlの配列を使う> では Perl の配列と OpenCV のマトリクスの変換を楽に
-しようと試みました。次は、C<Cv> のメソッドを拡張し、Perl の配列を渡せ
-るようなメソッドの拡張や追加について考えましょう。
+ここまで Perl の配列と OpenCV のマトリクスとの間で、これらの変換を簡単
+にするということについて考えました。これは、OpenCV の関数を使う側が、関
+数の求めるものを用意するものでしたので、今度は、OpenCV の関数、すなわち
+C<Cv> のメソッドに、Perl の点の配列を取り扱えないか、歩み寄ってもらえな
+いか考えてみましょう。
 
-=head3 点の配列を入力にするメソッド
+=head3 C言語の面影かな
 
-点のリストを入力にするメソッドを C<Cv> の実装から集めて、入出力を揃えま
-しょう。
+細部について考える前に、点のリストを入力にするメソッドを C<Cv> の実装か
+ら集めてみましょう。
 
  my $rect = Cv->boundingRect(\@points, $update);
  Cv->fitLine(\@points, $dist_type, $param, $reps, $aeps, my $line);
@@ -166,26 +157,177 @@ L</Perlの配列を使う> では Perl の配列と OpenCV のマトリクスの
  Cv->minEnclosingCircle(\@points, my $center, my $radius);
  my $s = Cv->ContourArea(\@points);
 
-C<MinEnclosingCircle()> のように複数の結果を返すものもありますが、基本
-的には次の形式に集約できます。
+結果を引数で受けとる関数があるのは、結果が複数あるとき戻り値だけで済ま
+なかったのでしょう。たとえば、C<MinEnclosingCircle()> は、 $center と
+$radius の 2つを返したいが、できなかった。そういう感じです。これは、C言
+語の戻り値の制約によるものですが、Perl はそうではありません。
 
- my $retval = Cv->method(\@points, @parameters, my $results);
+ my $line = Cv->fitLine(\@points, $dist_type, $param, $reps, $aeps);
+ my ($center, $radius) = Cv->minEnclosingCircle(\@points);
 
-=over
+=head3 歩み寄りの歩み寄り
 
-=item *
+簡単に、使いやすく、という話は分りますが、いままでに作ったプログラムが
+動かなくなるかもしれません。いや、きっと動かなくなるでしょう。迷惑な話
+です。そう考えてあたりを見渡すと、Perl は wornings を使ってこのような問
+題に対処しているように見えます。
 
-課題もある。過去のインターフェースとの互換性。
+たとえば、いままで MiAreaRect() は、呼び出されたコンテクストに関係なく、
+いつでもスカラを返していました。サボってました。そこで、C<Cv::More> で
+戻り値をコンテクストに合わせる変更を加えるとしましょう。すると、次のよ
+うな場面で MinAreaRect() の呼出し側が影響を受けるのです。
 
-=item *
+  my @box = Cv->boxPoints(Cv->minAreaRect(\@points));         # いままで
+  my @box = Cv->boxPoints(scalar Cv->minAreaRect(\@points));  # 変更の後
 
-実装は、 C<Cv::Arr::FitLine()> と C<Cv::FitLine()> の 2つに分けて。
+簡単にしようと思っていたのに、面倒くさいことになってしまいました。やは
+りインターフェースの変更は厄介です。そこで、warnings を使って気にしてく
+れたら、問題を知らせるだけでなく、いままでどおりリストコンテクストでも
+スカラを返して、できるだけ同じ動作を保つことにしましょう。
 
-=back
+  use warnings 'Cv::More::fashion';
+  my @box = Cv->boxPoints(Cv->minAreaRect(\@points)); # 警告はあるが使える
+
+
+ * 一方的なものではなく、うまいところはみつかるでしょうか。
+ * 進めやすくするためには、心理的な制約を軽減するのもいい。
+
+XXXXX
 
 =head2 追加または拡張したメソッド
 
 =over
+
+=item FitEllipse2()
+
+ my $box2d = Cv->FitEllipse2($points);
+
+戻り値は CvBox2D です。リストコンテクストで呼ばれると、次のとおり要素が
+展開されます。
+
+ my ($center, $size, $angle) = Cv->FitEllipse2($points);
+
+Perl のリストで表わした点と、それを FitEllipse2() で処理した結果を描き
+表示するサンプルを示します。
+
+ my $img = Cv::Image->new([250, 250], CV_8UC3)->fill(cvScalarAll(255));
+ $img->origin(1);
+ my @pts = (map { [ map { $_ / 4 + rand $_ / 2 } @{$img->size} ] } 1 .. 20);
+ $img->circle($_, 3, &color, 1, CV_AA) for @pts;
+ my $box = Cv->fitEllipse(\@pts);
+ $img->polyLine([[Cv->boxPoints($box)]], -1, &color, 1, CV_AA);
+ $img->ellipseBox($box, &color, 1, CV_AA);
+ $img->show("FitEllipse2");
+ Cv->waitKey;
+ sub color { [ map { rand 255 } 1 .. 3 ] }
+
+=item FitLine()
+
+ my $line = Cv->FitLine($points, $dist_type, $param, $reps, $aeps);
+
+たくさんパラメータがあります。しかし、$points 以外のパラメータは省略で
+きます。入力 $points は、2次元の点または 3次元の点のリストです。結果は、
+入力に合わせて変ります。
+
+ my $points2d = [ [$x1, $y1], [$x2, $y2], ... ];
+ my ($vx, $vy, $x0, $y0) = Cv->FitLine($points2d, ...);
+ my $points3d = [ [$x1, $y1, $z1], [$x2, $y2, $z2], ... ];
+ my ($vx, $vy, $vz, $x0, $y0, $z0) = Cv->FitLine($points3d, ...);
+
+いくつかの点の集りにフィッティングさせた直線を描いてみましょう。
+
+ my @pts = ([ 50, 50 ], [ 100, 120 ], [ 150, 150 ], [ 200, 150 ]);
+ my ($vx, $vy, $x0, $y0) = Cv->fitLine(\@pts); 
+ $img->line((map { [ $_, $vy / $vx * ($_ - $x0) + $y0 ] } 20, 230),
+			cvScalarAll(200), 3, CV_AA);
+
+サンプルのはじめと終りは C<FitEllipse2()> を参照してください。
+
+
+=item MinAreaRect2()
+
+ my $box2d = Cv->MinAreaRect2($points);
+ my ($center, $size, $angle) = Cv->MinAreaRect2($points);
+
+戻り値は CvBox2D です。FitEllipse2() と同じような結果を返しますが。重ね
+合わせてみると違いが分ります。
+
+ for ([ [ Cv->fitEllipse(\@pts)  ], [ 200, 200, 200 ] ],
+      [ [ Cv->minAreaRect(\@pts) ], [ 100, 100, 255 ] ]) {
+   $img->polyLine([[Cv->boxPoints($_->[0])]], -1, $_->[1], 1, CV_AA);
+   $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
+ }
+
+サンプルのはじめと終りは C<FitEllipse2()> を参照してください。
+
+
+=item MinEnclosingCircle()
+
+ my $circle = Cv->MinEnclosingCircle($points);
+ my ($center, $radius) = Cv->MinEnclosingCircle($points);
+
+戻り値は、円の中心の座標 $center と半径 $radius です。CvBox2D の形に合
+わせて重ね合わせてみましょう。
+
+ my $rectangle = Cv->minAreaRect2(\@pts);
+ my $ellipse = Cv->fitEllipse2(\@pts);
+ my ($center, $radius) = Cv->minEnclosingCircle(\@pts);
+ my $circle = [ $center, [ ($radius * 2) x 2 ], 0 ];
+ for ([ $rectangle, [ 200, 200, 200 ] ],
+      # [ $ellipse,   [ 200, 200, 200 ] ],
+      [ $circle,    [ 100, 100, 255 ] ]) {
+   $img->polyLine([[Cv->boxPoints($_->[0])]], -1, $_->[1], 1, CV_AA);
+   $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
+ }
+
+サンプルで使った乱数による点のリストを処理してもあまり面白くないかもし
+れませね。点が表わすものを C<FitEllipse2()>, C<FitLine()>,
+C<MinAreaRect2()>, C<MinEnclosingCircle()> の中から元の形に合うものを選
+ぶといいでしょう。サンプルはどれも似ているので、そのはじめと終りは
+C<FitEllipse2()> から持って来てください。
+
+
+=item BoundingRect()
+
+ my $rect = Cv->BoundingRect($points)
+ my ($x, $y, $width, $height) = Cv->BoundingRect($points)
+
+点を囲む傾いていない矩形を求めます。傾いている矩形には
+C<MinAreaRect2()> を使います。戻り値は CvRect なので、CvBox2D に直すと
+C<EllipseBox()> や C<BoxPoints()> とのつながりが良くなります。
+CvRect から CvBox2D への変換は次のとおり。
+
+ my $box2d = [ [ $x + $width / 2, $y + $height / 2 ], [ $width, $height ], 0 ];
+
+
+=item ToArray()
+
+
+=item Cv::Arr::CvtMatToArray($arr)
+
+ # @array = $arr->cvtMatToArray
+ # $arr->cvtMatToArray(\@array)
+ # @array = $arr->ToArray
+
+=item Cv::Arr::ToArray($arr)
+
+=item Cv::Seq::Point::CvtSeqToArray($seq)
+
+ # @array = $seq->cvtSeqToArray
+ # @array = $seq->cvtSeqToArray($slice)
+ # $seq->cvtSeqToArray(\@array)
+ # $seq->cvtSeqToArray(\@array, $slice)
+ # @array = $seq->ToArray
+
+=item Cv::Seq::Point::ToArray($seq)
+
+=item Cv::ContourArea($points)
+
+=item Cv::Arr::Affine()
+
+=item Cv::GetBuildInformation()
+
+=item Cv::HasModule()
 
 =item Cv::Arr::m_new($size, $type, @init)
 
@@ -208,6 +350,31 @@ C<Cv> の C<new()> でできます。
 ださい。
 
 =item Cv::Arr::m_set($mat, $index, $value)
+
+マトリクスの要素、または要素のまとまりに値を代入します。 C<$index> で指
+定されたマトリクスの要素の数と C<$value> で指定された要素の値の数のバラ
+ンスがとれるように、C<$index> を補うか C<$value> をばらします。そして、
+マトリクスの要素に値を 1つずつ代入します。
+
+=over
+
+=item *
+
+代入される側、すなわちインデクスによる修飾は次のとおり。
+
+ $mat->set([], $value);       # マトリクス $mat 全体
+ $mat->set([$i], $value);     # マトリクス $mat の $i 行
+ $mat->set([$i, $j], $value); # マトリクス $mat の $i 行 $j 列 
+
+=back
+
+ * 値の数が足りないとき代入を打ち切る。
+ * m_set は set を再定義する。
+ * m_set は失敗することがある。
+ * m_ は Cv::more の〜 から。
+ * ec は eval & croak くらい。
+
+XXXXX
 
 C<$mat> の要素を特定するために必要なインデクス (C<$mat> の添字) の数が、
 C<$index> の指す配列に格納される要素の数と等しいなら C<$mat> の要素は特
@@ -243,61 +410,6 @@ C<m_set()> で再帰的に処理します。
 更に次のとおりインデクスに 0 を補い、再帰的な要素の更新を試みます。
 
  $mat->m_set([@$idx, 0], $value);
-
-=item Cv::FitLine($points, $dist_type, $param, $reps, $aeps, $line)
-
-=item Cv::Arr::FitLine($points, $dist_type = CV_DIST_L2, $param = 0, $reps = 0.01, $aeps = 0.01, $line)
-
-C<Cv> の C<FilLine()> は C<$points> で渡された Perl の配列を
-C<Cv::Mat> のオブジェクトに変換し、C<Cv::Arr::FitLine()> を呼びます。
-C<$points> は 2次元または 3次元の点の配列です。C<$line> は、2次元なら
-C<[$vx, $vy, $x0, $y0]> に、3次元なら C<[$vx, $vy, $vz, $x0, $y0,
-$z0]> になります。入力の C<$points> と出力の C<$line> 以外のパラメータ
-は指定しなければデフォルト値を使います。
-
-例を示します。いくつかの点の集りにフィッティングさせた直線を描きます。
-
- my $img = Cv::Image->new([250, 250], CV_8UC3)->fill(cvScalarAll(255));
- $img->origin(1);
- my @points = ([ 50, 50 ], [ 100, 120 ], [ 150, 150 ], [ 200, 150 ]);
- Cv->fitLine(\@points, my $line); my ($vx, $vy, $x0, $y0) = @$line;
- $img->line((map { [ $_, $vy / $vx * ($_ - $x0) + $y0 ] } 20, 230),
-			cvScalarAll(200), 3, CV_AA);
- $img->circle($_, 3, [200, 200, 255], -1, CV_AA) for @points;
- $img->show;
- Cv->waitKey;
-
-=item Cv::Arr::CvtMatToArray($arr)
-
- # @array = $arr->cvtMatToArray
- # $arr->cvtMatToArray(\@array)
- # @array = $arr->ToArray
-
-=item Cv::Arr::ToArray($arr)
-
-=item Cv::Seq::Point::CvtSeqToArray($seq)
-
- # @array = $seq->cvtSeqToArray
- # @array = $seq->cvtSeqToArray($slice)
- # $seq->cvtSeqToArray(\@array)
- # $seq->cvtSeqToArray(\@array, $slice)
- # @array = $seq->ToArray
-
-=item Cv::Seq::Point::ToArray($seq)
-
-=item Cv::FitEllipse2($points)
-
-=item Cv::MinAreaRect2($points)
-
-=item Cv::MinEnclosingCircle($points)
-
-=item Cv::ContourArea($points)
-
-=item Cv::Arr::Affine()
-
-=item Cv::GetBuildInformation()
-
-=item Cv::HasModule()
 
 =back
 

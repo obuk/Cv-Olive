@@ -3,9 +3,9 @@
 
 use strict;
 use lib qw(blib/lib blib/arch);
-
-use File::Basename;
 use Cv;
+use warnings qw(Cv::More::fashion);
+use File::Basename;
 
 sub help {
 	die <<"----";
