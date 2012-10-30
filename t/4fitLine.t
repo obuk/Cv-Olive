@@ -1,6 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 31;
 
@@ -48,6 +49,7 @@ if (4) {
 
 # Cv-0.16
 if (11) {
+	no warnings 'Cv::oldfashion';
 	my $points = Cv::Mat->new([3, 1], CV_32FC2);
 	$points->set([0], [1, 1]);
 	$points->set([1], [2, 2]);
@@ -59,6 +61,7 @@ if (11) {
 }
 
 if (12) {
+	no warnings 'Cv::oldfashion';
 	my $points = Cv::Mat->new([3, 1], CV_32FC2);
 	$points->set([0], [1, 1]);
 	$points->set([1], [2, 2]);
@@ -70,6 +73,7 @@ if (12) {
 }
 
 if (13) {
+	no warnings 'Cv::oldfashion';
 	my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], CV_DIST_L2, 0, 0.01, 0.01);
 	my ($vx, $vy, $x0, $y0) = @line;
 	cmp_ok(abs(1 - ($vy / $vx)), '<', 1e-6);
@@ -77,6 +81,7 @@ if (13) {
 }
 
 if (14) {
+	no warnings 'Cv::oldfashion';
 	my $line = Cv->FitLine([[1, 2, 1], [2, 3, 1.5], [3, 4, 2]], CV_DIST_L2);
 	my ($vx, $vy, $vz, $x0, $y0, $z0) = @$line;
 	cmp_ok(abs(1.0 - ($vy / $vx)), '<', 1e-6);
@@ -92,7 +97,7 @@ SKIP: {
 	};
 
 	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my @list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 		is(scalar @list, 1);	# 1
 	};
@@ -100,14 +105,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my $list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 	};
 	is($stdout, '');			# 4
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my @list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 		is(scalar @list, 4);	# 6
 	};
@@ -115,7 +120,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my $list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 	};
 	is($stdout, '');			# 9
@@ -124,7 +129,7 @@ SKIP: {
 	my $points = Cv::Mat->new([ ], CV_32FC2, [ [1, 2], [2, 3], [3, 4] ]);
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my @list = $points->FitLine;
 		is(scalar @list, 1);	# 11
 	};
@@ -132,14 +137,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 13
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my $list = $points->FitLine;
 	};
 	is($stdout, '');			# 14
 	is($stderr, '');			# 15
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my @list = $points->FitLine;
 		is(scalar @list, 4);	# 16
 	};
@@ -147,7 +152,7 @@ SKIP: {
 	is($stderr, '');			# 18
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my $list = $points->FitLine;
 	};
 	is($stdout, '');			# 19

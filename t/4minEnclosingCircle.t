@@ -1,6 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 7;
 
@@ -61,7 +62,7 @@ SKIP: {
 		sub capture (&;@) { goto &Capture::Tiny::capture };
 	};
 	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my @list = Cv->minEnclosingCircle(@points);
 		is(scalar @list, 1);	# 1
 	};
@@ -69,7 +70,7 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my $list = Cv->minEnclosingCircle(@points);
 
 	};
@@ -77,7 +78,7 @@ SKIP: {
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my @list = Cv->minEnclosingCircle(@points);
 		is(scalar @list, 2);	# 6
 	};
@@ -85,7 +86,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my $list = Cv->minEnclosingCircle(@points);
 	};
 	is($stdout, '');			# 9

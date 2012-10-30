@@ -5,7 +5,6 @@ package Cv::More;
 use 5.008008;
 use strict;
 use warnings;
-use warnings::register;
 
 our %M = (
 	butscalar => "called in list context, but returning scaler",
@@ -271,7 +270,7 @@ sub BoundingRect {
 	# CvRect cvBoundingRect(CvArr* points, int update=0)
 	my $retval = eval { cvBoundingRect(@_) };
 	Cv::m_croak($@) if $@;
-	if (wantarray && warnings::enabled('Cv::More')) {
+	if (wantarray && warnings::enabled('Cv::oldfashion')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
@@ -301,9 +300,9 @@ sub FitEllipse2 {
         $self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
         Cv::m_croak $@ if $@;
     }
-    my $retval = eval { Cv::Arr::cvFitEllipse2($self) };
+    my $retval = eval { cvFitEllipse2($self) };
     Cv::m_croak $@ if $@;
-    if (wantarray && warnings::enabled('Cv::More')) {
+    if (wantarray && warnings::enabled('Cv::oldfashion')) {
         Carp::carp $Cv::More::M{butscalar};
         return $retval;
     }
@@ -332,7 +331,7 @@ sub FitLine {
 	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
 	Cv::m_croak($@) if $@;
 	my $retval = $$rr;
-	if (wantarray && warnings::enabled('Cv::More')) {
+	if (wantarray && warnings::enabled('Cv::oldfashion')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
@@ -350,7 +349,7 @@ sub MinAreaRect2 {
 	}
 	my $retval = eval { cvMinAreaRect2($self) };
 	Cv::m_croak($@) if $@;
-	if (wantarray && warnings::enabled('Cv::More')) {
+	if (wantarray && warnings::enabled('Cv::oldfashion')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
@@ -379,7 +378,7 @@ sub MinEnclosingCircle {
 			[$$rcenter, $$rradius] : undef;
 	};
 	Cv::m_croak $@ if $@;
-	if (wantarray && warnings::enabled('Cv::More')) {
+	if (wantarray && warnings::enabled('Cv::oldfashion')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}

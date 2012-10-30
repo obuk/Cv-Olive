@@ -37,6 +37,7 @@ use strict;
 use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
+use warnings::register qw(oldfashion);
 
 our $VERSION = '0.16';
 

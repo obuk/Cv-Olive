@@ -1,6 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 23;
 use List::Util qw(sum min max);
@@ -44,6 +45,7 @@ if (2) {
 		$points->push([$x, $y]);
 	}
 	$img->circle($_, 3, &color, 1, CV_AA) for $points->toArray; 
+	no warnings 'Cv::oldfashion';
 	my $box = [$points->fitEllipse];
 	$_ *= 1.3 for @{$box->[1]};	# size * 1.2
 	my @b4 = Cv->BoxPoints($box);
@@ -71,7 +73,7 @@ SKIP: {
 	my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
 	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my @list = Cv->FitEllipse($pts5);
 		is(scalar @list, 1);	# 1
 	};
@@ -79,14 +81,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my $list = Cv->FitEllipse($pts5);
 	};
 	is($stdout, '');			# 4
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my @list = Cv->FitEllipse($pts5);
 		is(scalar @list, 3);	# 6
 	};
@@ -94,7 +96,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my $list = Cv->FitEllipse($pts5);
 	};
 	is($stdout, '');			# 9
@@ -103,7 +105,7 @@ SKIP: {
 	my $points = Cv::Mat->new([ ], CV_32FC2, $pts5);
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my @list = $points->FitEllipse;
 		is(scalar @list, 1);	# 11
 	};
@@ -111,14 +113,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 13
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More';
+		use warnings 'Cv::oldfashion';
 		my $list = $points->FitEllipse;
 	};
 	is($stdout, '');			# 14
 	is($stderr, '');			# 15
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my @list = $points->FitEllipse;
 		is(scalar @list, 3);	# 16
 	};
@@ -126,14 +128,14 @@ SKIP: {
 	is($stderr, '');			# 18
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More';
+		no warnings 'Cv::oldfashion';
 		my $list = $points->FitEllipse;
 	};
 	is($stdout, '');			# 19
 	is($stderr, '');			# 20
 
 	my $line;
-	use warnings 'Cv::More';
+	use warnings 'Cv::oldfashion';
 	eval {
 		$line = __LINE__; my @list = Cv->FitEllipse($pts3);
 	};

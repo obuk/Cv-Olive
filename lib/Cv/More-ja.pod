@@ -186,8 +186,11 @@ $radius の 2つを返したいが、できなかった。そういう感じで�
 なく、いままでどおり、どのようなコンテクストでもスカラを返し、できるだ
 け同じ動作を保つことにしましょう。XXXXX
 
-  use warnings 'Cv::More::fashion';
   my @box = Cv->boxPoints(Cv->minAreaRect(\@points)); # 警告はあるが使える
+
+  no warnings 'Cv::oldfashion';                       # 警告は止まる
+  my @box = Cv->boxPoints(Cv->minAreaRect(\@points)); # 動かない
+  my @box = Cv->boxPoints([Cv->minAreaRect(\@points)]); # 動く
 
 
  * 一方的なものではなく、うまいところはみつかるでしょうか。
