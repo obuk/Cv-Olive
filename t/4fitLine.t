@@ -92,7 +92,7 @@ SKIP: {
 	};
 
 	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my @list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 		is(scalar @list, 1);	# 1
 	};
@@ -100,14 +100,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my $list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 	};
 	is($stdout, '');			# 4
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my @list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 		is(scalar @list, 4);	# 6
 	};
@@ -115,7 +115,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my $list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 	};
 	is($stdout, '');			# 9
@@ -124,7 +124,7 @@ SKIP: {
 	my $points = Cv::Mat->new([ ], CV_32FC2, [ [1, 2], [2, 3], [3, 4] ]);
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my @list = $points->FitLine;
 		is(scalar @list, 1);	# 11
 	};
@@ -132,14 +132,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 13
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my $list = $points->FitLine;
 	};
 	is($stdout, '');			# 14
 	is($stderr, '');			# 15
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my @list = $points->FitLine;
 		is(scalar @list, 4);	# 16
 	};
@@ -147,7 +147,7 @@ SKIP: {
 	is($stderr, '');			# 18
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my $list = $points->FitLine;
 	};
 	is($stdout, '');			# 19

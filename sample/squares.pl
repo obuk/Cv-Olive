@@ -5,9 +5,9 @@
 # subsequentally and tries to find squares in each image
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 use File::Basename;
 use Data::Dumper;
 

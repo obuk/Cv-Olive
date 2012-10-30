@@ -2,12 +2,11 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 use File::Basename;
 use Time::HiRes qw(gettimeofday);
-use Data::Dumper;
 
 my $filename = @ARGV > 0 ? shift : dirname($0).'/'."stuff.jpg";
 my $gray = Cv->LoadImage($filename, CV_LOAD_IMAGE_GRAYSCALE)

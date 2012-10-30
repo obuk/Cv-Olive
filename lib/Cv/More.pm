@@ -5,7 +5,7 @@ package Cv::More;
 use 5.008008;
 use strict;
 use warnings;
-use warnings::register qw(fashion);
+use warnings::register;
 
 our %M = (
 	butscalar => "called in list context, but returning scaler",
@@ -19,7 +19,7 @@ package Cv;
 sub m_croak {
 	chomp(my ($e) = @_);
 	1 while ($e =~ s/\s*(in|file|line|at) [^,]+,?\s*//g);
-	unshift(@_, $e);
+	@_ = ($e);
 	goto &Carp::croak;
 }
 
@@ -57,11 +57,9 @@ sub m_new {
 			$mat = Cv::cvCreateMat($rows, $cols, $type);
 		}
 	} elsif (@_) {
-		my @dims = m_dims(@_);
-		return undef unless @dims;
-		# push(@dims, 1) while @dims < 2;
+		return undef unless my @dims = m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
-		my ($rows, $cols) = @dims; $cols ||= 1;
+		return undef unless my ($rows, $cols) = @dims; $cols ||= 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
 		eval { $mat->m_set([], \@_) };
 		Cv::m_croak($@) if $@;
@@ -267,48 +265,13 @@ sub Affine {
 #  imgproc. Image Processing: Structural Analysis and Shape Descriptors
 # ============================================================
 
-# ApproxChains (xs)
-# ApproxPoly (xs)
-# ArcLength (xs)
-# BoundingRect (xs)
-# BoxPoints (Cv)
-# CalcPGH (xs)
-# CalcEMD2 (TBD)
-# CheckContourConvexity (xs)
-# ConvexityDefect (xs)
-# ContourArea (xs)
-# ContourFromContourTree (xs)
-# ConvexHull2 (xs)
-# ConvexityDefects (xs)
-# CreateContourTree (xs)
-# EndFindContours (xs)
-# FindContours (xs)
-# FindNextContour (xs)
-# FitEllipse2(Cv::More)
-# FitLine (Cv::More)
-# GetCentralMoment (xs)
-# GetHuMoments (xs)
-# GetNormalizedCentralMoment (xs)
-# GetSpatialMoment (xs)
-# MatchContourTrees (xs)
-# MatchShapes (xs)
-# MinAreaRect2 (Cv::More)
-# MinEnclosingCircle (Cv::More)
-# Moments (xs)
-# PointPolygonTest (xs)
-# PointSeqFromMat (xs)
-# ReadChainPoint (xs)
-# StartFindContours (xs)
-# StartReadChainPoints (xs)
-# SubstituteContour (xs)
-
 package Cv::Arr;
 
 sub BoundingRect {
 	# CvRect cvBoundingRect(CvArr* points, int update=0)
 	my $retval = eval { cvBoundingRect(@_) };
 	Cv::m_croak($@) if $@;
-	if (wantarray && warnings::enabled('Cv::More::fashion')) {
+	if (wantarray && warnings::enabled('Cv::More')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
@@ -328,33 +291,35 @@ sub BoundingRect {
 package Cv::Arr;
 
 { *FitEllipse = \&FitEllipse2 }
+{ *Cv::FitEllipse = *Cv::FitEllipse2 = \&FitEllipse2 }
 sub FitEllipse2 {
-	# FitEllipse2(IN points)
-	my $retval = eval { cvFitEllipse2(@_) };
-	Cv::m_croak($@) if $@;
-	if (wantarray && warnings::enabled('Cv::More::fashion')) {
-		Carp::carp $Cv::More::M{butscalar};
-		return $retval;
-	}
-	wantarray? @$retval : $retval;
+    # Cv->FitEllipse2(\@points);                                                
+    # Cv->FitEllipse2(pt1, pt2, pt3, ...);                                      
+    # $mat->FitEllipse2;                                                        
+    my $self = shift;
+    unless (ref $self) {
+        $self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+        Cv::m_croak $@ if $@;
+    }
+    my $retval = eval { Cv::Arr::cvFitEllipse2($self) };
+    Cv::m_croak $@ if $@;
+    if (wantarray && warnings::enabled('Cv::More')) {
+        Carp::carp $Cv::More::M{butscalar};
+        return $retval;
+    }
+    wantarray? @$retval : $retval;
 }
 
-package Cv;
 
-{ *FitEllipse = \&FitEllipse2 }
-sub FitEllipse2 {
-	# FitEllipse2(pt1, pt2, pt3, ...);
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	eval { @_ = (Cv::Mat->new([], &Cv::CV_32SC2, @_)) };
-	Cv::m_croak($@) if $@;
-	goto &Cv::Arr::FitEllipse2;
-}
-
-package Cv::Arr;
-
+{ *Cv::FitLine = \&FitLine }
 sub FitLine {
-	# FitLine(IN points, IN dist_type, IN param, IN reps, IN aeps, OUT line)
-	my $points = shift;
+    my $self = shift;
+    unless (ref $self) {
+		my $points = shift;
+		my @dims = Cv::m_dims(@$points);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
+        Cv::m_croak $@ if $@;
+    }
 	my $rr = \ [ ];			# dummy
 	if (@_ && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
 		$rr = \ $_[-1]; pop;
@@ -364,59 +329,38 @@ sub FitLine {
 	$param    //= 0;
 	$reps     //= 0.01;
 	$aeps     //= 0.01;
-	eval { cvFitLine($points, $distType, $param, $reps, $aeps, $$rr) };
+	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
 	Cv::m_croak($@) if $@;
 	my $retval = $$rr;
-	if (wantarray && warnings::enabled('Cv::More::fashion')) {
+	if (wantarray && warnings::enabled('Cv::More')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
 	wantarray? @$retval : $retval;
 }
 
-package Cv;
-
-sub FitLine {
-	# cvFitLine(points, ...)
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $points = shift;
-	my @dims = Cv::m_dims(@$points);
-	eval { unshift(@_, Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points)) };
-	Cv::m_croak($@) if $@;
-	goto &Cv::Arr::FitLine;
-}
-
-package Cv::Arr;
 
 { *MinAreaRect = \&MinAreaRect2 }
+{ *Cv::MinAreaRect = *Cv::MinAreaRect2 = \&MinAreaRect2 }
 sub MinAreaRect2 {
-	# MinAreaRect2(IN points)
-	my $points = shift;
-	my $retval = eval { cvMinAreaRect2($points) };
+    my $self = shift;
+    unless (ref $self) {
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak($@) if $@;
+	}
+	my $retval = eval { cvMinAreaRect2($self) };
 	Cv::m_croak($@) if $@;
-	if (wantarray && warnings::enabled('Cv::More::fashion')) {
+	if (wantarray && warnings::enabled('Cv::More')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
 	wantarray? @$retval : $retval;
 }
 
-package Cv;
 
-{ *MinAreaRect = \&MinAreaRect2 }
-sub MinAreaRect2 {
-	# MinAreaRect2(pt1, pt2, pt3, ...);
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	eval { @_ = (Cv::Mat->new([], &Cv::CV_32SC2, @_)) };
-	Cv::m_croak($@) if $@;
-	goto &Cv::Arr::MinAreaRect2;
-}
-
-package Cv::Arr;
-
+{ *Cv::MinEnclosingCircle = \&MinEnclosingCircle }
 sub MinEnclosingCircle {
-	# MinEnclosingCircle(IN points, OUT center OUT radius)
-	my $points = shift;
+	my $self = shift;
 	my ($xcenter, $xradius);	# dummy
 	my ($rcenter, $rradius) = (\$xcenter, \$xradius);
 	if (@_ >= 2 &&
@@ -426,35 +370,20 @@ sub MinEnclosingCircle {
 		($rcenter, $rradius) = (\$_[-2], \$_[-1]);
 		pop; pop;
 	}
+    unless (ref $self) {
+		$self = eval { $self =  Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
+	}
 	my $retval = eval {
-		cvMinEnclosingCircle($points, $$rcenter, $$rradius)?
+		cvMinEnclosingCircle($self, $$rcenter, $$rradius)?
 			[$$rcenter, $$rradius] : undef;
 	};
-	Cv::m_croak($@) if $@;
-	if (wantarray && warnings::enabled('Cv::More::fashion')) {
+	Cv::m_croak $@ if $@;
+	if (wantarray && warnings::enabled('Cv::More')) {
 		Carp::carp $Cv::More::M{butscalar};
 		return $retval;
 	}
 	wantarray? @$retval : $retval;
-}
-
-package Cv;
-
-sub MinEnclosingCircle {
-	# MinEnclosingCircle(points, ...)
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
-	my $n = @_;
-	if (@_ >= 2 &&
-		# undef or scalar
-		(!defined $_[-2] || !ref $_[-2]) &&
-		(!defined $_[-1] || !ref $_[-1])) {
-		$n -= 2;
-	}
-	my @points = splice(@_, 0, $n);
-	my @dims = Cv::m_dims(@points);
-	eval { unshift(@_, Cv::Mat->new([], &Cv::CV_32SC2, @points)) };
-	Cv::m_croak($@) if $@;
-	goto &Cv::Arr::MinEnclosingCircle;
 }
 
 

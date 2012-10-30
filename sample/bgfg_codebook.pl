@@ -2,9 +2,9 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+# use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 use List::Util qw(max min);
 
 # Background average sample code done with averages and done with codebooks
@@ -156,15 +156,11 @@ while (1) {
 	}
 	
 	# User input:
-	my $c = Cv->WaitKey(10);
-	if ($c < 0) {
-		$c = undef;
-	} else {
-		$c = lc(chr($c & 0xff));
-	}
+	next if (my $c = Cv->WaitKey(10)) < 0;
+	$c = lc(chr($c & 0xff));
 
 	# End processing on ESC, q or Q
-	if (ord($c) == 27 || $c eq 'q') {
+	if ($c == "\e" || $c eq 'q') {
 		last;
 	}
 	# Else check for user input

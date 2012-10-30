@@ -2,11 +2,10 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 use File::Basename;
-use Data::Dumper;
 
 my $ffill_case = 1;
 my $lo_diff = 20;

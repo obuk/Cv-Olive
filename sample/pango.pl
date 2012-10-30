@@ -2,10 +2,10 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use utf8;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 use Pango;
 # use Gtk2::Pango;
 my $pango_scale = 1024;

@@ -10,11 +10,11 @@
 #
 
 use strict;
+use warnings;
 use IO::File;
 use Time::HiRes qw(gettimeofday);
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 
 sub saveXYZ {
 	my ($filename, $mat) = @_;

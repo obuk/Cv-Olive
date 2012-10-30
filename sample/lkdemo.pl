@@ -2,9 +2,9 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 
 package Cv::Arr::OpticalFlowPyrLK;
 use Cv;
@@ -138,12 +138,12 @@ die "$0: Could not initialize capturing...\n"
 printf("Welcome to lkdemo, using OpenCV version %s (%d.%d.%d)\n",
 	   cvVersion, CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
 
-print ("Hot keys: \n",
-	   "\tESC - quit the program\n",
-	   "\tr - auto-initialize tracking\n",
-	   "\tc - delete all the points\n",
-	   "\tn - switch the \"night\" mode on/off\n",
-	   "To add/remove a feature point click it\n");
+print "Hot keys: \n",
+	"\tESC - quit the program\n",
+	"\tr - auto-initialize tracking\n",
+	"\tc - delete all the points\n",
+	"\tn - switch the \"night\" mode on/off\n",
+	"To add/remove a feature point click it\n";
 
 Cv->NamedWindow("LkDemo");
 Cv->SetMouseCallback("LkDemo", \&on_mouse);

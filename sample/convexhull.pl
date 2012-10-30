@@ -2,9 +2,9 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 
 my $ARRAY = 0;					# 1: Cv:Mat, 0: Cv::Seq
 $ARRAY = 1 if $0 =~ /-arr/;

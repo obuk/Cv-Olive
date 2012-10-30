@@ -2,10 +2,9 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
-use Data::Dumper;
 
 my $NUMBER = 100;
 my $DELAY = 5;
@@ -15,7 +14,6 @@ my ($width, $height) = (320, 240);
 
 # Load the source image
 my $image = Cv->CreateImage([$width, $height], 8, 3)->Zero;
-my $image2;
 
 # Create a window
 my $wndname = "Drawing Demo";

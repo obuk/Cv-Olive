@@ -2,10 +2,10 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
 use Cv::Seq::Point2;
-use warnings qw(Cv::More::fashion);
 use File::Basename;
 use List::Util qw(min);
 

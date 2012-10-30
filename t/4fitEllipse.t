@@ -4,10 +4,7 @@ use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 23;
 use List::Util qw(sum min max);
-
-BEGIN {
-	use_ok('Cv');
-}
+BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
 
@@ -74,7 +71,7 @@ SKIP: {
 	my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
 	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my @list = Cv->FitEllipse($pts5);
 		is(scalar @list, 1);	# 1
 	};
@@ -82,14 +79,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my $list = Cv->FitEllipse($pts5);
 	};
 	is($stdout, '');			# 4
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my @list = Cv->FitEllipse($pts5);
 		is(scalar @list, 3);	# 6
 	};
@@ -97,7 +94,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my $list = Cv->FitEllipse($pts5);
 	};
 	is($stdout, '');			# 9
@@ -106,7 +103,7 @@ SKIP: {
 	my $points = Cv::Mat->new([ ], CV_32FC2, $pts5);
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my @list = $points->FitEllipse;
 		is(scalar @list, 1);	# 11
 	};
@@ -114,14 +111,14 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 13
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my $list = $points->FitEllipse;
 	};
 	is($stdout, '');			# 14
 	is($stderr, '');			# 15
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my @list = $points->FitEllipse;
 		is(scalar @list, 3);	# 16
 	};
@@ -129,14 +126,14 @@ SKIP: {
 	is($stderr, '');			# 18
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my $list = $points->FitEllipse;
 	};
 	is($stdout, '');			# 19
 	is($stderr, '');			# 20
 
 	my $line;
-	use warnings 'Cv::More::fashion';
+	use warnings 'Cv::More';
 	eval {
 		$line = __LINE__; my @list = Cv->FitEllipse($pts3);
 	};

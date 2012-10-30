@@ -61,7 +61,7 @@ SKIP: {
 		sub capture (&;@) { goto &Capture::Tiny::capture };
 	};
 	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my @list = Cv->minEnclosingCircle(@points);
 		is(scalar @list, 1);	# 1
 	};
@@ -69,7 +69,7 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my $list = Cv->minEnclosingCircle(@points);
 
 	};
@@ -77,7 +77,7 @@ SKIP: {
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my @list = Cv->minEnclosingCircle(@points);
 		is(scalar @list, 2);	# 6
 	};
@@ -85,7 +85,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my $list = Cv->minEnclosingCircle(@points);
 	};
 	is($stdout, '');			# 9

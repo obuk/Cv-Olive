@@ -2,9 +2,9 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 
 {
 	package Cv::SeqReader::Edge;
@@ -121,8 +121,9 @@ sub run {
 	my $storage = Cv::MemStorage->new(0);
     my $subdiv = Cv::Subdiv2D->createDelaunay([0, 0, 600, 600], $storage);
 
-    print ("Delaunay triangulation will be build now interactively.\n",
-		   "To stop the process, press any key\n\n");
+    print
+		"Delaunay triangulation will be build now interactively.\n",
+		"To stop the process, press any key\n\n";
 
     for (1 .. 200) {
         my $fp = cvPoint2D32f(

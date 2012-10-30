@@ -1558,12 +1558,12 @@ sub BoxPoints {
 # ============================================================
 
 package Cv::Subdiv2D;
+sub DESTROY { }
 { *CalcVoronoi = \&CalcSubdivVoronoi2D }
 { *ClearVoronoi = \&ClearSubdivVoronoi2D }
 { *CreateDelaunay = \&Cv::CreateSubdivDelaunay2D }
 { *Locate = \&Subdiv2DLocate }
 { *DelaunayInsert = \&SubdivDelaunay2DInsert }
-
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking

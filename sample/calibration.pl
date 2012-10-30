@@ -4,9 +4,9 @@
 # http://opencv.jp/sample/camera_calibration.html
 
 use strict;
+use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use warnings qw(Cv::More::fashion);
 use IO::File;
 use File::Basename;
 

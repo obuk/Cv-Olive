@@ -47,7 +47,7 @@ SKIP: {
 		sub capture (&;@) { goto &Capture::Tiny::capture };
 	};
 	my ($stdout, $stderr) = capture(sub {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my @list = Cv->minAreaRect(@points);
 		is(scalar @list, 1);	# 1
 	});
@@ -55,7 +55,7 @@ SKIP: {
 	like($stderr, qr/but .* scaler/); # 3
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::More::fashion';
+		use warnings 'Cv::More';
 		my $list = Cv->minAreaRect(@points);
 
 	};
@@ -63,7 +63,7 @@ SKIP: {
 	is($stderr, '');			# 5
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my @list = Cv->minAreaRect(@points);
 		is(scalar @list, 3);	# 6
 	};
@@ -71,7 +71,7 @@ SKIP: {
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::More::fashion';
+		no warnings 'Cv::More';
 		my $list = Cv->minAreaRect(@points);
 	};
 	is($stdout, '');			# 9
