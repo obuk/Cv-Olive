@@ -292,6 +292,7 @@ sub Affine {
 
 package Cv::Arr;
 
+{ *Cv::BoundingRect = \&BoundingRect }
 sub BoundingRect {
 	# CvRect cvBoundingRect(CvArr* points, int update=0)
 	my $self = shift;

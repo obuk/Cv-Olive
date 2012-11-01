@@ -6,8 +6,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-use Cv qw( );
-
+# use Cv qw( );
 # use Cv::Seq::Seq;
 # our @ISA = qw(Cv::Arr);
 

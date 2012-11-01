@@ -1,5 +1,8 @@
 Revision history for Cv.pm
 
+0.17 - 2012-11-1 (working)
+     * fixed alias boundingRect
+
 0.16 - 2012-11-1
      * separating experimental code into Cv/More.pm
      * added initializer Cv::Mat in More.pm
