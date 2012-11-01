@@ -3,11 +3,8 @@
 use strict;
 use warnings;
 use Test::More qw(no_plan);
-# use Test::More tests => 31;
-
-BEGIN {
-	use_ok('Cv');
-}
+# use Test::More tests => 11;
+BEGIN { use_ok('Cv') }
 
 if (1) {
 	my $points = Cv::Mat->new([3, 1], CV_32FC2);
@@ -47,9 +44,11 @@ if (4) {
 	cmp_ok(abs($z0 - ($vz / $vx) * $x0), '<', 1 + 1e-6);
 }
 
+
 # Cv-0.16
+Cv::More->import(qw(cs));
+
 if (11) {
-	no warnings 'Cv::oldfashion';
 	my $points = Cv::Mat->new([3, 1], CV_32FC2);
 	$points->set([0], [1, 1]);
 	$points->set([1], [2, 2]);
@@ -61,7 +60,6 @@ if (11) {
 }
 
 if (12) {
-	no warnings 'Cv::oldfashion';
 	my $points = Cv::Mat->new([3, 1], CV_32FC2);
 	$points->set([0], [1, 1]);
 	$points->set([1], [2, 2]);
@@ -73,7 +71,6 @@ if (12) {
 }
 
 if (13) {
-	no warnings 'Cv::oldfashion';
 	my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], CV_DIST_L2, 0, 0.01, 0.01);
 	my ($vx, $vy, $x0, $y0) = @line;
 	cmp_ok(abs(1 - ($vy / $vx)), '<', 1e-6);
@@ -81,7 +78,6 @@ if (13) {
 }
 
 if (14) {
-	no warnings 'Cv::oldfashion';
 	my $line = Cv->FitLine([[1, 2, 1], [2, 3, 1.5], [3, 4, 2]], CV_DIST_L2);
 	my ($vx, $vy, $vz, $x0, $y0, $z0) = @$line;
 	cmp_ok(abs(1.0 - ($vy / $vx)), '<', 1e-6);
@@ -91,70 +87,41 @@ if (14) {
 }
 
 SKIP: {
-	skip "can't use Capture::Tiny", 20 unless eval {
+	skip "can't use Capture::Tiny", 10 unless eval {
 		require Capture::Tiny;
 		sub capture (&;@) { goto &Capture::Tiny::capture };
 	};
 
-	my ($stdout, $stderr) = capture {
-		use warnings 'Cv::oldfashion';
-		my @list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
-		is(scalar @list, 1);	# 1
-	};
-	is($stdout, '');			# 2
-	like($stderr, qr/but .* scaler/); # 3
-
+	my ($stdout, $stderr); my $line;
+	Cv::More->unimport(qw(cs cs-warn));
+	Cv::More->import(qw(cs-warn));
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::oldfashion';
-		my $list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
+		my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
+		is(scalar @line, 1);	# 4
 	};
-	is($stdout, '');			# 4
-	is($stderr, '');			# 5
+	is($stdout, '');			# 5
+	like($stderr, qr/but .* scaler/); # 6
 
+	Cv::More->unimport(qw(cs-warn));
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::oldfashion';
-		my @list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
-		is(scalar @list, 4);	# 6
+		my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
 	};
 	is($stdout, '');			# 7
 	is($stderr, '');			# 8
 
 	($stdout, $stderr) = capture {
-		no warnings 'Cv::oldfashion';
-		my $list = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
+		eval {
+			$line = __LINE__ + 1;
+			my @line = Cv->FitLine;
+		};
 	};
-	is($stdout, '');			# 9
-	is($stderr, '');			# 10
-
-	my $points = Cv::Mat->new([ ], CV_32FC2, [ [1, 2], [2, 3], [3, 4] ]);
-
-	($stdout, $stderr) = capture {
-		use warnings 'Cv::oldfashion';
-		my @list = $points->FitLine;
-		is(scalar @list, 1);	# 11
-	};
-	is($stdout, '');			# 12
-	like($stderr, qr/but .* scaler/); # 13
+	like($@, qr/line $line/);	# 9
 
 	($stdout, $stderr) = capture {
-		use warnings 'Cv::oldfashion';
-		my $list = $points->FitLine;
+		eval {
+			my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1);
+		};
 	};
-	is($stdout, '');			# 14
-	is($stderr, '');			# 15
+	like($@, qr/OpenCV Error:/); # 9
 
-	($stdout, $stderr) = capture {
-		no warnings 'Cv::oldfashion';
-		my @list = $points->FitLine;
-		is(scalar @list, 4);	# 16
-	};
-	is($stdout, '');			# 17
-	is($stderr, '');			# 18
-
-	($stdout, $stderr) = capture {
-		no warnings 'Cv::oldfashion';
-		my $list = $points->FitLine;
-	};
-	is($stdout, '');			# 19
-	is($stderr, '');			# 20
 }

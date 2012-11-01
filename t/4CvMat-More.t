@@ -108,7 +108,7 @@ if (9) {
 }
 
 
-if (1) {
+if (10) {
 	my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
 	ok($arr);
 	is($arr->rows, 3);
@@ -150,3 +150,12 @@ if (1) {
 	$arr->set([ 1, 1 ], [ 31, 1 ]);
 	$arr->set([ 1, 2 ], [ 31, 2 ]);
 }
+
+
+if (11) {
+	my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
+	eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
+	like($@, qr/values is out of range/);
+}
+
+	

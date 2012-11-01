@@ -16,4 +16,5 @@ _Inline/
 *.old
 *.tmp
 *.bak
+*.orig
 *~
