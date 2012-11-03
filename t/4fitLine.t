@@ -122,6 +122,6 @@ SKIP: {
 			my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1);
 		};
 	};
-	like($@, qr/OpenCV Error:/); # 9
+	like($@, qr/OpenCV Error:/); # 10
 
 }

@@ -270,15 +270,13 @@ $points は、2次元の点または 3次元の点のリストで、結果は、
 
 サンプルのはじめと終りは C<FitEllipse2()> を参照してください。
 
-C言語のインタフェースは次のとおり。メモリストレージを渡すこともできます
-が確認していないので、渡さないでください。
+C言語のインタフェースは次のとおり。メモリストレージを渡すこともできます。
 
  CvBox2D cvMinAreaRect2(const CvArr* points, CvMemStorage* storage=NULL)
 
 Cv-0.15 までは、Perl の点のリストを Cv::Seq::Point にして使っていました。
-そのときはメモリストレージを使うこともあったと思いますが、本当に使われ
-ていたのか確認していません。Cv-0.16 から Perl の点のリストを Cv::Mat に
-直したので、おそらく渡しても使われないだろうと思います。
+そのときはメモリストレージを使うこともできたのですが Cv-0.16 で Perl の
+点のリストを Cv::Mat に直したので、メモリストレージを渡しても使いません。
 
 
 =item MinEnclosingCircle()
@@ -307,6 +305,9 @@ C<MinAreaRect2()>, C<MinEnclosingCircle()> の中から元の形に合うもの�
 ぶといいでしょう。サンプルはどれも似ているので、そのはじめと終りは
 C<FitEllipse2()> から持って来てください。
 
+(注意) MinEnclosingCircle() の戻り値は、Cv-0.15 まで (1') の形式でした。
+つまり、いつも ($center, $radius) を返していました。しかし、Cv-0.16 で
+メソッドの戻り値を揃え [$center, $radius] を返すことにしました。
 
 =item BoundingRect()
 
@@ -323,24 +324,28 @@ CvRect から CvBox2D への変換は次のとおり。
 
 =item ToArray()
 
+ my @array = $arr->ToArray();                                           # (1)
+ my @array = $arr->ToArray($slice);                                     # (2)
 
-=item Cv::Arr::CvtMatToArray($arr)
+シーケンスまたはマトリクス (1xN, Nx1) を Perl の点の配列に変換します。
+シーケンスを変換する cvCvtSeqToArray() をマトリクスを扱えるように、拡張
+したものです。$slice は [ $start, $end ] の形式か、cvSlice() が使えます。
+マトリクスは、いまのところ C<Cv::Mat> しか扱えません。C<Cv::MatND> も扱
+えるといいのかもしれませんが、そのうちに、、、
 
- # @array = $arr->cvtMatToArray
- # $arr->cvtMatToArray(\@array)
- # @array = $arr->ToArray
+cvCvtSeqToArray() が元になっているので同じ呼出し形式も使えます。つまり、
+次の使い方もできます。でも使わないかもしれませんね。
 
-=item Cv::Arr::ToArray($arr)
+ $arr->ToArray(\my @array);                                             # (3)
+ $arr->ToArray(\my @attay, $slice);                                     # (4)
 
-=item Cv::Seq::Point::CvtSeqToArray($seq)
+(注意) Perl の配列のようにインデクスに負数が使えると便利なことがありま
+す。私もよく使いますが、いまのところ、そのような使い方はできません。そ
+のうち考えてみようと思っています。
 
- # @array = $seq->cvtSeqToArray
- # @array = $seq->cvtSeqToArray($slice)
- # $seq->cvtSeqToArray(\@array)
- # $seq->cvtSeqToArray(\@array, $slice)
- # @array = $seq->ToArray
+ my @array = $arr->ToArray([ -1, 1 ]);
+ my @array = $arr->ToArray([ 1, -1 ]);
 
-=item Cv::Seq::Point::ToArray($seq)
 
 =item Cv::ContourArea($points)
 
@@ -436,6 +441,12 @@ C<m_set()> で再帰的に処理します。
 
 
 =head1 バグ
+
+=over
+
+=item *
+
+=back
 
 =head1 参考
 

@@ -30,7 +30,7 @@ sub GetSeqElem {
 }
 
 
-{ *Set = \&SetSeqElem }
+{ *Set = *set = \&SetSeqElem }
 sub SetSeqElem {
 	my $self = CORE::shift;
 	my $index = CORE::shift;

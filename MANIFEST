@@ -24,7 +24,6 @@ lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm
 lib/Cv/Seq/Point2.pm
 lib/Cv/Seq/Rect.pm
-lib/Cv/Seq/Seq.pm
 lib/Cv/Seq/SURFPoint.pm
 lib/Cv/typemap
 lib/Cv/typemap.h

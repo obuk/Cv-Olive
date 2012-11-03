@@ -6,9 +6,11 @@ use 5.008008;
 use strict;
 use warnings;
 
-# use Cv qw( );
-# use Cv::Seq::Seq;
-# our @ISA = qw(Cv::Arr);
+use Cv::Seq::Point;
+use Cv::Seq::Point2;
+use Cv::Seq::Circle;
+use Cv::Seq::Rect;
+use Cv::Seq::SURFPoint;
 
 package Cv::Seq::Seq;
 

@@ -6,6 +6,13 @@ use 5.008008;
 use strict;
 use warnings;
 
+# use Cv qw( );
+use Cv::Seq;
+use Cv::Seq::Point;
+use Cv::Seq::Point2;
+use Cv::Seq::Rect;
+use Cv::Seq::SURFPoint;
+
 our %O = map { $_ => 0 } qw(cs cs-warn);
 
 our %M = (
@@ -36,9 +43,6 @@ sub unimport {
 	}
 }
 
-
-# use Cv qw( );
-use Cv::Seq::Point;
 
 package Cv;
 
@@ -76,29 +80,33 @@ sub m_new {
 	if (@$sizes) {
 		my ($rows, $cols) = @$sizes; $cols ||= 1;
 		if (@_) {
-			my ($data, $step) = @_; $step ||= &Cv::CV_AUTOSTEP;
+			my ($data, $step) = @_;
+			$step = &Cv::CV_AUTOSTEP unless $step;
 			$mat = Cv::cvCreateMatHeader($rows, $cols, $type);
 			$mat->setData($data, $step) if $data;
 		} else {
 			$mat = Cv::cvCreateMat($rows, $cols, $type);
 		}
 	} elsif (@_) {
-		return undef unless my @dims = m_dims(@_);
+		my @dims = m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
 		return undef unless my ($rows, $cols) = @dims; $cols ||= 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
-		$mat->Set([], \@_);
+		eval { $mat->m_set([], \@_) };
+		Cv::m_croak $@ if $@;
 	}
 	$mat;
 }
+
 
 package Cv::Arr;
 
 {
 	no warnings 'redefine';
 	*Set = *set = sub {
-		eval { &m_set(@_) };
+		my $mat = eval { &m_set(@_) };
 		Cv::m_croak $@ if $@;
+		$mat;
 	}
 }
 
@@ -122,22 +130,11 @@ sub m_set {
 }
 
 
-{ *ToArray = \&CvtMatToArray }
-sub CvtMatToArray {
-	my $mat = shift; my @arr;
-	if ($mat->cols == 1) {
-		@arr = map { $mat->get([$_, 0]) } 0 .. $mat->rows - 1;
-	}
-	if ($mat->rows == 1) {
-		@arr = map { $mat->get([0, $_]) } 0 .. $mat->cols - 1;
-	}
-	wantarray? @arr : \@arr;
-}
+{ *Cv::Seq::Point::ToArray = \&ToArray }
+{ *Cv::Seq::Point::CvtSeqToArray = \&ToArray }
+{ *Cv::Arr::CvtMatToArray = \&ToArray }
 
-package Cv::Seq::Point;
-
-{ *ToArray = \&CvtSeqToArray }
-sub CvtSeqToArray {
+sub ToArray {
 	# @array = cvtSeqToArray($seq)
 	# @array = cvtSeqToArray($seq, $slice)
 	# cvtSeqToArray($seq, \@array)
@@ -145,15 +142,29 @@ sub CvtSeqToArray {
 	my $self = CORE::shift;
 	my $slice = ref $_[-1] eq 'ARRAY' && @{$_[-1]} == 2?
 		CORE::pop : &Cv::CV_WHOLE_SEQ;
-	$self->SUPER::CvtSeqToArray(my $string, $slice);
 	if (@_ >= 1 && ref $_[0] eq 'ARRAY') {
 		@{$_[0]} = ();
 	} else {
 		$_[0] = [];
 	}
-	$self->UnpackMulti($_[0], $string);
+	if ($self->isa('Cv::Seq::Point')) {
+		cvCvtSeqToArray($self, my $string, $slice);
+		$self->UnpackMulti($_[0], $string);
+	} else {
+		my ($start, $end) = @$slice;
+		if ($self->cols == 1) {
+			$end = $self->rows - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
+			@{$_[0]} = map { $self->get([$_, 0]) } $start .. $end;
+		} elsif ($self->rows == 1) {
+			$end = $self->cols - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
+			@{$_[0]} = map { $self->get([0, $_]) } $start .. $end;
+		} else {
+			Carp::carp "can't convert; toArray works 1xN and Nx1";
+		}
+	}
 	wantarray? @{$_[0]} : $_[0];
 }
+
 
 package Cv::Arr;
 
@@ -282,7 +293,7 @@ sub Affine {
 			$src, $dst, Cv::Mat->new([], &Cv::CV_32FC1, @$map));
 	};
 	Cv::m_croak $@ if $@;
-	$src;
+	$dst;
 }
 
 
@@ -297,9 +308,10 @@ sub BoundingRect {
 	# CvRect cvBoundingRect(CvArr* points, int update=0)
 	my $self = shift;
 	unless (ref $self) {
-		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
 	}
-	my $retval = eval { cvBoundingRect(@_) };
+	my $retval = eval { cvBoundingRect($self) };
 	Cv::m_croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
@@ -318,7 +330,8 @@ sub FitEllipse2 {
 	# $mat->FitEllipse2;                                                        
 	my $self = shift;
 	unless (ref $self) {
-		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
 	}
 	my $retval = eval { cvFitEllipse2($self) };
 	Cv::m_croak $@ if $@;
@@ -363,8 +376,10 @@ sub FitLine {
 { *Cv::MinAreaRect = *Cv::MinAreaRect2 = \&MinAreaRect2 }
 sub MinAreaRect2 {
     my $self = shift;
+	&Cv::Seq::stor(\@_);		# remove memstorage;
     unless (ref $self) {
-		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
 	}
 	my $retval = eval { cvMinAreaRect2($self) };
 	Cv::m_croak $@ if $@;
@@ -389,7 +404,8 @@ sub MinEnclosingCircle {
 		pop; pop;
 	}
     unless (ref $self) {
-		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
 	}
 	my $retval = eval {
 		cvMinEnclosingCircle($self, $$rcenter, $$rradius)?

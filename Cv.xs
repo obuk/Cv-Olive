@@ -4596,6 +4596,9 @@ BOOT:
 	MY_CXT.cb_error = (SV*)0;
 	MY_CXT.cb_trackbar_list = newAV();
 	MY_CXT.cb_mouse = (SV*)0;
+	MY_CXT.errorMode = 0;
+	MY_CXT.errorStatus = 0;
+	cvSetErrStatus(0);
 
 void
 CLONE(...)
