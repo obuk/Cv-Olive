@@ -99,6 +99,10 @@ sub m_new {
 }
 
 
+# ============================================================
+#  core. The Core Functionality: Operations on Arrays
+# ============================================================
+
 package Cv::Arr;
 
 {
@@ -129,6 +133,44 @@ sub m_set {
 	$mat;
 }
 
+use overload
+	'@{}' => sub { $_[0]->ToArray },
+	bool => sub { $_[0] },
+	'<=>' => \&overload_cmp,
+	cmp => \&overload_cmp,
+	fallback => undef,
+	nomethod => \&overload_nomethod;
+
+sub overload_cmp {
+	my ($l, $r) = @_;
+	my ($lc, $rc) = (ref $l, ref $r);
+	bless $l, 'overload::dummy';
+	bless $r, 'overload::dummy';
+	my $cmp = $l cmp $r;
+	bless $l, $lc;
+	bless $r, $rc;
+	$cmp;
+}
+
+sub overload_nomethod {
+	Carp::croak "$0: can't overload ", ref $_[0], "::", $_[3]
+}
+
+=xxx
+
+sub matrix {
+	my $matrix = shift;
+	my $rows = @$matrix;
+	my $cols = @{$matrix->[0]};
+	my @m = map @$_, @$matrix;
+	($rows, $cols, @m);
+}
+
+=cut
+
+# ============================================================
+#  core. The Core Functionality: Dynamic Structures
+# ============================================================
 
 { *Cv::Seq::Point::ToArray = \&ToArray }
 { *Cv::Seq::Point::CvtSeqToArray = \&ToArray }
@@ -166,42 +208,161 @@ sub ToArray {
 }
 
 
+# ============================================================
+#  imgproc. Image Processing: Geometric Image Transformations
+# ============================================================
+
 package Cv::Arr;
 
-use overload
-	'@{}' => sub { $_[0]->ToArray },
-	bool => sub { $_[0] },
-	'<=>' => \&overload_cmp,
-	cmp => \&overload_cmp,
-	fallback => undef,
-	nomethod => \&overload_nomethod;
-
-sub overload_cmp {
-	my ($l, $r) = @_;
-	my ($lc, $rc) = (ref $l, ref $r);
-	bless $l, 'overload::dummy';
-	bless $r, 'overload::dummy';
-	my $cmp = $l cmp $r;
-	bless $l, $lc;
-	bless $r, $rc;
-	$cmp;
+sub Affine {
+	my $src = shift;
+	my $dst = dst(@_) || $src->new;
+	my $map = shift;
+	eval {
+		GetQuadrangleSubPix(
+			$src, $dst, Cv::Mat->new([], &Cv::CV_32FC1, @$map));
+	};
+	Cv::m_croak $@ if $@;
+	$dst;
 }
 
-sub overload_nomethod {
-	Carp::croak "$0: can't overload ", ref $_[0], "::", $_[3]
+
+# ============================================================
+#  imgproc. Image Processing: Structural Analysis and Shape Descriptors
+# ============================================================
+
+package Cv::Arr;
+
+{ *Cv::BoundingRect = \&BoundingRect }
+sub BoundingRect {
+	# CvRect cvBoundingRect(CvArr* points, int update=0)
+	my $self = shift;
+	unless (ref $self) {
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
+	}
+	my $retval = eval { cvBoundingRect($self) };
+	Cv::m_croak $@ if $@;
+	if (wantarray) {
+		return @$retval if $Cv::More::O{cs};
+		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
+	}
+	return $retval;
 }
 
-=xxx
-
-sub matrix {
-	my $matrix = shift;
-	my $rows = @$matrix;
-	my $cols = @{$matrix->[0]};
-	my @m = map @$_, @$matrix;
-	($rows, $cols, @m);
+{ *Cv::ContourArea = \&ContourArea }
+sub ContourArea {
+	# double cvContourArea(const CvArr* contour, CvSlice slice=CV_WHOLE_SEQ)
+	my $self = shift;
+	unless (ref $self) {
+		my $points = shift;
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @$points) };
+		Cv::m_croak $@ if $@;
+	}
+	my $slice = shift || &Cv::CV_WHOLE_SEQ;
+	my $retval = eval { cvContourArea($self, $slice) };
+	Cv::m_croak $@ if $@;
+	if (wantarray) {
+		return @$retval if $Cv::More::O{cs};
+		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
+	}
+	return $retval;
 }
 
-=cut
+{ *FitEllipse = \&FitEllipse2 }
+{ *Cv::FitEllipse = *Cv::FitEllipse2 = \&FitEllipse2 }
+sub FitEllipse2 {
+	# Cv->FitEllipse2(\@points);                                                
+	# Cv->FitEllipse2(pt1, pt2, pt3, ...);                                      
+	# $mat->FitEllipse2;                                                        
+	my $self = shift;
+	unless (ref $self) {
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
+	}
+	my $retval = eval { cvFitEllipse2($self) };
+	Cv::m_croak $@ if $@;
+	if (wantarray) {
+		return @$retval if $Cv::More::O{cs};
+		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+	}
+	return $retval;
+}
+
+{ *Cv::FitLine = \&FitLine }
+sub FitLine {
+    my $self = shift;
+    unless (ref $self) {
+		my $points = shift;
+		my @dims = Cv::m_dims(@$points);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
+		Cv::m_croak $@ if $@;
+    }
+	my $rr = \ [ ];			# dummy
+	if (@_ && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
+		$rr = \ $_[-1]; pop;
+	}
+	my ($distType, $param, $reps, $aeps) = @_;
+	$distType //= &Cv::CV_DIST_L2;
+	$param    //= 0;
+	$reps     //= 0.01;
+	$aeps     //= 0.01;
+	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
+	Cv::m_croak $@ if $@;
+	my $retval = $$rr;
+	if (wantarray) {
+		return @$retval if $Cv::More::O{cs};
+		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+	}
+	return $retval;
+}
+
+{ *MinAreaRect = \&MinAreaRect2 }
+{ *Cv::MinAreaRect = *Cv::MinAreaRect2 = \&MinAreaRect2 }
+sub MinAreaRect2 {
+    my $self = shift;
+	&Cv::Seq::stor(\@_);		# remove memstorage;
+    unless (ref $self) {
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
+	}
+	my $retval = eval { cvMinAreaRect2($self) };
+	Cv::m_croak $@ if $@;
+	if (wantarray) {
+		return @$retval if $Cv::More::O{cs};
+		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+	}
+	return $retval;
+}
+
+{ *Cv::MinEnclosingCircle = \&MinEnclosingCircle }
+sub MinEnclosingCircle {
+	my $self = shift;
+	my ($xcenter, $xradius);	# dummy
+	my ($rcenter, $rradius) = (\$xcenter, \$xradius);
+	if (@_ >= 2 &&
+		# undef or scalar
+		(!defined $_[-2] || !ref $_[-2]) &&
+		(!defined $_[-1] || !ref $_[-1])) {
+		($rcenter, $rradius) = (\$_[-2], \$_[-1]);
+		pop; pop;
+	}
+    unless (ref $self) {
+		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
+		Cv::m_croak $@ if $@;
+	}
+	my $retval = eval {
+		cvMinEnclosingCircle($self, $$rcenter, $$rradius)?
+			[$$rcenter, $$rradius] : undef;
+	};
+	Cv::m_croak $@ if $@;
+	if (wantarray) {
+		return @$retval if $Cv::More::O{cs};
+		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+	}
+	return $retval;
+}
+
 
 # ============================================================
 #  highgui. High-level GUI and Media I/O: Qt new functions
@@ -276,147 +437,6 @@ unless (Cv->hasQt) {
 	*Cv::cvDisplayOverlay =
 	*Cv::cvDisplayStatusBar =
 	*Cv::cvCreateOpenGLCallback = sub { Carp::croak "no Qt" };
-}
-
-# ============================================================
-#  imgproc. Image Processing: Geometric Image Transformations
-# ============================================================
-
-package Cv::Arr;
-
-sub Affine {
-	my $src = shift;
-	my $dst = dst(@_) || $src->new;
-	my $map = shift;
-	eval {
-		GetQuadrangleSubPix(
-			$src, $dst, Cv::Mat->new([], &Cv::CV_32FC1, @$map));
-	};
-	Cv::m_croak $@ if $@;
-	$dst;
-}
-
-
-# ============================================================
-#  imgproc. Image Processing: Structural Analysis and Shape Descriptors
-# ============================================================
-
-package Cv::Arr;
-
-{ *Cv::BoundingRect = \&BoundingRect }
-sub BoundingRect {
-	# CvRect cvBoundingRect(CvArr* points, int update=0)
-	my $self = shift;
-	unless (ref $self) {
-		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
-	}
-	my $retval = eval { cvBoundingRect($self) };
-	Cv::m_croak $@ if $@;
-	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
-	}
-	return $retval;
-}
-
-package Cv::Arr;
-
-{ *FitEllipse = \&FitEllipse2 }
-{ *Cv::FitEllipse = *Cv::FitEllipse2 = \&FitEllipse2 }
-sub FitEllipse2 {
-	# Cv->FitEllipse2(\@points);                                                
-	# Cv->FitEllipse2(pt1, pt2, pt3, ...);                                      
-	# $mat->FitEllipse2;                                                        
-	my $self = shift;
-	unless (ref $self) {
-		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
-	}
-	my $retval = eval { cvFitEllipse2($self) };
-	Cv::m_croak $@ if $@;
-	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
-	}
-	return $retval;
-}
-
-
-{ *Cv::FitLine = \&FitLine }
-sub FitLine {
-    my $self = shift;
-    unless (ref $self) {
-		my $points = shift;
-		my @dims = Cv::m_dims(@$points);
-		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
-		Cv::m_croak $@ if $@;
-    }
-	my $rr = \ [ ];			# dummy
-	if (@_ && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
-		$rr = \ $_[-1]; pop;
-	}
-	my ($distType, $param, $reps, $aeps) = @_;
-	$distType //= &Cv::CV_DIST_L2;
-	$param    //= 0;
-	$reps     //= 0.01;
-	$aeps     //= 0.01;
-	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
-	Cv::m_croak $@ if $@;
-	my $retval = $$rr;
-	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
-	}
-	return $retval;
-}
-
-
-{ *MinAreaRect = \&MinAreaRect2 }
-{ *Cv::MinAreaRect = *Cv::MinAreaRect2 = \&MinAreaRect2 }
-sub MinAreaRect2 {
-    my $self = shift;
-	&Cv::Seq::stor(\@_);		# remove memstorage;
-    unless (ref $self) {
-		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
-	}
-	my $retval = eval { cvMinAreaRect2($self) };
-	Cv::m_croak $@ if $@;
-	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
-	}
-	return $retval;
-}
-
-
-{ *Cv::MinEnclosingCircle = \&MinEnclosingCircle }
-sub MinEnclosingCircle {
-	my $self = shift;
-	my ($xcenter, $xradius);	# dummy
-	my ($rcenter, $rradius) = (\$xcenter, \$xradius);
-	if (@_ >= 2 &&
-		# undef or scalar
-		(!defined $_[-2] || !ref $_[-2]) &&
-		(!defined $_[-1] || !ref $_[-1])) {
-		($rcenter, $rradius) = (\$_[-2], \$_[-1]);
-		pop; pop;
-	}
-    unless (ref $self) {
-		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
-	}
-	my $retval = eval {
-		cvMinEnclosingCircle($self, $$rcenter, $$rradius)?
-			[$$rcenter, $$rradius] : undef;
-	};
-	Cv::m_croak $@ if $@;
-	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
-	}
-	return $retval;
 }
 
 1;

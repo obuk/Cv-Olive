@@ -92,10 +92,10 @@ C<[ 2, 0 ]>, C<[ 2, 1 ]>, C<[ 2, 2 ]> になり、少々、冗長です。3行�
  $mat->set([ 2 ], \@pts);
 
 すっきりしました。ただ、このインデクスを C<[ 2 ]> と書く表現は、すでに
-C<Set()> では少し違う意味で使っています。それは、いまの C<Set()> は省略
-したインデクスを単に 0で補うだけのものですが、1次元のリストの表現に 2次
-元の C<Cv::Mat> を Nx1 で使ったとき、いつも 0 になるインデクスの省略を
-許してくれるのです。具体的には次のとおり。どちらも同じように働きます。
+C<Set()> では少し違う意味で使っています。それは、省略したインデクスを単
+に 0で補うというものですが、1次元のリストの表現に 2次元の C<Cv::Mat> を
+Nx1 で使ったとき、いつも 0 になるインデクスの省略を許すことになるのです。
+具体的には次のとおり。どちらも同じように働きます。
 
  my $points = Cv::Mat->new([ 3, 1 ], CV_32FC2);
  $points->set([ 2, 0 ], [ $x, $y ]);   # すべてのインデクスを書く
@@ -275,8 +275,8 @@ C言語のインタフェースは次のとおり。メモリストレージを�
  CvBox2D cvMinAreaRect2(const CvArr* points, CvMemStorage* storage=NULL)
 
 Cv-0.15 までは、Perl の点のリストを Cv::Seq::Point にして使っていました。
-そのときはメモリストレージを使うこともできたのですが Cv-0.16 で Perl の
-点のリストを Cv::Mat に直したので、メモリストレージを渡しても使いません。
+そのときはメモリストレージを使っていました。しかし、Cv-0.16 で Perl の
+点のリストを Cv::Mat に直したので、メモリストレージは使いません。
 
 
 =item MinEnclosingCircle()
@@ -322,34 +322,62 @@ CvRect から CvBox2D への変換は次のとおり。
  my $box2d = [ [ $x + $width / 2, $y + $height / 2 ], [ $width, $height ], 0 ];
 
 
+=item ContourArea()
+
+ my $s = Cv->cvContourArea($points)
+ my $s = Cv->cvContourArea($points, $slice)
+
+点で囲まれる領域の面積を求めます。
+
+ my @pts = ([100, 100], [100, 200], [200, 200], [200, 100]);
+ my $s = Cv->contourArea(\@pts);
+
+この場合の面積 $s は、縦 x 横 (100x100) になります。
+
+
+=item Affine()
+
+GetQuadrangleSubPix() を使って、画像やマトリクスの回転と縮小を行います。
+
+  my $mapMatrix = [ [ $A11, $A12, $b1 ],
+                    [ $A21, $A22, $b2 ] ];
+  my $dst = $src->Affine($mapMatrix);
+
+Affine() は、簡単に変換行列を作る方法がなかったので、その対処として作っ
+たものでしたが、 new() を拡張したので、必要なら次の書き方でも同じことが
+できるようになったと思います。
+
+  $src->GetQuadrangleSubPix(
+          Cv::Mat->new([], &Cv::CV_32FC1,
+                       [ $A11, $A12, $b1 ],
+                       [ $A21, $A22, $b2 ],
+                       ));
+
 =item ToArray()
 
  my @array = $arr->ToArray();                                           # (1)
  my @array = $arr->ToArray($slice);                                     # (2)
 
 シーケンスまたはマトリクス (1xN, Nx1) を Perl の点の配列に変換します。
-シーケンスを変換する cvCvtSeqToArray() をマトリクスを扱えるように、拡張
-したものです。$slice は [ $start, $end ] の形式か、cvSlice() が使えます。
-マトリクスは、いまのところ C<Cv::Mat> しか扱えません。C<Cv::MatND> も扱
-えるといいのかもしれませんが、そのうちに、、、
+シーケンスを変換する cvCvtSeqToArray() をマトリクスも変換できるように拡
+張したものです。$slice は、cvSlice() で作るか、単にはじめ $start と終り
+$end を対にした配列のリファレンス [$start, $end] です。省略したときは
+$arr のすべての要素を変換します。
 
-cvCvtSeqToArray() が元になっているので同じ呼出し形式も使えます。つまり、
-次の使い方もできます。でも使わないかもしれませんね。
+cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。つまり、次の
+使い方もできます。でも使わないかもしれませんね。
 
  $arr->ToArray(\my @array);                                             # (3)
  $arr->ToArray(\my @attay, $slice);                                     # (4)
 
 (注意) Perl の配列のようにインデクスに負数が使えると便利なことがありま
-す。私もよく使いますが、いまのところ、そのような使い方はできません。そ
-のうち考えてみようと思っています。
+すが、これはできません。そのうち考えてみようと思っています。
 
  my @array = $arr->ToArray([ -1, 1 ]);
  my @array = $arr->ToArray([ 1, -1 ]);
 
 
-=item Cv::ContourArea($points)
 
-=item Cv::Arr::Affine()
 
 =item Cv::GetBuildInformation()
 
