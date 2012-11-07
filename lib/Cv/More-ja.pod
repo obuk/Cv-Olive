@@ -7,13 +7,14 @@ Cv::More - L<Cv|Cv::Nihongo> をもう少し Perl で使いやすくしたいね
 
 =head1 概要
 
+ use Cv::More qw(cs);
 
 =head1 説明
 
 C<Cv::More> は、L<Cv|Cv::Nihongo> から実験的な機能を切り離して整理する
 ためのパッケージです。C<Cv> が拡張しやすくなると考えています。
-C<Cv::More> は、もともと C<Cv> の一部だったので、使わないことを明示しな
-い限り C<Cv::More> も取り込まれます。
+C<Cv::More> は、C<Cv> の一部を切り離したものなので、使わないことを明示
+しない限り取り込みます。
 
  use Cv;              # Cv::More を使う
  use Cv qw(:nomore);  # Cv::More を使わない
@@ -134,7 +135,7 @@ OpenCV には多数の同じ要素を格納するマトリクスと異なる要�
 Perl の点の配列を扱うところで利用者の負担を減らすことができます。たとえ
 ば、点のリストを入力にする C<PolyLine()> では次のとおり。
 
- $img->polyLine([ [ @$mat ] ], ...); # もっと可能性があると思う。
+ $img->polyLine([ [ @$mat ] ], ...);
 
 =head2 メソッドに歩み寄ってもらう
 
@@ -166,9 +167,9 @@ $radius の 2つを返したいが、できなかった。そういう感じで�
 
 =head3 歩み寄りの歩み寄り
 
-簡単に、使いやすく、という話は分りますが、いままでに作ったプログラムが
-動かなくなるかもしれません。いや、きっと動かなくなるでしょう。迷惑な話
-です。
+簡単に〜、使いやすく〜、というのは C<Cv::More> の目標ですが、いままでに
+作ったプログラムが動かなくなるかもしれません。いや、きっと動かなくなる
+でしょう。迷惑な話です。
 
 たとえば、MiAreaRect() は、いままで呼び出されたコンテクストに関係なく、
 いつでもスカラを返していたので、呼ばれたコンテクストに合わせた戻り値を
@@ -198,6 +199,8 @@ import() と unimport() でごまかすことに、、、
   Cv::More->unimport(qw(cs));
 
 =head2 追加または拡張したメソッド
+
+=head3 Perlの配列を使うメソッド
 
 =over
 
@@ -324,15 +327,15 @@ CvRect から CvBox2D への変換は次のとおり。
 
 =item ContourArea()
 
- my $s = Cv->cvContourArea($points)
- my $s = Cv->cvContourArea($points, $slice)
+ my $s = Cv->ContourArea($points)
+ my $s = Cv->ContourArea($points, $slice)
 
 点で囲まれる領域の面積を求めます。
 
  my @pts = ([100, 100], [100, 200], [200, 200], [200, 100]);
  my $s = Cv->contourArea(\@pts);
 
-この場合の面積 $s は、縦 x 横 (100x100) になります。
+この面積 $s は、縦x横 (100x100) になります。
 
 
 =item Affine()
@@ -343,9 +346,9 @@ GetQuadrangleSubPix() を使って、画像やマトリクスの回転と縮小�
                     [ $A21, $A22, $b2 ] ];
   my $dst = $src->Affine($mapMatrix);
 
-Affine() は、簡単に変換行列を作る方法がなかったので、その対処として作っ
-たものでしたが、 new() を拡張したので、必要なら次の書き方でも同じことが
-できるようになったと思います。
+この Affine() は、GetQuadrangleSubPix() の変換行列を作るのが面倒だった
+ので、その対処として作ったものです。拡張した new() を使えば次の書き方で
+も同じことができます。
 
   $src->GetQuadrangleSubPix(
           Cv::Mat->new([], &Cv::CV_32FC1,
@@ -353,41 +356,19 @@ Affine() は、簡単に変換行列を作る方法がなかったので、そ�
                        [ $A21, $A22, $b2 ],
                        ));
 
-=item ToArray()
+こうしてみると、考えずに Affine() のようなものを作るのは良くないことで、
+GetQuadrangleSubPix() が $mapMatrix に C<Cv::Mat> と Perl の配列のどち
+らでも扱えるようにするのが良かったと分りました。これもそのうちに考えて
+みることにします。
 
- my @array = $arr->ToArray();                                           # (1)
- my @array = $arr->ToArray($slice);                                     # (2)
+=item new()
 
-シーケンスまたはマトリクス (1xN, Nx1) を Perl の点の配列に変換します。
-シーケンスを変換する cvCvtSeqToArray() をマトリクスも変換できるように拡
-張したものです。$slice は、cvSlice() で作るか、単にはじめ $start と終り
-$end を対にした配列のリファレンス [$start, $end] です。省略したときは
-$arr のすべての要素を変換します。
-
-cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。つまり、次の
-使い方もできます。でも使わないかもしれませんね。
-
- $arr->ToArray(\my @array);                                             # (3)
- $arr->ToArray(\my @attay, $slice);                                     # (4)
-
-(注意) Perl の配列のようにインデクスに負数が使えると便利なことがありま
-すが、これはできません。そのうち考えてみようと思っています。
-
- my @array = $arr->ToArray([ -1, 1 ]);
- my @array = $arr->ToArray([ 1, -1 ]);
-
-
-
-
-=item Cv::GetBuildInformation()
-
-=item Cv::HasModule()
-
-=item Cv::Arr::m_new($size, $type, @init)
+=item m_new()
 
 OpenCV の画像やマトリクスのオブジェクトは、大きさと要素の型を指定して作
 ります。C<Cv::Createなんとか()> か C<Cv::なんとか::new()> で作ります。
-C<m_new()> は、これらを再定義し、初期値を扱えるように拡張します。
+C<m_new()> は、C<Cv::なんとか::new()> を再定義し、初期値を扱えるように
+拡張します。
 
  my $mat1 = Cv::Mat->new([], 要素の型, 初期値のリスト);
  my $mat2 = Cv::Mat->new(マトリクスの大きさ, 要素の型);
@@ -398,75 +379,102 @@ C<m_new()> は、これらを再定義し、初期値を扱えるように拡張
 C<m_new()> が拡張するのは、上の C<$mat1> を作る例です。マトリクスの大き
 さを指定するところに C<[]> を指定します。具体的な使い方については、
 L</Perlの配列でマトリクスを作る> を参照してください。他の例は、いまの
-C<Cv> の C<new()> でできます。
+C<Cv> の C<new()> でもできます。
 
-初期値は、C<m_set()> で実装されています。制約もあるので詳細を確認してく
-ださい。
 
-=item Cv::Arr::m_set($mat, $index, $value)
+=item Set()
 
-マトリクスの要素、または要素のまとまりに値を代入します。 C<$index> で指
-定されたマトリクスの要素の数と C<$value> で指定された要素の値の数のバラ
-ンスがとれるように、C<$index> を補うか C<$value> をばらします。そして、
-マトリクスの要素に値を 1つずつ代入します。
+=item m_set()
+
+ $mat->Set($index, $value);
+
+$index は配列のリファレンスで、より具体的に次のとおり書くことができます。
+
+ $mat->Set([], $value);       # マトリクス $mat 全体に $value を代入する
+ $mat->Set([$i], $value);     # マトリクス $mat の $i 行に〜
+ $mat->Set([$i, $j], $value); # マトリクス $mat の $i 行 $j 列に〜
+
+このように C<m_set()> は C<Set()> を拡張し、C<Set()> が 要素を 1つずつ
+代入していたところで、要素をひとまとめに代入することを可能にします。
+
+それは、C<$index> で指定されたマトリクスの要素の数と C<$value> で指定さ
+れた要素の値の数のバランスがとれるように、C<$index> を補うか C<$value>
+をばらし、そして、マトリクスの要素に値を 1つずつ代入するというものです。
+インデクス C<$index> が C<$mat> の要素を特定するために十分でないときは、
+足りないインデクスを補うために、C<$value> が値のリストなら C<$value> を
+ばらして 1つずつ C<m_set()> で再帰的に処理します。つまり、
+
+ $mat->m_set([@$index, $_], $value->[$_]) for 0 .. $#{$value};
+
+そうでない (C<$value> をばらせない) ときは、次のとおり単にインデクスに
+0 を補います。正確には、Nx1 のマトリクスの x1 のインデクスに相当する部
+分を 0 で補うのがいいと思いますが、次に示す手抜きでも十分でしょう。
+
+ $mat->m_set([@$index, 0], $value);
+
+
+=item ToArray()
+
+ my @array = $arr->ToArray();                                           # (1)
+ my @array = $arr->ToArray($slice);                                     # (2)
+
+シーケンスまたはマトリクス (1xN, Nx1) を Perl の点の配列に変換します。
+シーケンスを変換する cvCvtSeqToArray() をマトリクスも変換できるように拡
+張したものです。従って、範囲を与える $slice を指定することができます。
+これは、cvSlice() で作るか、単にはじめ $start と終り $end を対にした配
+列のリファレンス [$start, $end] で表わすことができます。省略したときは
+$arr のすべての要素を変換します。
+
+cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。つまり、次の
+使い方もできます。でも使わないかもしれませんね。
+
+ $arr->ToArray(\my @array);
+ $arr->ToArray(\my @attay, $slice);
+
+(注意) Perl の配列のようにインデクスに負数が使えると便利なことがありま
+すが、これはできません。そのうち考えてみようと思っています。
+
+ my @array = $arr->ToArray([ -1, 1 ]);
+ my @array = $arr->ToArray([ 1, -1 ]);
+
+=back
+
+
+=head3 その他のメソッド
 
 =over
 
-=item *
+=item GetBuildInformation()
 
-代入される側、すなわちインデクスによる修飾は次のとおり。
+  my $info = Cv->GetBuildInformation()
+  my %info = Cv->GetBuildInformation()
 
- $mat->set([], $value);       # マトリクス $mat 全体
- $mat->set([$i], $value);     # マトリクス $mat の $i 行
- $mat->set([$i, $j], $value); # マトリクス $mat の $i 行 $j 列 
+OpenCV 2.4.0 からビルド時の情報が取り出せるます。コンテクトがスカラなら
+cv::getBuildInformation() の戻り値を返し、リストなら次のような結果を返
+します。
 
-=back
+  'OpenCV modules' => {
+	'Disabled by dependency' => '-',
+	'Unavailable' => 'androidcamera java ocl',
+	'Disabled' => 'world',
+	'To be built' => 'core imgproc flann highgui features2d calib3d ml video objdetect contrib nonfree photo legacy gpu python stitching ts videostab'
+  },
+  'Version control' => 'commit:6484732',
+  'Linker flags (Debug)' => {
+	'Precompiled headers' => 'YES'
+  },
+  ...
 
- * 値の数が足りないとき代入を打ち切る。
- * m_set は set を再定義する。
- * m_set は失敗することがある。
- * m_ は Cv::more の〜 から。
- * ec は eval & croak くらい。
+これは、C<HasModule()> でOpenCV で利用可能なモジュールを確認するために
+使用しています。
 
-XXXXX
+=item HasModule()
 
-C<$mat> の要素を特定するために必要なインデクス (C<$mat> の添字) の数が、
-C<$index> の指す配列に格納される要素の数と等しいなら C<$mat> の要素は特
-定されたと考えられます。ただ、C<$value> については、C<$mat> の要素のチャ
-ネル数が 1 のとき、たとえば C<CV_32FC1> のときにはリファレンスでない
-C<$value> を使うことが考えられ、ここでリファレンスに直します。
+ my $hasCore = Cv->HasModule('core');
 
- $value = [ $value ] unless ref $value;
- cvSetND($mat, $idx, $value)
-
-しかし、こうして C<cvSetND()> を呼んだとき、誤りがあれば OpenCV がエラー
-を発生させるでしょう。しかし C<m_set()> は下記のとおり再帰呼出しを使う
-ので、エラーを補足するために呼出し側は C<eval { }> を使わなければなりま
-せん。
-
-上記の条件を満足しないとき、つまり、C<$mat> の要素を特定するために必要
-なインデクスの数が足りないとき、もし C<$value> がネストした配列なら、足
-りないインデクスを補って C<$value> の要素を 1つずつ C<m_set()> で再帰的
-に処理します。
-
- $mat->m_set([@$idx, $_], $value->[$_]) for 0 .. $#{$value}
-
-同様に、要素を特定するために必要なインデクスが足りないときは、
-C<$value> がネストした配列ではなくても要素の数が 2以上だと混乱します。
-もし C<$mat> の要素のチャネル数が 2 以上 (たとえば C<CV_32FC2> の類) な
-ら、C<$value> の要素は個々のチャネルに対応するものかもしれないので、
-Nx1 のマトリクスの最後のいつも 0 になるインデクス、つまり x1 の部分が省
-略されたかもしれません。だから x2 以上で、要素のチャネル数が 1
-(C<CV_32FC1> の類) のときにも、上と同様 C<$value> の要素を 1つずつ
-C<m_set()> で再帰的に処理します。
-
-それ以外は、最後のいつも 0 になるインデクスが省略された可能性がないか、
-更に次のとおりインデクスに 0 を補い、再帰的な要素の更新を試みます。
-
- $mat->m_set([@$idx, 0], $value);
+OpenCV がどのようなモジュールを有効にしてビルドされたかを返します。
 
 =back
-
 
 =head1 バグ
 

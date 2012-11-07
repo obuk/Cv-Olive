@@ -9,7 +9,7 @@ use Carp;
 
 our $VERSION = '0.14';
 
-# Following constants was made from OpenCV Version: 2.4.0.
+# Following constants were made from OpenCV Version: 2.4.0.
 
 *cvSlice = \&Cv::cvSlice;
 

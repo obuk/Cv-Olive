@@ -1,10 +1,12 @@
 Revision history for Cv.pm
 
-0.17 - 2012-11-1 (working)
+0.17 - 2012-11-7 (working)
      * fixed alias boundingRect
      * fixed Affine retval
      * rewrote ToArray
      * fixed BoundingRect
+     * added fallback/Constant.pm-2.4.3
+     * added some sample/*pl
 
 0.16 - 2012-11-1
      * separating experimental code into Cv/More.pm

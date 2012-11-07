@@ -10,6 +10,7 @@ fallback/Constant.pm-2.3.1
 fallback/Constant.pm-2.4.0
 fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
+fallback/Constant.pm-2.4.3
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
@@ -59,6 +60,8 @@ sample/fback_c.pl
 sample/ffilldemo.pl
 sample/find_obj.pl
 sample/fitellipse.pl
+sample/fitellipse2.pl
+sample/fitline.pl
 sample/flipbook.pl
 sample/fruits.jpg
 sample/houghlines-prob.pl
@@ -88,6 +91,9 @@ sample/lkdemo.pl
 sample/logo.png
 sample/logo_in_clutter.png
 sample/minarea.pl
+sample/minarearect.pl
+sample/minenclosingcircle.pl
+sample/modules.pl
 sample/morphology.pl
 sample/motempl.pl
 sample/mser_sample.pl
@@ -179,13 +185,15 @@ t/3stereoSGBM.t
 t/3sum.t
 t/3threshold.t
 t/3trackbar.t
+t/4boundingRect.t
 t/4contour.t
+t/4contourArea.t
 t/4CvMat-More.t
+t/4CvMore.t
 t/4CvSeq-Circle.t
 t/4CvSeq-Point.t
 t/4CvSeq-Rect.t
 t/4CvSeq-SURFPoint.t
-t/4cvtMatToArray.t
 t/4fitEllipse.t
 t/4fitLine.t
 t/4fontQt.t
@@ -198,6 +206,7 @@ t/4moments.t
 t/4overload.t
 t/4pointSeqFromMat.t
 t/4projectPoints2.t
+t/4toArray.t
 t/8flipbook.t
 t/8pango.t
 t/9inlineC.t
