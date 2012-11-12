@@ -291,6 +291,10 @@ CV_MAKETYPE() のようなマクロのいくつかには Cv::MAKETYPE()
 バージョン 0.16 で C<Cv> を分け、拡張したコードを分離して
 L<Cv::More|Cv::More-ja> に置くことにしました。
 
+=item *
+
+バージョン 0.17 で typemap の見直しを。一旦、xlib も止める。
+
 =back
 
 =head1 参考

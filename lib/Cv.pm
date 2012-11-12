@@ -78,8 +78,10 @@ sub import {
 			push(@std, $_);
 		}
 	}
-	eval "use $auto{$_}" for
-		grep { defined $auto{$_} } qw(seq more);
+	for (grep { defined $auto{$_} } qw(seq more)) {
+		eval "use $auto{$_}";
+		Carp::croak "can't use $auto{$_}; $@" if $@;
+	}
 	push(@std, ":std") unless @std;
 	$self->export_to_level(1, $self, @std);
 }
@@ -91,8 +93,6 @@ sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
 sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
 Cv::alias(qw(Version));
-
-# use Cv::Seq;
 
 =over 4
 
@@ -231,6 +231,7 @@ foreach (classes('Cv')) {
 	next if /^Cv::Constant$/;
 	no warnings 'redefine';
 	eval "{ package $_; sub AUTOLOAD { &Cv::autoload } }";
+	
 }
 
 
