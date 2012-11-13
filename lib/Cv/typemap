@@ -80,15 +80,14 @@ CvSeqWriter*				T_CvPTROBJ
 const CvSeqWriter*			T_CvPTROBJ
 CvSize						T_CvSize
 CvSize2D32f					T_CvSize2D32f
-CvSlice						T_PACKED
+CvSlice						T_CvSlice
 CvSparseMat*				T_CvPTROBJ
 const CvSparseMat*			T_CvPTROBJ
 CvSparseMatIterator*		T_CvPTROBJ
 const CvSparseMatIterator*	T_CvPTROBJ
 CvStereoBMState*			T_CvPTROBJ
 CvStereoGCState*			T_CvPTROBJ
-CvString					T_PACKED
-CvStringHashNode			T_PACKED
+CvString					T_CvString
 CvStringHashNode*			T_CvPTROBJ
 const CvStringHashNode*		T_CvPTROBJ
 CvSubdiv2D*					T_CvPTROBJ
@@ -97,8 +96,8 @@ CvSubdiv2DPointLocation		T_IV
 CvSubdiv2DEdge				T_UV
 CvSubdiv2DPoint				T_CvSubdiv2DPoint
 CvSubdiv2DPoint*			T_CvSubdiv2DPointPtr
-CvSURFParams				T_PACKED
-CvSURFPoint					T_PACKED
+CvSURFParams				T_CvSURFParams
+CvSURFPoint					T_CvSURFPoint
 CvTermCriteria				T_CvTermCriteria
 CvTreeNodeIterator*			T_CvPTROBJ
 const CvTreeNodeIterator*	T_CvPTROBJ
@@ -166,9 +165,9 @@ T_CvArrPtrPtr
 		} else
 			$var = ($type)0;
 	} else
-		Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\")
+			\"$var\", \"$type\")
 
 T_CvAttrList
 	int length_${var} = 0;
@@ -183,11 +182,10 @@ T_CvAttrList
 		}
 		${var}_attr[i] = (const char*)0;
 		${var} = cvAttrList(${var}_attr, NULL);
-	} else {
+	} else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$ntype\");
-	}
+			\"$var\", \"$ntype\")
 
 T_CvBox2D
 	STMT_START {
@@ -444,7 +442,7 @@ T_CvPointPtr
 	} else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\");
+			\"$var\", \"$type\")
 
 T_CvPointPtrPtr
 	int length_$var = 0;
@@ -456,7 +454,16 @@ T_CvPointPtrPtr
 		if (length_$var > 0) { int i;
 			$var = ($type)alloca(sizeof(${var}[0])*length_$var);
 			length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
-			XS_unpack_lengthPtr(av_outer, length_inner_$var, length_$var);
+			for (i = 0; i < length_$var; i++) {
+				SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
+				if (SvROK(sv_inner) && SvTYPE(SvRV(sv_inner)) == SVt_PVAV) {
+					AV* av_inner = (AV*)SvRV(sv_inner);
+					length_inner_${var}[i] = av_len(av_inner) + 1;
+				} else	
+					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+						\"$var\", \"$type\");
+			}
 			for (i = 0; i < length_$var; i++) { int j;
 				SV* sv_inner = (SV*)(*av_fetch(av_outer, i, 0));
 				AV* av_inner = (AV*)SvRV(sv_inner);
@@ -467,19 +474,25 @@ T_CvPointPtrPtr
 					if (SvROK(p) && SvTYPE(SvRV(p)) == SVt_PVAV) {
 						SV* sv_x = (SV*)*av_fetch((AV*)SvRV(p), 0, 0);
 						SV* sv_y = (SV*)*av_fetch((AV*)SvRV(p), 1, 0);
-						/* XXXXX - check sv_x, sv_y */
-						${var}[i][j].x = SvIV(sv_x);
-						${var}[i][j].y = SvIV(sv_y);
+						if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
+							${var}[i][j].x = SvIV(sv_x);
+							${var}[i][j].y = SvIV(sv_y);
+						} else
+							Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+								${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+								\"$var\", \"$type\");
 					} else
-						croak(\"element is not an array reference\");
+						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+							\"$var\", \"$type\");
 				}
 			}
 		} else
 			$var = ($type)0;
 	} else
-	    Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\")
+			\"$var\", \"$type\")
 
 T_CvPoint2D64f
 	STMT_START {
@@ -534,7 +547,7 @@ T_CvPoint2D64fPtr
 	} else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\");
+			\"$var\", \"$type\")
 
 T_CvPoint3D64f
 	STMT_START {
@@ -593,7 +606,7 @@ T_CvPoint3D64fPtr
 	} else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\");
+			\"$var\", \"$type\")
 
 T_CvRect
 	STMT_START {
@@ -689,6 +702,48 @@ T_CvSize2D32f
 				\"$var\", \"$type\");
 	} STMT_END
 
+T_CvSlice
+	STMT_START {
+		SV* sv = $arg; AV* av;
+		SvGETMAGIC(sv);
+		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
+			av_len(av = (AV*)SvRV(sv)) >= 1) {
+			SV* sv_start = (SV*)*av_fetch(av, 0, 0);
+			SV* sv_end   = (SV*)*av_fetch(av, 1, 0);
+			if (SvNIOK(sv_start) && SvNIOK(sv_end)) {
+				$var.start_index = SvIV(sv_start);
+				$var.end_index   = SvIV(sv_end);
+			} else
+				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+					\"$var\", \"$type\");
+		} else
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
+
+T_CvString
+	STMT_START {
+		SV* sv = $arg; AV* av;
+		SvGETMAGIC(sv);
+		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
+			av_len(av = (AV*)SvRV(sv)) >= 1) {
+			SV* sv_len = (SV*)*av_fetch(av, 0, 0);
+			SV* sv_ptr = (SV*)*av_fetch(av, 1, 0);
+			if (SvIOK(sv_len) && SvIOK(sv_ptr)) {
+				$var.len = SvIV(sv_len);
+				$var.ptr = (char*)SvIV(sv_ptr);
+			} else
+				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+					\"$var\", \"$type\");
+		} else
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
+
 T_CvSubdiv2DPoint
 	STMT_START {
 		SV* sv = $arg; AV* av;
@@ -725,6 +780,32 @@ T_CvSubdiv2DPoint
 					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 					\"$var\", \"$type\");
 #endif
+		} else
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
+
+T_CvSURFParams
+	STMT_START {
+		SV* sv = $arg; AV* av;
+		SvGETMAGIC(sv);
+		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
+			av_len(av = (AV*)SvRV(sv)) >= 3) {
+			SV* sv_extended         = (SV*)*av_fetch((AV*)SvRV(sv), 0, 0);
+			SV* sv_hessianThreshold = (SV*)*av_fetch((AV*)SvRV(sv), 1, 0);
+			SV* sv_nOctaves         = (SV*)*av_fetch((AV*)SvRV(sv), 2, 0);
+			SV* sv_nOctaveLayers    = (SV*)*av_fetch((AV*)SvRV(sv), 3, 0);
+			if (SvIOK(sv_extended) && SvNIOK(sv_hessianThreshold) &&
+				SvIOK(sv_nOctaves) && SvIOK(sv_nOctaveLayers)) {
+				$var.extended         = SvIV(sv_extended);
+				$var.hessianThreshold = SvNV(sv_hessianThreshold);
+				$var.nOctaves         = SvIV(sv_nOctaves);
+				$var.nOctaveLayers    = SvIV(sv_nOctaveLayers);
+			} else
+				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+					\"$var\", \"$type\");
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -769,9 +850,9 @@ T_floatPtr
 		} else
 			$var = ($type)0;
 	} else
-		Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\")
+			\"$var\", \"$type\")
 
 T_floatPtrPtr
 	int length_$var = 0;
@@ -783,7 +864,16 @@ T_floatPtrPtr
 		if (length_$var > 0) { int i;
 			$var = ($type)alloca(sizeof(${var}[0])*length_$var);
 			length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
-			XS_unpack_lengthPtr(av_outer, length_inner_$var, length_$var);
+			for (i = 0; i < length_$var; i++) {
+				SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
+				if (SvROK(sv_inner) && SvTYPE(SvRV(sv_inner)) == SVt_PVAV) {
+					AV* av_inner = (AV*)SvRV(sv_inner);
+					length_inner_${var}[i] = av_len(av_inner) + 1;
+				} else
+					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+						\"$var\", \"$type\");
+			}
 			for (i = 0; i < length_$var; i++) { int j;
 				SV* sv_inner = (SV*)(*av_fetch(av_outer, i, 0));
 				AV* av_inner = (AV*)SvRV(sv_inner);
@@ -791,16 +881,20 @@ T_floatPtrPtr
 				})alloca(sizeof(${var}[0][0]) * length_inner_${var}[i]);
 				for (j = 0; j < length_inner_${var}[i]; j++) {
 					SV* p = (SV*)(*av_fetch(av_inner, j, 0));
-					/* XXXXX - check p */
-					${var}[i][j] = SvNV(p);
+					if (SvNIOK(p)) {
+						${var}[i][j] = SvNV(p);
+					} else
+						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+							\"$var\", \"$type\");
 				}
 			}
 		} else
 			$var = ($type)0;
 	} else
-	    Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\")
+			\"$var\", \"$type\")
 
 T_intPtr
 	int length_$var = 0;
@@ -817,18 +911,17 @@ T_intPtr
 		} else
 			$var = ($type)0;
 	} else
-		Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\")
+			\"$var\", \"$type\")
 
 O_OBJECT
 	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
 		$var = ($type)SvIV((SV*)SvRV($arg));
-	else {
+	else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$ntype\");
-	}
+			\"$var\", \"$ntype\")
 	
 ##################################################
 OUTPUT
@@ -1026,6 +1119,23 @@ T_CvSize2D32f
 		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
 	} STMT_END;
 
+T_CvSlice
+	STMT_START {
+		AV* av = newAV();
+		av_push(av, newSViv($var.start_index));
+		av_push(av, newSViv($var.end_index));
+		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+	} STMT_END;
+
+T_CvString
+	STMT_START {
+		AV* av = newAV();
+		SV* sv = sv_2mortal(newRV_inc(sv_2mortal((SV*)av)));
+		av_push(av, newSViv($var.len));
+		av_push(av, newSViv((IV)$var.ptr));
+		sv_setsv($arg, sv_bless(sv, gv_stashpv("Cv::String", 1)));
+	} STMT_END;
+
 T_CvSubdiv2DPoint
 	STMT_START {
 		AV* av = newAV();
@@ -1064,6 +1174,30 @@ T_CvSubdiv2DPointPtr
 #endif
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_pointt)));
 		}
+	} STMT_END;
+
+T_CvSURFParams
+	STMT_START {
+		AV* av = newAV();
+		av_push(av, newSViv($var.extended));
+		av_push(av, newSVnv($var.hessianThreshold));
+		av_push(av, newSViv($var.nOctaves));
+		av_push(av, newSViv($var.nOctaveLayers));
+		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+	} STMT_END;
+
+T_CvSURFPoint
+	STMT_START {
+		AV* av = newAV();
+		AV* av_pt = newAV();
+		av_push(av_pt, newSVnv($var.pt.x));
+		av_push(av_pt, newSVnv($var.pt.y));
+		av_push(av, newRV_inc(sv_2mortal((SV*)av_pt)));
+		av_push(av, newSViv($var.laplacian));
+		av_push(av, newSViv($var.size));
+		av_push(av, newSVnv($var.dir));
+		av_push(av, newSVnv($var.hessian));
+		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
 	} STMT_END;
 
 T_CvTermCriteria

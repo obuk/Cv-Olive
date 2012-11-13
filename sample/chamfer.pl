@@ -42,3 +42,49 @@ foreach my $pt (@{$results->[$best]}) {
 
 $cimg->show("result");
 Cv->waitKey;
+
+use Cv::Config;
+use Inline C => Config => %Cv::Config::C;
+use Inline C => << '----';
+#include <opencv/cv.h>
+#ifndef __cplusplus
+#define __OPENCV_BACKGROUND_SEGM_HPP__
+#define __OPENCV_VIDEOSURVEILLANCE_H__
+#endif
+#include <opencv/cvaux.h>
+#include "typemap.h"
+
+MODULE = Cv	PACKAGE = Cv::Arr
+
+int
+cvChamerMatching(CvArr* img, CvArr* templ, results, costs, double templScale=1, int maxMatches = 20, double minMatchDistance = 1.0, int padX = 3, int padY = 3, int scales = 5, double minScale = 0.6, double maxScale = 1.6, double orientationWeight = 0.5, double truncate = 20)
+ALIAS: Cv::cvChamerMatching = 1
+PREINIT:
+	vector<vector<Point> > results;
+	vector<float> costs;
+INIT:
+	Mat _img = cv::cvarrToMat(img);
+	Mat _templ = cv::cvarrToMat(templ);
+CODE:
+	RETVAL = chamerMatching(_img, _templ, results, costs, templScale, maxMatches, minMatchDistance, padX, padY, scales, minScale, maxScale, orientationWeight, truncate);
+	AV* av_vv = newAV();
+	for (int i = 0; i < results.size(); i++) {
+		AV* av_v = newAV();
+		for (int j = 0; j < results[i].size(); j++) {
+			AV* av_pt = newAV();
+			av_push(av_pt, newSViv(results[i][j].x));
+			av_push(av_pt, newSViv(results[i][j].y));
+			av_push(av_v, newRV_inc(sv_2mortal((SV*)av_pt)));
+		}
+		av_push(av_vv, newRV_inc(sv_2mortal((SV*)av_v)));
+	}
+	sv_setsv(ST(2), sv_2mortal(newRV_inc(sv_2mortal((SV*)av_vv))));
+	AV* av_v = newAV();
+	for (int i = 0; i < costs.size(); i++) {
+		av_push(av_v, newSVnv(costs[i])); 
+	}
+	sv_setsv(ST(3), sv_2mortal(newRV_inc(sv_2mortal((SV*)av_v))));
+OUTPUT:
+	RETVAL
+
+----

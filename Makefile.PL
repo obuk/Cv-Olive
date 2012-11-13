@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 use lib qw(./lib);
 use Cv::Config;
 my $cf = new Cv::Config;
-my %with = ( QT => 0, T => 1 );
+my %with = ( QT => 0, T => 0 );
 
 my @perl_h = qw(perl.h sv.h pp.h);
 my @perl_h_patched = ();
@@ -94,10 +94,8 @@ WriteMakefile(
 	TYPEMAPS => $cf->typemaps,
 	CCFLAGS => $cf->ccflags,
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
-	MYEXTLIB => 'xlib/libxs$(LIB_EXT)',
 	dynamic_lib => $cf->dynamic_lib,
 	INC => "-I. -I..",
-	DIR => [ qw(xlib) ],
 	clean => {
 		FILES => [
 			'_Inline', 'cover_db',

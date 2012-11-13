@@ -1,6 +1,48 @@
 /* -*- mode: text; coding: utf-8; tab-width: 4 -*- */
 
-#include "xlib/xs.h"
+/* #include "xlib/xs.h" */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#ifdef __cplusplus
+}
+#endif
+
+/* #define NEED_sv_2pv_nolen */
+#include "ppport.h"
+
+/* remove confincting macros */
+#undef do_open
+#undef do_close
+
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
+#define _VERSION(x, y, z) ((((x) * 1000 + (y)) * 1000) + (z))
+#define _CV_VERSION() _VERSION(CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION)
+
+#ifndef __cplusplus
+#define __OPENCV_BACKGROUND_SEGM_HPP__
+#define __OPENCV_VIDEOSURVEILLANCE_H__
+#endif
+
+#include <opencv/cvaux.h>
+
+#ifdef __cplusplus
+#  ifdef __OPENCV_OLD_CV_H__
+#    include <opencv2/opencv.hpp>
+#  endif
+#else
+#  if _CV_VERSION() >= _VERSION(2,4,0)
+#    include <opencv2/photo/photo_c.h>
+#  endif
+#endif
+
+#include "typemap.h"
 
 #define DIM(x) (sizeof(x)/sizeof((x)[0]))
 
@@ -213,7 +255,6 @@ cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, 
 }
 #endif
 #endif
-
 
 MODULE = Cv	PACKAGE = Cv
 
@@ -742,15 +783,10 @@ cvGetOptimalDFTSize(int size0)
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
-cvGetRawData(const CvArr* arr, SV* data, step = NO_INIT, roiSize = NO_INIT)
-INPUT:
-	int &step = NO_INIT;
-	CvSize &roiSize = NO_INIT;
-PREINIT:
-	CvSize size;
-	uchar* _data;
+cvGetRawData(const CvArr* arr, SV* data, OUT int step, OUT CvSize roiSize)
 INIT:
-	size = cvGetSize(arr);
+	CvSize size = cvGetSize(arr);
+	uchar* _data;
 CODE:
 	cvGetRawData(arr, &_data, &step, &roiSize);
 	sv_upgrade(data, SVt_PV);
@@ -765,8 +801,6 @@ CODE:
 	}
 	SvPOK_on(data);
 	SvREADONLY_on(data); // XXXXX
-	if (items >= 3) sv_setiv(ST(2), step);
-	if (items >= 4) XS_pack_CvSize(ST(3), roiSize);
 
 double
 cvGetReal1D(const CvArr* arr, int idx0)
@@ -882,13 +916,7 @@ POSTCALL:
 	XSRETURN(1);
 
 void
-cvMinMaxLoc(IN const CvArr *arr, OUT double min_val, OUT double max_val, min_loc = NO_INIT, max_loc = NO_INIT, IN const CvArr* mask = NULL)
-INPUT:
-	CvPoint& min_loc = NO_INIT
-	CvPoint& max_loc = NO_INIT
-POSTCALL:
-	if (items >= 4) XS_pack_CvPoint(ST(3), min_loc);
-	if (items >= 5) XS_pack_CvPoint(ST(4), max_loc);
+cvMinMaxLoc(IN const CvArr *arr, OUT double min_val, OUT double max_val, OUT CvPoint min_loc, OUT CvPoint max_loc, IN const CvArr* mask = NULL)
 
 void
 cvMinS(const CvArr* src, double value, CvArr* dst)
@@ -3003,19 +3031,11 @@ cvSubdiv2DNextEdge(CvSubdiv2DEdge edge)
 
 MODULE = Cv	PACKAGE = Cv::Subdiv2D
 CvSubdiv2DPointLocation
-cvSubdiv2DLocate(CvSubdiv2D* subdiv, CvPoint2D32f pt, edge, vertex = NO_INIT)
+cvSubdiv2DLocate(CvSubdiv2D* subdiv, CvPoint2D32f pt, OUT CvSubdiv2DEdge edge, vertex = NO_INIT)
 INPUT:
-	CvSubdiv2DEdge &edge = NO_INIT
 	CvSubdiv2DPoint* &vertex = NO_INIT
 CODE:
-	if (items <= 3) {
-		RETVAL = cvSubdiv2DLocate(subdiv, pt, &edge, NULL);
-	} else {
-		vertex = NULL;
-		RETVAL = cvSubdiv2DLocate(subdiv, pt, &edge, &vertex);
-		if (vertex) XS_pack_CvSubdiv2DPoint(ST(3), *vertex);
-		else ST(3) = &PL_sv_undef;
-	}
+	RETVAL = cvSubdiv2DLocate(subdiv, pt, &edge, NULL);
 OUTPUT:
 	edge
 
@@ -3618,20 +3638,7 @@ POSTCALL:
 #if _CV_VERSION() >= _VERSION(2,0,0)
 
 CvMat*
-cvEncodeImage(const CvArr* arr, const char* ext, params = NO_INIT)
-INPUT:
-	int* params = NO_INIT
-PREINIT:
-	int length_params = 0;
-INIT:
-	params = (int *)0;
-	if (items >= 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVAV) {
-		AV* av = (AV*)SvRV(ST(2)); length_params = av_len(av) + 1;
-		if (length_params > 0) {
-			params = (int*)alloca(sizeof(params[0])*(length_params + 1));
-			XS_unpack_intPtr(av, (int *)params, length_params);
-		}
-	}
+cvEncodeImage(const CvArr* arr, const char* ext, int* params)
 CODE:
     int i = length_params & ~1;
 #ifdef __cplusplus
@@ -4095,27 +4102,13 @@ C_ARGS: left, right, dispLeft, dispRight, state, useDisparityGuess
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
-cvGetOptimalNewCameraMatrix(const CvMat* cameraMatrix, const CvMat* distCoeffs, CvSize imageSize, double alpha, CvMat* newCameraMatrix, CvSize newImageSize=cvSize(0, 0), validPixROI = NO_INIT, int centerPrincipalPoint = 0)
-ALIAS: Cv::cvGetOptimalNewCameraMatrix = 1
-INPUT:
-	CvRect& validPixROI = NO_INIT;
-PREINIT:
-	CvRect* validPixROI_ptr;
-INIT:
-	if (items < 7)
-		validPixROI_ptr = (CvRect*)0;
-	else {
-		validPixROI = XS_unpack_CvRect(ST(6));
-		validPixROI_ptr = &validPixROI;
-	}
+cvGetOptimalNewCameraMatrix(const CvMat* cameraMatrix, const CvMat* distCoeffs, CvSize imageSize, double alpha, CvMat* newCameraMatrix, CvSize newImageSize=cvSize(0, 0), OUT CvRect validPixROI, int centerPrincipalPoint = 0)
 CODE:
-	cvGetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, alpha, newCameraMatrix, newImageSize, validPixROI_ptr
+	cvGetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, alpha, newCameraMatrix, newImageSize, &validPixROI
 #if _CV_VERSION() >= _VERSION(2,3,0)
 	, centerPrincipalPoint
 #endif
 	);
-OUTPUT:
-	validPixROI if (items >= 7) XS_pack_CvRect(ST(6), validPixROI);
 
 #endif
 
@@ -4200,21 +4193,14 @@ OUTPUT:
 	RETVAL
 
 void
-cvStereoRectify(const CvMat* cameraMatrix1, const CvMat* cameraMatrix2, const CvMat* distCoeffs1, const CvMat* distCoeffs2, CvSize imageSize, const CvMat* R, const CvMat* T, CvMat* R1, CvMat* R2, CvMat* P1, CvMat* P2, CvMat* Q=0, int flags=CV_CALIB_ZERO_DISPARITY, double alpha=-1, CvSize newImageSize=cvSize(0, 0), roi1 = NO_INIT, roi2 = NO_INIT)
+cvStereoRectify(const CvMat* cameraMatrix1, const CvMat* cameraMatrix2, const CvMat* distCoeffs1, const CvMat* distCoeffs2, CvSize imageSize, const CvMat* R, const CvMat* T, CvMat* R1, CvMat* R2, CvMat* P1, CvMat* P2, CvMat* Q=0, int flags=CV_CALIB_ZERO_DISPARITY, double alpha=-1, CvSize newImageSize=cvSize(0, 0), OUT CvRect roi1, OUT CvRect roi2)
 ALIAS: Cv::cvStereoRectify = 1
-INPUT:
-	CvRect &roi1 = NO_INIT
-	CvRect &roi2 = NO_INIT
 CODE:
 	cvStereoRectify(cameraMatrix1, cameraMatrix2, distCoeffs1, distCoeffs2, imageSize, R, T, R1, R2, P1, P2, Q, flags
 #if _CV_VERSION() >= _VERSION(2,0,0)
 		, alpha, newImageSize, &roi1, &roi2
 #endif
 		);
-#if _CV_VERSION() >= _VERSION(2,0,0)
-	if (items >= 16) XS_pack_CvRect(ST(15), roi1);
-	if (items >= 17) XS_pack_CvRect(ST(16), roi2);
-#endif
 
 void
 cvStereoRectifyUncalibrated(const CvMat* points1, const CvMat* points2, const CvMat* F, CvSize imageSize, CvMat* H1, CvMat* H2, double threshold=5)
@@ -4437,29 +4423,6 @@ CODE:
 	RETVAL = model->t;
 OUTPUT:
 	RETVAL
-
-#if _CV_VERSION() >= _VERSION(2,2,0)
-#ifdef __cplusplus
-
-MODULE = Cv	PACKAGE = Cv::Arr
-int
-cvChamerMatching(CvArr* img, CvArr* templ, results, costs, double templScale=1, int maxMatches = 20, double minMatchDistance = 1.0, int padX = 3, int padY = 3, int scales = 5, double minScale = 0.6, double maxScale = 1.6, double orientationWeight = 0.5, double truncate = 20)
-ALIAS: Cv::cvChamerMatching = 1
-PREINIT:
-	vector<vector<Point> > results;
-	vector<float> costs;
-INIT:
-	Mat _img = cv::cvarrToMat(img);
-	Mat _templ = cv::cvarrToMat(templ);
-CODE:
-	RETVAL = chamerMatching(_img, _templ, results, costs, templScale, maxMatches, minMatchDistance, padX, padY, scales, minScale, maxScale, orientationWeight, truncate);
-	XS_pack_PointVecVec(ST(2), results);
-	XS_pack_floatVec(ST(3), costs);
-OUTPUT:
-	RETVAL
-
-#endif
-#endif
 
 
 # ============================================================

@@ -464,6 +464,14 @@ sub SetND {
 }
 
 
+sub GetRawData {
+	# GetRawData($arr, my $data, my $step, my $roiSize)
+	push(@_, my $step_dummy) if @_ == 2;
+	push(@_, my $roiSize_dummy) if @_ == 3;
+	goto &cvGetRawData;
+}
+
+
 sub GetReal {
 	# GetReal($src, $idx0);
 	# GetReal($src, $idx0, $idx1);
@@ -625,6 +633,13 @@ sub GetSubRect {
 	goto &cvGetSubRect;
 }
 
+
+sub MinMaxLoc {
+	# MinMaxLoc($arr, my $minVal, my $maxVal, my $minLoc, my $maxLoc, my $mask)
+	push(@_, my $minLoc) if @_ == 3;
+	push(@_, my $maxLoc) if @_ == 4;
+	goto &cvMinMaxLoc;
+}
 
 =item *
 
@@ -1669,6 +1684,13 @@ package Cv::Arr;
 #  highgui. High-level GUI and Media I/O: Reading and Writing Images and Video
 # ============================================================
 
+package Cv::Arr;
+
+sub EncodeImage {
+	push(@_, \0) if @_ == 2;
+	goto &cvEncodeImage;
+}
+
 package Cv;
 
 sub cvHasGUI {
@@ -1717,6 +1739,21 @@ package Cv::VideoWriter;
 # ============================================================
 
 package Cv::Arr;
+
+{ *Cv::GetOptimalNewCameraMatrix = \&GetOptimalNewCameraMatrix }
+sub GetOptimalNewCameraMatrix {
+	push(@_, my $newImageSize = [0, 0])    if @_ == 5;
+	push(@_, my $validROI = \0)            if @_ == 6;
+	push(@_, my $centerPrincipalPoint = 0) if @_ == 7;
+	goto &cvGetOptimalNewCameraMatrix;
+}
+
+{ *Cv::StereoRectify = \&StereoRectify }
+sub StereoRectify {
+	push(@_, my $roi1 = \0) if @_ == 15;
+	push(@_, my $roi2 = \0) if @_ == 16;
+	goto &cvStereoRectify;
+}
 
 sub ProjectPoints2 {
 	my ($pts3d, $rvec, $tvec, $cmat, $dist, $pts2d) = splice(@_, 0, 6);

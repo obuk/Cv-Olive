@@ -8,7 +8,7 @@ BEGIN {	use_ok('Cv', qw(:nomore)) }
 my ($x, $y) = map { (int rand 16384) + 0.5 } 0..1;
 
 SKIP: {
-	skip "no T", 8 unless Cv->can('CvPoint2D64fPtr');
+	skip "no T", 10 unless Cv->can('CvPoint2D64fPtr');
 	my $line;
 
 	my $arr = Cv::cvPoint2D64fPtr($x, $y);
