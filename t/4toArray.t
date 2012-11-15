@@ -69,3 +69,19 @@ if (2) {
 	is($list2[1]->[0], 5);
 	is($list2[1]->[1], 6);
 }
+
+
+if (3) {
+	my $arr = Cv::Mat->new([], CV_32FC1,
+						   [ 11, 12, 13 ],
+						   [ 21, 22, 23 ],
+						   [ 31, 32, 33 ],
+		);
+	ok($arr);
+	is($arr->rows, 3);
+	is($arr->cols, 3);
+
+	my $line = __LINE__ + 1;
+	eval { my @list = @$arr };
+	is($@, "can't convert; toArray works 1xN and Nx1 at $0 line $line\n");
+}

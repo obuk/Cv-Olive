@@ -7,7 +7,7 @@ BEGIN {	use_ok('Cv', qw(:nomore)) }
 
 my @val = map { (int rand 16384) + 0.5 } 0..3;
 
-my $scalar1 = Cv::cvScalar(@val[0]);
+my $scalar1 = Cv::cvScalar($val[0]);
 is($scalar1->[$_], $val[$_]) for 0;
 is($scalar1->[$_], 0) for 1 .. 3;
 

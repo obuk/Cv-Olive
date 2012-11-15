@@ -209,6 +209,7 @@ sub CV_BayerGR2BGR () { 49 }
 sub CV_BayerGR2RGB () { &CV_BayerGB2BGR }
 sub CV_BayerRG2BGR () { 48 }
 sub CV_BayerRG2RGB () { &CV_BayerBG2BGR }
+sub CV_C () { 1 }
 sub CV_CALIB_CB_ADAPTIVE_THRESH () { 1 }
 sub CV_CALIB_CB_FILTER_QUADS () { 4 }
 sub CV_CALIB_CB_NORMALIZE_IMAGE () { 2 }
@@ -452,8 +453,6 @@ sub CV_INTER_AREA () { 3 }
 sub CV_INTER_CUBIC () { 2 }
 sub CV_INTER_LINEAR () { 1 }
 sub CV_INTER_NN () { 0 }
-sub CV_IS_CONT_MAT () { &CV_IS_MAT_CONT }
-sub CV_IS_SET_ELEM_EXISTS () { &CV_IS_SET_ELEM }
 sub CV_KMEANS_USE_INITIAL_LABELS () { 1 }
 sub CV_L1 () { 2 }
 sub CV_L2 () { 4 }
@@ -675,7 +674,6 @@ sub CV_STEREO_BM_BASIC () { 0 }
 sub CV_STEREO_BM_FISH_EYE () { 1 }
 sub CV_STEREO_BM_NARROW () { 2 }
 sub CV_STEREO_BM_NORMALIZED_RESPONSE () { 0 }
-sub CV_STEREO_GC_OCCLUDED () { &SHRT_MAX }
 sub CV_STORAGE_APPEND () { 2 }
 sub CV_STORAGE_BLOCK_SIZE () { 65408 }
 sub CV_STORAGE_MAGIC_VAL () { 1116274688 }

@@ -207,3 +207,10 @@ if (16) {
 if (17) {
 	my $arr = Cv::Mat->new([], CV_8UC1, []);
 }
+
+if (18) {
+	my $line = __LINE__ + 1;
+	eval { Cv::Mat->new([], CV_32FC1, [1, 'x'], [2, 2], [3, 3]) };
+	is($@, "Cv::Arr::cvSetND: value is not of type CvScalar at $0 line $line\n");
+}
+

@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 122;
+use Test::More tests => 127;
 
 BEGIN {
 	use_ok('Cv');
@@ -153,4 +153,21 @@ if (5) {
 
 	$seq->Splice(1, 1, [4, 4], [5, 5]);
 	is($seq->total, 4);
+}
+
+if (6) {
+	my $stor = Cv::MemStorage->new;
+	ok($stor->isa('Cv::MemStorage'));
+	my $seq = Cv::Seq::Point->new(CV_32SC2, $stor);
+	ok($seq->isa('Cv::Seq::Point'));
+
+	$seq->Push([1, 1], [2, 2]);
+	is($seq->total, 2);
+	my $p0 = $seq->Get(0);
+	is($p0->[0], 1);
+
+	$seq->Set(0, [3, 3]);
+	my $p1 = $seq->Get(0);
+	is($p1->[0], 3);
+
 }

@@ -29,7 +29,8 @@ sub Pack {
 sub Unpack {
 	my $self = CORE::shift;
 	my $t = $self->template;
-	no warnings 'uninitialized';
+	return undef unless defined $_[0];
+	# no warnings 'uninitialized';
 	my ($x, $y, @r) = CORE::unpack($t, $_[0]);
 	my @elem = ([ $x, $y ], @r);
 	wantarray? @elem : \@elem;
@@ -39,7 +40,8 @@ sub Unpack {
 sub UnpackMulti {
 	my $self = CORE::shift;
 	my ($t, $c) = $self->template;
-	no warnings 'uninitialized';
+	return undef unless defined $_[1];
+	# no warnings 'uninitialized';
 	my @data = CORE::unpack("($t)*", $_[1]);
 	while (my ($x, $y, @r) = CORE::splice(@data, 0, $c)) {
 		CORE::push(@{$_[0]}, [[$x, $y], @r]);

@@ -63,3 +63,27 @@ if (2) {
 sub color {
 	[ map { (rand 128) + 127 } 1..3 ];
 }
+
+SKIP: {
+	skip "can't use Capture::Tiny", 5 unless eval {
+		require Capture::Tiny;
+		sub capture (&;@) { goto &Capture::Tiny::capture };
+	};
+
+	my ($stdout, $stderr); my $line;
+	Cv::More->unimport(qw(cs cs-warn));
+	Cv::More->import(qw(cs-warn));
+	($stdout, $stderr) = capture {
+		my @line = Cv->boundingRect([[1, 2], [2, 3], [3, 4]]);
+		is(scalar @line, 1);	# 1
+	};
+	is($stdout, '');			# 2
+	like($stderr, qr/but .* scaler/); # 3
+
+	Cv::More->unimport(qw(cs-warn));
+	($stdout, $stderr) = capture {
+		my @line = Cv->boundingRect([[1, 2], [2, 3], [3, 4]]);
+	};
+	is($stdout, '');			# 4
+	is($stderr, '');			# 5
+}

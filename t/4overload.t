@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-# use Test::More qw(no_plan);
-use Test::More tests => 171;
+use Test::More qw(no_plan);
+# use Test::More tests => 171;
 
 BEGIN {
 	use_ok('Cv');
@@ -41,5 +41,16 @@ for my $type (CV_8UC3, CV_16SC4, CV_32SC2, CV_32FC2, CV_64FC1) {
 			}
 		}
 	}
+}
+
+if (1) {
+	my $mat1 = Cv::Mat->new([ 240, 320 ], CV_8UC1);
+	my $mat2 = $mat1->new;
+	ok($mat1 != $mat2);
+	ok($mat1 ne $mat2);
+
+	my $line = __LINE__ + 1;
+	eval { $mat1++ };
+	is($@, "$0: can't overload Cv::Mat::++ at $0 line $line\n");
 }
 

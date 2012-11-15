@@ -25,8 +25,9 @@ sub CreateSeq {
 sub GetSeqElem {
 	my $self = CORE::shift;
 	my $index = CORE::shift;
-	my @pt = $self->Unpack($self->SUPER::GetSeqElem($index));
-	wantarray? @pt : \@pt;
+	my $pt = $self->Unpack($self->SUPER::GetSeqElem($index));
+	return undef unless defined $pt;
+	wantarray? @$pt : $pt;
 }
 
 
@@ -47,15 +48,17 @@ sub Push {
 
 sub Pop {
 	my $self = CORE::shift;
-	my @pt = $self->Unpack($self->SUPER::Pop);
-	wantarray? @pt : \@pt;
+	my $pt = $self->Unpack($self->SUPER::Pop);
+	return undef unless defined $pt;
+	wantarray? @$pt : $pt;
 }
 
 
 sub Shift {
 	my $self = CORE::shift;
-	my @pt = $self->Unpack($self->SUPER::Shift);
-	wantarray? @pt : \@pt;
+	my $pt = $self->Unpack($self->SUPER::Shift);
+	return undef unless defined $pt;
+	wantarray? @$pt : $pt;
 }
 
 
@@ -82,15 +85,18 @@ sub Pack {
 sub Unpack {
 	my $self = CORE::shift;
 	my $t = $self->template;
-	no warnings 'uninitialized';
-	CORE::unpack($t, $_[0]);
+	return undef unless defined $_[0];
+	# no warnings 'uninitialized';
+	my @pt = CORE::unpack($t, $_[0]);
+	wantarray? @pt : \@pt;
 }
 
 
 sub UnpackMulti {
 	my $self = CORE::shift;
 	my ($t, $c) = $self->template;
-	no warnings 'uninitialized';
+	return undef unless defined $_[1];
+	# no warnings 'uninitialized';
 	my @data = CORE::unpack("($t)*", $_[1]);
 	while (my @elem = CORE::splice(@data, 0, $c)) {
 		CORE::push(@{$_[0]}, \@elem);

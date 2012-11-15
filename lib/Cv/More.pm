@@ -23,10 +23,9 @@ sub import {
 	my $self = shift;
 	for (@_) {
 		if (defined $O{$_}) {
-			# Carp::carp "Cv::More: $_: imported";
 			$O{$_} = 1;
 		} else {
-			Carp::carp "Cv::More: can't import $_";
+			Carp::croak "Cv::More: can't import $_";
 		}
 	}
 }
@@ -35,10 +34,9 @@ sub unimport {
 	my $self = shift;
 	for (@_) {
 		if (defined $O{$_}) {
-			# Carp::carp "Cv::More: $_: unimported";
 			$O{$_} = 0;
 		} else {
-			Carp::carp "Cv::More: can't unimport $_";
+			Carp::croak "Cv::More: can't unimport $_";
 		}
 	}
 }
@@ -139,7 +137,8 @@ use overload
 	'<=>' => \&overload_cmp,
 	cmp => \&overload_cmp,
 	fallback => undef,
-	nomethod => \&overload_nomethod;
+	nomethod => \&overload_nomethod
+	;
 
 sub overload_cmp {
 	my ($l, $r) = @_;
@@ -201,7 +200,7 @@ sub ToArray {
 			$end = $self->cols - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
 			@{$_[0]} = map { $self->get([0, $_]) } $start .. $end;
 		} else {
-			Carp::carp "can't convert; toArray works 1xN and Nx1";
+			Carp::croak "can't convert; toArray works 1xN and Nx1";
 		}
 	}
 	wantarray? @{$_[0]} : $_[0];

@@ -217,6 +217,18 @@ static SV *unbless(SV * rv)
     return rv;
 }
 
+static AV* useAV(SV* sv)
+{
+	AV* av;
+	if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
+		av = (AV*)SvRV(sv);
+		av_clear(av);
+	} else {
+		av = newAV();
+		sv_setsv(sv, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+	}
+	return av;
+}
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 #ifdef __cplusplus
@@ -4561,7 +4573,7 @@ MODULE = Cv		PACKAGE = Cv
 # ====================
 
 # ============================================================
-#  CvBox2D
+#  T_CvBox2D
 # ============================================================
 
 CvBox2D
@@ -4582,7 +4594,7 @@ OUTPUT:
 
 
 # ============================================================
-#  CvCircle
+#  T_CvCircle
 # ============================================================
 
 CvCircle
@@ -4602,7 +4614,7 @@ OUTPUT:
 
 
 # ============================================================
-#  CvConnectedComp
+#  T_CvConnectedComp
 # ============================================================
 
 CvConnectedComp
@@ -4624,7 +4636,7 @@ OUTPUT:
 
 
 # ============================================================
-#  CvPoint, CvPoint*
+#  T_CvPoint, T_CvPointPtr
 # ============================================================
 
 CvPoint
@@ -4650,7 +4662,7 @@ CODE: RETVAL = &pt;
 
 
 # ============================================================
-#  CvPoint2D32f, CvPoint2D32f*,
+#  T_CvPoint2D32f, T_CvPoint2D32fPtr
 # ============================================================
 
 CvPoint
@@ -4676,7 +4688,7 @@ CODE: RETVAL = &pt;
 
 
 # ============================================================
-#  CvPoint2D64f, CvPoint2D64f*,
+#  T_CvPoint2D64f, T_CvPoint2D64fPtr
 # ============================================================
 
 CvPoint
@@ -4702,7 +4714,7 @@ CODE: RETVAL = &pt;
 
 
 # ============================================================
-#  CvPoint3D32f, CvPoint3D32f*,
+#  T_CvPoint3D32f, T_CvPoint3D32fPtr
 # ============================================================
 
 CvPoint3D32f
@@ -4728,7 +4740,7 @@ CODE: RETVAL = &pt;
 
 
 # ============================================================
-#  CvPoint3D64f, CvPoint3D64f*,
+#  T_CvPoint3D64f, T_CvPoint3D64fPtr
 # ============================================================
 
 CvPoint3D64f
@@ -4754,7 +4766,7 @@ CODE: RETVAL = &pt;
 
 
 # ============================================================
-#  CvRect
+#  T_CvRect
 # ============================================================
 
 CvRect
@@ -4766,7 +4778,7 @@ OUTPUT:
 
 
 # ============================================================
-#  CvScalar
+#  T_CvScalar
 # ============================================================
 
 CvScalar
@@ -4777,7 +4789,7 @@ OUTPUT:
 	RETVAL
 
 # ============================================================
-#  CvSize
+#  T_CvSize
 # ============================================================
 
 CvSize
@@ -4788,13 +4800,64 @@ OUTPUT:
 	RETVAL
 
 # ============================================================
-#  CvSize2D32f
+#  T_CvSize2D32f
 # ============================================================
 
 CvSize2D32f
 CvSize2D32f(CvSize2D32f size)
 CODE:
 	RETVAL = size;
+OUTPUT:
+	RETVAL
+
+# ============================================================
+#  T_CvTermCriteria
+# ============================================================
+
+CvTermCriteria
+CvTermCriteria(CvTermCriteria term)
+CODE:
+	RETVAL = term;
+OUTPUT:
+	RETVAL
+
+
+# ============================================================
+#  T_floatPtr
+# ============================================================
+
+float*
+floatPtr(float* values)
+PREINIT:
+	int length_RETVAL;
+CODE:
+	length_RETVAL = length_values;
+	RETVAL = values;
+OUTPUT:
+	RETVAL
+
+double*
+doublePtr(double* values)
+PREINIT:
+	int length_RETVAL;
+CODE:
+	length_RETVAL = length_values;
+	RETVAL = values;
+OUTPUT:
+	RETVAL
+
+
+# ============================================================
+#  T_intPtr
+# ============================================================
+
+int*
+intPtr(int* values)
+PREINIT:
+	int length_RETVAL;
+CODE:
+	length_RETVAL = length_values;
+	RETVAL = values;
 OUTPUT:
 	RETVAL
 
