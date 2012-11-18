@@ -27,11 +27,11 @@ SKIP: {
 	is($@, "Cv::CvSize: size is not of type CvSize at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvSize(['x', $height]) };
-	is($@, "Cv::CvSize: size is not of type CvSize at $0 line $line.\n");
+	eval { Cv::CvSize(['1x', $height]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvSize([$width, 'x']) };
-	is($@, "Cv::CvSize: size is not of type CvSize at $0 line $line.\n");
+	eval { Cv::CvSize([$width, '2x']) };
+	is($@, "");
 
 }

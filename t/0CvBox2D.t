@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 16;
+use Test::More tests => 17;
 BEGIN {	use_ok('Cv', qw(:nomore)) }
 
 my $center = [ map { (int rand 16384) + 0.5 } 0..1 ];
@@ -10,7 +10,7 @@ my $size = [ map { (int rand 16384) + 0.5 } 0..1 ];
 my $angle = (int rand 16384) + 0.5;
 
 SKIP: {
-	skip "no T", 15 unless Cv->can('CvBox2D');
+	skip "no T", 16 unless Cv->can('CvBox2D');
 	my $line;
 
 	my $box = Cv::cvBox2D($center, $size, $angle);
@@ -40,7 +40,8 @@ SKIP: {
 	is($@, "Cv::CvBox2D: box is not of type CvBox2D at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvBox2D([$center, $size, 'x']) };
-	is($@, "Cv::CvBox2D: box is not of type CvBox2D at $0 line $line.\n");
+	my $pt2 = eval { Cv::CvBox2D([$center, $size, '1.5x']) };
+	is($@, "");
+	is($pt2->[2], 1.5);
 
 }

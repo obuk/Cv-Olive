@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 25;
+use Test::More tests => 26;
 BEGIN {	use_ok('Cv', qw(:nomore)) }
 
 my $area = int rand 16384;
@@ -11,7 +11,7 @@ my $rect = [ map { int rand 16384 } 0..3 ];
 my $contour = Cv::Seq->new(CV_8UC4);
 
 SKIP: {
-	skip "no T", 24 unless Cv->can('CvConnectedComp');
+	skip "no T", 25 unless Cv->can('CvConnectedComp');
 	my $line;
 
 	my $cc = Cv::cvConnectedComp($area, $value, $rect, $contour);
@@ -35,8 +35,9 @@ SKIP: {
 	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvConnectedComp(['x', $value, $rect, $contour]) };
-	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
+	my $cc = eval { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
+	is($@, "");
+	is($cc->[0], 1);
 
 	$line = __LINE__ + 1;
 	eval { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) };

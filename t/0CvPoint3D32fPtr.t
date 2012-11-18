@@ -21,9 +21,9 @@ SKIP: {
 	is($pt->[2], $z);
 
 	my $out = Cv::CvPoint3D32fPtr($pt);
-	is($out->[0], $pt->[0]);
-	is($out->[1], $pt->[1]);
-	is($out->[2], $pt->[2]);
+	is($out->[0]->[0], $pt->[0]);
+	is($out->[0]->[1], $pt->[1]);
+	is($out->[0]->[2], $pt->[2]);
 
 	$line = __LINE__ + 1;
 	eval { Cv::CvPoint3D32fPtr() };
@@ -46,6 +46,6 @@ SKIP: {
 	is($@, "Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr(['x', 'y', 'z']) };
-	is($@, "Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f at $0 line $line.\n");
+	eval { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
+	is($@, "");
 }

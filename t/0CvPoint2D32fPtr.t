@@ -20,8 +20,8 @@ SKIP: {
 	is($pt->[1], $y);
 
 	my $out = Cv::CvPoint2D32fPtr($pt);
-	is($out->[0], $pt->[0]);
-	is($out->[1], $pt->[1]);
+	is($out->[0]->[0], $pt->[0]);
+	is($out->[0]->[1], $pt->[1]);
 
 	$line = __LINE__ + 1;
 	eval { Cv::CvPoint2D32fPtr() };
@@ -36,6 +36,6 @@ SKIP: {
 	is($@, "Cv::CvPoint2D32fPtr: pt is not of type CvPoint2D32f at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvPoint2D32fPtr(['x', 'y']) };
-	is($@, "Cv::CvPoint2D32fPtr: pt is not of type CvPoint2D32f at $0 line $line.\n");
+	eval { Cv::CvPoint2D32fPtr(['1x', '2y']) };
+	is($@, "");
 }

@@ -37,6 +37,6 @@ SKIP: {
 	is($@, "Cv::CvPoint3D32f: pt is not of type CvPoint3D32f at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32f(['x', 'y', 'z']) };
-	is($@, "Cv::CvPoint3D32f: pt is not of type CvPoint3D32f at $0 line $line.\n");
+	eval { Cv::CvPoint3D32f(['1x', '2y', '3z']) };
+	is($@, "");
 }

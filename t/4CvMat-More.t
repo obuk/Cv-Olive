@@ -210,7 +210,7 @@ if (17) {
 
 if (18) {
 	my $line = __LINE__ + 1;
-	eval { Cv::Mat->new([], CV_32FC1, [1, 'x'], [2, 2], [3, 3]) };
-	is($@, "Cv::Arr::cvSetND: value is not of type CvScalar at $0 line $line\n");
+	eval { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) };
+	is($@, "OpenCV Error: One of arguments' values is out of range (index is out of range) at $0 line $line\n");
 }
 

@@ -23,11 +23,15 @@ SKIP: {
 	is($@, "Cv::doublePtr: values is not of type double * at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::doublePtr(['x']) };
-	is($@, "Cv::doublePtr: values is not of type double * at $0 line $line.\n");
+	eval { Cv::doublePtr([ '1x' ]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::doublePtr([1, [2], 3]) };
-	is($@, "Cv::doublePtr: values is not of type double * at $0 line $line.\n");
+	eval { Cv::doublePtr([1, "2x", 3]) };
+	is($@, "");
+
+	$line = __LINE__ + 1;
+	eval { Cv::doublePtr([1, 2, "3x"]) };
+	is($@, "");
 
 }

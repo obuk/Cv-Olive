@@ -27,11 +27,11 @@ SKIP: {
 	is($@, "Cv::CvSize2D32f: size is not of type CvSize2D32f at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvSize2D32f(['x', $height]) };
-	is($@, "Cv::CvSize2D32f: size is not of type CvSize2D32f at $0 line $line.\n");
+	eval { Cv::CvSize2D32f(['1x', $height]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvSize2D32f([$width, 'x']) };
-	is($@, "Cv::CvSize2D32f: size is not of type CvSize2D32f at $0 line $line.\n");
+	eval { Cv::CvSize2D32f([$width, '1x']) };
+	is($@, "");
 
 }

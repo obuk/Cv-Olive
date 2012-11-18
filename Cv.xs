@@ -4641,16 +4641,16 @@ OUTPUT:
 
 CvPoint
 CvPoint(CvPoint pt)
-CODE: RETVAL = pt;
-
+CODE:
+	RETVAL = pt;
+OUTPUT:
+	RETVAL
 
 CvPoint*
 cvPointPtr(int x, int y)
-INIT:
-	int length_RETVAL;
 CODE:
 	CvPoint pt = cvPoint(x, y);
-	length_RETVAL = 1;
+	int length_RETVAL = 1;
 	RETVAL = &pt;
 OUTPUT:
 	RETVAL
@@ -4658,25 +4658,30 @@ OUTPUT:
 
 CvPoint*
 CvPointPtr(CvPoint pt)
-CODE: RETVAL = &pt;
+CODE:
+	int length_RETVAL = 1;
+	RETVAL = &pt;
+OUTPUT:
+	RETVAL
 
 
 # ============================================================
 #  T_CvPoint2D32f, T_CvPoint2D32fPtr
 # ============================================================
 
-CvPoint
+CvPoint2D32f
 CvPoint2D32f(CvPoint2D32f pt)
-CODE: RETVAL = pt;
+CODE:
+	RETVAL = pt;
+OUTPUT:
+	RETVAL
 
 
 CvPoint2D32f*
 cvPoint2D32fPtr(float x, float y)
-INIT:
-	int length_RETVAL;
 CODE:
 	CvPoint2D32f pt = cvPoint2D32f(x, y);
-	length_RETVAL = 1;
+	int length_RETVAL = 1;
 	RETVAL = &pt;
 OUTPUT:
 	RETVAL
@@ -4684,25 +4689,29 @@ OUTPUT:
 
 CvPoint2D32f*
 CvPoint2D32fPtr(CvPoint2D32f pt)
-CODE: RETVAL = &pt;
+CODE:
+	int length_RETVAL = 1;
+	RETVAL = &pt;
+OUTPUT:
+	RETVAL
 
 
 # ============================================================
 #  T_CvPoint2D64f, T_CvPoint2D64fPtr
 # ============================================================
 
-CvPoint
+CvPoint2D64f
 CvPoint2D64f(CvPoint2D64f pt)
-CODE: RETVAL = pt;
-
+CODE:
+	RETVAL = pt;
+OUTPUT:
+	RETVAL
 
 CvPoint2D64f*
 cvPoint2D64fPtr(double x, double y)
-INIT:
-	int length_RETVAL;
 CODE:
 	CvPoint2D64f pt = cvPoint2D64f(x, y);
-	length_RETVAL = 1;
+	int length_RETVAL = 1;
 	RETVAL = &pt;
 OUTPUT:
 	RETVAL
@@ -4710,7 +4719,11 @@ OUTPUT:
 
 CvPoint2D64f*
 CvPoint2D64fPtr(CvPoint2D64f pt)
-CODE: RETVAL = &pt;
+CODE:
+	int length_RETVAL = 1;
+	RETVAL = &pt;
+OUTPUT:
+	RETVAL
 
 
 # ============================================================
@@ -4719,16 +4732,17 @@ CODE: RETVAL = &pt;
 
 CvPoint3D32f
 CvPoint3D32f(CvPoint3D32f pt)
-CODE: RETVAL = pt;
+CODE:
+	RETVAL = pt;
+OUTPUT:
+	RETVAL
 
 
 CvPoint3D32f*
 cvPoint3D32fPtr(float x, float y, float z)
-INIT:
-	int length_RETVAL;
 CODE:
 	CvPoint3D32f pt = cvPoint3D32f(x, y, z);
-	length_RETVAL = 1;
+	int length_RETVAL = 1;
 	RETVAL = &pt;
 OUTPUT:
 	RETVAL
@@ -4736,7 +4750,11 @@ OUTPUT:
 
 CvPoint3D32f*
 CvPoint3D32fPtr(CvPoint3D32f pt)
-CODE: RETVAL = &pt;
+CODE:
+	int length_RETVAL = 1;
+	RETVAL = &pt;
+OUTPUT:
+	RETVAL
 
 
 # ============================================================
@@ -4745,16 +4763,17 @@ CODE: RETVAL = &pt;
 
 CvPoint3D64f
 CvPoint3D64f(CvPoint3D64f pt)
-CODE: RETVAL = pt;
+CODE:
+	RETVAL = pt;
+OUTPUT:
+	RETVAL
 
 
 CvPoint3D64f*
 cvPoint3D64fPtr(float x, float y, float z)
-INIT:
-	int length_RETVAL;
 CODE:
 	CvPoint3D64f pt = cvPoint3D64f(x, y, z);
-	length_RETVAL = 1;
+	int length_RETVAL = 1;
 	RETVAL = &pt;
 OUTPUT:
 	RETVAL
@@ -4762,7 +4781,11 @@ OUTPUT:
 
 CvPoint3D64f*
 CvPoint3D64fPtr(CvPoint3D64f pt)
-CODE: RETVAL = &pt;
+CODE:
+	int length_RETVAL = 1;
+	RETVAL = &pt;
+OUTPUT:
+	RETVAL
 
 
 # ============================================================
@@ -4828,20 +4851,16 @@ OUTPUT:
 
 float*
 floatPtr(float* values)
-PREINIT:
-	int length_RETVAL;
 CODE:
-	length_RETVAL = length_values;
+	int length_RETVAL = length_values;
 	RETVAL = values;
 OUTPUT:
 	RETVAL
 
 double*
 doublePtr(double* values)
-PREINIT:
-	int length_RETVAL;
 CODE:
-	length_RETVAL = length_values;
+	int length_RETVAL = length_values;
 	RETVAL = values;
 OUTPUT:
 	RETVAL
@@ -4853,10 +4872,8 @@ OUTPUT:
 
 int*
 intPtr(int* values)
-PREINIT:
-	int length_RETVAL;
 CODE:
-	length_RETVAL = length_values;
+	int length_RETVAL = length_values;
 	RETVAL = values;
 OUTPUT:
 	RETVAL

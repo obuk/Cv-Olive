@@ -38,19 +38,19 @@ SKIP: {
 	is($@, "Usage: Cv::CvScalar(scalar) at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvScalar(['x', $val[1], $val[2], $val[3]]) };
-	is($@, "Cv::CvScalar: scalar is not of type CvScalar at $0 line $line.\n");
+	eval { Cv::CvScalar(['1x', $val[1], $val[2], $val[3]]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvScalar([$val[0], 'x', $val[2], $val[3]]) };
-	is($@, "Cv::CvScalar: scalar is not of type CvScalar at $0 line $line.\n");
+	eval { Cv::CvScalar([$val[0], '2x', $val[2], $val[3]]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvScalar([$val[0], $val[1], 'x', $val[3]]) };
-	is($@, "Cv::CvScalar: scalar is not of type CvScalar at $0 line $line.\n");
+	eval { Cv::CvScalar([$val[0], $val[1], '3x', $val[3]]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvScalar([$val[0], $val[1], $val[2], 'x']) };
-	is($@, "Cv::CvScalar: scalar is not of type CvScalar at $0 line $line.\n");
+	eval { Cv::CvScalar([$val[0], $val[1], $val[2], '4x']) };
+	is($@, "");
 
 }

@@ -23,11 +23,11 @@ SKIP: {
 	is($@, "Cv::floatPtr: values is not of type float * at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::floatPtr(['x']) };
-	is($@, "Cv::floatPtr: values is not of type float * at $0 line $line.\n");
+	eval { Cv::floatPtr(['1x']) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::floatPtr([1, [2], 3]) };
-	is($@, "Cv::floatPtr: values is not of type float * at $0 line $line.\n");
+	eval { Cv::floatPtr([1, '2x', 3]) };
+	is($@, "");
 
 }

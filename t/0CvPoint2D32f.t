@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More tests => 11;
 BEGIN {	use_ok('Cv', qw(:nomore)) }
 
 my ($x, $y) = map { (int rand 16384) + 0.5 } 0..1;
@@ -11,7 +11,7 @@ is($pt->[0], $x);
 is($pt->[1], $y);
 
 SKIP: {
-	skip "no T", 6 unless Cv->can('CvPoint2D32f');
+	skip "no T", 8 unless Cv->can('CvPoint2D32f');
 	my $line;
 
 	my $out = Cv::CvPoint2D32f($pt);
@@ -31,6 +31,8 @@ SKIP: {
 	is($@, "Cv::CvPoint2D32f: pt is not of type CvPoint2D32f at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvPoint2D32f(['x', 'y']) };
-	is($@, "Cv::CvPoint2D32f: pt is not of type CvPoint2D32f at $0 line $line.\n");
+	my $pt2 = eval { Cv::CvPoint2D32f(['1x', '2y']) };
+	is($@, "");
+	is($pt2->[0], 1);
+	is($pt2->[1], 2);
 }

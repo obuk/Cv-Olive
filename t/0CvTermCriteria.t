@@ -34,15 +34,15 @@ SKIP: {
 	is($@, "Cv::CvTermCriteria: term is not of type CvTermCriteria at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria(['x', 2, 3]) };
-	is($@, "Cv::CvTermCriteria: term is not of type CvTermCriteria at $0 line $line.\n");
+	eval { Cv::CvTermCriteria(['1x', 2, 3]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria([1, 'x', 3]) };
-	is($@, "Cv::CvTermCriteria: term is not of type CvTermCriteria at $0 line $line.\n");
+	eval { Cv::CvTermCriteria([1, '2x', 3]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria([1, 2, 'x']) };
-	is($@, "Cv::CvTermCriteria: term is not of type CvTermCriteria at $0 line $line.\n");
+	eval { Cv::CvTermCriteria([1, 2, '3x']) };
+	is($@, "");
 
 }

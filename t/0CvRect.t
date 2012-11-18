@@ -29,19 +29,19 @@ SKIP: {
 	is($@, "Cv::CvRect: rect is not of type CvRect at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvRect(['x', $y, $width, $height]) };
-	is($@, "Cv::CvRect: rect is not of type CvRect at $0 line $line.\n");
+	eval { Cv::CvRect(['1x', $y, $width, $height]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvRect([$x, 'x', $width, $height]) };
-	is($@, "Cv::CvRect: rect is not of type CvRect at $0 line $line.\n");
+	eval { Cv::CvRect([$x, '2x', $width, $height]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvRect([$x, $y, 'x', $height]) };
-	is($@, "Cv::CvRect: rect is not of type CvRect at $0 line $line.\n");
+	eval { Cv::CvRect([$x, $y, '3x', $height]) };
+	is($@, "");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvRect([$x, $y, $width, 'x']) };
-	is($@, "Cv::CvRect: rect is not of type CvRect at $0 line $line.\n");
+	eval { Cv::CvRect([$x, $y, $width, '4x']) };
+	is($@, "");
 
 }

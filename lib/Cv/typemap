@@ -189,46 +189,32 @@ T_CvAttrList
 
 T_CvBox2D
 	STMT_START {
-		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
+		SV* sv = $arg; AV* av; int err = 0;
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 2) {
 			SV* sv_center = (SV*)*av_fetch(av, 0, 0); AV* av_center;
 			SV* sv_size   = (SV*)*av_fetch(av, 1, 0); AV* av_size;
 			SV* sv_angle  = (SV*)*av_fetch(av, 2, 0);
 			if (SvROK(sv_center) && SvTYPE(SvRV(sv_center)) == SVt_PVAV &&
-				av_len(av_center = (AV*)SvRV(sv_center)) >= 1 &&
-				SvROK(sv_size) && SvTYPE(SvRV(sv_size)) == SVt_PVAV &&
-				av_len(av_size = (AV*)SvRV(sv_size)) >= 1 &&
-				SvNIOK(sv_angle)) {
-				/* center */ {
-					SV* sv_x = (SV*)*av_fetch(av_center, 0, 0);
-					SV* sv_y = (SV*)*av_fetch(av_center, 1, 0);
-					if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-						$var.center.x = SvNV(sv_x);
-						$var.center.y = SvNV(sv_y);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				}
-				/* size */ {
-					SV* sv_width  = (SV*)*av_fetch(av_size, 0, 0);
-					SV* sv_height = (SV*)*av_fetch(av_size, 1, 0);
-					if (SvNIOK(sv_width) && SvNIOK(sv_height)) {
-						$var.size.width  = SvNV(sv_width);
-						$var.size.height = SvNV(sv_height);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				}
-				$var.angle = SvNV(sv_angle);
+				av_len(av_center = (AV*)SvRV(sv_center)) >= 1) {
+				SV* sv_x = (SV*)*av_fetch(av_center, 0, 0);
+				SV* sv_y = (SV*)*av_fetch(av_center, 1, 0);
+				$var.center.x = SvNV(sv_x);
+				$var.center.y = SvNV(sv_y);
 			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+				err++;
+			if (SvROK(sv_size) && SvTYPE(SvRV(sv_size)) == SVt_PVAV &&
+				av_len(av_size = (AV*)SvRV(sv_size)) >= 1) {
+				SV* sv_width  = (SV*)*av_fetch(av_size, 0, 0);
+				SV* sv_height = (SV*)*av_fetch(av_size, 1, 0);
+				$var.size.width  = SvNV(sv_width);
+				$var.size.height = SvNV(sv_height);
+			} else
+				err++;
+			$var.angle = SvNV(sv_angle);
 		} else
+			err++;
+		if (err)
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 				\"$var\", \"$type\");
@@ -236,32 +222,23 @@ T_CvBox2D
 
 T_CvCircle
 	STMT_START {
-		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
+		SV* sv = $arg; AV* av; int err = 0;
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_center = (SV*)*av_fetch(av, 0, 0); AV* av_center;
 			SV* sv_radius = (SV*)*av_fetch(av, 1, 0);
 			if (SvROK(sv_center) && SvTYPE(SvRV(sv_center)) == SVt_PVAV &&
-				av_len(av_center = (AV*)SvRV(sv_center)) >= 1 &&
-				SvNIOK(sv_radius)) {
-				/* CvPoint */ {
-					SV* sv_x = (SV*)*av_fetch(av_center, 0, 0);
-					SV* sv_y = (SV*)*av_fetch(av_center, 1, 0);
-					if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-						$var.center.x = SvNV(sv_x);
-						$var.center.y = SvNV(sv_y);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				}
-				$var.radius = SvNV(sv_radius);
+				av_len(av_center = (AV*)SvRV(sv_center)) >= 1) {
+				SV* sv_x = (SV*)*av_fetch(av_center, 0, 0);
+				SV* sv_y = (SV*)*av_fetch(av_center, 1, 0);
+				$var.center.x = SvNV(sv_x);
+				$var.center.y = SvNV(sv_y);
 			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+				err++;
+			$var.radius = SvNV(sv_radius);
 		} else
+			err++;
+		if (err)
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 				\"$var\", \"$type\");
@@ -269,59 +246,47 @@ T_CvCircle
 
 T_CvConnectedComp
 	STMT_START {
-		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
+		SV* sv = $arg; AV* av; int err = 0;
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 3) {
 			SV* sv_area    = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_value   = (SV*)*av_fetch(av, 1, 0);
 			SV* sv_rect    = (SV*)*av_fetch(av, 2, 0); AV* av_rect;
 			SV* sv_contour = (SV*)*av_fetch(av, 3, 0);
-			if (SvNIOK(sv_area) &&
-				SvROK(sv_value) && SvTYPE(SvRV(sv_value)) == SVt_PVAV &&
-				SvROK(sv_rect) && SvTYPE(SvRV(sv_rect)) == SVt_PVAV &&
-					av_len(av_rect = (AV*)SvRV(sv_rect)) >= 3 &&
-				SvROK(sv_contour) && sv_derived_from(sv_contour, \"Cv::Seq\")) {
-				$var.area = SvNV(sv_area);
-				/* CvScalar */ {
-					AV* av_value = (AV*)SvRV(sv_value);
-					int i, n = av_len(av_value) + 1;
-					if (n > 4) n = 4;
-					for (i = 0; i < n; i++) {
-						SV* sv_tmp = (SV*)*av_fetch(av_value, i, 0);
-						if (SvNIOK(sv_tmp)) $var.value.val[i] = SvNV(sv_tmp);
-						else
-							Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-					}
-					for (; i < 4; i++) {
-						$var.value.val[i] = 0;
-					}
+			$var.area = SvNV(sv_area);
+			if (SvROK(sv_value) && SvTYPE(SvRV(sv_value)) == SVt_PVAV) {
+				AV* av_value = (AV*)SvRV(sv_value); /* CvScalar */
+				int i, n = av_len(av_value) + 1;
+				if (n > 4) n = 4;
+				for (i = 0; i < n; i++) {
+					SV* sv_tmp = (SV*)*av_fetch(av_value, i, 0);
+					$var.value.val[i] = SvNV(sv_tmp);
 				}
-				/* CvRect */ {
-					SV* sv_x      = (SV*)*av_fetch(av_rect, 0, 0);
-					SV* sv_y      = (SV*)*av_fetch(av_rect, 1, 0);
-					SV* sv_width  = (SV*)*av_fetch(av_rect, 2, 0);
-					SV* sv_height = (SV*)*av_fetch(av_rect, 3, 0);
-					if (SvNIOK(sv_x) && SvNIOK(sv_y) &&
-						SvNIOK(sv_width) && SvNIOK(sv_height)) {
-						$var.rect.x      = SvIV(sv_x);
-						$var.rect.y      = SvIV(sv_y);
-						$var.rect.width  = SvIV(sv_width);
-						$var.rect.height = SvIV(sv_height);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
+				for (; i < 4; i++) {
+					$var.value.val[i] = 0;
 				}
+			} else
+				err++;
+			if (SvROK(sv_rect) && SvTYPE(SvRV(sv_rect)) == SVt_PVAV &&
+				av_len(av_rect = (AV*)SvRV(sv_rect)) >= 3) {
+				SV* sv_x      = (SV*)*av_fetch(av_rect, 0, 0);
+				SV* sv_y      = (SV*)*av_fetch(av_rect, 1, 0);
+				SV* sv_width  = (SV*)*av_fetch(av_rect, 2, 0);
+				SV* sv_height = (SV*)*av_fetch(av_rect, 3, 0);
+				$var.rect.x      = SvIV(sv_x);
+				$var.rect.y      = SvIV(sv_y);
+				$var.rect.width  = SvIV(sv_width);
+				$var.rect.height = SvIV(sv_height);
+			} else
+				err++;
+			if (SvROK(sv_contour) && sv_derived_from(sv_contour, \"Cv::Seq\")) {
 				$var.contour = (CvSeq*)SvIV(sv_contour);
 			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+				err++;
 		} else
-		    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 				\"$var\", \"$type\");
 	} STMT_END
@@ -329,17 +294,11 @@ T_CvConnectedComp
 T_CvMemStoragePos
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
 			SV* sv_top        = (SV*)*av_fetch((AV*)SvRV(sv), 0, 0);
 			SV* sv_free_space = (SV*)*av_fetch((AV*)SvRV(sv), 1, 0);
-			if (SvIOK(sv_top) && SvIOK(sv_free_space)) {
-				$var.top        = (CvMemBlock*)SvIV(sv_top);
-				$var.free_space = SvIV(sv_free_space);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.top        = (CvMemBlock*)SvIV(sv_top);
+			$var.free_space = SvIV(sv_free_space);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -349,7 +308,6 @@ T_CvMemStoragePos
 T_CvMSERParams
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 8) {
 			SV* sv_delta         = (SV*)*av_fetch(av, 0, 0);
@@ -361,27 +319,15 @@ T_CvMSERParams
 			SV* sv_areaThreshold = (SV*)*av_fetch(av, 6, 0);
 			SV* sv_minMargin     = (SV*)*av_fetch(av, 7, 0);
 			SV* sv_edgeBlurSize  = (SV*)*av_fetch(av, 8, 0);
-			if (SvNIOK(sv_delta) &&
-				SvNIOK(sv_maxArea) && SvNIOK(sv_minArea) &&
-				SvNIOK(sv_maxVariation) &&
-				SvNIOK(sv_minDiversity) &&
-				SvNIOK(sv_maxEvolution) &&
-				SvNIOK(sv_areaThreshold) &&
-				SvNIOK(sv_minMargin) &&
-				SvIOK(sv_edgeBlurSize)) {
-				$var.delta         = SvIV(sv_delta);
-				$var.maxArea       = SvIV(sv_maxArea);
-				$var.minArea       = SvIV(sv_minArea);
-				$var.maxVariation  = SvNV(sv_maxVariation);
-				$var.minDiversity  = SvNV(sv_minDiversity);
-				$var.maxEvolution  = SvIV(sv_maxEvolution);
-				$var.areaThreshold = SvNV(sv_areaThreshold);
-				$var.minMargin     = SvNV(sv_minMargin);
-				$var.edgeBlurSize  = SvIV(sv_edgeBlurSize);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.delta         = SvIV(sv_delta);
+			$var.maxArea       = SvIV(sv_maxArea);
+			$var.minArea       = SvIV(sv_minArea);
+			$var.maxVariation  = SvNV(sv_maxVariation);
+			$var.minDiversity  = SvNV(sv_minDiversity);
+			$var.maxEvolution  = SvIV(sv_maxEvolution);
+			$var.areaThreshold = SvNV(sv_areaThreshold);
+			$var.minMargin     = SvNV(sv_minMargin);
+			$var.edgeBlurSize  = SvIV(sv_edgeBlurSize);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -391,18 +337,12 @@ T_CvMSERParams
 T_CvPoint
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_x = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_y = (SV*)*av_fetch(av, 1, 0);
-			if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-				$var.x = SvIV(sv_x);
-				$var.y = SvIV(sv_y);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.x = SvIV(sv_x);
+			$var.y = SvIV(sv_y);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -411,104 +351,92 @@ T_CvPoint
 
 T_CvPointPtr
 	int length_$var = 0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
-		if (length_$var > 0) {
-			int i;
-			$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* sv_point = (SV*)*av_fetch(av, i, 0);
-				AV* av_point = (AV*)SvRV(sv_point);
-				if (SvROK(sv_point) && SvTYPE(SvRV(sv_point)) == SVt_PVAV &&
-					av_len(av_point) >= 1) {
-					SV* sv_x = (SV*)*av_fetch(av_point, 0, 0);
-					SV* sv_y = (SV*)*av_fetch(av_point, 1, 0);
-					if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].x = SvIV(sv_x);
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].y = SvIV(sv_y);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-		} else
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
 			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
+			if (length_$var > 0) {
+				int i;
+				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* sv_point = (SV*)*av_fetch(av, i, 0);
+					AV* av_point = (AV*)SvRV(sv_point);
+					if (SvROK(sv_point) && SvTYPE(SvRV(sv_point)) == SVt_PVAV &&
+						av_len(av_point) >= 1) {
+						SV* sv_x = (SV*)*av_fetch(av_point, 0, 0);
+						SV* sv_y = (SV*)*av_fetch(av_point, 1, 0);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.x = SvIV(sv_x);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.y = SvIV(sv_y);
+					} else
+						err++;
+				}
+			} else
+				$var = ($type)0;
+		} else
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 T_CvPointPtrPtr
 	int length_$var = 0;
 	int* length_inner_$var = (int*)0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
-		if (length_$var > 0) { int i;
-			$var = ($type)alloca(sizeof(${var}[0])*length_$var);
-			length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
-				if (SvROK(sv_inner) && SvTYPE(SvRV(sv_inner)) == SVt_PVAV) {
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
+			$var = ($type)0;
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
+			if (length_$var > 0) { int i;
+				$var = ($type)alloca(sizeof(${var}[0])*length_$var);
+				length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
+					if (SvROK(sv_inner) && SvTYPE(SvRV(sv_inner)) == SVt_PVAV) {
+						AV* av_inner = (AV*)SvRV(sv_inner);
+						length_inner_${var}[i] = av_len(av_inner) + 1;
+					} else	
+						err++;
+				}
+				for (i = 0; i < length_$var; i++) { int j;
+					SV* sv_inner = (SV*)(*av_fetch(av_outer, i, 0));
 					AV* av_inner = (AV*)SvRV(sv_inner);
-					length_inner_${var}[i] = av_len(av_inner) + 1;
-				} else	
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-			for (i = 0; i < length_$var; i++) { int j;
-				SV* sv_inner = (SV*)(*av_fetch(av_outer, i, 0));
-				AV* av_inner = (AV*)SvRV(sv_inner);
-				${var}[i] = (@{$type =~ /(const\s)?(.*)\s*\*$/; [$2]
-				})alloca(sizeof(${var}[0][0]) * length_inner_${var}[i]);
-				for (j = 0; j < length_inner_${var}[i]; j++) {
-					SV* p = (SV*)(*av_fetch(av_inner, j, 0));
-					if (SvROK(p) && SvTYPE(SvRV(p)) == SVt_PVAV) {
-						SV* sv_x = (SV*)*av_fetch((AV*)SvRV(p), 0, 0);
-						SV* sv_y = (SV*)*av_fetch((AV*)SvRV(p), 1, 0);
-						if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
+					${var}[i] = (@{$type =~ /(const\s)?(.*)\s*\*$/; [$2]
+					})alloca(sizeof(${var}[0][0]) * length_inner_${var}[i]);
+					for (j = 0; j < length_inner_${var}[i]; j++) {
+						SV* p = (SV*)(*av_fetch(av_inner, j, 0));
+						if (SvROK(p) && SvTYPE(SvRV(p)) == SVt_PVAV) {
+							SV* sv_x = (SV*)*av_fetch((AV*)SvRV(p), 0, 0);
+							SV* sv_y = (SV*)*av_fetch((AV*)SvRV(p), 1, 0);
 							${var}[i][j].x = SvIV(sv_x);
 							${var}[i][j].y = SvIV(sv_y);
 						} else
-							Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-								${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-								\"$var\", \"$type\");
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
+							err++;
+					}
 				}
-			}
+			} else
+				$var = ($type)0;
 		} else
-			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 T_CvPoint2D64f
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_x = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_y = (SV*)*av_fetch(av, 1, 0);
-			if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-				$var.x = SvNV(sv_x);
-				$var.y = SvNV(sv_y);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.x = SvNV(sv_x);
+			$var.y = SvNV(sv_y);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -517,55 +445,48 @@ T_CvPoint2D64f
 
 T_CvPoint2D64fPtr
 	int length_$var = 0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
-		if (length_$var > 0) { int i;
-			$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* sv_point = (SV*)*av_fetch(av, i, 0);
-				AV* av_point = (AV*)SvRV(sv_point);
-				if (SvROK(sv_point) && SvTYPE(SvRV(sv_point)) == SVt_PVAV &&
-					av_len(av_point) >= 1) {
-					SV* sv_x = (SV*)*av_fetch(av_point, 0, 0);
-					SV* sv_y = (SV*)*av_fetch(av_point, 1, 0);
-					if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].x = SvNV(sv_x);
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].y = SvNV(sv_y);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-		} else
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
 			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
+			if (length_$var > 0) { int i;
+				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* sv_point = (SV*)*av_fetch(av, i, 0);
+					AV* av_point = (AV*)SvRV(sv_point);
+					if (SvROK(sv_point) && SvTYPE(SvRV(sv_point)) == SVt_PVAV &&
+						av_len(av_point) >= 1) {
+						SV* sv_x = (SV*)*av_fetch(av_point, 0, 0);
+						SV* sv_y = (SV*)*av_fetch(av_point, 1, 0);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.x = SvNV(sv_x);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.y = SvNV(sv_y);
+					} else
+						err++;
+				}
+			} else
+				$var = ($type)0;
+		} else
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 T_CvPoint3D64f
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 2) {
 			SV* sv_x = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_y = (SV*)*av_fetch(av, 1, 0);
 			SV* sv_z = (SV*)*av_fetch(av, 2, 0);
-			if (SvNIOK(sv_x) && SvNIOK(sv_y) && SvNIOK(sv_z)) {
-				$var.x = SvNV(sv_x);
-				$var.y = SvNV(sv_y);
-				$var.z = SvNV(sv_z);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.x = SvNV(sv_x);
+			$var.y = SvNV(sv_y);
+			$var.z = SvNV(sv_z);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -574,60 +495,53 @@ T_CvPoint3D64f
 
 T_CvPoint3D64fPtr
 	int length_$var = 0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
-		if (length_$var > 0) { int i;
-			$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* sv_point = (SV*)*av_fetch(av, i, 0);
-				AV* av_point = (AV*)SvRV(sv_point);
-				if (SvROK(sv_point) && SvTYPE(SvRV(sv_point)) == SVt_PVAV &&
-					av_len(av_point) >= 2) {
-					SV* sv_x = (SV*)*av_fetch(av_point, 0, 0);
-					SV* sv_y = (SV*)*av_fetch(av_point, 1, 0);
-					SV* sv_z = (SV*)*av_fetch(av_point, 2, 0);
-					if (SvNIOK(sv_x) && SvNIOK(sv_y)) {
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].x = SvNV(sv_x);
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].y = SvNV(sv_y);
-						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i].z = SvNV(sv_z);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-		} else
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
 			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
+			if (length_$var > 0) { int i;
+				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* sv_point = (SV*)*av_fetch(av, i, 0);
+					AV* av_point = (AV*)SvRV(sv_point);
+					if (SvROK(sv_point) && SvTYPE(SvRV(sv_point)) == SVt_PVAV &&
+						av_len(av_point) >= 2) {
+						SV* sv_x = (SV*)*av_fetch(av_point, 0, 0);
+						SV* sv_y = (SV*)*av_fetch(av_point, 1, 0);
+						SV* sv_z = (SV*)*av_fetch(av_point, 2, 0);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.x = SvNV(sv_x);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.y = SvNV(sv_y);
+						((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i]
+							.z = SvNV(sv_z);
+					} else
+						err++;
+				}
+			} else
+				$var = ($type)0;
+		} else
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 T_CvRect
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 3) {
 			SV* sv_x      = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_y      = (SV*)*av_fetch(av, 1, 0);
 			SV* sv_width  = (SV*)*av_fetch(av, 2, 0);
 			SV* sv_height = (SV*)*av_fetch(av, 3, 0);
-			if (SvNIOK(sv_x) && SvNIOK(sv_y) &&
-				SvNIOK(sv_width) && SvNIOK(sv_height)) {
-				$var.x      = SvIV(sv_x);
-				$var.y      = SvIV(sv_y);
-				$var.width  = SvIV(sv_width);
-				$var.height = SvIV(sv_height);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.x      = SvIV(sv_x);
+			$var.y      = SvIV(sv_y);
+			$var.width  = SvIV(sv_width);
+			$var.height = SvIV(sv_height);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -637,19 +551,13 @@ T_CvRect
 T_CvScalar
 	STMT_START {
 		SV* sv = $arg;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
 			AV* av_val = (AV*)SvRV(sv);
 			int i, n = av_len(av_val) + 1;
 			if (n > 4) n = 4;
 			for (i = 0; i < n; i++) {
 				SV* sv_tmp = (SV*)*av_fetch(av_val, i, 0);
-				if (SvNIOK(sv_tmp))
-					$var.val[i] = SvNV(sv_tmp);
-				else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
+				$var.val[i] = SvNV(sv_tmp);
 			}
 			for (; i < 4; i++) {
 				$var.val[i] = 0;
@@ -663,18 +571,12 @@ T_CvScalar
 T_CvSize
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_width  = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_height = (SV*)*av_fetch(av, 1, 0);
-			if (SvNIOK(sv_width) && SvNIOK(sv_height)) {
-				$var.width  = SvIV(sv_width);
-				$var.height = SvIV(sv_height);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.width  = SvIV(sv_width);
+			$var.height = SvIV(sv_height);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -684,18 +586,12 @@ T_CvSize
 T_CvSize2D32f
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_width  = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_height = (SV*)*av_fetch(av, 1, 0);
-			if (SvNIOK(sv_width) && SvNIOK(sv_height)) {
-				$var.width  = SvNV(sv_width);
-				$var.height = SvNV(sv_height);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.width  = SvNV(sv_width);
+			$var.height = SvNV(sv_height);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -705,18 +601,12 @@ T_CvSize2D32f
 T_CvSlice
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_start = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_end   = (SV*)*av_fetch(av, 1, 0);
-			if (SvNIOK(sv_start) && SvNIOK(sv_end)) {
-				$var.start_index = SvIV(sv_start);
-				$var.end_index   = SvIV(sv_end);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.start_index = SvIV(sv_start);
+			$var.end_index   = SvIV(sv_end);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -726,18 +616,12 @@ T_CvSlice
 T_CvString
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 1) {
 			SV* sv_len = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_ptr = (SV*)*av_fetch(av, 1, 0);
-			if (SvIOK(sv_len) && SvIOK(sv_ptr)) {
-				$var.len = SvIV(sv_len);
-				$var.ptr = (char*)SvIV(sv_ptr);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.len = SvIV(sv_len);
+			$var.ptr = (char*)SvIV(sv_ptr);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -746,41 +630,31 @@ T_CvString
 
 T_CvSubdiv2DPoint
 	STMT_START {
-		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
+		SV* sv = $arg; AV* av; int err = 0;
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 2) {
 			SV* sv_flags = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_first = (SV*)*av_fetch(av, 1, 0);
 			SV* sv_pt    = (SV*)*av_fetch(av, 2, 0); AV* av_pt;
-			if (SvIOK(sv_flags) &&
-				SvUOK(sv_first) &&
-				SvROK(sv_pt) && SvTYPE(SvRV(sv_pt)) == SVt_PVAV &&
+			$var.flags = SvIV(sv_flags);
+			$var.first = SvUV(sv_fierst);
+			if (SvROK(sv_pt) && SvTYPE(SvRV(sv_pt)) == SVt_PVAV &&
 				av_len(av_pt = (AV*)SvRV(sv_pt)) >= 1) {
-				$var.flags = SvIV(sv_flags);
-				$var.first = SvUV(sv_fierst);
 				/* check av_pt */
 				$var.pt.x = SvNV((SV*)*av_fetch(av_pt, 0, 0));
 				$var.pt.y = SvNV((SV*)*av_fetch(av_pt, 1, 0));
 			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+				err++;
 #if CV_MAJOR_VERSION >= 2
 			if (av_len(av_pt) >= 2) {
 				SV* sv_id = (SV*)*av_fetch((AV*)SvRV(av), 3, 0);
-				if (SvIOK(sv_id)) {
-					$var.id = SvIV(sv_id);
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
+				$var.id = SvIV(sv_id);
 			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+				err++;
 #endif
 		} else
+			err++;
+		if (err)
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 				\"$var\", \"$type\");
@@ -789,23 +663,16 @@ T_CvSubdiv2DPoint
 T_CvSURFParams
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 3) {
 			SV* sv_extended         = (SV*)*av_fetch((AV*)SvRV(sv), 0, 0);
 			SV* sv_hessianThreshold = (SV*)*av_fetch((AV*)SvRV(sv), 1, 0);
 			SV* sv_nOctaves         = (SV*)*av_fetch((AV*)SvRV(sv), 2, 0);
 			SV* sv_nOctaveLayers    = (SV*)*av_fetch((AV*)SvRV(sv), 3, 0);
-			if (SvIOK(sv_extended) && SvNIOK(sv_hessianThreshold) &&
-				SvIOK(sv_nOctaves) && SvIOK(sv_nOctaveLayers)) {
-				$var.extended         = SvIV(sv_extended);
-				$var.hessianThreshold = SvNV(sv_hessianThreshold);
-				$var.nOctaves         = SvIV(sv_nOctaves);
-				$var.nOctaveLayers    = SvIV(sv_nOctaveLayers);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.extended         = SvIV(sv_extended);
+			$var.hessianThreshold = SvNV(sv_hessianThreshold);
+			$var.nOctaves         = SvIV(sv_nOctaves);
+			$var.nOctaveLayers    = SvIV(sv_nOctaveLayers);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -815,20 +682,14 @@ T_CvSURFParams
 T_CvTermCriteria
 	STMT_START {
 		SV* sv = $arg; AV* av;
-		SvGETMAGIC(sv);
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 2) {
 			SV* sv_type     = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_max_iter = (SV*)*av_fetch(av, 1, 0);
 			SV* sv_epsilon  = (SV*)*av_fetch(av, 2, 0);
-			if (SvNIOK(sv_type) && SvNIOK(sv_max_iter) && SvNIOK(sv_epsilon)) {
-				$var.type     = SvIV(sv_type);
-				$var.max_iter = SvIV(sv_max_iter);
-				$var.epsilon  = SvNV(sv_epsilon);
-			} else
-				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-					${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-					\"$var\", \"$type\");
+			$var.type     = SvIV(sv_type);
+			$var.max_iter = SvIV(sv_max_iter);
+			$var.epsilon  = SvNV(sv_epsilon);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -837,93 +698,86 @@ T_CvTermCriteria
 
 T_floatPtr
 	int length_$var = 0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
-		if (length_$var > 0) { int i;
-			$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* p = (SV*)*av_fetch(av, i, 0);
-				if (SvNIOK(p)) {
-					((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i] = SvNV(p);
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-		} else
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
 			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
+			if (length_$var > 0) { int i;
+				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* p = (SV*)*av_fetch(av, i, 0);
+					((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i] = SvNV(p);
+				}
+			} else
+				$var = ($type)0;
+		} else
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 T_floatPtrPtr
 	int length_$var = 0;
 	int* length_inner_$var = (int*)0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
-		if (length_$var > 0) { int i;
-			$var = ($type)alloca(sizeof(${var}[0])*length_$var);
-			length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
-				if (SvROK(sv_inner) && SvTYPE(SvRV(sv_inner)) == SVt_PVAV) {
-					AV* av_inner = (AV*)SvRV(sv_inner);
-					length_inner_${var}[i] = av_len(av_inner) + 1;
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-			for (i = 0; i < length_$var; i++) { int j;
-				SV* sv_inner = (SV*)(*av_fetch(av_outer, i, 0));
-				AV* av_inner = (AV*)SvRV(sv_inner);
-				${var}[i] = (@{$type =~ /(const\s)?(.*)\s*\*$/; [$2]
-				})alloca(sizeof(${var}[0][0]) * length_inner_${var}[i]);
-				for (j = 0; j < length_inner_${var}[i]; j++) {
-					SV* p = (SV*)(*av_fetch(av_inner, j, 0));
-					if (SvNIOK(p)) {
-						${var}[i][j] = SvNV(p);
-					} else
-						Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-							\"$var\", \"$type\");
-				}
-			}
-		} else
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
 			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
+			if (length_$var > 0) { int i;
+				$var = ($type)alloca(sizeof(${var}[0])*length_$var);
+				length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
+					if (SvROK(sv_inner) && SvTYPE(SvRV(sv_inner)) == SVt_PVAV) {
+						AV* av_inner = (AV*)SvRV(sv_inner);
+						length_inner_${var}[i] = av_len(av_inner) + 1;
+					} else
+						err++;
+				}
+				for (i = 0; i < length_$var; i++) { int j;
+					SV* sv_inner = (SV*)(*av_fetch(av_outer, i, 0));
+					AV* av_inner = (AV*)SvRV(sv_inner);
+					${var}[i] = (@{$type =~ /(const\s)?(.*)\s*\*$/; [$2]
+					})alloca(sizeof(${var}[0][0]) * length_inner_${var}[i]);
+					for (j = 0; j < length_inner_${var}[i]; j++) {
+						SV* p = (SV*)(*av_fetch(av_inner, j, 0));
+						${var}[i][j] = SvNV(p);
+					}
+				}
+			} else
+				$var = ($type)0;
+		} else
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 T_intPtr
 	int length_$var = 0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
-		AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
-		if (length_$var > 0) { int i;
-			$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
-			for (i = 0; i < length_$var; i++) {
-				SV* p = (SV*)*av_fetch(av, i, 0);
-				if (SvNIOK(p)) {
-					((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i] = SvIV(p);
-				} else
-					Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"$type\");
-			}
-		} else
+	STMT_START { int err = 0;
+		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
 			$var = ($type)0;
-	} else
-		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$type\")
+		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
+			if (length_$var > 0) { int i;
+				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				for (i = 0; i < length_$var; i++) {
+					SV* p = (SV*)*av_fetch(av, i, 0);
+					((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i] = SvIV(p);
+				}
+			} else
+				$var = ($type)0;
+		} else
+			err++;
+		if (err)
+			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\", \"$type\");
+	} STMT_END
 
 O_OBJECT
 	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))

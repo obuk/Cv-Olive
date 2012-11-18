@@ -31,6 +31,6 @@ SKIP: {
 	is($@, "Cv::CvPoint2D64f: pt is not of type CvPoint2D64f at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	eval { Cv::CvPoint2D64f(['x', 'y']) };
-	is($@, "Cv::CvPoint2D64f: pt is not of type CvPoint2D64f at $0 line $line.\n");
+	eval { Cv::CvPoint2D64f(['1x', '2y']) };
+	is($@, "");
 }
