@@ -35,7 +35,7 @@ package Cv;
 use 5.008008;
 use strict;
 use warnings;
-use Carp;
+use Carp qw();
 use Scalar::Util qw(blessed);
 use warnings::register;
 
@@ -84,6 +84,13 @@ sub import {
 	}
 	push(@std, ":std") unless @std;
 	$self->export_to_level(1, $self, @std);
+}
+
+sub croak {
+	chomp(my ($e) = join('', @_));
+	$e =~ s/\s*(in|file|line|at) .*$//;
+	@_ = ($e);
+	goto &Carp::croak;
 }
 
 sub DESTROY { }
@@ -231,7 +238,6 @@ foreach (classes('Cv')) {
 	next if /^Cv::Constant$/;
 	no warnings 'redefine';
 	eval "{ package $_; sub AUTOLOAD { &Cv::autoload } }";
-	
 }
 
 
@@ -244,7 +250,19 @@ sub autoload {
     (my $short = $$autoload) =~ s/.*:://;
 	if (my $code = assoc($package, $short)) {
 		*$$autoload = $code;
-		goto &$$autoload;
+		if (wantarray) {
+			my @cc; eval { @cc = &$$autoload };
+			croak($@) if $@;
+			return @cc;
+		} elsif (defined wantarray) {
+			my $cc; eval { $cc = &$$autoload };
+			croak($@) if $@;
+			return $cc;
+		} else {
+			eval { &$$autoload };
+			croak($@) if $@;
+			return;
+		}
 	} elsif ($short =~ /^assoc$/) {
 		*$$autoload = \&Cv::assoc;
 		goto &$$autoload;
@@ -1358,25 +1376,25 @@ package Cv::ConvKernel;
 package Cv;
 
 sub GetRotationMatrix2D {
-	my ($class, $center, $angle, $scale, $map) = splice(@_, 0, 5);
-	$map ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
-	unshift(@_, $center, $angle, $scale, $map);
+	# Cv->GetRotationMatrix2D($center, $angle, $scale, my $mapMatrix)
+	my $class = shift;
+	$_[3] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
 	goto &cv2DRotationMatrix;
 }
 
 
 sub GetAffineTransform {
-	my ($class, $src, $dst, $map) = splice(@_, 0, 4);
-	$map ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
-	unshift(@_, $src, $dst, $map);
+	# Cv->GetAffineTransform($src, $dst, my $mapMatrix)
+	my $class = shift;
+	$_[2] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
 	goto &cvGetAffineTransform;
 }
 
 
 sub GetPerspectiveTransform {
-	my ($class, $src, $dst, $map) = splice(@_, 0, 4);
-	$map ||= Cv::Mat->new([3, 3], &Cv::CV_32FC1);
-	unshift(@_, $src, $dst, $map);
+	# Cv->GetPerspectiveTransform($src, $dst, my $mapMatrix)
+	my $class = shift;
+	$_[2] ||= Cv::Mat->new([3, 3], &Cv::CV_32FC1);
 	goto &cvGetPerspectiveTransform;
 }
 

@@ -2,18 +2,32 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 3;
+use Test::More tests => 6;
 BEGIN {
 	use_ok('Cv', qw(:nomore /^cv/));
 }
 
-if (1) {
-	my $at;
-	eval {
-		$at = sprintf("at %s line %d.", __FILE__, __LINE__ + 1);
-		cvCreateImage();
-	};
-	# warn $@;
-	like($@, qr/^Usage:/);
-	like($@, qr/$at/);
+sub err_is {
+	our $line;
+	my $m = shift;
+	chomp(my $e = $@);
+	$e =~ s/\.$//;
+	unshift(@_, $e, "$m at $0 line $line");
+	goto &is;
 }
+
+our $line;
+$line = __LINE__; eval { cvCreateImage() };
+err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+
+$line = __LINE__; eval { Cv->createImage() };
+err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+
+$line = __LINE__; eval { Cv->createImage() };
+err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+
+$line = __LINE__; eval { Cv->CreateImage() };
+err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+
+$line = __LINE__; eval { Cv->CreateImage() };
+err_is("Usage: Cv::cvCreateImage(size, depth, channels)");

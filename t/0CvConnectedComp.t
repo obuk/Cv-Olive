@@ -35,9 +35,9 @@ SKIP: {
 	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
 
 	$line = __LINE__ + 1;
-	my $cc = eval { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
+	my $cc2 = eval { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
 	is($@, "");
-	is($cc->[0], 1);
+	is($cc2->[0], 1);
 
 	$line = __LINE__ + 1;
 	eval { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) };

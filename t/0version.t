@@ -16,6 +16,6 @@ is($v, join('.', @v));
 is(Cv::cvVersion(), $v[0] + $v[1] * 1e-3 + $v[2] * 1e-6);
 diag "OpenCV $v";
 is(scalar Cv::Version, Cv::cvVersion());
-is(scalar Cv::version, Cv::cvVersion());
+is(scalar Cv::version, cvVersion());
 is(scalar Cv->Version, Cv::cvVersion());
-is(scalar Cv->version, Cv::cvVersion());
+is(scalar Cv->version, cvVersion());

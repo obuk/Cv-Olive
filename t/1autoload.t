@@ -1,21 +1,17 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-# use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More qw(no_plan);
+# use Test::More tests => 12;
 BEGIN {
 	use_ok('Cv', qw(:nomore));
 }
 
+our $line;
+
 if (1) {
-	my $at;
-	eval {
-		$at = sprintf("at %s line %d.", __FILE__, __LINE__ + 1);
-		Cv->NotDefined();
-	};
-	# warn "\$@: $@\n";
-	# warn "\$at: $at\n";
-	like($@, qr/Cv::AUTOLOAD can't call Cv::NotDefined $at/);
+	eval { Cv->NotDefined() }; $line = __LINE__;
+	err_is("Cv::AUTOLOAD can't call Cv::NotDefined");
 }
 
 if (2) {
@@ -43,12 +39,21 @@ if (3) {
 }
 
 if (4) {
-	eval { Cv->cvmGet() };
-	like($@, qr/can't/);
+	$line = __LINE__; eval { Cv->cvmGet() };
+	err_is("Cv::AUTOLOAD can't call Cv::cvmGet");
 }
 
 if (5) {
 	my $cv = bless [], 'Cv';
-	eval { $cv->alloc() };
-	like($@, qr/class name needed at/);
+	$line = __LINE__; eval { $cv->alloc() };
+	err_is("class name needed");
+}
+
+sub err_is {
+	our $line;
+	my $m = shift;
+	chomp(my $e = $@);
+	$e =~ s/\.$//;
+	unshift(@_, $e, "$m at $0 line $line");
+	goto &is;
 }

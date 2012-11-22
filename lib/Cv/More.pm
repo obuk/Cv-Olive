@@ -44,14 +44,6 @@ sub unimport {
 
 package Cv;
 
-sub m_croak {
-	chomp(my ($e) = @_);
-	$e =~ s/\s*(in|file|line|at) .*$//;
-	@_ = ($e);
-	goto &Carp::croak;
-}
-
-
 sub m_dims {
 	if (@_) {
 		if (ref $_[0]) {
@@ -91,7 +83,7 @@ sub m_new {
 		return undef unless my ($rows, $cols) = @dims; $cols ||= 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
 		eval { $mat->m_set([], \@_) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 	}
 	$mat;
 }
@@ -107,7 +99,7 @@ package Cv::Arr;
 	no warnings 'redefine';
 	*Set = *set = sub {
 		my $mat = eval { &m_set(@_) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 		$mat;
 	}
 }
@@ -221,7 +213,7 @@ sub Affine {
 		GetQuadrangleSubPix(
 			$src, $dst, Cv::Mat->new([], &Cv::CV_32FC1, @$map));
 	};
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	$dst;
 }
 
@@ -238,10 +230,10 @@ sub BoundingRect {
 	my $self = shift;
 	unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 	}
 	my $retval = eval { cvBoundingRect($self) };
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
 		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
@@ -256,11 +248,11 @@ sub ContourArea {
 	unless (ref $self) {
 		my $points = shift;
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @$points) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 	}
 	my $slice = shift || &Cv::CV_WHOLE_SEQ;
 	my $retval = eval { cvContourArea($self, $slice) };
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
 		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
@@ -277,10 +269,10 @@ sub FitEllipse2 {
 	my $self = shift;
 	unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 	}
 	my $retval = eval { cvFitEllipse2($self) };
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
 		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
@@ -295,7 +287,7 @@ sub FitLine {
 		my $points = shift;
 		my @dims = Cv::m_dims(@$points);
 		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
     }
 	my $rr = \ [ ];			# dummy
 	if (@_ && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
@@ -307,7 +299,7 @@ sub FitLine {
 	$reps     //= 0.01;
 	$aeps     //= 0.01;
 	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	my $retval = $$rr;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
@@ -323,10 +315,10 @@ sub MinAreaRect2 {
 	&Cv::Seq::stor(\@_);		# remove memstorage;
     unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 	}
 	my $retval = eval { cvMinAreaRect2($self) };
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
 		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
@@ -348,13 +340,13 @@ sub MinEnclosingCircle {
 	}
     unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::m_croak $@ if $@;
+		Cv::croak $@ if $@;
 	}
 	my $retval = eval {
 		cvMinEnclosingCircle($self, $$rcenter, $$rradius)?
 			[$$rcenter, $$rradius] : undef;
 	};
-	Cv::m_croak $@ if $@;
+	Cv::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::More::O{cs};
 		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};

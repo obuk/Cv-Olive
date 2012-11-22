@@ -1,10 +1,11 @@
 Revision history for Cv.pm
 
-0.18 - 2012-11-18 (working)
+0.18 - 2012-11-21 (working)
      * fixed tools/dumpconst.pl
      * fixed lib/Cv/Seq/*pm to clear stmt "no warnings"
      * added some t/*t
      * rewrote typemap again
+     * fixed error location where AUTOLOAD relaying
 
 0.17 - 2012-11-13
      * fixed alias boundingRect
