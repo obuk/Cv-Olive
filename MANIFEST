@@ -151,6 +151,10 @@ t/0CvRect.t
 t/0CvScalar.t
 t/0CvSize.t
 t/0CvSize2D32f.t
+t/0CvTermCriteria.t
+t/0doublePtr.t
+t/0floatPtr.t
+t/0intPtr.t
 t/0sizeof.t
 t/0version.t
 t/0xs.t
@@ -179,6 +183,7 @@ t/3getCols.t
 t/3getDims.t
 t/3getRawData.t
 t/3getReal.t
+t/3getRotationMatrix2D.t
 t/3getRows.t
 t/3getSize.t
 t/3getSubRect.t
@@ -206,9 +211,11 @@ t/4boundingRect.t
 t/4contour.t
 t/4contourArea.t
 t/4CvMat-More.t
+t/4CvMatND-More.t
 t/4CvMore.t
 t/4CvSeq-Circle.t
 t/4CvSeq-Point.t
+t/4CvSeq-Point2.t
 t/4CvSeq-Rect.t
 t/4CvSeq-SURFPoint.t
 t/4fitEllipse.t

@@ -57,9 +57,11 @@ sub m_dims {
 }
 
 
+package Cv::Mat;
+
 {
 	no warnings 'redefine';
-	sub Cv::Mat::new { goto &m_new }
+	sub new { goto &m_new }
 }
 
 sub m_new {
@@ -78,7 +80,7 @@ sub m_new {
 			$mat = Cv::cvCreateMat($rows, $cols, $type);
 		}
 	} elsif (@_) {
-		my @dims = m_dims(@_);
+		my @dims = Cv::m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
 		return undef unless my ($rows, $cols) = @dims; $cols ||= 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
@@ -88,6 +90,36 @@ sub m_new {
 	$mat;
 }
 
+
+package Cv::MatND;
+
+{
+	no warnings 'redefine';
+	sub new { goto &m_new }
+}
+
+sub m_new {
+	my $self = shift;
+	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
+	my $type = @_? shift : $self->type;
+	my $mat;
+	if (@$sizes) {
+		if (@_) {
+			$mat = Cv::cvCreateMatNDHeader($sizes, $type);
+			$mat->setData($_[0], &Cv::CV_AUTOSTEP) if $_[0];
+		} else {
+			$mat = Cv::cvCreateMatND($sizes, $type);
+		}
+	} elsif (@_) {
+		my @dims = Cv::m_dims(@_);
+		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
+		eval { $mat = Cv::cvCreateMatND(\@dims, $type) };
+		Cv::croak $@ if $@;
+		eval { $mat->m_set([], \@_) };
+		Cv::croak $@ if $@;
+	}
+	$mat;
+}
 
 # ============================================================
 #  core. The Core Functionality: Operations on Arrays
@@ -185,14 +217,17 @@ sub ToArray {
 		$self->UnpackMulti($_[0], $string);
 	} else {
 		my ($start, $end) = @$slice;
-		if ($self->cols == 1) {
+		if ($self->isa('Cv::MatND') && $self->dims == 1) {
+			$end = $self->rows - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
+			@{$_[0]} = map { $self->get([$_]) } $start .. $end;
+		} elsif ($self->cols == 1) {
 			$end = $self->rows - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
 			@{$_[0]} = map { $self->get([$_, 0]) } $start .. $end;
 		} elsif ($self->rows == 1) {
 			$end = $self->cols - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
 			@{$_[0]} = map { $self->get([0, $_]) } $start .. $end;
 		} else {
-			Carp::croak "can't convert; toArray works 1xN and Nx1";
+			Carp::croak "can't convert ", join('x', $self->getDims);
 		}
 	}
 	wantarray? @{$_[0]} : $_[0];

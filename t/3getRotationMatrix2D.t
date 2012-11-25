@@ -8,7 +8,7 @@ BEGIN {
 	use_ok('Cv', qw(:nomore));
 }
 
-sub is_g {
+sub is_gg {
 	my ($a, $b) = splice(@_, 0, 2);
 	unshift(@_, map { sprintf("%g", $_) } $a, $b);
 	goto &is;
@@ -29,8 +29,8 @@ if (1) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_g($a, $scale * cos($angle * $rad));
-	is_g($b, $scale * sin($angle * $rad));
+	is_gg($a, $scale * cos($angle * $rad));
+	is_gg($b, $scale * sin($angle * $rad));
 }
 
 if (2) {
@@ -44,8 +44,8 @@ if (2) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_g($a, $scale * cos($angle * $rad));
-	is_g($b, $scale * sin($angle * $rad));
+	is_gg($a, $scale * cos($angle * $rad));
+	is_gg($b, $scale * sin($angle * $rad));
 }
 
 if (3) {
@@ -61,8 +61,8 @@ if (3) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_g($a, $scale * cos($angle * $rad));
-	is_g($b, $scale * sin($angle * $rad));
+	is_gg($a, $scale * cos($angle * $rad));
+	is_gg($b, $scale * sin($angle * $rad));
 }
 
 if (4) {
@@ -74,8 +74,8 @@ if (4) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_g($a, $scale * cos($angle * $rad));
-	is_g($b, $scale * sin($angle * $rad));
+	is_gg($a, $scale * cos($angle * $rad));
+	is_gg($b, $scale * sin($angle * $rad));
 }
 
 sub print_map {
