@@ -1441,26 +1441,20 @@ sub Resize {
 
 sub WarpAffine {
 	# WarpAffine(src, dst, mapMatrix, [flags], [fillval])
-	my ($src, $dst, $map) = splice(@_, 0, 3);
-	unless (ref $map) {
-		unshift(@_, $map);
-		($dst, $map) = (undef, $dst);
+	if (ref $_[1] && !ref $_[2]) {
+		my $src = shift;
+		unshift(@_, $src, $src->new);
 	}
-	$dst //= $src->new;
-	unshift(@_, $src, $dst, $map);
 	goto &cvWarpAffine;
 }
 
 
 sub WarpPerspective {
 	# WarpPerspective(src, dst, mapMatrix, [flags], [fillval])
-	my ($src, $dst, $map) = splice(@_, 0, 3);
-	unless (ref $map) {
-		unshift(@_, $map);
-		($dst, $map) = (undef, $dst);
+	if (ref $_[1] && !ref $_[2]) {
+		my $src = shift;
+		unshift(@_, $src, $src->new);
 	}
-	$dst //= $src->new;
-	unshift(@_, $src, $dst, $map);
 	goto &cvWarpPerspective;
 }
 
