@@ -8,6 +8,7 @@ Revision history for Cv.pm
      * fixed error location where AUTOLOAD relaying
      * added initializer for Cv::MatND::new
      * fixed WarpAffine, WarpPerspective
+     * added m_get, Transform
 
 0.17 - 2012-11-13
      * fixed alias boundingRect

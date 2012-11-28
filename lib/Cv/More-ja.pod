@@ -137,6 +137,47 @@ Perl の点の配列を扱うところで利用者の負担を減らすことが
 
  $img->polyLine([ [ @$mat ] ], ...);
 
+
+=head3 疎な点と密な点
+
+OpenCV には疎な点と密な点があります。 疎な点とは、その言葉通り、まばら
+な点のことです。疎な点は、座標あるいは座標と値の対を値として集めたもの
+で、OpenCV の文書中では疎な点集合と呼ばれています。まばらにしかないので
+座標そのものに価値があり、ひとまとめにするためにマトリクスやシーケンス
+が使われます。密な点は密集した点のことで、画像はその典型です。点の値に
+価値があり、点の値はその座標が示す場所に格納されています。
+
+OpenCV の関数の中には、疎な点と密な点のそれぞれについて同じ操作をする関
+数があります。たとえば、アフィン変換がそうです。疎な点は cvTransform()
+で変換し、密な点は cvWarpAffine() で変換します。点の違いは利用者が使う
+関数で決まります。
+
+疎な点のアフィン変換を考えてみましょう。
+
+ my $transmat = Cv->getAffineTransform(\@points_src, \@points_dst);
+ my $dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1)
+ my @dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1')
+ Cv->Transform([ $pt1, $pt2, ... ], my $dst, $transmat);                # (2)
+
+この (1)、(2) は Perl の配列、つまり疎な点を変換します。ただ、この
+cvTransform() は、Nx1 や 1xN のリストのようなマトリクスを変換するという
+よりは、次の (3)、(4) の使い方が本来のものです。
+
+ my $arr = Cv::Mat->new(...);
+ my $arr_transe = $arr->Transform($transmat);                           # (3)
+ $arr->Transform(my arr_trans, $transmat);                              # (4)
+
+使い方について考えると、(1)、(2) は、Perl の点の配列を OpenCV の Nx1 や
+1xN のマトリクスに直して使うところで便利だと思います。(3)、(4) は、幾何
+学変換、色空間の変換、画像チャンネルの入れ替えなど様々な場面で便利でしょ
+う。そして更に密な点を扱う cvWarpAffine() があり、少し混乱させられます。
+
+ my $arr_affine = $arr->warpAffine($transmat);                          # (5)
+ $arr->warpAffine(my $arr_affine, $transmat);                           # (6)
+
+どうまとめましょうか、、、
+
+
 =head3 補足: OpenCVの点
 
 OpenCV には様々な点があります。それは次の構造体で表わされます。
@@ -359,6 +400,21 @@ CvRect から CvBox2D への変換は次のとおり。
  my $s = Cv->contourArea(\@pts);
 
 この面積 $s は、縦x横 (100x100) になります。
+
+
+=item Transform()
+
+ my $dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1)
+ my @dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1')
+ Cv->Transform([ $pt1, $pt2, ... ], my $dst, $transmat);                # (2)
+
+ my @points = ( [$x1, $y1], [$x2, $y2], ... );
+ my $arr = Cv::Mat->new([], CV_32FC2, @points);
+ my $dst = $arr->Transform($transmat);                                  # (3)
+ $arr->Transform(my $dst, $transmat);                                   # (4)
+
+ my $dst = $arr->WarpAffine($transmat);                                 # (5)
+ $arr->warpTransform(my $dst, $transmat);                               # (6)
 
 
 =item Affine()

@@ -67,7 +67,7 @@ package Cv::Mat;
 sub m_new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_? shift : $self->type;
+	my $type = shift // $self->type;
 	my $mat;
 	if (@$sizes) {
 		my ($rows, $cols) = @$sizes; $cols ||= 1;
@@ -101,7 +101,7 @@ package Cv::MatND;
 sub m_new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_? shift : $self->type;
+	my $type = shift // $self->type;
 	my $mat;
 	if (@$sizes) {
 		if (@_) {
@@ -154,6 +154,20 @@ sub m_set {
 	}
 	$mat;
 }
+
+
+sub m_get {
+	my $arr = shift;
+	my $idx = shift;
+	cvGetDims($arr, my @dims);
+	if (@dims <= @$idx) {
+		my $type = cvGetElemType($arr);
+		[ @{ cvGetND($arr, $idx) }[0 .. Cv::CV_MAT_CN($type) - 1] ];
+	} else {
+		[ map { $arr->m_get([@$idx, $_]) } (0 .. $dims[scalar @$idx] - 1) ];
+	}
+}
+
 
 use overload
 	'@{}' => sub { $_[0]->ToArray },
@@ -250,6 +264,42 @@ sub Affine {
 	};
 	Cv::croak $@ if $@;
 	$dst;
+}
+
+
+{ *Cv::Transform = \&Transform }
+sub Transform {
+	# cvTransform(CvArr* src, CvArr* dst, CvMat* transmat, CvMat* shiftvec)
+	my $self = shift;
+	my $cs = 0;
+	unless (ref $self) {
+		my $points = shift;
+		my @dims = Cv::m_dims(@$points);
+		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
+		Cv::croak $@ if $@;
+		$cs++;
+	}
+	if (ref $_[0] && $_[0]->isa('Cv::Mat') &&
+		$_[0]->rows == 2 && $_[0]->cols == 3) { # $_[0] is transmat
+		unshift(@_, $self->new);
+	} else {
+		$_[0] //= $self->new;
+	}
+	unshift(@_, $self);
+	my $retval = eval { &cvTransform };
+	Cv::croak $@ if $@;
+	if ($cs) {
+		# my @dst = @$retval;
+		@{ $_[1] = [] } = @$retval;
+		if (wantarray) {
+			# return @dst if $Cv::More::O{cs};
+			return @{$_[1]} if $Cv::More::O{cs};
+			Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
+		}
+		# return \@dst;
+		return $_[1];
+	}
+	$retval;
 }
 
 
