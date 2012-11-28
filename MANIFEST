@@ -179,6 +179,7 @@ t/3dst.t
 t/3encode.t
 t/3font.t
 t/3GEMM.t
+t/3getAffineTransform.t
 t/3getCols.t
 t/3getDims.t
 t/3getRawData.t
@@ -223,6 +224,7 @@ t/4fitLine.t
 t/4fontQt.t
 t/4getBuildInformation.t
 t/4houghCircle.t
+t/4m_get.t
 t/4makeSeqHeaderForArray.t
 t/4minAreaRect.t
 t/4minEnclosingCircle.t
@@ -231,6 +233,7 @@ t/4overload.t
 t/4pointSeqFromMat.t
 t/4projectPoints2.t
 t/4toArray.t
+t/4transform.t
 t/8flipbook.t
 t/8pango.t
 t/9inlineC.t

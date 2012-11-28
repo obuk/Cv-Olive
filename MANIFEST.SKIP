@@ -5,7 +5,7 @@
 \.skip/
 ^\.|/\.
 ^\#|/\#
-\.(a|o|bak|new|old|tmp)$
+\.(a|o|bak|new|old|tmp|orig)$
 \~$
 lib/Cv/(perl|pp|sv)\.h$
 lib/Cv/Constant\.pm$
