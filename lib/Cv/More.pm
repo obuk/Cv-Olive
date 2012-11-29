@@ -13,16 +13,22 @@ use Cv::Seq::Point2;
 use Cv::Seq::Rect;
 use Cv::Seq::SURFPoint;
 
-our %O = map { $_ => 0 } qw(cs cs-warn);
+package Cv;
 
-our %M = (
-	butscalar => "called in list context, but returning scaler",
-	);
+our %O;
+
+$O{$_} = 0 for qw(cs cs-warn);
+
+our %M;
+
+$M{butscalar} = "called in list context, but returning scaler";
+
+package Cv::More;
 
 sub import {
 	my $self = shift;
 	for (@_) {
-		if (defined $O{$_}) {
+		if (defined $Cv::O{$_}) {
 			$O{$_} = 1;
 		} else {
 			Carp::croak "Cv::More: can't import $_";
@@ -33,7 +39,7 @@ sub import {
 sub unimport {
 	my $self = shift;
 	for (@_) {
-		if (defined $O{$_}) {
+		if (defined $Cv::O{$_}) {
 			$O{$_} = 0;
 		} else {
 			Carp::croak "Cv::More: can't unimport $_";
@@ -193,17 +199,6 @@ sub overload_nomethod {
 	Carp::croak "$0: can't overload ", ref $_[0], "::", $_[3]
 }
 
-=xxx
-
-sub matrix {
-	my $matrix = shift;
-	my $rows = @$matrix;
-	my $cols = @{$matrix->[0]};
-	my @m = map @$_, @$matrix;
-	($rows, $cols, @m);
-}
-
-=cut
 
 # ============================================================
 #  core. The Core Functionality: Dynamic Structures
@@ -289,14 +284,11 @@ sub Transform {
 	my $retval = eval { &cvTransform };
 	Cv::croak $@ if $@;
 	if ($cs) {
-		# my @dst = @$retval;
 		@{ $_[1] = [] } = @$retval;
 		if (wantarray) {
-			# return @dst if $Cv::More::O{cs};
-			return @{$_[1]} if $Cv::More::O{cs};
-			Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
+			return @{$_[1]} if $Cv::O{cs};
+			Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'}
 		}
-		# return \@dst;
 		return $_[1];
 	}
 	$retval;
@@ -320,8 +312,8 @@ sub BoundingRect {
 	my $retval = eval { cvBoundingRect($self) };
 	Cv::croak $@ if $@;
 	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
+		return @$retval if $Cv::O{cs};
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'}
 	}
 	return $retval;
 }
@@ -339,8 +331,8 @@ sub ContourArea {
 	my $retval = eval { cvContourArea($self, $slice) };
 	Cv::croak $@ if $@;
 	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'}
+		return @$retval if $Cv::O{cs};
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'}
 	}
 	return $retval;
 }
@@ -359,8 +351,8 @@ sub FitEllipse2 {
 	my $retval = eval { cvFitEllipse2($self) };
 	Cv::croak $@ if $@;
 	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+		return @$retval if $Cv::O{cs};
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
 	}
 	return $retval;
 }
@@ -387,8 +379,8 @@ sub FitLine {
 	Cv::croak $@ if $@;
 	my $retval = $$rr;
 	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+		return @$retval if $Cv::O{cs};
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
 	}
 	return $retval;
 }
@@ -405,8 +397,8 @@ sub MinAreaRect2 {
 	my $retval = eval { cvMinAreaRect2($self) };
 	Cv::croak $@ if $@;
 	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+		return @$retval if $Cv::O{cs};
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
 	}
 	return $retval;
 }
@@ -433,8 +425,8 @@ sub MinEnclosingCircle {
 	};
 	Cv::croak $@ if $@;
 	if (wantarray) {
-		return @$retval if $Cv::More::O{cs};
-		Carp::carp $Cv::More::M{butscalar} if $Cv::More::O{'cs-warn'};
+		return @$retval if $Cv::O{cs};
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
 	}
 	return $retval;
 }

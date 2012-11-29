@@ -64,6 +64,9 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = ( );
 
+our %O;
+our %M;
+
 sub import {
 	my $self = shift;
 	my @std = ();
@@ -99,8 +102,7 @@ sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
 sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
 sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
-# Cv::alias(qw(Version));
-{ no strict 'refs'; *Version = *version = sub {	shift; goto &cvVersion } }
+{ *Version = *version = sub {	shift; goto &cvVersion } }
 
 =over 4
 
@@ -230,8 +232,7 @@ package Cv;
 foreach (classes('Cv')) {
 	next if /^Cv::.*::Ghost$/;
 	next if /^Cv::Constant$/;
-	no strict 'refs';
-	*{$_ . '::AUTOLOAD'} = \&Cv::autoload;
+	{ no strict 'refs'; *{$_ . '::AUTOLOAD'} = \&Cv::autoload }
 }
 
 
@@ -277,8 +278,6 @@ sub assoc {
 	my $family = shift;
 	my $short = shift;
 	my @names;
-	# my $verbose = 0;
-	# my $verbose = $short =~ /new/i;
 	if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
 		(my $caps = $short) =~ s/^[a-z]/\U$&/;
 		push(@names, $caps);
@@ -290,20 +289,15 @@ sub assoc {
 	}
 	push(@names, $short);
 	foreach (@names) {
-		no strict 'refs';
-		# print STDERR "assoc: trying $family->can($_)\n" if $verbose > 1;
 		if (my $subr = $family->can($_)) {
-			# print STDERR "assoc: found $_ in $family\n" if $verbose;
 			if ($family eq 'Cv' && $_ =~ /^cv[A-Zm]/) {
 				return sub {
-					# shift unless defined $_[0] && ref $_[0] && blessed $_[0];
 					ref (my $class = shift) and Carp::croak 'class name needed';
 					goto &$subr;
 				};
 			}
 			return $subr;
 		}
-		# print STDERR "assoc: can't assoc $_ in $family\n" if $verbose;
 	}
 	return undef;
 }
@@ -345,9 +339,6 @@ package Cv::Arr;
 
 # The GetDims needs alias before calling.  The function called via
 # AUTOLOAD will not know the context of the caller.
-
-# Cv::alias qw(GetDims);
-# Cv::alias qw(Size), \&cvGetSize;
 
 sub dst (\@) {
 	my $dst = undef;
@@ -1035,11 +1026,6 @@ sub Transpose {
 	goto &cvTranspose;
 }
 
-
-# package Cv::Image; Cv::alias qw(InitImageHeader);
-# package Cv::Mat; Cv::alias qw(InitMatHeader);
-# package Cv::MatND; Cv::alias qw(InitMatNDHeader);
-# package Cv::SparseMat; Cv::alias qw(InitSparseMatIterator);
 
 =pod
 
