@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-sub AUTOLOAD { &Cv::autoload };
+{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 {
 	package Cv;

@@ -39,7 +39,7 @@ use Carp qw();
 use Scalar::Util qw(blessed);
 use warnings::register;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Cv::Constant qw(:all);
 
@@ -99,7 +99,8 @@ sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
 sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
 sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
-Cv::alias(qw(Version));
+# Cv::alias(qw(Version));
+{ no strict 'refs'; *Version = *version = sub {	shift; goto &cvVersion } }
 
 =over 4
 
@@ -227,40 +228,10 @@ C<cvCreateMat()> as:
 package Cv;
 
 foreach (classes('Cv')) {
-	next if /::Ghost$/;
+	next if /^Cv::.*::Ghost$/;
 	next if /^Cv::Constant$/;
-	no warnings 'redefine';
-	eval "{ package $_; sub AUTOLOAD { &Cv::autoload } }";
-}
-
-
-sub autoload {
-	my ($package, $filename, $line) = caller;
-	my $autoload = "${package}::AUTOLOAD";
-	my ($package1, $filename1, $line1) = caller(1);
-	my $at = "at $filename1 line $line1";
-	no strict "refs";
-    (my $short = $$autoload) =~ s/.*:://;
-	if (my $code = assoc($package, $short)) {
-		*$$autoload = $code;
-		if (wantarray) {
-			my @cc; eval { @cc = &$$autoload };
-			croak($@) if $@;
-			return @cc;
-		} elsif (defined wantarray) {
-			my $cc; eval { $cc = &$$autoload };
-			croak($@) if $@;
-			return $cc;
-		} else {
-			eval { &$$autoload };
-			croak($@) if $@;
-			return;
-		}
-	} elsif ($short =~ /^assoc$/) {
-		*$$autoload = \&Cv::assoc;
-		goto &$$autoload;
-	}
-	die "${package}::AUTOLOAD can't call $$autoload $at.\n";
+	no strict 'refs';
+	*{$_ . '::AUTOLOAD'} = \&Cv::autoload;
 }
 
 
@@ -280,11 +251,33 @@ sub classes {
 }
 
 
+sub autoload {
+	our $AUTOLOAD;
+	(my $short = $AUTOLOAD) =~ s/(.*):://;
+	my $family = $1;
+	if (my $code = assoc($family, $short)) {
+		{ no strict 'refs'; *$AUTOLOAD = $code }
+		if (wantarray) {
+			my @cc; eval { @cc = &$code };
+			return @cc unless $@;
+		} elsif (defined wantarray) {
+			my $cc; eval { $cc = &$code };
+			return $cc unless $@;
+		} else {
+			eval { &$code };
+			return unless $@;
+		}
+		Cv::croak $@;
+	}
+	croak "can't call $AUTOLOAD";
+}
+
+
 sub assoc {
 	my $family = shift;
 	my $short = shift;
 	my @names;
-	my $verbose = 0;
+	# my $verbose = 0;
 	# my $verbose = $short =~ /new/i;
 	if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
 		(my $caps = $short) =~ s/^[a-z]/\U$&/;
@@ -298,8 +291,9 @@ sub assoc {
 	push(@names, $short);
 	foreach (@names) {
 		no strict 'refs';
+		# print STDERR "assoc: trying $family->can($_)\n" if $verbose > 1;
 		if (my $subr = $family->can($_)) {
-			print STDERR "assoc: found $_ in $family\n" if $verbose;
+			# print STDERR "assoc: found $_ in $family\n" if $verbose;
 			if ($family eq 'Cv' && $_ =~ /^cv[A-Zm]/) {
 				return sub {
 					# shift unless defined $_[0] && ref $_[0] && blessed $_[0];
@@ -309,40 +303,11 @@ sub assoc {
 			}
 			return $subr;
 		}
-		print STDERR "assoc: can't $_ in $family\n" if $verbose;
+		# print STDERR "assoc: can't assoc $_ in $family\n" if $verbose;
 	}
 	return undef;
 }
 
-
-sub alias {
-	return undef unless @_;
-	shift if $_[0] eq __PACKAGE__;
-	# my $package = shift;
-	my ($package, $filename, $line) = caller;
-	my $subr; $subr = pop if (ref $_[-1] eq 'CODE');
-	$subr ||= $package->can($_[0]);
-	unless ($subr) {
-		if (my $code = assoc($package, $_[0])) {
-			$subr = $code;
-		} else {
-			# warn "can't alias ${package}::$_[0]";
-			$subr = sub { Carp::croak "TBD: ${package}::$_[0]" };
-		}
-	}
-	my $verbose = 0;
-	for my $upper (@_) {
-		(my $lower = $upper) =~ s/^[A-Z]+/\L$&/;
-		for ($upper, $lower) {
-			no strict 'refs';
-			unless ($package->can($_)) {
-				print STDERR "Cv::alias *{${package}::$_}\n" if $verbose;
-				*{"${package}::$_"} = $subr;
-			}
-		}
-	}
-	$subr;
-}
 
 =item *
 
@@ -381,8 +346,8 @@ package Cv::Arr;
 # The GetDims needs alias before calling.  The function called via
 # AUTOLOAD will not know the context of the caller.
 
-Cv::alias qw(GetDims);
-Cv::alias qw(Size), \&cvGetSize;
+# Cv::alias qw(GetDims);
+# Cv::alias qw(Size), \&cvGetSize;
 
 sub dst (\@) {
 	my $dst = undef;
@@ -1126,6 +1091,7 @@ for ([ qw(CV_TYPE_NAME_GRAPH Cv::Graph) ],
 	$TYPENAME2CLASS{$t} = $_->[1];
 }
 
+
 package Cv::FileStorage;
 { *new = \&Cv::OpenFileStorage }
 
@@ -1158,11 +1124,13 @@ sub Read {
 	fsbless cvRead(@_);
 }
 
+
 sub ReadByName {
 	my ($fs, $map, $name) = splice(@_, 0, 3);
 	Carp::croak "instance variable needed" unless ref $fs;
 	$fs->Read($fs->getFileNodeByName($map, $name), @_);
 }
+
 
 sub Cv::TypeInfo::DESTROY {}
 sub Cv::FileNode::DESTROY {}

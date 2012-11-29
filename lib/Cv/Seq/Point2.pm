@@ -10,7 +10,7 @@ use Cv::Seq::Point;
 
 our @ISA = qw(Cv::Seq::Point);
 
-sub AUTOLOAD { &Cv::autoload };
+{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 sub template {
 	my $self = CORE::shift;

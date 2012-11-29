@@ -10,10 +10,7 @@ use Cv::Seq;
 
 our @ISA = qw(Cv::Seq);
 
-{
-	no warnings 'redefine';
-	sub AUTOLOAD { &Cv::autoload };
-}
+{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 { *new = \&CreateSeq }
 sub CreateSeq {

@@ -740,7 +740,8 @@ OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(1));
 #C# int cvGetDims(const CvArr* arr, int* sizes=NULL)
 void
 cvGetDims(const CvArr* arr, ...)
-ALIAS: Cv::Arr::cvSizes = 1
+ALIAS: GetDims = 1
+ALIAS: getDims = 2
 PROTOTYPE: $;\@
 PPCODE:
 	const int verbose = 0;
@@ -835,6 +836,8 @@ OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(1));
 CvSize
 cvGetSize(const CvArr* arr)
 ALIAS: cvSize = 1
+ALIAS: Size = 2
+ALIAS: size = 3
 
 CvMat*
 cvGetSubRect(const CvArr* arr, CvMat* submat, CvRect rect)

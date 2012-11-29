@@ -20,10 +20,7 @@ package Cv::Seq::Seq;
 
 package Cv::Seq;
 
-{
-	no warnings 'redefine';
-	sub AUTOLOAD { &Cv::autoload };
-}
+{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 our %TEMPLATE;
 our $STORAGE;

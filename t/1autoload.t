@@ -11,7 +11,7 @@ our $line;
 
 if (1) {
 	eval { Cv->NotDefined() }; $line = __LINE__;
-	err_is("Cv::AUTOLOAD can't call Cv::NotDefined");
+	err_is("can't call Cv::NotDefined");
 }
 
 if (2) {
@@ -40,7 +40,7 @@ if (3) {
 
 if (4) {
 	$line = __LINE__; eval { Cv->cvmGet() };
-	err_is("Cv::AUTOLOAD can't call Cv::cvmGet");
+	err_is("can't call Cv::cvmGet");
 }
 
 if (5) {
