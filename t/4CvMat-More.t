@@ -152,13 +152,6 @@ if (10) {
 }
 
 
-if (11) {
-	my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
-	eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
-	like($@, qr/values is out of range/);
-}
-
-
 # has data
 if (12) {
 	my $rows = 8;
@@ -208,9 +201,36 @@ if (17) {
 	my $arr = Cv::Mat->new([], CV_8UC1, []);
 }
 
-if (18) {
-	my $line = __LINE__ + 1;
-	eval { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) };
-	is($@, "OpenCV Error: One of arguments' values is out of range (index is out of range) at $0 line $line\n");
+our $line;
+
+SKIP: {
+	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
+	Cv->setErrMode(1);
+	my $can_hook = Cv->getErrMode() == 1;
+	$can_hook = 0 if $^O eq 'cygwin';
+	Cv->setErrMode(0);
+	skip("can't hook cv:error", 2) unless $can_hook;
+
+	if (21) {
+		my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
+		$line = __LINE__ + 1;
+		eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
+		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range)");
+	}
+
+	if (22) {
+		$line = __LINE__ + 1;
+		eval { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) };
+		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range)");
+	}
 }
 
+
+sub err_is {
+	our $line;
+	my $m = shift;
+	chomp(my $e = $@);
+	$e =~ s/\.$//;
+	unshift(@_, $e, "$m at $0 line $line");
+	goto &is;
+}

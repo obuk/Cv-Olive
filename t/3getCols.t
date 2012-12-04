@@ -78,7 +78,7 @@ SKIP: {
 	my $can_hook = Cv->getErrMode() == 1;
 	$can_hook = 0 if $^O eq 'cygwin';
 	Cv->setErrMode(0);
-	skip("can't hook cv:error", 3) unless $can_hook;
+	skip("can't hook cv:error", 2) unless $can_hook;
 
 	if (0) {
 		my $src = Cv::Mat->new([240, 320], CV_8UC3);

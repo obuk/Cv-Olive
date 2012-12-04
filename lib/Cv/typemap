@@ -130,21 +130,19 @@ StereoSGBM*					O_OBJECT
 ##################################################
 INPUT
 T_CvPTROBJ
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = (${type})0;
-	else if (sv_isobject($arg) && sv_derived_from($arg, \"@{
-			$type =~ /\b(Cv|Ipl)(\w+)/; ['Cv::'.$2] }\"))
+	if (sv_isobject($arg) && sv_derived_from($arg, \"@{
+			$type =~ /\b(Cv|Ipl)(\w+)/; ['Cv::'.$2] }\")) {
 		$var = INT2PTR(${type}, SvIV((SV*)SvRV($arg)));
-	else
+	} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+		$var = (${type})0;
+	} else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\", \"$type\")
 
 T_CvArrPtrPtr
 	int length_$var = 0;
-	if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-		$var = ($type)0;
-	else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+	if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 		AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 		if (length_$var > 0) { int i;
 			$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
@@ -164,6 +162,8 @@ T_CvArrPtrPtr
 			}
 		} else
 			$var = ($type)0;
+	} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+		$var = ($type)0;
 	} else
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -352,9 +352,7 @@ T_CvPoint
 T_CvPointPtr
 	int length_$var = 0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) {
 				int i;
@@ -375,6 +373,8 @@ T_CvPointPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			err++;
 		if (err)
@@ -387,9 +387,7 @@ T_CvPointPtrPtr
 	int length_$var = 0;
 	int* length_inner_$var = (int*)0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
 			if (length_$var > 0) { int i;
 				$var = ($type)alloca(sizeof(${var}[0])*length_$var);
@@ -420,6 +418,8 @@ T_CvPointPtrPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			err++;
 		if (err)
@@ -446,9 +446,7 @@ T_CvPoint2D64f
 T_CvPoint2D64fPtr
 	int length_$var = 0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) { int i;
 				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
@@ -468,6 +466,8 @@ T_CvPoint2D64fPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			err++;
 		if (err)
@@ -496,9 +496,7 @@ T_CvPoint3D64f
 T_CvPoint3D64fPtr
 	int length_$var = 0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) { int i;
 				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
@@ -521,6 +519,8 @@ T_CvPoint3D64fPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			err++;
 		if (err)
@@ -699,9 +699,7 @@ T_CvTermCriteria
 T_floatPtr
 	int length_$var = 0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) { int i;
 				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
@@ -711,6 +709,8 @@ T_floatPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -721,9 +721,7 @@ T_floatPtrPtr
 	int length_$var = 0;
 	int* length_inner_$var = (int*)0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
 			if (length_$var > 0) { int i;
 				$var = ($type)alloca(sizeof(${var}[0])*length_$var);
@@ -748,6 +746,8 @@ T_floatPtrPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			err++;
 		if (err)
@@ -759,9 +759,7 @@ T_floatPtrPtr
 T_intPtr
 	int length_$var = 0;
 	STMT_START { int err = 0;
-		if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0)
-			$var = ($type)0;
-		else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) { int i;
 				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
@@ -771,6 +769,8 @@ T_intPtr
 				}
 			} else
 				$var = ($type)0;
+		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
+			$var = ($type)0;
 		} else
 			err++;
 		if (err)

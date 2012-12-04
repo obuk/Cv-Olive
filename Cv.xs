@@ -274,12 +274,13 @@ MODULE = Cv	PACKAGE = Cv
 #  core. The Core Functionality: Basic Structures
 # ============================================================
 
+=xxx
+
 CvPoint
 cvPoint(int x, int y)
 
 CvPoint
 cvPointFrom32f(CvPoint2D32f pt)
-
 
 CvPoint2D32f
 cvPoint2D32f(float x, float y)
@@ -287,10 +288,8 @@ cvPoint2D32f(float x, float y)
 CvPoint2D32f
 cvPointTo32f(CvPoint point)
 
-
 CvPoint3D32f
 cvPoint3D32f(float x, float y, float z)
-
 
 CvPoint2D64f
 cvPoint2D64f(double x, double y)
@@ -306,17 +305,14 @@ OUTPUT:
 CvPoint3D64f
 cvPoint3D64f(double x, double y, double z)
 
-
 CvSize
 cvSize(int width, int height)
 
 CvSize2D32f
 cvSize2D32f(float width, float height)
 
-
 CvRect
 cvRect(int x, int y, int width, int height)
-
 
 CvScalar
 cvScalar(double val0, double val1=0, double val2=0, double val3=0)
@@ -327,9 +323,10 @@ cvScalarAll(double val0123);
 CvScalar
 cvRealScalar(double val0)
 
-
 CvTermCriteria
 cvTermCriteria(int type, int max_iter, double epsilon)
+
+=cut
 
 
 MODULE = Cv	PACKAGE = Cv::Mat
@@ -714,6 +711,8 @@ POSTCALL:
 	ST(0) = ST(5);
 	XSRETURN(1);
 
+=xxx
+
 CvScalar
 cvGet1D(const CvArr* arr, int idx0)
 
@@ -722,6 +721,8 @@ cvGet2D(const CvArr* arr, int idx0, int idx1)
 
 CvScalar
 cvGet3D(const CvArr* arr, int idx0, int idx1, int idx2)
+
+=cut
 
 CvScalar
 cvGetND(const CvArr* arr, int* idx)
@@ -815,6 +816,8 @@ CODE:
 	SvPOK_on(data);
 	SvREADONLY_on(data); // XXXXX
 
+=xxx
+
 double
 cvGetReal1D(const CvArr* arr, int idx0)
 
@@ -823,6 +826,8 @@ cvGetReal2D(const CvArr* arr, int idx0, int idx1)
 
 double
 cvGetReal3D(const CvArr* arr, int idx0, int idx1, int idx2)
+
+=cut
 
 double
 cvGetRealND(const CvArr* arr, int* idx)
@@ -836,8 +841,6 @@ OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(1));
 CvSize
 cvGetSize(const CvArr* arr)
 ALIAS: cvSize = 1
-ALIAS: Size = 2
-ALIAS: size = 3
 
 CvMat*
 cvGetSubRect(const CvArr* arr, CvMat* submat, CvRect rect)
@@ -1004,6 +1007,8 @@ POSTCALL:
 	ST(0) = ST(1);
 	XSRETURN(1);
 
+=xxx
+
 SV *
 cvPtr1D(const CvArr* arr, int idx0, type = NO_INIT)
 INPUT:
@@ -1040,6 +1045,8 @@ CODE:
 OUTPUT:
 	RETVAL
 
+=cut
+
 SV *
 cvPtrND(const CvArr* arr, int* idx, type = NO_INIT, int createNode = 1, unsigned precalcHashval = NO_INIT)
 INPUT:
@@ -1073,7 +1080,7 @@ OUTPUT:
 MODULE = Cv	PACKAGE = Cv::RNG
 void
 cvReleaseRNG(CvRNG* rng)
-ALIAS: Cv::RNG::DESTROY = 1
+ALIAS: DESTROY = 1
 CODE:
 	if (rng) safefree(rng);
 	unbless(ST(0));
@@ -1108,28 +1115,28 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv::Image
 void
 cvReleaseImage(IplImage* &image)
-ALIAS: Cv::Image::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Mat
 void
 cvReleaseMat(CvMat* &mat)
-ALIAS: Cv::Mat::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::MatND
 void
 cvReleaseMatND(CvMatND* &mat)
-ALIAS: Cv::MatND::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::SparseMat
 void
 cvReleaseSparseMat(CvSparseMat* &mat)
-ALIAS: Cv::SparseMat::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -1181,6 +1188,8 @@ ALIAS: cvFill = 1
 POSTCALL:
 	XSRETURN(1);
 
+=xxx
+
 void
 cvSet1D(CvArr* arr, int idx0, CvScalar value)
 POSTCALL:
@@ -1195,6 +1204,8 @@ void
 cvSet3D(CvArr* arr, int idx0, int idx1, int idx2, CvScalar value)
 POSTCALL:
 	XSRETURN(1);
+
+=cut
 
 void
 cvSetND(CvArr* arr, int* idx, CvScalar value)
@@ -1213,6 +1224,8 @@ cvSetIdentity(CvArr* mat, CvScalar value=cvRealScalar(1))
 POSTCALL:
 	XSRETURN(1);
 
+=xxx
+
 void
 cvSetReal1D(CvArr* arr, int idx0, double value)
 POSTCALL:
@@ -1227,6 +1240,8 @@ void
 cvSetReal3D(CvArr* arr, int idx0, int idx1, int idx2, double value)
 POSTCALL:
 	XSRETURN(1);
+
+=cut
 
 void
 cvSetRealND(CvArr* arr, int* idx, double value)
@@ -1628,7 +1643,7 @@ C_ARGS:
 
 void
 cvReleaseMemStorage(CvMemStorage* &storage)
-ALIAS: Cv::MemStorage::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -1714,8 +1729,14 @@ cvSeqSlice(const CvSeq* seq, CvSlice slice, CvMemStorage* storage=NULL, int copy
 #TBD# void cvSetSeqReaderPos(CvSeqReader* reader, int index, int is_relative=0)
 
 MODULE = Cv	PACKAGE = Cv
+
+=xxx
+
 CvSlice
 cvSlice(int start_index, int end_index)
+
+=cut
+
 
 MODULE = Cv	PACKAGE = Cv::Arr
 int
@@ -1741,7 +1762,7 @@ cvStartWriteSeq(int seq_flags, int header_size, int elem_size, CvMemStorage* sto
 MODULE = Cv	PACKAGE = Cv::SeqReader
 void
 cvReleaseSeqReader(CvSeqReader* reader)
-ALIAS: Cv::SeqReader::DESTROY = 1
+ALIAS: DESTROY = 1
 CODE:
 	if (reader) safefree(reader);
 	unbless(ST(0));
@@ -1839,7 +1860,7 @@ OUTPUT:
 MODULE = Cv	PACKAGE = Cv::Font
 void
 cvReleaseFont(CvFont* font)
-ALIAS: Cv::Font::DESTROY = 1
+ALIAS: DESTROY = 1
 CODE:
 	safefree(font);
 	unbless(ST(0));
@@ -2021,7 +2042,7 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv::FileStorage
 void
 cvReleaseFileStorage(CvFileStorage* &fs)
-ALIAS: Cv::FileStorage::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -2358,7 +2379,7 @@ POSTCALL:
 
 void
 cvReleaseHist(CvHistogram* &hist)
-ALIAS: Cv::Histogram::DESTROY = 1
+ALIAS: DESTROY = 1
 
 void
 cvSetHistBinRanges(CvHistogram* hist, float** ranges, int uniform=1)
@@ -2433,7 +2454,7 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv::ConvKernel
 void
 cvReleaseStructuringElement(IplConvKernel* &element)
-ALIAS: Cv::ConvKernel::DESTROY = 1
+ALIAS: DESTROY = 1
 
 
 MODULE = Cv	PACKAGE = Cv::Arr
@@ -2839,7 +2860,7 @@ MODULE = Cv	PACKAGE = Cv::HuMoments
 # ====================
 void
 cvReleaseHuMoments(CvHuMoments* hu_moments)
-ALIAS: Cv::HuMoments::DESTROY = 1
+ALIAS: DESTROY = 1
 CODE:
 	safefree(hu_moments);
 	unbless(ST(0));
@@ -2943,7 +2964,7 @@ OUTPUT:
 MODULE = Cv	PACKAGE = Cv::Moments
 void
 cvReleaseMoments(CvMoments* moments)
-ALIAS: Cv::Moments::DESTROY = 1
+ALIAS: DESTROY = 1
 CODE:
 	safefree(moments);
 	unbless(ST(0));
@@ -3242,7 +3263,7 @@ cvSetImagesForHaarClassifierCascade(CvHaarClassifierCascade* cascade, const CvAr
 
 void
 cvReleaseHaarClassifierCascade(CvHaarClassifierCascade* &cascade)
-ALIAS:	Cv::HaarClassifierCascade::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -3326,7 +3347,7 @@ cvConDensInitSampleSet(CvConDensation* condens, CvMat* lower_bound, CvMat* upper
 
 void
 cvReleaseConDensation( CvConDensation*& condens )
-ALIAS: Cv::ConDensation::DESTROY = 1
+ALIAS: DESTROY = 1
 
 
 MODULE = Cv	PACKAGE = Cv::Kalman
@@ -3448,7 +3469,7 @@ OUTPUT:
 MODULE = Cv	PACKAGE = Cv::Kalman
 void
 cvReleaseKalman(CvKalman* &kalman)
-ALIAS: Cv::Kalman::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -3751,7 +3772,7 @@ OUTPUT: RETVAL bless(ST(0), "Cv::Image::Ghost", RETVAL);
 
 void
 cvReleaseCapture(CvCapture* &capture)
-ALIAS:	Cv::Capture::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -3788,7 +3809,7 @@ C_ARGS:	filename, cc, fps, frame_size, is_color
 MODULE = Cv	PACKAGE = Cv::VideoWriter
 void
 cvReleaseVideoWriter(CvVideoWriter* &writer)
-ALIAS: Cv::VideoWriter::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -4168,13 +4189,13 @@ cvRQDecomp3x3(const CvMat *M, CvMat *R, CvMat *Q, CvMat *Qx=NULL, CvMat *Qy=NULL
 #xs# MODULE = Cv	PACKAGE = Cv::POSITObject
 #xs# void
 #xs# cvReleasePOSITObject(CvPOSITObject* &posit_object)
-#xs# ALIAS: Cv::POSITObject::DESTROY = 1
+#xs# ALIAS: DESTROY = 1
 
 
 MODULE = Cv	PACKAGE = Cv::StereoBMState
 void
 cvReleaseStereoBMState(CvStereoBMState* &state)
-ALIAS: Cv::StereoBMState::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -4184,7 +4205,7 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv::StereoGCState
 void 
 cvReleaseStereoGCState(CvStereoGCState* &state)
-ALIAS: Cv::StereoGCState::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 
@@ -4370,7 +4391,7 @@ cvCreateBGCodeBookModel()
 MODULE = Cv	PACKAGE = Cv::BGCodeBookModel
 void
 cvReleaseBGCodeBookModel(CvBGCodeBookModel* &model)
-ALIAS: Cv::BGCodeBookModel::DESTROY = 1
+ALIAS: DESTROY = 1
 POSTCALL:
 	unbless(ST(0));
 

@@ -11,7 +11,7 @@ BEGIN {
 SKIP: {
 	skip('version 2.4.0+', 3)
 		unless Cv->version >= 2.004;
-	skip('can\'t call GetBuildInformation', 2)
+	skip('can\'t call GetBuildInformation', 3)
 		unless Cv->assoc('GetBuildInformation') && Cv->GetBuildInformation;
 	is(scalar Cv->hasModule('core'), 1);
 	is(scalar Cv->hasModule('Core'), 0);

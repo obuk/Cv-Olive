@@ -83,7 +83,7 @@ sub import {
 	}
 	for (grep { defined $auto{$_} } qw(seq more)) {
 		eval "use $auto{$_}";
-		Carp::croak "can't use $auto{$_}; $@" if $@;
+		die "can't use $auto{$_}; $@" if $@;
 	}
 	push(@std, ":std") unless @std;
 	$self->export_to_level(1, $self, @std);
@@ -102,7 +102,7 @@ sub CV_MAJOR_VERSION () { ${[ &CV_VERSION ]}[0] }
 sub CV_MINOR_VERSION () { ${[ &CV_VERSION ]}[1] }
 sub CV_SUBMINOR_VERSION () { ${[ &CV_VERSION ]}[2] }
 
-{ *Version = *version = sub {	shift; goto &cvVersion } }
+{ *Version = *version = sub { shift; goto &cvVersion } }
 
 =over 4
 
@@ -157,7 +157,7 @@ sub Cv::Mat::new {
 	my $type = shift // $self->type;
 	if (@_) {
 		eval "use Cv::More";
-		Cv::croak $@ if $@;
+		die $@ if $@;
 		$self->new($sizes, $type, @_);
 	} else {
 		my ($rows, $cols) = @$sizes; $cols ||= 1;
@@ -172,7 +172,7 @@ sub Cv::MatND::new {
 	my $type = shift // $self->type;
 	if (@_) {
 		eval "use Cv::More";
-		Cv::croak $@ if $@;
+		die $@ if $@;
 		$self->new($sizes, $type, @_);
 	} else {
 		Cv::cvCreateMatND($sizes, $type);
@@ -270,7 +270,7 @@ sub autoload {
 		}
 		Cv::croak $@;
 	}
-	croak "can't call $AUTOLOAD";
+	Cv::croak "can't call $AUTOLOAD";
 }
 
 
@@ -329,6 +329,31 @@ package Cv;
 
 sub is_null { ref $_[0] eq 'SCALAR' && ${$_[0]} == 0 }
 sub is_cvarr { blessed $_[0] && $_[0]->isa('Cv::Arr') }
+
+
+# ============================================================
+#  core. The Core Functionality: Basic Structures
+# ============================================================
+
+package Cv;
+
+sub cvPoint        { [ unpack("i2", pack("i2", @_)) ]; }
+sub cvPoint2D32f   { [ unpack("f2", pack("f2", @_)) ]; }
+sub cvPoint2D64f   { [ unpack("d2", pack("d2", @_)) ]; }
+sub cvPoint3D32f   { [ unpack("f3", pack("f3", @_)) ]; }
+sub cvPoint3D64f   { [ unpack("d3", pack("d3", @_)) ]; }
+sub cvPointFrom32f { cvPoint(@{$_[0]}); }
+sub cvPointTo2D32f { cvPoint2D32f(@{$_[0]}); }
+sub cvPointTo3D32f { cvPoint3D32f(@{$_[0]}); }
+sub cvPointTo3D64f { cvPoint3D64f(@{$_[0]}); }
+sub cvSize         { [ unpack("i2", pack("i2", @_)) ]; }
+sub cvSize2D32f    { [ unpack("f2", pack("f2", @_)) ]; }
+sub cvRect         { [ unpack("i4", pack("i4", @_)) ]; }
+sub cvScalar       { [ unpack("d4", pack("d4", @_)) ]; }
+sub cvScalarAll    { cvScalar(($_[0]) x 4); }
+sub cvRealScalar   { cvScalar($_[0], 0, 0, 0); }
+sub cvTermCriteria { [ unpack("i2d1", pack("i2d1", @_)) ]; }
+sub cvSlice        { [ unpack("i2", pack("i2", @_)) ]; }
 
 
 # ============================================================
@@ -415,6 +440,12 @@ sub GetND {
 	goto &cvGetND;
 }
 
+*Get1D = *Get2D = *Get3D = \&GetND;
+# sub Get1D { GetND($_[0], [$_[1]]) }
+# sub Get2D { GetND($_[0], [@_[1..2]]) }
+# sub Get3D { GetND($_[0], [@_[1..3]]) }
+
+
 { *Set = *set = \&SetND }
 sub SetND {
 	# Set($src, $idx0, $value);
@@ -429,6 +460,11 @@ sub SetND {
 	unshift(@_, $src, $idx, $value);
 	goto &cvSetND;
 }
+
+*Set1D = *Set2D = *Set3D = \&SetND;
+# sub Set1D { SetND($_[0], [$_[1]], $_[2]) }
+# sub Set2D { SetND($_[0], [@_[1..2]], $_[3]) }
+# sub Set3D { SetND($_[0], [@_[1..3]], $_[4]) }
 
 
 sub GetRawData {
@@ -452,6 +488,11 @@ sub GetReal {
 	goto &cvGetRealND;
 }
 
+*GetReal1D = *GetReal2D = *GetReal3D = \&GetReal;
+# sub GetReal1D { GetReal($_[0], [$_[1]]) }
+# sub GetReal2D { GetReal($_[0], [@_[1..2]]) }
+# sub GetReal3D { GetReal($_[0], [@_[1..3]]) }
+
 
 sub SetReal {
 	# SetReal($src, $idx0, $value);
@@ -467,6 +508,11 @@ sub SetReal {
 	push(@_, $value);
 	goto &cvSetRealND;
 }
+
+*SetReal1D = *SetReal2D = *SetReal3D = \&SetReal;
+# sub SetReal1D { SetReal($_[0], [$_[1]], $_[2]) }
+# sub SetReal2D { SetReal($_[0], [@_[1..2]], $_[3]) }
+# sub SetReal3D { SetReal($_[0], [@_[1..3]], $_[4]) }
 
 
 =item *
@@ -491,6 +537,12 @@ sub Ptr {
 	unshift(@_, $src, $idx);
 	goto &cvPtrND;
 }
+
+*Ptr1D = *Ptr2D = *Ptr3D = \&Ptr;
+# sub Ptr1D { Ptr($_[0], [$_[1]], $_[2]) }
+# sub Ptr2D { Ptr($_[0], [@_[1..2]], $_[3]) }
+# sub Ptr3D { Ptr($_[0], [@_[1..3]], $_[4]) }
+
 
 =item *
 

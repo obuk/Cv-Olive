@@ -35,7 +35,7 @@ if ($output) {
 		or die "$0: can't open $output\n";
 }
 
-print STDERR "include: ", join(', ', @ARGV), "\n" if $verbose;
+print STDERR "include: ", join(', ', @ARGV), "\n" if $verbose > 1;
 
 =head1 DESCRIPTION
 
@@ -159,7 +159,7 @@ sub h2ph {
 	while (<H2PH>) {
 		my $ec = s/\brequire\s+\'([^\']+)\'/eval { $& } || eval { require \'opencv\/$1\' }/;
 		print PH;
-		if ($verbose) {
+		if ($verbose > 1) {
 			print PH "warn \"can't $&\" if \$@;\n" if $ec;
 		}
 	}
@@ -201,9 +201,9 @@ package Cv::Constant;
 use 5.008008;
 use strict;
 use warnings;
-use Carp;
+# use Carp;
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 ----
 	;
 }
@@ -215,7 +215,7 @@ sub macros {
 
 sub CV_MAKETYPE {
 	my ($depth, $cn) = @_;
-	croak "CV_MAKETYPE: ?cn" unless $cn >= 1 && $cn <= &CV_CN_MAX;
+	Carp::croak "CV_MAKETYPE: ?cn" unless $cn >= 1 && $cn <= &CV_CN_MAX;
 	(&CV_MAT_DEPTH($depth) + ((($cn)-1) <<  &CV_CN_SHIFT));
 }
 

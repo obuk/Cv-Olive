@@ -5,9 +5,9 @@ package Cv::Constant;
 use 5.008008;
 use strict;
 use warnings;
-use Carp;
+# use Carp;
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 # Following constants were made from OpenCV Version: 2.1.0.
 
@@ -15,7 +15,7 @@ our $VERSION = '0.14';
 
 sub CV_MAKETYPE {
 	my ($depth, $cn) = @_;
-	croak "CV_MAKETYPE: ?cn" unless $cn >= 1 && $cn <= &CV_CN_MAX;
+	Carp::croak "CV_MAKETYPE: ?cn" unless $cn >= 1 && $cn <= &CV_CN_MAX;
 	(&CV_MAT_DEPTH($depth) + ((($cn)-1) <<  &CV_CN_SHIFT));
 }
 

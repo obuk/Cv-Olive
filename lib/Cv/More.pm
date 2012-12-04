@@ -440,10 +440,11 @@ package Cv;
 
 sub GetBuildInformation {
 	ref (my $class = shift) and Cv::croak 'class name needed';
-	our $BuildInformation = '';
+	our $BuildInformation;
 	if (Cv->version >= 2.004) {
-		$BuildInformation ||= cvGetBuildInformation();
+		$BuildInformation //= cvGetBuildInformation();
 	}
+	$BuildInformation //= '';
 	our %BuildInformation = ();
 	unless (%BuildInformation) {
 		for ($BuildInformation) {
