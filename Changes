@@ -1,8 +1,10 @@
 Revision history for Cv.pm
 
-0.19 - 2012-11-29 (working)
+0.19 - 2012-12-08 (working)
      * fixed croak error location in AUTOLOAD relaying at first
      * removed Cv::alias
+     * rewrote callbacks
+     * removed global data in Cv.xs
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl

@@ -73,6 +73,7 @@ sub import {
 	my %auto = (
 		more => 'Cv::More',
 		seq => 'Cv::Seq',
+		highgui => 'Cv::Highgui',
 		);
 	for (@_) {
 		if (/^:no(\w+)$/) {
@@ -81,7 +82,7 @@ sub import {
 			push(@std, $_);
 		}
 	}
-	for (grep { defined $auto{$_} } qw(seq more)) {
+	for (grep { defined $auto{$_} } keys %auto) {
 		eval "use $auto{$_}";
 		die "can't use $auto{$_}; $@" if $@;
 	}
@@ -1716,72 +1717,6 @@ package Cv::Kalman;
 { *Correct = \&KalmanCorrect }
 { *Predict = \&KalmanPredict }
 
-
-# ============================================================
-#  highgui. High-level GUI and Media I/O: User Interface
-# ============================================================
-
-package Cv;
-
-our %MOUSE = ( );
-our %TRACKBAR = ( );
-
-
-package Cv::Arr;
-{ *Show = \&ShowImage }
-
-# ============================================================
-#  highgui. High-level GUI and Media I/O: Reading and Writing Images and Video
-# ============================================================
-
-package Cv::Arr;
-
-sub EncodeImage {
-	$_[2] //= my $params = \0;
-	goto &cvEncodeImage;
-}
-
-package Cv;
-
-sub cvHasGUI {
-	if (fork) {
-		wait;
-		$? == 0;
-	} else {
-		open(STDERR, ">/dev/null");
-		cvNamedWindow("Cv");
-		cvDestroyWindow("Cv");
-		exit(0);
-	}
-}
-
-sub cvHasQt { 0 }
-
-package Cv::Image;
-{ *Load = \&Cv::LoadImage }
-
-package Cv::Mat;
-{ *Load = \&Cv::LoadImageM }
-
-package Cv::Arr;
-{ *Save = \&SaveImage }
-
-package Cv::Capture;
-{ *FromCAM = \&Cv::CaptureFromCAM }
-{ *FromFile = *FromAVI = \&Cv::CaptureFromFile }
-{ *GetProperty = \&GetCaptureProperty }
-{ *Grab = \&GrabFrame }
-{ *Query = \&QueryFrame }
-{ *Retrieve = \&RetrieveFrame }
-{ *SetProperty = \&SetCaptureProperty }
-
-package Cv::VideoWriter;
-{ *new = \&Cv::CreateVideoWriter }
-
-
-# ============================================================
-#  highgui. High-level GUI and Media I/O: Qt new functions
-# ============================================================
 
 # ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera

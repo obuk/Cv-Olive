@@ -18,7 +18,7 @@ extern "C" {
 #undef do_close
 
 #include <opencv/cv.h>
-#include <opencv/highgui.h>
+// #include <opencv/highgui.h>
 
 #define _VERSION(x, y, z) ((((x) * 1000 + (y)) * 1000) + (z))
 #define _CV_VERSION() _VERSION(CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION)
@@ -67,119 +67,6 @@ typedef struct CvCircle {
 #define SvREF0(arg) \
 	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
 
-typedef struct {
-	SV* callback;
-	union {
-		struct trackbar {
-			SV* value;
-			int pos;
-			int lastpos;
-		} t;
-		struct mouse {
-			SV* userdata;
-			int pos;
-			int lastpos;
-		} m;
-	} u;
-} callback_t;
-
-static void delete_callback(AV* av)
-{
-	SV* sv;
-	while ((sv = av_shift(av)) && sv != &PL_sv_undef) {
-		callback_t* callback = INT2PTR(callback_t*, SvIV(sv));
-		if (callback) {
-			if (callback->callback) SvREFCNT_dec(callback->callback);
-			if (callback->u.t.value) SvREFCNT_dec(callback->u.t.value);
-			safefree(callback);
-		} else {
-			croak("callback is 0");
-		}
-		// SvREFCNT_dec(sv);
-	}
-	// SvREFCNT_dec((SV*)av);
-}
-
-static void delete_all_callback(const char* hash)
-{
-	HV* hv = get_hv(hash, 0);
-	if (hv) { HE* he;
-		hv_iterinit(hv);
-		while (he = hv_iternext(hv)) {
-			SV* sv = hv_iterval(hv, he);
-			delete_callback((AV*)SvRV(sv));
-		}
-		// hv_clear(hv);
-		hv_undef(hv);
-	}
-}
-
-static void delete_win_callback(const char* key, const char* hash)
-{
-	HV* hv = get_hv(hash, 0);
-	if (hv) {
-		SV* sv = hv_delete(hv, key, strlen(key), 0);
-		if (sv && SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
-			delete_callback((AV*)SvRV(sv));
-		}
-	}
-}
-
-static void cb_trackbar(int pos)
-{
-	HV* Cv_TRACKBAR = get_hv("Cv::TRACKBAR", 0);
-	if (Cv_TRACKBAR) { HE* he;
-		hv_iterinit(Cv_TRACKBAR);
-		while (he = hv_iternext(Cv_TRACKBAR)) {
-			SV* sv = hv_iterval(Cv_TRACKBAR, he);
-			AV* av = (AV*)SvRV(sv);
-			int i, n = av_len(av);
-			for (i = 0; i <= n; i++) {
-				SV* sv = *av_fetch(av, i, 0);
-				callback_t* p = INT2PTR(callback_t*, SvIV(sv));
-				if (p && p->u.t.pos != p->u.t.lastpos) {
-					p->u.t.lastpos = p->u.t.pos;
-					if (p->u.t.value) sv_setiv(p->u.t.value, p->u.t.pos);
-					if (p->callback) {
-						dSP;
-						ENTER;
-						SAVETMPS;
-						PUSHMARK(SP);
-						XPUSHs(sv_2mortal(newSViv(p->u.t.pos)));
-						PUTBACK;
-						call_sv(p->callback, G_EVAL|G_DISCARD);
-						FREETMPS;
-						LEAVE;
-					}
-				}
-			}
-		}
-	}
-}
-
-/* CvMouseCallback */
-
-static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
-{
-	callback_t *p = (callback_t*)userdata;
-	if (p && p->callback) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		EXTEND(SP, 5);
-		PUSHs(sv_2mortal(newSViv(event)));
-		PUSHs(sv_2mortal(newSViv(x)));
-		PUSHs(sv_2mortal(newSViv(y)));
-		PUSHs(sv_2mortal(newSViv(flags)));
-		PUSHs(p->u.m.userdata? p->u.m.userdata : &PL_sv_undef);
-		PUTBACK;
-		call_sv(p->callback, G_EVAL|G_DISCARD);
-		FREETMPS;
-		LEAVE;
-	}
-}
-
 #if _CV_VERSION() >= _VERSION(2,0,0)
 #ifdef __cplusplus
 void cv::error(const Exception& exc)
@@ -194,6 +81,7 @@ void cv::error(const Exception& exc)
 	IV mode = 0;
 	SV* userdata = &PL_sv_undef;
 	HV* Cv_ERROR = get_hv("Cv::ERROR", 0);
+	// fprintf(stderr, "%s(%d): cv::error\n", __FILE__, __LINE__);
 	if (Cv_ERROR) { SV** q;
 		hv_store(Cv_ERROR, "status", 6, newSViv(status), 0);
 		if ((q = hv_fetch(Cv_ERROR, "handler", 7, 0)) &&
@@ -3303,6 +3191,8 @@ cvSnakeImage(const IplImage* image, CvPoint* points, int length, float* alpha, f
 void
 cvUpdateMotionHistory(const CvArr* silhouette, CvArr* mhi, double timestamp, double duration)
 
+#if WITH_HIGHGUI
+
 # ============================================================
 #  highgui. High-level GUI and Media I/O: User Interface
 # ============================================================
@@ -3694,6 +3584,7 @@ cvLoadWindowParameters(const char* name)
 
 #endif /* WITH_QT */
 
+#endif /* WITH_HIGHGUI */
 
 # ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera

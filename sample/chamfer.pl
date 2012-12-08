@@ -53,6 +53,11 @@ use Inline C => << '----';
 #endif
 #include <opencv/cvaux.h>
 
+#ifdef __cplusplus
+using namespace cv;
+using namespace std;
+#endif
+
 MODULE = Cv	PACKAGE = Cv::Arr
 
 int

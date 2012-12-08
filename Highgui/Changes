@@ -1,0 +1,6 @@
+Revision history for Perl extension Cv::Highgui.
+
+0.01  Sat Dec  8 10:35:50 2012
+	- original version; created by h2xs 1.23 with options
+		-An Cv::Highgui
+

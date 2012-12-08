@@ -96,6 +96,9 @@ WriteMakefile(
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
 	INC => "-I. -I..",
+	DIR => [
+		qw(Highgui),
+	],
 	clean => {
 		FILES => [
 			'_Inline', 'cover_db',

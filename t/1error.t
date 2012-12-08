@@ -2,7 +2,7 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 26;
+use Test::More tests => 27;
 
 BEGIN {
 	use_ok('Cv', qw(:nomore));
@@ -35,6 +35,9 @@ SKIP: {
 	$can_hook = 0 if $^O eq 'cygwin';
 	Cv->setErrMode(0);
 	skip("can't hook cv:error", 25) unless $can_hook;
+
+	$line = __LINE__; eval { Cv->LoadImage };
+	err_is("Usage: Cv::cvLoadImage(filename, iscolor=CV_LOAD_IMAGE_COLOR)");
 
 	my $err;
 	sub myerror {
