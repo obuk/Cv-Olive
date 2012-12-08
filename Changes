@@ -5,6 +5,7 @@ Revision history for Cv.pm
      * removed Cv::alias
      * rewrote callbacks
      * removed global data in Cv.xs
+     * separating Highgui
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl
