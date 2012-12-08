@@ -27,6 +27,14 @@ XSLoader::load('Cv::Highgui', $VERSION);
 
 # Preloaded methods go here.
 
+package Cv::Capture;
+
+{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
+
+package Cv::VideoWriter;
+
+{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
+
 # ============================================================
 #  highgui. High-level GUI and Media I/O: User Interface
 # ============================================================
