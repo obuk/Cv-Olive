@@ -73,7 +73,6 @@ use Inline C => << '----';
 #define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 #include <opencv/cvaux.h>
-#include "typemap.h"
 
 void drawOptFlowMap(const CvMat* flow, CvMat* cflowmap,
 					int step, double scale, CvScalar color)

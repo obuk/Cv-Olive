@@ -35,7 +35,7 @@ package Cv;
 use 5.008008;
 use strict;
 use warnings;
-use Carp qw();
+use Carp;
 use Scalar::Util qw(blessed);
 use warnings::register;
 
@@ -89,12 +89,6 @@ sub import {
 	$self->export_to_level(1, $self, @std);
 }
 
-sub croak {
-	chomp(my ($e) = join('', @_));
-	$e =~ s/\s*(in|file|line|at) .*$//;
-	@_ = ($e);
-	goto &Carp::croak;
-}
 
 sub DESTROY { }
 
@@ -268,9 +262,12 @@ sub autoload {
 			eval { &$code };
 			return unless $@;
 		}
-		Cv::croak $@;
+		local $_ = $@;
+		s/\s+at \S+ line \S+\n?$//;
+		# Carp::croak $@;
+		Carp::croak $_;
 	}
-	Cv::croak "can't call $AUTOLOAD";
+	Carp::croak "can't call $AUTOLOAD";
 }
 
 
@@ -1206,6 +1203,46 @@ the error, and you can also redirect to your own error hander.
 
 =cut
 
+our %ERROR = (
+	handler => undef,
+    handler_sample => sub {
+		local $Carp::CarpInternal{Cv} = 1;
+		my ($status, $func_name, $err_msg, $file_name, $line) = @_;
+		Carp::croak("$func_name: @{[ cvErrorStr($status) ]} ($err_msg)");
+    },
+    mode => 0,
+	status => undef,
+    userdata => undef,
+    );
+
+# CvErrorCallback cvRedirectError(
+#  CvErrorCallback error_handler, void* userdata=NULL, void** prevUserdata=NULL)
+sub cvRedirectError {
+	my $handler; ($handler, $_[2]) = ($ERROR{handler}, $ERROR{userdata});
+	($ERROR{handler}, $ERROR{userdata}) = @_[0..1];
+	$handler;
+}
+
+sub cvGetErrStatus {
+	$ERROR{status};
+}
+
+sub cvSetErrStatus {
+	my $status = $ERROR{status};
+	($ERROR{status}) = @_;
+	$status;
+}
+
+sub cvGetErrMode {
+	$ERROR{mode};
+}
+
+sub cvSetErrMode {
+	my $mode = $ERROR{mode};
+	($ERROR{mode}) = @_;
+	$mode;
+}
+
 
 # ============================================================
 #  imgproc. Image Processing: Histograms
@@ -1683,6 +1720,12 @@ package Cv::Kalman;
 # ============================================================
 #  highgui. High-level GUI and Media I/O: User Interface
 # ============================================================
+
+package Cv;
+
+our %MOUSE = ( );
+our %TRACKBAR = ( );
+
 
 package Cv::Arr;
 { *Show = \&ShowImage }

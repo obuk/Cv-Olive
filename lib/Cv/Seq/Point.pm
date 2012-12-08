@@ -14,7 +14,7 @@ our @ISA = qw(Cv::Seq);
 
 { *new = \&CreateSeq }
 sub CreateSeq {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	$class->SUPER::new(@_);
 }
 
@@ -67,7 +67,7 @@ sub Unshift {
 
 
 sub MakeSeqHeaderForArray {
-	ref (my $class = CORE::shift) and Cv::croak 'class name needed';
+	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
 	$class->SUPER::MakeSeqHeaderForArray(@_);
 }
 

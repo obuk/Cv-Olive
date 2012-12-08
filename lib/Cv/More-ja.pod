@@ -262,6 +262,11 @@ import() と unimport() でごまかすことに、、、
   Cv::More->unimport(qw(cs));
 
 
+=head2 エラー処理
+
+  Cv->setErrMode(1);
+
+
 =head2 追加または拡張したメソッド
 
 =head3 Perlの配列を使うメソッド

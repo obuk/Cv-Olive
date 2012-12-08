@@ -1,7 +1,5 @@
 /* -*- mode: text; coding: utf-8; tab-width: 4 -*- */
 
-/* #include "xlib/xs.h" */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,78 +40,129 @@ extern "C" {
 #  endif
 #endif
 
-#include "typemap.h"
+#ifdef __cplusplus
+#  if CV_MAJOR_VERSION >= 2
+using namespace cv;
+using namespace std;
+#  endif
+#endif
+
+typedef char tiny;
+#define VOID void
+#define CvWindow void
+
+typedef struct CvCircle {
+	CvPoint2D32f center;
+	float radius;
+} CvCircle;
+
 
 #define DIM(x) (sizeof(x)/sizeof((x)[0]))
 
 #define length(x) length_ ## x
-#define VOID void
+
 #define bless(st0, class, retval) \
     sv_setref_pv(st0 = sv_newmortal(), class, (void*)retval);
 
 #define SvREF0(arg) \
 	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
 
-/* Global Data */
-#define MY_CXT_KEY "Cv::_guts" XS_VERSION
-
 typedef struct {
 	SV* callback;
-	SV* value;
-	int pos;
-	int lastpos;
-} trackbar_t;
+	union {
+		struct trackbar {
+			SV* value;
+			int pos;
+			int lastpos;
+		} t;
+		struct mouse {
+			SV* userdata;
+			int pos;
+			int lastpos;
+		} m;
+	} u;
+} callback_t;
 
-typedef struct {
-	AV* cb_trackbar_list;
-	SV* cb_mouse;
-	SV* mouseUserdata;
-	SV* cb_error;
-	SV* errorUserdata;
-	int errorMode;
-	int errorStatus;
-} my_cxt_t;
+static void delete_callback(AV* av)
+{
+	SV* sv;
+	while ((sv = av_shift(av)) && sv != &PL_sv_undef) {
+		callback_t* callback = INT2PTR(callback_t*, SvIV(sv));
+		if (callback) {
+			if (callback->callback) SvREFCNT_dec(callback->callback);
+			if (callback->u.t.value) SvREFCNT_dec(callback->u.t.value);
+			safefree(callback);
+		} else {
+			croak("callback is 0");
+		}
+		// SvREFCNT_dec(sv);
+	}
+	// SvREFCNT_dec((SV*)av);
+}
 
-START_MY_CXT
+static void delete_all_callback(const char* hash)
+{
+	HV* hv = get_hv(hash, 0);
+	if (hv) { HE* he;
+		hv_iterinit(hv);
+		while (he = hv_iternext(hv)) {
+			SV* sv = hv_iterval(hv, he);
+			delete_callback((AV*)SvRV(sv));
+		}
+		// hv_clear(hv);
+		hv_undef(hv);
+	}
+}
 
-/* CvTrackbarCallback */
+static void delete_win_callback(const char* key, const char* hash)
+{
+	HV* hv = get_hv(hash, 0);
+	if (hv) {
+		SV* sv = hv_delete(hv, key, strlen(key), 0);
+		if (sv && SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
+			delete_callback((AV*)SvRV(sv));
+		}
+	}
+}
 
 static void cb_trackbar(int pos)
 {
-	dMY_CXT;
-	SV* t; AV *tmp = newAV();
-	while ((t = av_shift(MY_CXT.cb_trackbar_list)) && t != &PL_sv_undef) {
-		MAGIC* mg = mg_find(t, PERL_MAGIC_ext);
-		trackbar_t* p = (trackbar_t*)mg->mg_obj;
-		av_push(tmp, t);
-		if (p && p->pos != p->lastpos) {
-			p->lastpos = p->pos;
-			if (p->value) sv_setiv(p->value, p->pos);
-			if (p->callback) {
-				dSP;
-				ENTER;
-				SAVETMPS;
-				PUSHMARK(SP);
-				XPUSHs(sv_2mortal(newSViv(p->pos)));
-				PUTBACK;
-				call_sv(p->callback, G_EVAL|G_DISCARD);
-				FREETMPS;
-				LEAVE;
+	HV* Cv_TRACKBAR = get_hv("Cv::TRACKBAR", 0);
+	if (Cv_TRACKBAR) { HE* he;
+		hv_iterinit(Cv_TRACKBAR);
+		while (he = hv_iternext(Cv_TRACKBAR)) {
+			SV* sv = hv_iterval(Cv_TRACKBAR, he);
+			AV* av = (AV*)SvRV(sv);
+			int i, n = av_len(av);
+			for (i = 0; i <= n; i++) {
+				SV* sv = *av_fetch(av, i, 0);
+				callback_t* p = INT2PTR(callback_t*, SvIV(sv));
+				if (p && p->u.t.pos != p->u.t.lastpos) {
+					p->u.t.lastpos = p->u.t.pos;
+					if (p->u.t.value) sv_setiv(p->u.t.value, p->u.t.pos);
+					if (p->callback) {
+						dSP;
+						ENTER;
+						SAVETMPS;
+						PUSHMARK(SP);
+						XPUSHs(sv_2mortal(newSViv(p->u.t.pos)));
+						PUTBACK;
+						call_sv(p->callback, G_EVAL|G_DISCARD);
+						FREETMPS;
+						LEAVE;
+					}
+				}
 			}
 		}
 	}
-	while ((t = av_shift(tmp)) && t != &PL_sv_undef) {
-		av_push(MY_CXT.cb_trackbar_list, t);
-	}
-	SvREFCNT_dec((SV*)tmp);
 }
 
 /* CvMouseCallback */
 
 static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 {
-	dMY_CXT;
-    if (MY_CXT.cb_mouse) {
+	callback_t *p = (callback_t*)userdata;
+	if (p && p->callback) {
 		dSP;
 		ENTER;
 		SAVETMPS;
@@ -123,64 +172,69 @@ static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 		PUSHs(sv_2mortal(newSViv(x)));
 		PUSHs(sv_2mortal(newSViv(y)));
 		PUSHs(sv_2mortal(newSViv(flags)));
-		PUSHs(userdata? (SV*)userdata : &PL_sv_undef);
+		PUSHs(p->u.m.userdata? p->u.m.userdata : &PL_sv_undef);
 		PUTBACK;
-		call_sv(MY_CXT.cb_mouse, G_EVAL|G_DISCARD);
+		call_sv(p->callback, G_EVAL|G_DISCARD);
 		FREETMPS;
 		LEAVE;
 	}
 }
-
-/* CvErrorCallback */
-static int cb_error(int status, const char* func_name, const char* err_msg,
-					const char* file_name, int line, VOID* userdata)  {
-	dMY_CXT;
-    if (MY_CXT.cb_error) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		EXTEND(SP, 6);
-		PUSHs(sv_2mortal(newSViv(status)));
-		PUSHs(sv_2mortal(newSVpvn(func_name, strlen(func_name))));
-		PUSHs(sv_2mortal(newSVpvn(err_msg, strlen(err_msg))));
-		PUSHs(sv_2mortal(newSVpvn(file_name, strlen(file_name))));
-		PUSHs(sv_2mortal(newSViv(line)));
-		PUSHs(userdata? (SV*)userdata : &PL_sv_undef);
-		PUTBACK;
-		call_sv((SV*)SvRV(MY_CXT.cb_error), G_EVAL|G_DISCARD);
-		FREETMPS;
-		LEAVE;
-	}
-	return 0;
-}
-
 
 #if _CV_VERSION() >= _VERSION(2,0,0)
 #ifdef __cplusplus
 void cv::error(const Exception& exc)
 {
-    dMY_CXT;
-    MY_CXT.errorStatus = exc.code;
-    if (MY_CXT.errorMode == 0 || MY_CXT.errorMode == 1) {
-        if (MY_CXT.cb_error) {
-            cb_error(
-                exc.code,
-                exc.func.size() > 0 ? exc.func.c_str() : "unknown function",
-                exc.err.c_str(),
-                exc.file.c_str(),
-                exc.line,
-                MY_CXT.errorUserdata
-                );
-        }
-        if (MY_CXT.errorMode == 0) {
-            const char* errorStr = cvErrorStr(exc.code);
-            croak("OpenCV Error: %s (%s) in %s, file %s, line %d",
-                  errorStr, exc.err.c_str(),
-                  exc.func.size() > 0 ? exc.func.c_str() : "unknown function",
-                  exc.file.c_str(), exc.line);
-        }
-    }
+	int status = exc.code;
+	const char* func_name = exc.func.size() > 0 ?
+		exc.func.c_str() : "unknown function";
+	const char* err_msg = exc.err.c_str();
+	const char* file_name = exc.file.c_str();
+	int line = exc.line;
+	SV* handler = (SV*)0;
+	IV mode = 0;
+	SV* userdata = &PL_sv_undef;
+	HV* Cv_ERROR = get_hv("Cv::ERROR", 0);
+	if (Cv_ERROR) { SV** q;
+		hv_store(Cv_ERROR, "status", 6, newSViv(status), 0);
+		if ((q = hv_fetch(Cv_ERROR, "handler", 7, 0)) &&
+			SvROK(*q) && SvTYPE(SvRV(*q)) == SVt_PVCV) {
+			handler = *q;
+		}
+		if ((q = hv_fetch(Cv_ERROR, "mode", 4, 0)) && SvIOK(*q)) {
+			mode = SvIV(*q);
+		}
+		if ((q = hv_fetch(Cv_ERROR, "userdata", 8, 0)) && SvOK(*q)) {
+			userdata = *q;
+		}
+		if (handler && (mode == 0 || mode == 1)) {
+			dSP;
+			ENTER;
+			SAVETMPS;
+			PUSHMARK(SP);
+			EXTEND(SP, 6);
+			PUSHs(sv_2mortal(newSViv(status)));
+			PUSHs(sv_2mortal(newSVpvn(func_name, strlen(func_name))));
+			PUSHs(sv_2mortal(newSVpvn(err_msg, strlen(err_msg))));
+			PUSHs(sv_2mortal(newSVpvn(file_name, strlen(file_name))));
+			PUSHs(sv_2mortal(newSViv(line)));
+			PUSHs(userdata);
+			PUTBACK;
+			call_sv(handler, G_EVAL|G_DISCARD);
+			FREETMPS;
+			LEAVE;
+		}
+	}
+	if (mode == 0) {
+		int original = 0;
+		if (original) {
+			const char* fmt = "OpenCV Error: %s (%s) in %s, file %s, line %d";
+			Perl_croak(aTHX_ fmt, cvErrorStr(exc.code), err_msg,
+				file_name, line);
+		} else {
+			const char* fmt = "OpenCV Error: %s (%s)";
+			Perl_croak(aTHX_ fmt, cvErrorStr(exc.code), err_msg);
+		}
+	}
 }
 #endif
 #endif
@@ -215,19 +269,6 @@ static SV *unbless(SV * rv)
     SvUNMAGIC(sv);
 #endif
     return rv;
-}
-
-static AV* useAV(SV* sv)
-{
-	AV* av;
-	if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
-		av = (AV*)SvRV(sv);
-		av_clear(av);
-	} else {
-		av = newAV();
-		sv_setsv(sv, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
-	}
-	return av;
 }
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
@@ -273,61 +314,6 @@ MODULE = Cv	PACKAGE = Cv
 # ============================================================
 #  core. The Core Functionality: Basic Structures
 # ============================================================
-
-=xxx
-
-CvPoint
-cvPoint(int x, int y)
-
-CvPoint
-cvPointFrom32f(CvPoint2D32f pt)
-
-CvPoint2D32f
-cvPoint2D32f(float x, float y)
-
-CvPoint2D32f
-cvPointTo32f(CvPoint point)
-
-CvPoint3D32f
-cvPoint3D32f(float x, float y, float z)
-
-CvPoint2D64f
-cvPoint2D64f(double x, double y)
-
-CvPoint2D64f
-cvPointTo64f(CvPoint point)
-CODE:
-	RETVAL.x = point.x;
-	RETVAL.y = point.y;
-OUTPUT:
-	RETVAL
-
-CvPoint3D64f
-cvPoint3D64f(double x, double y, double z)
-
-CvSize
-cvSize(int width, int height)
-
-CvSize2D32f
-cvSize2D32f(float width, float height)
-
-CvRect
-cvRect(int x, int y, int width, int height)
-
-CvScalar
-cvScalar(double val0, double val1=0, double val2=0, double val3=0)
-
-CvScalar
-cvScalarAll(double val0123);
-
-CvScalar
-cvRealScalar(double val0)
-
-CvTermCriteria
-cvTermCriteria(int type, int max_iter, double epsilon)
-
-=cut
-
 
 MODULE = Cv	PACKAGE = Cv::Mat
 # ====================
@@ -711,18 +697,9 @@ POSTCALL:
 	ST(0) = ST(5);
 	XSRETURN(1);
 
-=xxx
-
-CvScalar
-cvGet1D(const CvArr* arr, int idx0)
-
-CvScalar
-cvGet2D(const CvArr* arr, int idx0, int idx1)
-
-CvScalar
-cvGet3D(const CvArr* arr, int idx0, int idx1, int idx2)
-
-=cut
+#PERL# CvScalar cvGet1D(const CvArr* arr, int idx0)
+#PERL# CvScalar cvGet2D(const CvArr* arr, int idx0, int idx1)
+#PERL# CvScalar cvGet3D(const CvArr* arr, int idx0, int idx1, int idx2)
 
 CvScalar
 cvGetND(const CvArr* arr, int* idx)
@@ -816,18 +793,9 @@ CODE:
 	SvPOK_on(data);
 	SvREADONLY_on(data); // XXXXX
 
-=xxx
-
-double
-cvGetReal1D(const CvArr* arr, int idx0)
-
-double
-cvGetReal2D(const CvArr* arr, int idx0, int idx1)
-
-double
-cvGetReal3D(const CvArr* arr, int idx0, int idx1, int idx2)
-
-=cut
+#PERL# double cvGetReal1D(const CvArr* arr, int idx0)
+#PERL# double cvGetReal2D(const CvArr* arr, int idx0, int idx1)
+#PERL# double cvGetReal3D(const CvArr* arr, int idx0, int idx1, int idx2)
 
 double
 cvGetRealND(const CvArr* arr, int* idx)
@@ -1007,45 +975,9 @@ POSTCALL:
 	ST(0) = ST(1);
 	XSRETURN(1);
 
-=xxx
-
-SV *
-cvPtr1D(const CvArr* arr, int idx0, type = NO_INIT)
-INPUT:
-	int &type = NO_INIT
-CODE:
-	uchar* s = cvPtr1D(arr, idx0, &type);
-	int n = cvGetDimSize(arr, 0);
-	if (items >= 3) sv_setiv(ST(2), type);
-	RETVAL = newSVpvn_ro((const char*)s, n*CV_ELEM_SIZE(type));
-OUTPUT:
-	RETVAL
-
-SV *
-cvPtr2D(const CvArr* arr, int idx0, int idx1, type = NO_INIT)
-INPUT:
-	int &type = NO_INIT
-CODE:
-	uchar* s = cvPtr2D(arr, idx0, idx1, &type);
-	int n = cvGetDimSize(arr, 0);
-	if (items >= 4) sv_setiv(ST(3), type);
-	RETVAL = newSVpvn_ro((const char*)s, n*CV_ELEM_SIZE(type));
-OUTPUT:
-	RETVAL
-
-SV *
-cvPtr3D(const CvArr* arr, int idx0, int idx1, int idx2, type = NO_INIT)
-INPUT:
-	int &type = NO_INIT
-CODE:
-	uchar* s = cvPtr3D(arr, idx0, idx1, idx2, &type);
-	int n = cvGetDimSize(arr, 0);
-	if (items >= 5) sv_setiv(ST(4), type);
-	RETVAL = newSVpvn_ro((const char*)s, n*CV_ELEM_SIZE(type));
-OUTPUT:
-	RETVAL
-
-=cut
+#PERL# uchar* cvPtr1D(const CvArr* arr, int idx0, int* type=NULL)
+#PERL# uchar* cvPtr2D(const CvArr* arr, int idx0, int idx1, int* type=NULL)
+#PERL# uchar* cvPtr3D(const CvArr* arr, int idx0, int idx1, int idx2, int* type=NULL)
 
 SV *
 cvPtrND(const CvArr* arr, int* idx, type = NO_INIT, int createNode = 1, unsigned precalcHashval = NO_INIT)
@@ -1188,24 +1120,9 @@ ALIAS: cvFill = 1
 POSTCALL:
 	XSRETURN(1);
 
-=xxx
-
-void
-cvSet1D(CvArr* arr, int idx0, CvScalar value)
-POSTCALL:
-	XSRETURN(1);
-
-void
-cvSet2D(CvArr* arr, int idx0, int idx1, CvScalar value)
-POSTCALL:
-	XSRETURN(1);
-
-void
-cvSet3D(CvArr* arr, int idx0, int idx1, int idx2, CvScalar value)
-POSTCALL:
-	XSRETURN(1);
-
-=cut
+#PERL# void cvSet1D(CvArr* arr, int idx0, CvScalar value)
+#PERL# void cvSet2D(CvArr* arr, int idx0, int idx1, CvScalar value)
+#PERL# void cvSet3D(CvArr* arr, int idx0, int idx1, int idx2, CvScalar value)
 
 void
 cvSetND(CvArr* arr, int* idx, CvScalar value)
@@ -1224,24 +1141,9 @@ cvSetIdentity(CvArr* mat, CvScalar value=cvRealScalar(1))
 POSTCALL:
 	XSRETURN(1);
 
-=xxx
-
-void
-cvSetReal1D(CvArr* arr, int idx0, double value)
-POSTCALL:
-	XSRETURN(1);
-
-void
-cvSetReal2D(CvArr* arr, int idx0, int idx1, double value)
-POSTCALL:
-	XSRETURN(1);
-
-void
-cvSetReal3D(CvArr* arr, int idx0, int idx1, int idx2, double value)
-POSTCALL:
-	XSRETURN(1);
-
-=cut
+#PERL# void cvSetReal1D(CvArr* arr, int idx0, double value)
+#PERL# void cvSetReal2D(CvArr* arr, int idx0, int idx1, double value)
+#PERL# void cvSetReal3D(CvArr* arr, int idx0, int idx1, int idx2, double value)
 
 void
 cvSetRealND(CvArr* arr, int* idx, double value)
@@ -1730,13 +1632,7 @@ cvSeqSlice(const CvSeq* seq, CvSlice slice, CvMemStorage* storage=NULL, int copy
 
 MODULE = Cv	PACKAGE = Cv
 
-=xxx
-
-CvSlice
-cvSlice(int start_index, int end_index)
-
-=cut
-
+#PERL# CvSlice cvSlice(int start_index, int end_index)
 
 MODULE = Cv	PACKAGE = Cv::Arr
 int
@@ -2126,93 +2022,17 @@ OUTPUT:
 MODULE = Cv	PACKAGE = Cv
 # ====================
 
-int
-cvGetErrStatus()
-CODE:
-#ifdef __cplusplus
-	dMY_CXT;
-	RETVAL = MY_CXT.errorStatus;
-#else
-	RETVAL = cvGetErrStatus();
-#endif
-OUTPUT:
-	RETVAL
-
-int
-cvSetErrStatus(int status)
-CODE:
-#ifdef __cplusplus
-	dMY_CXT;
-	RETVAL = MY_CXT.errorStatus;
-	MY_CXT.errorStatus = status;
-#else
-	RETVAL = cvGetErrStatus();
-	cvSetErrStatus(status);
-#endif
-OUTPUT:
-	RETVAL
-
-int
-cvGetErrMode()
-CODE:
-#ifdef __cplusplus
-	dMY_CXT;
-	RETVAL = MY_CXT.errorMode;
-#else
-	RETVAL = cvGetErrMode();
-#endif
-OUTPUT:
-	RETVAL
-
-int
-cvSetErrMode(int mode)
-CODE:
-#ifdef __cplusplus
-	dMY_CXT;
-	RETVAL = MY_CXT.errorMode;
-	MY_CXT.errorMode = mode;
-#else
-	RETVAL = cvSetErrMode(mode);
-#endif
-OUTPUT:
-	RETVAL
+#PERL# int cvGetErrStatus(void)
+#PERL# void cvSetErrStatus(int status)
+#PERL# int cvGetErrMode(void)
+#PERL# int cvSetErrMode(int mode)
+#PERL# CvErrorCallback cvRedirectError(CvErrorCallback error_handler, void* userdata=NULL, void** prevUserdata=NULL)
 
 void
 cvError(int status, const char* func_name, const char* err_msg, const char* filename, int line)
 
 const char*
 cvErrorStr(int status)
-
-SV*
-cvRedirectError(SV* error_handler, SV* userdata = NO_INIT, SV* prevUserdata = NO_INIT)
-INIT:
-	if (items <= 1) userdata = (SV*)0;
-CODE:
-	if (!SvROK(error_handler)) XSRETURN_UNDEF;
-	if (SvTYPE(SvRV(error_handler)) != SVt_PVCV) XSRETURN_UNDEF;
-	dMY_CXT;
-	if (MY_CXT.cb_error) {
-		I32 gimme = GIMME_V;
-		if (gimme != G_VOID) {
-			ST(0) = MY_CXT.cb_error;
-		} else {
-			SvREFCNT_dec(MY_CXT.cb_error);
-		}
-	} else {
-		ST(0) = &PL_sv_undef;
-	}
-	MY_CXT.cb_error = error_handler;
-	if (MY_CXT.cb_error) SvREFCNT_inc(MY_CXT.cb_error);
-	if (MY_CXT.errorUserdata) {
-		if (items == 3) {
-			sv_setsv(ST(2), MY_CXT.errorUserdata);
-		} else {
-			SvREFCNT_dec(MY_CXT.errorUserdata);
-		}
-	}
-	MY_CXT.errorUserdata = userdata;
-	if (MY_CXT.errorUserdata) SvREFCNT_inc(MY_CXT.errorUserdata);
-	cvRedirectError(&cb_error, (VOID*)userdata, NULL);
 
 #TBD# int cvNulDevReport(int status, const char* func_name, const char* err_msg, const char* file_name, int line, VOID* userdata)
 #TBD# int cvStdErrReport(int status, const char* func_name, const char* err_msg, const char* file_name, int line, VOID* userdata)
@@ -3483,7 +3303,6 @@ cvSnakeImage(const IplImage* image, CvPoint* points, int length, float* alpha, f
 void
 cvUpdateMotionHistory(const CvArr* silhouette, CvArr* mhi, double timestamp, double duration)
 
-
 # ============================================================
 #  highgui. High-level GUI and Media I/O: User Interface
 # ============================================================
@@ -3496,26 +3315,41 @@ cvConvertImage(const CvArr* src, CvArr* dst, int flags=0)
 MODULE = Cv	PACKAGE = Cv
 int
 cvCreateTrackbar(const char* trackbarName, const char* windowName, SV* value, int count, SV* onChange = NULL)
-CODE:
+PREINIT:
+	callback_t* callback; 
+	HV* Cv_TRACKBAR;
+	SV** q; AV* av; SV* sv;
+INIT:
+	if (!(Cv_TRACKBAR = get_hv("Cv::TRACKBAR", 0))) {
+		croak("Cv::cvCreateTrackbar: can't get %Cv::TRACKBAR");
+	}
 	RETVAL = -1;
-	trackbar_t* trackbar; Newx(trackbar, 1, trackbar_t);
-	trackbar->callback = 0;
+CODE:
+	Newx(callback, 1, callback_t);
+	callback->callback = 0;
 	if (onChange && SvROK(onChange) && SvTYPE(SvRV(onChange)) == SVt_PVCV) {
-		SvREFCNT_inc(trackbar->callback = (SV*)SvRV(onChange));
+		SvREFCNT_inc(callback->callback = (SV*)SvRV(onChange));
 	}
-	trackbar->value = 0;
-	trackbar->lastpos = trackbar->pos = 0;
+	callback->u.t.value = 0;
+	callback->u.t.lastpos = callback->u.t.pos = 0;
 	if (SvOK(value) && SvTYPE(value) == SVt_IV) {
-		SvREFCNT_inc(trackbar->value = value);
-		trackbar->lastpos = trackbar->pos = SvIV(value);
-		RETVAL = cvCreateTrackbar(trackbarName,	windowName,
-					&trackbar->pos, count, cb_trackbar);
-		sv_magic(value, NULL, PERL_MAGIC_ext, windowName, strlen(windowName)+1);
-		mg_find(value, PERL_MAGIC_ext)->mg_obj = (SV*) trackbar;
-		dMY_CXT; av_push(MY_CXT.cb_trackbar_list, value);
-	} else {
-		safefree(trackbar);
+		SvREFCNT_inc(callback->u.t.value = value);
+		callback->u.t.lastpos = callback->u.t.pos = SvIV(value);
 	}
+	RETVAL = cvCreateTrackbar(trackbarName,	windowName,
+				&callback->u.t.pos, count, cb_trackbar);
+	q = hv_fetch(Cv_TRACKBAR, windowName, strlen(windowName), 0);
+	if (q && SvROK(*q) && SvTYPE(SvRV(*q)) == SVt_PVAV) { SV* sv;
+		av = (AV*)SvRV(*q);
+		// delete_trackbar(av);
+	} else if (!q) {
+		av = newAV();
+		hv_store(Cv_TRACKBAR, windowName, strlen(windowName),
+			newRV_inc(sv_2mortal((SV*)av)), 0);
+	} else {
+		croak("Cv::cvCreateTrackbar: Cv::TRACKBAR was broken");
+	}
+	av_push(av, newSViv(PTR2IV(callback)));
 OUTPUT:
 	RETVAL
 
@@ -3523,53 +3357,26 @@ void
 cvDestroyAllWindows()
 CODE:
 	cvDestroyAllWindows();
-	dMY_CXT; SV* t;
-	while ((t = av_shift(MY_CXT.cb_trackbar_list)) && t != &PL_sv_undef) {
-		MAGIC* mg = mg_find(t, PERL_MAGIC_ext);
-		trackbar_t* trackbar = (trackbar_t*)mg->mg_obj;
-		if (trackbar) {
-			if (trackbar->callback) SvREFCNT_dec(trackbar->callback);
-			if (trackbar->value) SvREFCNT_dec(trackbar->value);
-		}
-		SvREFCNT_dec((SV*)mg->mg_obj);
-		sv_unmagic(t, PERL_MAGIC_ext);
-		safefree(mg->mg_obj);
-	}
+	delete_all_callback("Cv::TRACKBAR");
+	delete_all_callback("Cv::MOUSE");
+
 
 void
 cvDestroyWindow(const char* name)
 CODE:
 	cvDestroyWindow(name);
-	dMY_CXT; SV* t; AV *tmp = newAV();
-	while ((t = av_shift(MY_CXT.cb_trackbar_list)) && t != &PL_sv_undef) {
-		MAGIC* mg = mg_find(t, PERL_MAGIC_ext);
-		if (strcmp(name, mg->mg_ptr) == 0) {
-			trackbar_t* trackbar = (trackbar_t*)mg->mg_obj;
-			if (trackbar) {
-				if (trackbar->callback) SvREFCNT_dec(trackbar->callback);
-				if (trackbar->value) SvREFCNT_dec(trackbar->value);
-			}
-			SvREFCNT_dec((SV*)mg->mg_obj);
-			sv_unmagic(t, PERL_MAGIC_ext);
-			safefree(mg->mg_obj);
-		} else {
-			av_push(tmp, t);
-		}
-	}
-	while ((t = av_shift(tmp)) && t != &PL_sv_undef) {
-		av_push(MY_CXT.cb_trackbar_list, t);
-	}
-	SvREFCNT_dec((SV*)tmp);
+	delete_win_callback(name, "Cv::TRACKBAR");
+	delete_win_callback(name, "Cv::MOUSE");
 
 int
 cvGetTrackbarPos(const char* trackbarName, const char* windowName)
 
-VOID*
+CvWindow*
 cvGetWindowHandle(const char* name)
 
 MODULE = Cv	PACKAGE = Cv
 const char*
-cvGetWindowName(VOID* windowHandle)
+cvGetWindowName(CvWindow* windowHandle)
 
 #TBD# int cvInitSystem(int argc, char** argv)
 
@@ -3608,23 +3415,41 @@ cvResizeWindow(const char* name, int width, int height)
 
 void
 cvSetMouseCallback(const char* windowName, SV* onMouse = NO_INIT, SV* userdata = NO_INIT)
+PREINIT:
+	callback_t* callback;
+	HV* Cv_MOUSE;
+	SV** q; AV* av; SV* sv;
 INIT:
 	if (items <= 1) onMouse = (SV*)0;
 	if (items <= 2) userdata = (SV*)0;
+	if (!(Cv_MOUSE = get_hv("Cv::MOUSE", 0))) {
+		croak("Cv::cvSetMouseCallback: can't get %Cv::MOUSE");
+	}
 CODE:
-	dMY_CXT;
-	if (MY_CXT.cb_mouse) SvREFCNT_dec(MY_CXT.cb_mouse);
-	MY_CXT.cb_mouse = (SV*)0;
-	if (MY_CXT.mouseUserdata) SvREFCNT_dec(MY_CXT.mouseUserdata);
-	MY_CXT.mouseUserdata = userdata;
-	if (MY_CXT.mouseUserdata) SvREFCNT_inc(MY_CXT.mouseUserdata);
+	Newx(callback, 1, callback_t);
+	callback->callback = 0;
 	if (onMouse && SvROK(onMouse) && SvTYPE(SvRV(onMouse)) == SVt_PVCV) {
-		MY_CXT.cb_mouse = (SV*)SvRV(onMouse);
-		if (MY_CXT.cb_mouse) SvREFCNT_inc(MY_CXT.cb_mouse);
-		cvSetMouseCallback(windowName, cb_mouse, userdata);
-	} else {
-		if (onMouse) croak("onMouse isn't sub");
+		SvREFCNT_inc(callback->callback = (SV*)SvRV(onMouse));
+	}
+	callback->u.m.userdata = 0;
+	if (userdata) {
+		SvREFCNT_inc(callback->u.m.userdata = userdata);
+	}
+	q = hv_fetch(Cv_MOUSE, windowName, strlen(windowName), 0);
+	if (q && SvROK(*q) && SvTYPE(SvRV(*q)) == SVt_PVAV) { SV* sv;
+		av = (AV*)SvRV(*q);
 		cvSetMouseCallback(windowName, NULL, NULL);
+		delete_callback(av);
+	} else if (!q) {
+		av = newAV();
+		hv_store(Cv_MOUSE, windowName, strlen(windowName),
+			newRV_inc(sv_2mortal((SV*)av)), 0);
+	} else {
+		croak("Cv::cvSetMouseCallback: Cv::MOUSE was broken");
+	}
+	if (onMouse) {
+		av_push(av, newSViv(PTR2IV(callback)));
+		cvSetMouseCallback(windowName, cb_mouse, callback);
 	}
 
 void
@@ -3634,7 +3459,7 @@ MODULE = Cv	PACKAGE = Cv::Arr
 void
 cvShowImage(const CvArr* image, const char* name = "Cv", int flags = CV_WINDOW_AUTOSIZE)
 CODE:
-	VOID* win = cvGetWindowHandle(name);
+	CvWindow* win = cvGetWindowHandle(name);
 	if (!win) {
 		cvNamedWindow(name, flags);
 		win = cvGetWindowHandle(name);
@@ -3816,7 +3641,6 @@ POSTCALL:
 int
 cvWriteFrame(CvVideoWriter* writer, const IplImage* image)
 
-
 # ============================================================
 #  highgui. High-level GUI and Media I/O: Qt new functions
 # ============================================================
@@ -3869,6 +3693,7 @@ cvLoadWindowParameters(const char* name)
 #endif
 
 #endif /* WITH_QT */
+
 
 # ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera
@@ -4903,21 +4728,3 @@ OUTPUT:
 	RETVAL
 
 #endif
-
-
-MODULE = Cv		PACKAGE = Cv
-# ====================
-BOOT:
-	/* Setup Global Data */
-	MY_CXT_INIT;
-	MY_CXT.cb_error = (SV*)0;
-	MY_CXT.cb_trackbar_list = newAV();
-	MY_CXT.cb_mouse = (SV*)0;
-	MY_CXT.errorMode = 0;
-	MY_CXT.errorStatus = 0;
-	cvSetErrStatus(0);
-
-void
-CLONE(...)
-CODE:
-	MY_CXT_CLONE;

@@ -118,7 +118,6 @@ use Inline C => << '----';
 #define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 #include <opencv/cvaux.h>
-#include "typemap.h"
 
 void dovoronoi(IplImage* labels, IplImage* dist, IplImage* dist8u)
 {

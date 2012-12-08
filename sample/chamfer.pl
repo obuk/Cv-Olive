@@ -52,7 +52,6 @@ use Inline C => << '----';
 #define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 #include <opencv/cvaux.h>
-#include "typemap.h"
 
 MODULE = Cv	PACKAGE = Cv::Arr
 

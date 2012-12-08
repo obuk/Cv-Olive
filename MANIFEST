@@ -27,7 +27,6 @@ lib/Cv/Seq/Point2.pm
 lib/Cv/Seq/Rect.pm
 lib/Cv/Seq/SURFPoint.pm
 lib/Cv/typemap
-lib/Cv/typemap.h
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -182,6 +181,7 @@ t/3GEMM.t
 t/3getAffineTransform.t
 t/3getCols.t
 t/3getDims.t
+t/3getPerspectiveTransform.t
 t/3getRawData.t
 t/3getReal.t
 t/3getRotationMatrix2D.t

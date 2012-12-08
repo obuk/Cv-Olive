@@ -104,6 +104,10 @@ const CvTreeNodeIterator*	T_CvPTROBJ
 CvTypeInfo*					T_CvPTROBJ
 const CvTypeInfo*			T_CvPTROBJ
 CvVideoWriter*				T_CvPTROBJ
+#	CvWindow*					T_CvPTROBJ
+#	const CvWindow*				T_CvPTROBJ
+CvWindow*					T_PTRREF
+const CvWindow*				T_PTRREF
 double*						T_floatPtr
 const double*				T_floatPtr
 float*						T_floatPtr
@@ -786,7 +790,8 @@ O_OBJECT
 		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\", \"$ntype\")
-	
+
+
 ##################################################
 OUTPUT
 
@@ -876,7 +881,14 @@ T_CvPoint
 
 T_CvPointPtr
 	STMT_START {
-		AV* av = useAV($arg); int i;
+		AV* av; int i;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		for (i = 0; i < length_$var; i++) {
 			AV* av_point = newAV();
 			av_push(av_point, newSViv(${var}[i].x));
@@ -895,7 +907,14 @@ T_CvPoint2D64f
 
 T_CvPoint2D64fPtr
 	STMT_START {
-		AV* av = useAV($arg); int i;
+		AV* av; int i;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		for (i = 0; i < length_$var; i++) {
 			AV* av_point = newAV();
 			av_push(av_point, newSVnv(${var}[i].x));
@@ -915,7 +934,14 @@ T_CvPoint3D64f
 
 T_CvPoint3D64fPtr
 	STMT_START {
-		AV* av = useAV($arg); int i;
+		AV* av; int i;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		for (i = 0; i < length_$var; i++) {
 			AV* av_point = newAV();
 			av_push(av_point, newSVnv(${var}[i].x));
@@ -994,7 +1020,14 @@ T_CvSubdiv2DPoint
 
 T_CvSubdiv2DPointPtr
 	STMT_START {
-		AV* av = useAV($arg); int i;
+		AV* av; int i;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		for (i = 0; i < length_$var; i++) {
 			AV* av_point = newAV();
 			av_push(av_point, newSViv(${var}[i].flags));
@@ -1045,7 +1078,14 @@ T_CvTermCriteria
 
 T_floatPtr
 	STMT_START {
-		AV* av = useAV($arg); int i;
+		AV* av; int i;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		for (i = 0; i < length_$var; i++) {
 			av_push(av, newSVnv(${var}[i]));
 		}
@@ -1053,7 +1093,14 @@ T_floatPtr
 
 T_intPtr
 	STMT_START {
-		AV* av = useAV($arg); int i;
+		AV* av; int i;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		for (i = 0; i < length_$var; i++) {
 			av_push(av, newSViv(${var}[i]));
 		}

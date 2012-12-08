@@ -268,7 +268,6 @@ use Inline C => << '----';
 #ifdef __cplusplus
 #include <vector>
 #endif
-#include "typemap.h"
 
 AV*
 flannFindPairs(

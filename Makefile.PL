@@ -108,8 +108,6 @@ WriteMakefile(
 
 sub MY::postamble {
 	"
-Cv.xs:	lib/Cv/typemap.h
-
 ref:
 	./tools/ref2pl-all.pl |sh -x
 

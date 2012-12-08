@@ -37,7 +37,6 @@ use Inline C => << '----';
 #define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 #include <opencv/cvaux.h>
-#include "typemap.h"
 IplImage* myload(const char* name)
 {
 	return cvLoadImage(name, CV_LOAD_IMAGE_COLOR);

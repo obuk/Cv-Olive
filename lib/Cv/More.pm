@@ -67,7 +67,8 @@ package Cv::Mat;
 
 {
 	no warnings 'redefine';
-	sub new { goto &m_new }
+	# sub new { goto &m_new }
+	*new = sub { goto &m_new };
 }
 
 sub m_new {
@@ -89,9 +90,11 @@ sub m_new {
 		my @dims = Cv::m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
 		return undef unless my ($rows, $cols) = @dims; $cols ||= 1;
-		$mat = Cv::cvCreateMat($rows, $cols, $type);
-		eval { $mat->m_set([], \@_) };
-		Cv::croak $@ if $@;
+		eval {
+			$mat = Cv::cvCreateMat($rows, $cols, $type);
+			$mat->m_set([], \@_);
+		};
+		Carp::croak $1 if $@ =~ /(.*) at \S+ line \S+$/;
 	}
 	$mat;
 }
@@ -101,7 +104,9 @@ package Cv::MatND;
 
 {
 	no warnings 'redefine';
-	sub new { goto &m_new }
+	# sub new { goto &m_new }
+	# *new = sub { goto &m_new };
+	*new = \&m_new;
 }
 
 sub m_new {
@@ -119,10 +124,11 @@ sub m_new {
 	} elsif (@_) {
 		my @dims = Cv::m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
-		eval { $mat = Cv::cvCreateMatND(\@dims, $type) };
-		Cv::croak $@ if $@;
-		eval { $mat->m_set([], \@_) };
-		Cv::croak $@ if $@;
+		eval {
+			$mat = Cv::cvCreateMatND(\@dims, $type);
+			$mat->m_set([], \@_);
+		};
+		Carp::croak $1 if $@ =~ /(.*) at \S+ line \S+$/;
 	}
 	$mat;
 }
@@ -135,11 +141,24 @@ package Cv::Arr;
 
 {
 	no warnings 'redefine';
+	# *Set = *set = sub { goto &m_set };
+	*Set = *set = \&m_set;
+
+=xxx
+
 	*Set = *set = sub {
 		my $mat = eval { &m_set(@_) };
-		Cv::croak $@ if $@;
+		# Carp::croak $@ if $@;
+		if ($@) {
+			local $_ = $@;
+			s/\s+at \S+ line \S+\n?$//;
+			Carp::croak $_;
+		}
 		$mat;
 	}
+
+=cut
+
 }
 
 sub m_set {
@@ -257,7 +276,7 @@ sub Affine {
 		GetQuadrangleSubPix(
 			$src, $dst, Cv::Mat->new([], &Cv::CV_32FC1, @$map));
 	};
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	$dst;
 }
 
@@ -271,7 +290,7 @@ sub Transform {
 		my $points = shift;
 		my @dims = Cv::m_dims(@$points);
 		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
 		$cs++;
 	}
 	if (ref $_[0] && $_[0]->isa('Cv::Mat') &&
@@ -282,7 +301,7 @@ sub Transform {
 	}
 	unshift(@_, $self);
 	my $retval = eval { &cvTransform };
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	if ($cs) {
 		@{ $_[1] = [] } = @$retval;
 		if (wantarray) {
@@ -307,10 +326,10 @@ sub BoundingRect {
 	my $self = shift;
 	unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
 	}
 	my $retval = eval { cvBoundingRect($self) };
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::O{cs};
 		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'}
@@ -325,11 +344,11 @@ sub ContourArea {
 	unless (ref $self) {
 		my $points = shift;
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @$points) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
 	}
 	my $slice = shift || &Cv::CV_WHOLE_SEQ;
 	my $retval = eval { cvContourArea($self, $slice) };
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::O{cs};
 		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'}
@@ -346,10 +365,10 @@ sub FitEllipse2 {
 	my $self = shift;
 	unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
 	}
 	my $retval = eval { cvFitEllipse2($self) };
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::O{cs};
 		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
@@ -364,7 +383,7 @@ sub FitLine {
 		my $points = shift;
 		my @dims = Cv::m_dims(@$points);
 		$self = eval { Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
     }
 	my $rr = \ [ ];			# dummy
 	if (@_ && (!defined $_[-1] || ref $_[-1] eq 'ARRAY')) {
@@ -376,7 +395,7 @@ sub FitLine {
 	$reps     //= 0.01;
 	$aeps     //= 0.01;
 	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	my $retval = $$rr;
 	if (wantarray) {
 		return @$retval if $Cv::O{cs};
@@ -392,10 +411,10 @@ sub MinAreaRect2 {
 	&Cv::Seq::stor(\@_);		# remove memstorage;
     unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
 	}
 	my $retval = eval { cvMinAreaRect2($self) };
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::O{cs};
 		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
@@ -417,13 +436,13 @@ sub MinEnclosingCircle {
 	}
     unless (ref $self) {
 		$self = eval { Cv::Mat->new([], &Cv::CV_32SC2, @_) };
-		Cv::croak $@ if $@;
+		Carp::croak $@ if $@;
 	}
 	my $retval = eval {
 		cvMinEnclosingCircle($self, $$rcenter, $$rradius)?
 			[$$rcenter, $$rradius] : undef;
 	};
-	Cv::croak $@ if $@;
+	Carp::croak $@ if $@;
 	if (wantarray) {
 		return @$retval if $Cv::O{cs};
 		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
@@ -439,7 +458,7 @@ sub MinEnclosingCircle {
 package Cv;
 
 sub GetBuildInformation {
-	ref (my $class = shift) and Cv::croak 'class name needed';
+	ref (my $class = shift) and Carp::croak 'class name needed';
 	our $BuildInformation;
 	if (Cv->version >= 2.004) {
 		$BuildInformation //= cvGetBuildInformation();
@@ -471,7 +490,7 @@ sub GetBuildInformation {
 }
 
 sub HasModule {
-	ref (my $class = shift) and Cv::croak 'class name needed';
+	ref (my $class = shift) and Carp::croak 'class name needed';
 	our %OpenCV_modules;
 	unless (%OpenCV_modules) {
 		my %x = Cv->GetBuildInformation();
