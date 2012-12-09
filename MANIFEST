@@ -11,6 +11,14 @@ fallback/Constant.pm-2.4.0
 fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
+Highgui/Changes
+Highgui/Highgui.xs
+Highgui/lib/Cv/Highgui.pm
+Highgui/Makefile.PL
+Highgui/MANIFEST
+Highgui/ppport.h
+Highgui/README
+Highgui/t/Cv-Highgui.t
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
@@ -66,6 +74,7 @@ sample/fruits.jpg
 sample/houghlines-prob.pl
 sample/houghlines-stan.pl
 sample/houghlines.pl
+sample/image-gtk2.pl
 sample/image.pl
 sample/imager.pl
 sample/inpaint.pl
@@ -235,6 +244,7 @@ t/4projectPoints2.t
 t/4toArray.t
 t/4transform.t
 t/8flipbook.t
+t/8highgui.t
 t/8pango.t
 t/9inlineC.t
 t/9ref.t

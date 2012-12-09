@@ -67,11 +67,22 @@ sub getCvVersion {
 }
 
 sub getSvnRevision {
-    open(SVN, "svn status -v|");
-    my $rev = "unknown";
-    while (<SVN>) {
-	next unless /^...\s+(\d+)/;
-	$rev = $1 if $1 > $rev;
+    if (0) {
+	open(SVN, "svn status -v|");
+	my $rev = "unknown";
+	while (<SVN>) {
+	    next unless /^...\s+(\d+)/;
+	    $rev = $1 if $1 > $rev;
+	}
+	return $rev;
     }
-    $rev;
+    if (1) {
+	open(GIT, "git log|");
+	my $rev = 0;
+	while (<GIT>) {
+	    next unless /^commit/;
+	    $rev++;
+	}
+	return $rev;
+    }
 }
