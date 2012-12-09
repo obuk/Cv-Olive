@@ -29,16 +29,17 @@ if (2) {
 	no warnings;
 	local $Data::Dumper::Terse = 1;
 	local $Cv::Config::cf = undef;
-	my $dynamic_lib;
+	my $dynamic_lib = 0;
 	my @cxx = ();
 	for my $cxx (qw(c++ g++ g++-4 g++44 g++45 g++46)) {
 		local *STDERR_COPY;
 		open(STDERR_COPY, '>&STDERR');
 		open(STDERR, '/dev/null');
 		eval { `$cxx -v` };
-		next unless ($? == 0);
+		my $r = $?;
+		open(STDERR, '>&STDERR_COPY');
+		next unless $r == 0;
 		push(@cxx, $cxx);
-		open(STDERR, ">&STDERR_COPY");
 		delete $ENV{CC};
 		$ENV{CXX} = $cxx;
 		undef *{Cv::Config::cf};

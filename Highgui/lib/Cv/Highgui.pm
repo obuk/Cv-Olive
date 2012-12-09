@@ -54,7 +54,7 @@ package Cv::Arr;
 package Cv::Arr;
 
 sub EncodeImage {
-	$_[2] //= my $params = \0;
+	$_[2] = my $params = \0 unless defined $_[2];
 	goto &cvEncodeImage;
 }
 

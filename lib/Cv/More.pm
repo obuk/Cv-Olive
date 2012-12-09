@@ -74,7 +74,7 @@ package Cv::Mat;
 sub m_new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = shift // $self->type;
+	my $type = @_ ? shift : $self->type;
 	my $mat;
 	if (@$sizes) {
 		my ($rows, $cols) = @$sizes; $cols ||= 1;
@@ -112,7 +112,7 @@ package Cv::MatND;
 sub m_new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = shift // $self->type;
+	my $type = @_ ? shift : $self->type;
 	my $mat;
 	if (@$sizes) {
 		if (@_) {
@@ -297,7 +297,7 @@ sub Transform {
 		$_[0]->rows == 2 && $_[0]->cols == 3) { # $_[0] is transmat
 		unshift(@_, $self->new);
 	} else {
-		$_[0] //= $self->new;
+		$_[0] ||= $self->new;
 	}
 	unshift(@_, $self);
 	my $retval = eval { &cvTransform };
@@ -390,10 +390,10 @@ sub FitLine {
 		$rr = \ $_[-1]; pop;
 	}
 	my ($distType, $param, $reps, $aeps) = @_;
-	$distType //= &Cv::CV_DIST_L2;
-	$param    //= 0;
-	$reps     //= 0.01;
-	$aeps     //= 0.01;
+	$distType ||= &Cv::CV_DIST_L2;
+	$param    ||= 0;
+	$reps     ||= 0.01;
+	$aeps     ||= 0.01;
 	eval { cvFitLine($self, $distType, $param, $reps, $aeps, $$rr) };
 	Carp::croak $@ if $@;
 	my $retval = $$rr;
@@ -461,9 +461,10 @@ sub GetBuildInformation {
 	ref (my $class = shift) and Carp::croak 'class name needed';
 	our $BuildInformation;
 	if (Cv->version >= 2.004) {
-		$BuildInformation //= cvGetBuildInformation();
+		$BuildInformation = cvGetBuildInformation()
+			unless defined $BuildInformation;
 	}
-	$BuildInformation //= '';
+	$BuildInformation ||= '';
 	our %BuildInformation = ();
 	unless (%BuildInformation) {
 		for ($BuildInformation) {

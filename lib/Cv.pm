@@ -136,7 +136,7 @@ You can omit parameters and that will be inherited.
 sub Cv::Image::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = shift // $self->type;
+	my $type = @_? shift : $self->type;
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
 	Carp::croak "usage: Cv::Image->new(sizes, type)" unless $depth;
 	my ($rows, $cols) = @$sizes;
@@ -149,7 +149,7 @@ sub Cv::Image::new {
 sub Cv::Mat::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = shift // $self->type;
+	my $type = @_? shift : $self->type;
 	if (@_) {
 		eval "use Cv::More";
 		die $@ if $@;
@@ -164,7 +164,7 @@ sub Cv::Mat::new {
 sub Cv::MatND::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = shift // $self->type;
+	my $type = @_? shift : $self->type;
 	if (@_) {
 		eval "use Cv::More";
 		die $@ if $@;
@@ -178,7 +178,7 @@ sub Cv::MatND::new {
 sub Cv::SparseMat::new {
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = shift // $self->type;
+	my $type = @_? shift : $self->type;
 	unshift(@_, $sizes, $type);
 	goto &Cv::cvCreateSparseMat;
 }
@@ -467,8 +467,8 @@ sub SetND {
 
 sub GetRawData {
 	# GetRawData($arr, my $data, my $step, my $roiSize)
-	$_[2] //= my $step;
-	$_[3] //= my $roiSize;
+	$_[2] = my $step    unless defined $_[2];
+	$_[3] = my $roiSize unless defined $_[3];
 	goto &cvGetRawData;
 }
 
@@ -615,7 +615,7 @@ sub GetCols {
 	my $startCol = shift;
 	my $endCol  = shift;
 	my $cols = $endCol - $startCol;
-	$submat //= Cv::Mat->new([$src->rows, $cols], $src->type, undef);
+	$submat ||= Cv::Mat->new([$src->rows, $cols], $src->type, undef);
 	unshift(@_, $src, $submat, $startCol, $endCol);
 	goto &cvGetCols;
 }
@@ -633,7 +633,7 @@ sub GetRows {
 	my $endRow = shift;
 	my $deltaRow = shift || 1;
 	my $rows = int(($endRow - $startRow) / $deltaRow);
-	$submat //= Cv::Mat->new([$rows, $src->cols], $src->type, undef);
+	$submat ||= Cv::Mat->new([$rows, $src->cols], $src->type, undef);
 	unshift(@_, $src, $submat, $startRow, $endRow, $deltaRow);
 	goto &cvGetRows;
 }
@@ -645,7 +645,7 @@ sub GetSubRect {
 	my $submat = dst(@_);
 	my $rect = shift || [ 0, 0, $src->width, $src->height ];
 	my $sizes = [ $rect->[3], $rect->[2] ];
-	$submat //= Cv::Mat->new($sizes, $src->type, undef);
+	$submat ||= Cv::Mat->new($sizes, $src->type, undef);
 	unshift(@_, $src, $submat, $rect);
 	goto &cvGetSubRect;
 }
@@ -654,8 +654,8 @@ sub GetSubRect {
 sub MinMaxLoc {
 	# MinMaxLoc($arr, my $minVal, my $maxVal, my $minLoc, my $maxLoc, my $mask)
 	if (@_ >= 3) {
-		$_[3] //= my $minLoc;
-		$_[4] //= my $maxLoc;
+		$_[3] = my $minLoc unless defined $_[3];
+		$_[4] = my $maxLoc unless defined $_[3];
 	}
 	goto &cvMinMaxLoc;
 }
@@ -682,7 +682,7 @@ sub AbsDiff {
 	# AbsDiff(src1, src2, [dst])
 	# AbsDiffS(src, value, [dst])
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvAbsDiffS;
@@ -699,7 +699,7 @@ sub Add {
 	# Add(src1, src2, [dst], [mask])
 	# AddS(src, value, [dst], [mask])
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvAddS;
@@ -713,7 +713,7 @@ sub And {
 	# And(src1, src2, [dst], [mask])
 	# AndS(src, value, [dst], [mask])
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvAndS;
@@ -728,7 +728,7 @@ sub Cmp {
 	# Cmp(src, src2, [dst], cmpOp)
 	# CmpS(src, value, [dst], cmpOp)
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new(&Cv::CV_8UC(&Cv::CV_MAT_CN($src->type)));
+	my $dst = dst(@_) || $src->new(&Cv::CV_8UC(&Cv::CV_MAT_CN($src->type)));
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvCmpS;
@@ -744,7 +744,7 @@ sub InRange {
 	# InRangeS($src, $upper, $lower, [$dst]);
 	my $src = shift;
 	my ($upper, $lower) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $upper, $lower, $dst);
 	if (ref $upper eq 'ARRAY') {
 		goto &cvInRangeS;
@@ -758,7 +758,7 @@ sub InRange {
 sub Max {
 	# Max(src1, src2, [dst]);
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvMaxS;
@@ -772,7 +772,7 @@ sub Max {
 sub Min {
 	# Min(src1, src2, [dst]);
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvMinS;
@@ -787,7 +787,7 @@ sub Or {
 	# Or(src1, src2, [dst], [mask])
 	# OrS(src, value, [dst], [mask])
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvOrS;
@@ -802,7 +802,7 @@ sub Sub {
 	# Sub(src1, src2, [dst], [mask])
 	# SubS(src, value, [dst], [mask])
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvSubS;
@@ -817,7 +817,7 @@ sub Xor {
 	# Xor(src1, src2, [dst], [mask])
 	# XorS(src, value, [dst], [mask])
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
 	if (ref $src2_value eq 'ARRAY') {
 		goto &cvXorS;
@@ -833,7 +833,7 @@ sub Xor {
 sub ConvertScale {
 	# ConvertScale(src, [dst], [scale], [shift])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvConvertScale;
 }
@@ -843,7 +843,7 @@ sub ConvertScale {
 sub ConvertScaleAbs {
 	# ConvertScaleAbs(src, [dst], [scale], [shift])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvConvertScaleAbs;
 }
@@ -852,7 +852,7 @@ sub ConvertScaleAbs {
 sub AddWeighted {
 	# AddWeighted(src1, alpha, src2, beta, gamma, [dst])
 	my ($src, $alpha, $src2, $beta, $gamma) = splice(@_, 0, 5);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $alpha, $src2, $beta, $gamma, $dst);
 	goto &cvAddWeighted;
 }
@@ -861,7 +861,7 @@ sub AddWeighted {
 sub CrossProduct {
 	# CrossProduct(src1, src2, [dst])
 	my ($src, $src2) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, $dst);
 	goto &cvCrossProduct;
 }
@@ -870,7 +870,7 @@ sub CrossProduct {
 sub DCT {
 	# DCT(src, [dst], flags)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvDCT;
 }
@@ -879,7 +879,7 @@ sub DCT {
 sub DFT {
 	# DFT(src, [dst], flags, [nonzeroRows])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvDFT;
 }
@@ -888,7 +888,7 @@ sub DFT {
 sub Div {
 	# Div(src1, src2, [dst], [scale]);
 	my ($src, $src2) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, $dst);
 	goto &cvDiv;
 }
@@ -897,7 +897,7 @@ sub Div {
 sub Exp {
 	# Exp(src, [dst]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvExp;
 }
@@ -907,7 +907,7 @@ sub Exp {
 sub Flip {
 	# Flip(src, [dst], flipMode)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvFlip;
 }
@@ -916,7 +916,7 @@ sub Flip {
 sub GEMM {
 	# GEMM($src, $src2, $alpha, $src3, $beta, [$dst], [$tABC]);
 	my ($src, $src2, $alpha, $src3, $beta) = splice(@_, 0, 5);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, $alpha, $src3, $beta, $dst);
 	goto &cvGEMM;
 }
@@ -925,7 +925,7 @@ sub GEMM {
 sub MatMulAdd {
 	# MatMulAdd($src1, $src2, $src3, [$dst]);
 	my ($src, $src2, $src3) = splice(@_, 0, 3);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, 1, $src3, 1, $dst, 0);
 	goto &GEMM;
 }
@@ -934,7 +934,7 @@ sub MatMulAdd {
 sub MatMul {
 	# MatMulAdd($src1, $src2, [$dst]);
 	my ($src, $src2) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, \0, $dst);
 	goto &MatMulAdd;
 }
@@ -943,7 +943,7 @@ sub MatMul {
 sub Inv {
 	# Inv(src, [dst], [$method]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvInv;
 }
@@ -952,7 +952,7 @@ sub Inv {
 sub Log {
 	# Log(src, [dst]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvLog;
 }
@@ -965,12 +965,12 @@ sub LUT {
 	my $dst = dst(@_);
 	if (&Cv::CV_MAT_CN($lut->type) > 1) {
 		my @lut = $lut->split;
-		$dst //= $src->new($lut->type);
+		$dst ||= $src->new($lut->type);
 		my @dsts = $dst->split;
 		cvLUT($src, $dsts[$_], $lut[$_]) for 0 .. $#lut;
 		Cv->Merge(\@dsts, $dst); # XXXXX
 	} else {
-		$dst //= $src->new(&Cv::CV_MAKETYPE($lut->type, 1));
+		$dst ||= $src->new(&Cv::CV_MAKETYPE($lut->type, 1));
 		unshift(@_, $src, $dst, $lut);
 		goto &cvLUT;
 	}
@@ -980,7 +980,7 @@ sub LUT {
 sub Mul {
 	# Mul(src1, src2, [dst], [scale])
 	my ($src, $src2) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, $dst);
 	goto &cvMul;
 }
@@ -989,7 +989,7 @@ sub Mul {
 sub MulSpectrums {
 	# MulSpectrums(src1, src2, [dst], flags);
 	my ($src, $src2) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, $dst);
 	goto &cvMulSpectrums;
 }
@@ -998,7 +998,7 @@ sub MulSpectrums {
 sub MulTransposed {
 	# MulTransposed(src1, src2, [dst], order, [delta], [scale]);
 	my ($src, $src2) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2, $dst);
 	goto &cvMulTransposed;
 }
@@ -1007,7 +1007,7 @@ sub MulTransposed {
 sub Normalize {
 	# Normalize(src, dst, [a], [b], [norm_type], [mask])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvNormalize;
 }
@@ -1016,7 +1016,7 @@ sub Normalize {
 sub Not {
 	# Not(src, [dst])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvNot;
 }
@@ -1025,7 +1025,7 @@ sub Not {
 sub Pow {
 	# Pow(src, [dst], power)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvPow;
 }
@@ -1034,7 +1034,7 @@ sub Pow {
 sub Reduce {
 	# Reduce(src, [dst], [dim], [op]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvReduce;
 }
@@ -1043,7 +1043,7 @@ sub Reduce {
 sub Repeat {
 	# Repeat(src, dst);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvRepeat;
 }
@@ -1053,7 +1053,7 @@ sub Repeat {
 sub ScaleAdd {
 	# ScaleAdd(src, scale, src2, [dst]);
 	my ($src, $scale, $src2) = splice(@_, 0, 3);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $scale, $src2, $dst);
 	goto &cvScaleAdd;
 }
@@ -1062,7 +1062,7 @@ sub ScaleAdd {
 sub SubRS {
 	# SubRS(src, value, [dst], [mask])
 	my ($src, $value) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $value, $dst);
 	goto &cvSubRS;
 }
@@ -1071,7 +1071,7 @@ sub SubRS {
 sub Transpose {
 	# Transpose(src, [dst])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvTranspose;
 }
@@ -1101,7 +1101,7 @@ package Cv::MemStorage;
 
 package Cv;
 
-sub CV_RGB { my ($r, $g, $b, $a) = @_; cvScalar($b, $g, $r, $a // 0) }
+sub CV_RGB { my ($r, $g, $b, $a) = @_; cvScalar($b, $g, $r, $a || 0) }
 
 package Cv::Font;
 { *new = \&Cv::InitFont }
@@ -1253,9 +1253,9 @@ package Cv::Histogram;
 
 sub new {
 	my $self   = shift;
-	my $sizes  = shift // $self->sizes;
-	my $type   = shift // &Cv::CV_HIST_ARRAY;
-	my $ranges = shift // $self->thresh;
+	my $sizes  = shift || $self->sizes;
+	my $type   = shift || &Cv::CV_HIST_ARRAY;
+	my $ranges = shift || $self->thresh;
 	unshift(@_, $sizes, $type, $ranges);
 	goto &Cv::cvCreateHist;
 }
@@ -1265,7 +1265,7 @@ sub new {
 sub CopyHist {
 	# CopyHist(src. dst)
 	my $src = shift;
-	my $dst = shift // $src->new;
+	my $dst = shift || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvCopyHist;
 }
@@ -1301,7 +1301,7 @@ package Cv::Arr;
 sub CopyMakeBorder {
 	# CopyMakeBorder(src, dst, offset, bordertype, [value]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvCopyMakeBorder;
 }
@@ -1310,7 +1310,7 @@ sub CopyMakeBorder {
 sub Dilate {
 	# Dilate(src, dst, [element], [iterations])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvDilate;
 }
@@ -1319,7 +1319,7 @@ sub Dilate {
 sub Erode {
 	# Erode(src, dst, [element], [iterations])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvErode;
 }
@@ -1328,7 +1328,7 @@ sub Erode {
 sub Filter2D {
 	# Filter2D(src, dst, [kernel], [anchor])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvFilter2D;
 }
@@ -1337,7 +1337,7 @@ sub Filter2D {
 sub Laplace {
 	# Laplace(src, dst, [apertureSize])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new(&Cv::CV_16SC(&Cv::CV_MAT_CN($src->type)));
+	my $dst = dst(@_) || $src->new(&Cv::CV_16SC(&Cv::CV_MAT_CN($src->type)));
 	unshift(@_, $src, $dst);
 	goto &cvLaplace;
 }
@@ -1346,13 +1346,13 @@ sub Laplace {
 sub MorphologyEx {
 	# MorphologyEx(src, dst, temp, element, operation, [iterations])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	if (@_) {
 		my $temp = dst(@_);
 		unless ($temp) {
 			if ($_[1] == &Cv::CV_MOP_TOPHAT ||
 				$_[1] == &Cv::CV_MOP_BLACKHAT) {
-				$temp //= $src->new;
+				$temp ||= $src->new;
 			}
 		}
 		unshift(@_, $temp);
@@ -1365,7 +1365,7 @@ sub MorphologyEx {
 sub PyrDown {
 	# PyrDown(src, dst, [filter]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new([map { int(($_ + 1) / 2) } @{$src->sizes}]);
+	my $dst = dst(@_) || $src->new([map { int(($_ + 1) / 2) } @{$src->sizes}]);
 	unshift(@_, $src, $dst);
 	goto &cvPyrDown;
 }
@@ -1374,7 +1374,7 @@ sub PyrDown {
 sub PyrUp {
 	# PyrUp(src, dst, [filter]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new([map { int($_ * 2) } @{$src->sizes}]);
+	my $dst = dst(@_) || $src->new([map { int($_ * 2) } @{$src->sizes}]);
 	unshift(@_, $src, $dst);
 	goto &cvPyrUp;
 }
@@ -1383,7 +1383,7 @@ sub PyrUp {
 sub Smooth {
 	# Smooth(src, dst, [smoothtype], [param1], [param2], [param3], [param4])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvSmooth;
 }
@@ -1392,7 +1392,7 @@ sub Smooth {
 sub Sobel {
 	# Sobel(src, dst, xorder, yorder, [apertureSize])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvSobel;
 }
@@ -1411,7 +1411,7 @@ package Cv;
 sub GetRotationMatrix2D {
 	# Cv->GetRotationMatrix2D($center, $angle, $scale, my $mapMatrix)
 	my $class = shift;
-	$_[3] //= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
+	$_[3] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
 	goto &cv2DRotationMatrix;
 }
 
@@ -1419,7 +1419,7 @@ sub GetRotationMatrix2D {
 sub GetAffineTransform {
 	# Cv->GetAffineTransform($src, $dst, my $mapMatrix)
 	my $class = shift;
-	$_[2] //= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
+	$_[2] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
 	goto &cvGetAffineTransform;
 }
 
@@ -1427,7 +1427,7 @@ sub GetAffineTransform {
 sub GetPerspectiveTransform {
 	# Cv->GetPerspectiveTransform($src, $dst, my $mapMatrix)
 	my $class = shift;
-	$_[2] //= Cv::Mat->new([3, 3], &Cv::CV_32FC1);
+	$_[2] ||= Cv::Mat->new([3, 3], &Cv::CV_32FC1);
 	goto &cvGetPerspectiveTransform;
 }
 
@@ -1436,7 +1436,7 @@ package Cv::Arr;
 
 sub GetQuadrangleSubPix {
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvGetQuadrangleSubPix;
 }
@@ -1444,7 +1444,7 @@ sub GetQuadrangleSubPix {
 sub LinearPolar {
 	# LinearPolar(src, dst, center, maxRadius, [flags]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvLinearPolar;
 }
@@ -1453,7 +1453,7 @@ sub LinearPolar {
 sub LogPolar {
 	# LogPolar(src, dst, center, M, [flags]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvLogPolar;
 }
@@ -1462,7 +1462,7 @@ sub LogPolar {
 sub Remap {
 	# Remap(src, dst, mapx, mapy, [flags], [fillval])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvRemap;
 }
@@ -1476,7 +1476,7 @@ sub Resize {
 		my $sizes = shift;
 		$dst = $src->new($sizes);
 	} else {
-		$dst = dst(@_) // $src->new;
+		$dst = dst(@_) || $src->new;
 	}
 	unshift(@_, $src, $dst);
 	goto &cvResize;
@@ -1511,7 +1511,7 @@ package Cv::Arr;
 sub AdaptiveThreshold {
 	# AdaptiveThreshold(src, dst, maxValue, [adaptive_method], [thresholdType], [blockSize], [param1])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvAdaptiveThreshold;
 }
@@ -1544,7 +1544,7 @@ sub CvtColor {
 sub DistTransform {
 	# DistTransform(src, dst, [distance_type], [mask_size], [mask], [labels]);
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvDistTransform;
 }
@@ -1553,7 +1553,7 @@ sub DistTransform {
 sub EqualizeHist {
 	# EqualizeHist(src, dst)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvEqualizeHist;
 }
@@ -1562,7 +1562,7 @@ sub EqualizeHist {
 sub Inpaint {
 	# Inpaint(src, mask, dst, inpaintRadius, flags)
 	my ($src, $mask) = splice(@_, 0, 2);
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $mask, $dst);
 	goto &cvInpaint;
 }
@@ -1571,7 +1571,7 @@ sub Inpaint {
 sub Integral {
 	# Integral(image, sum, [sqsum], [tiltedSum])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvIntegral;
 }
@@ -1580,7 +1580,7 @@ sub Integral {
 sub PyrMeanShiftFiltering {
 	# PyrMeanShiftFiltering(src, dst, sp, sr, [max_level], [termcrit])
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvPyrMeanShiftFiltering;
 }
@@ -1589,7 +1589,7 @@ sub PyrMeanShiftFiltering {
 sub PyrSegmentation {
 	# PyrSegmentation(src, dst, storage, comp, level, threshold1, threshold2)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvPyrSegmentation;
 }
@@ -1598,7 +1598,7 @@ sub PyrSegmentation {
 sub Threshold {
 	# Threshold(src, dst, threshold, maxValue, thresholdType)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new(&Cv::CV_MAKETYPE($src->type, 1));
+	my $dst = dst(@_) || $src->new(&Cv::CV_MAKETYPE($src->type, 1));
 	unshift(@_, $src, $dst);
 	goto &cvThreshold;
 }
@@ -1612,7 +1612,8 @@ package Cv;
 sub BoxPoints {
 	ref (my $class = shift) and Carp::croak 'class name needed';
 	cvBoxPoints($_[0], my $pts);
-	@{ $_[1] //= [] } = @$pts if @_ >= 2;
+	$_[1] = [] unless defined $_[1];
+	@{ $_[1] } = @$pts if @_ >= 2;
 	wantarray? @$pts : $pts;
 }
 
@@ -1642,7 +1643,7 @@ package Cv::Arr;
 sub Canny {
 	# Canny(image, edges, threshold1, threshold2, aperture_size=3)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new;
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvCanny;
 }
@@ -1652,7 +1653,7 @@ sub CornerEigenValsAndVecs {
 	# CornerEigenValsAndVecs(image, eigenvv, blockSize, aperture_size=3)
 	my $src = shift;
 	my $dst = dst(@_);
-	$dst //= $src->new([$src->rows, $src->cols * 6], &Cv::CV_32FC1);
+	$dst ||= $src->new([$src->rows, $src->cols * 6], &Cv::CV_32FC1);
 	unshift(@_, $src, $dst);
 	goto &cvCornerEigenValsAndVecs;
 }
@@ -1661,7 +1662,7 @@ sub CornerEigenValsAndVecs {
 sub CornerHarris {
 	# CornerHarris(image, harris_dst, blockSize, aperture_size=3, k=0.04)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new(&Cv::CV_32FC1);
+	my $dst = dst(@_) || $src->new(&Cv::CV_32FC1);
 	unshift(@_, $src, $dst);
 	goto &cvCornerHarris;
 }
@@ -1670,7 +1671,7 @@ sub CornerHarris {
 sub CornerMinEigenVal {
 	# CornerMinEigenVal(image, eigenval, blockSize, aperture_size=3)
 	my $src = shift;
-	my $dst = dst(@_) // $src->new(&Cv::CV_32FC1);
+	my $dst = dst(@_) || $src->new(&Cv::CV_32FC1);
 	unshift(@_, $src, $dst);
 	goto &cvCornerMinEigenVal;
 }
@@ -1686,7 +1687,7 @@ sub MatchTemplate {
 	# MatchTemplate(image, templ, result, method)
 	my $image = shift;
 	my $templ = shift;
-	my $result = dst(@_) // $templ->new(
+	my $result = dst(@_) || $templ->new(
 		[ $image->rows - $templ->rows + 1,
 		  $image->cols - $templ->cols + 1 ], &Cv::CV_32FC1);
 	unshift(@_, $image, $templ, $result);
@@ -1729,22 +1730,22 @@ package Cv::Arr;
 
 { *Cv::GetOptimalNewCameraMatrix = \&GetOptimalNewCameraMatrix }
 sub GetOptimalNewCameraMatrix {
-	$_[5] //= my $newImageSize = [0, 0];
-	$_[6] //= my $validROI = \0;
-	$_[7] //= my $centerPrincipalPoint = 0;
+	$_[5] = my $newImageSize = [0, 0]    unless defined $_[5];
+	$_[6] = my $validROI = \0            unless defined $_[6];
+	$_[7] = my $centerPrincipalPoint = 0 unless defined $_[7];
 	goto &cvGetOptimalNewCameraMatrix;
 }
 
 { *Cv::StereoRectify = \&StereoRectify }
 sub StereoRectify {
-	$_[15] //= my $roi1 = \0;
-	$_[16] //= my $roi2 = \0;
+	$_[15] = my $roi1 = \0 unless defined $_[15];
+	$_[16] = my $roi2 = \0 unless defined $_[16];
 	goto &cvStereoRectify;
 }
 
 sub ProjectPoints2 {
 	# ProjectPoints2($pts3d, $rvec, $tvec, $cmat, $dist, $pts2d);
-	$_[5] //= $_[0]->new(&Cv::CV_MAKETYPE($_[0]->type, 2));
+	$_[5] ||= $_[0]->new(&Cv::CV_MAKETYPE($_[0]->type, 2));
 	goto &cvProjectPoints2;
 }
 
