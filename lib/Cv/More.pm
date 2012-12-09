@@ -67,7 +67,6 @@ package Cv::Mat;
 
 {
 	no warnings 'redefine';
-	# sub new { goto &m_new }
 	*new = sub { goto &m_new };
 }
 
@@ -104,8 +103,6 @@ package Cv::MatND;
 
 {
 	no warnings 'redefine';
-	# sub new { goto &m_new }
-	# *new = sub { goto &m_new };
 	*new = \&m_new;
 }
 
@@ -141,24 +138,7 @@ package Cv::Arr;
 
 {
 	no warnings 'redefine';
-	# *Set = *set = sub { goto &m_set };
 	*Set = *set = \&m_set;
-
-=xxx
-
-	*Set = *set = sub {
-		my $mat = eval { &m_set(@_) };
-		# Carp::croak $@ if $@;
-		if ($@) {
-			local $_ = $@;
-			s/\s+at \S+ line \S+\n?$//;
-			Carp::croak $_;
-		}
-		$mat;
-	}
-
-=cut
-
 }
 
 sub m_set {

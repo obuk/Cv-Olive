@@ -8,6 +8,7 @@ Revision history for Cv.pm
      * separating Highgui
      * s/:nomore/-more/
      * fixed // op for perl-5.8.9
+     * fixed cvHasGUI() location
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl

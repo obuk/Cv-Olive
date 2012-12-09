@@ -1786,6 +1786,30 @@ package Cv::BGCodeBookModel;
 { *Diff = \&BGCodeBookDiff }
 { *ClearStale = \&BGCodeBookClearStale }
 
+
+# ============================================================
+#  misc.
+# ============================================================
+
+package Cv;
+
+sub cvHasGUI {
+	if (fork) {
+		wait;
+		$? == 0;
+	} else {
+		if (Cv->can('cvNamedWindow')) {
+			open(STDERR, ">/dev/null");
+			cvNamedWindow("Cv");
+			cvDestroyWindow("Cv");
+			exit(0);
+		} 
+		exit(1);
+	}
+}
+
+sub cvHasQt { 0 }
+
 1;
 __END__
 

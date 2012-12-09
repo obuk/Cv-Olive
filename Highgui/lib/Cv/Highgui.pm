@@ -58,22 +58,6 @@ sub EncodeImage {
 	goto &cvEncodeImage;
 }
 
-package Cv;
-
-sub cvHasGUI {
-	if (fork) {
-		wait;
-		$? == 0;
-	} else {
-		open(STDERR, ">/dev/null");
-		cvNamedWindow("Cv");
-		cvDestroyWindow("Cv");
-		exit(0);
-	}
-}
-
-sub cvHasQt { 0 }
-
 package Cv::Image;
 { *Load = \&Cv::LoadImage }
 
