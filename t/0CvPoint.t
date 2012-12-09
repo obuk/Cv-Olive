@@ -3,7 +3,7 @@
 use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 12;
-BEGIN {	use_ok('Cv', qw(:nomore)) }
+BEGIN {	use_ok('Cv', -more) }
 
 my ($x, $y) = map { int rand 65536 } 0..1;
 my $pt = cvPoint($x, $y);

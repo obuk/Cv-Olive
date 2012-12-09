@@ -5,15 +5,17 @@ use warnings;
 use utf8;
 
 use Test::More;
-eval("use Pango");
-if ($@) {
-	plan skip_all => "can't use Pango";
-} else {
-	plan qw(no_plan);
+BEGIN {
+	eval("use Pango");
+	if ($@) {
+		plan skip_all => "can't use Pango";
+	} else {
+		plan qw(no_plan);
+	}
 }
 
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 	use_ok('Cv::Pango');
 }
 

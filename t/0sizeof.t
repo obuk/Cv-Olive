@@ -4,7 +4,7 @@ use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 8;
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 }
 
 ok(CV_SIZEOF('CvSeq'));

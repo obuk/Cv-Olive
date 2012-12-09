@@ -3,7 +3,7 @@
 use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 13;
-BEGIN {	use_ok('Cv', qw(:nomore)) }
+BEGIN {	use_ok('Cv', -more) }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
 my ($epsilon) = map { int rand 1 } 3;

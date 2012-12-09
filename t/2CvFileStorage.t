@@ -5,7 +5,7 @@ use Test::More qw(no_plan);
 # use Test::More tests => 22;
 
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 	# use_ok('Cv::Seq');			# xxxxx
 }
 

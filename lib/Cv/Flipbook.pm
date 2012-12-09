@@ -9,7 +9,7 @@ use Carp;
 use File::Basename;
 use Cv;
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 require Exporter;
 
@@ -24,6 +24,8 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 	
 );
+
+sub DESTROY { }
 
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 

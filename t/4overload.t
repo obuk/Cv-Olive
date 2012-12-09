@@ -8,6 +8,17 @@ BEGIN {
 	use_ok('Cv');
 }
 
+our $line;
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = "$_[0] at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	# print STDERR "\n*** a = $a ***\n*** b = $b\n";
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
+
 for my $type (CV_8UC3, CV_16SC4, CV_32SC2, CV_32FC2, CV_64FC1) {
 	my $cn = CV_MAT_CN($type);
 
@@ -49,8 +60,7 @@ if (1) {
 	ok($mat1 != $mat2);
 	ok($mat1 ne $mat2);
 
-	my $line = __LINE__ + 1;
+	$line = __LINE__ + 1;
 	eval { $mat1++ };
-	is($@, "$0: can't overload Cv::Mat::++ at $0 line $line\n");
+	err_is("$0: can't overload Cv::Mat::++");
 }
-

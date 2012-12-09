@@ -5,7 +5,7 @@ use Test::More qw(no_plan);
 # use Test::More tests => 10;
 
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 }
 
 my $src = Cv->createImage([320, 240], 8, 3);

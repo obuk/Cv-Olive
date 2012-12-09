@@ -5,7 +5,7 @@ use strict;
 use Test::More tests => 8;
 
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 }
 
 use File::Basename;

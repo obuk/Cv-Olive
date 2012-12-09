@@ -6,7 +6,7 @@ use Test::More qw(no_plan);
 use Scalar::Util qw(blessed);
 
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 }
 
 use File::Basename;

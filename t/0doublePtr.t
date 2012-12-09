@@ -3,7 +3,7 @@
 use strict;
 use Test::More qw(no_plan);
 # use Test::More tests => 102;
-BEGIN {	use_ok('Cv', qw(:nomore)) }
+BEGIN {	use_ok('Cv', -more) }
 
 my @doublePtr = map { int rand 1 } 1 .. 100;
 

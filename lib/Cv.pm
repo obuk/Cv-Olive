@@ -76,8 +76,8 @@ sub import {
 		highgui => 'Cv::Highgui',
 		);
 	for (@_) {
-		if (/^:no(\w+)$/) {
-			delete $auto{lc $1};
+		if (/^(:no|-)(\w+)$/) {
+			delete $auto{lc $2};
 		} else {
 			push(@std, $_);
 		}
@@ -1525,6 +1525,8 @@ sub CvtColor {
 	unless ($dst) {
 		if (!defined $code) {
 			Carp::croak "Usage: Cv->CvtColor(src, dst, code)";
+		} elsif ($code == &Cv::CV_BGR2RGB   || $code == &Cv::CV_RGB2BGR) {
+			$dst = $src->new;
 		} elsif ($code == &Cv::CV_BGR2GRAY  || $code == &Cv::CV_RGB2GRAY) {
 			$dst = $src->new($src->sizes, &Cv::CV_MAKETYPE($src->type, 1));
 		} elsif ($code == &Cv::CV_GRAY2BGR  || $code == &Cv::CV_GRAY2RGB  ||

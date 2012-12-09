@@ -3,7 +3,7 @@
 use strict;
 # use Test::More qw(no_plan);
 use Test::More tests => 12;
-BEGIN {	use_ok('Cv', qw(:nomore)) }
+BEGIN {	use_ok('Cv', -more) }
 
 my $center = [ map { (int rand 16384) + 0.5 } 0..1 ];
 my $radius = (int rand 16384) + 0.5;

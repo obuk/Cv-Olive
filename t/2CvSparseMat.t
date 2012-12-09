@@ -5,7 +5,7 @@ use strict;
 use Test::More tests => 290;
 
 BEGIN {
-	use_ok('Cv', qw(:nomore));
+	use_ok('Cv', -more);
 }
 
 # structure member

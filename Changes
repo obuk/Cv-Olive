@@ -6,6 +6,7 @@ Revision history for Cv.pm
      * rewrote callbacks
      * removed global data in Cv.xs
      * separating Highgui
+     * s/:nomore/-more/
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl

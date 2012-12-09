@@ -8,6 +8,16 @@ BEGIN {
 	use_ok('Cv');
 }
 
+our $line;
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = "$_[0] at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
+
 SKIP: {
 	skip('version 2.4.0+', 3)
 		unless Cv->version >= 2.004;
@@ -17,7 +27,7 @@ SKIP: {
 	is(scalar Cv->hasModule('Core'), 0);
 	diag("OpenCV modules: ", join(", ", Cv->hasModule));
 
-	my $line = __LINE__ + 1;
+	$line = __LINE__ + 1;
 	eval { Cv->fontQt };
-	is($@, "no Qt at $0 line $line\n");
+	err_is("no Qt");
 }
