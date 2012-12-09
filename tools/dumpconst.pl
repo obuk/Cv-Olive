@@ -244,7 +244,12 @@ sub CV_MAT_TYPE {
 	(($flags) &  &CV_MAT_TYPE_MASK);
 }
 
-sub CV_FOURCC_DEFAULT { Cv::CV_FOURCC('I', 'Y', 'U', 'V') }
+sub CV_FOURCC {
+	my ($c1, $c2, $c3, $c4) = map { split(//, $_) } @_;
+	ord($c1) + (ord($c2) << 8) + (ord($c3) << 16) + (ord($c4) << 24);
+}
+
+sub CV_FOURCC_DEFAULT { CV_FOURCC('IYUV') }
 
 our @CV2IPL_DEPTH = (
 	&IPL_DEPTH_8U,

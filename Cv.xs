@@ -3819,31 +3819,6 @@ OUTPUT:
 int
 CV_ELEM_SIZE(int type)
 
-int
-CV_FOURCC(...)
-PREINIT:
-	int c[4];
-CODE:
-	if (items == 0) XSRETURN_UNDEF;
-	else if (items == 1) {
-		char *s; int i, n;
-		if (!SvPOK(ST(0))) XSRETURN_UNDEF;
-		s = (char*)SvPV_nolen(ST(0));
-		n = strlen(s);
-		for (i = 0; i < DIM(c) && i < n; i++) c[i] = s[i];
-		for (; i < DIM(c); i++) c[i] = ' ';
-	} else {
-		char *s; int i, n;
-		for (i = 0; i < DIM(c) && i < items; i++) {
-			if (SvIOK(ST(i))) c[i] = SvIV(ST(i));
-			else if (SvPOK(ST(i))) c[i] = *(char*)SvPV_nolen(ST(i));
-			else XSRETURN_UNDEF;
-		}
-		for (; i < DIM(c); i++) c[i] = ' ';
-	}
-	RETVAL = CV_FOURCC(c[0], c[1], c[2], c[3]);
-OUTPUT:
-	RETVAL
 
 # ====================
 #  CV_[H-N]
