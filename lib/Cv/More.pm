@@ -320,13 +320,7 @@ sub ContourArea {
 	}
 	my $slice = shift || &Cv::CV_WHOLE_SEQ;
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	my $retval = cvContourArea($self, $slice);
-	if (wantarray) {
-		return @$retval if $Cv::O{cs};
-		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'}
-	}
-	return $retval;
+	cvContourArea($self, $slice);
 }
 
 { *FitEllipse = \&FitEllipse2 }
