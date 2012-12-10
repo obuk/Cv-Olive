@@ -214,13 +214,13 @@ SKIP: {
 		my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
 		$line = __LINE__ + 1;
 		eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
-		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range)");
+		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtrND");
 	}
 
 	if (22) {
 		$line = __LINE__ + 1;
 		eval { Cv::MatND->new([], CV_8UC1, []) };
-		err_is("OpenCV Error: One of arguments' values is out of range (non-positive or too large number of dimensions)");
+		err_is("OpenCV Error: One of arguments' values is out of range (non-positive or too large number of dimensions) in cvCreateMatNDHeader");
 	}
 
 }

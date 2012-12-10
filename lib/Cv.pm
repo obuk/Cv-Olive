@@ -1216,6 +1216,28 @@ our %ERROR = (
     userdata => undef,
     );
 
+our $ERROR = sub {
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+	local $Carp::CarpInternal{Cv} = 1;
+	my ($status, $func_name, $err_msg, $file_name, $line) = @_;
+	$ERROR{status} = $status;
+	$func_name ||= 'unknown function';
+	my $mode = $ERROR{mode};
+	if ($mode == 0 || $mode == 1) {
+		if (my $handler = $ERROR{handler}) {
+			&{$handler}(
+				 $status, $func_name, $err_msg, $file_name, $line,
+				 $ERROR{userdata},
+			);
+		}
+	}
+	my $long = join(' ', "OpenCV Error:", cvErrorStr($status), "($err_msg)",
+					"in $func_name");
+	my $morelong = join(', ', $long, "file $file_name", "line $line");
+	my $short = "$func_name: @{[cvErrorStr($status)]} ($err_msg)";
+	Carp::croak $long if $mode == 0;
+};
+
 # CvErrorCallback cvRedirectError(
 #  CvErrorCallback error_handler, void* userdata=NULL, void** prevUserdata=NULL)
 sub cvRedirectError {

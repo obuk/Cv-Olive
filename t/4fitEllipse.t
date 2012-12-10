@@ -63,39 +63,38 @@ sub color {
 	[ map { (rand 128) + 127 } 1..3 ];
 }
 
-SKIP: {
-	skip "can't use Capture::Tiny", 10 unless eval {
-		require Capture::Tiny;
-		sub capture (&;@) { goto &Capture::Tiny::capture };
-	};
 
-	my $pts3 = [[1, 2], [2, 3], [3, 4]];
-	my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
+# Cv-0.19
+our $line;
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = shift(@_) . " at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
 
-	my ($stdout, $stderr); my $line;
-	Cv::More->unimport(qw(cs cs-warn));
-	Cv::More->import(qw(cs-warn));
-	($stdout, $stderr) = capture {
-		my @list = Cv->FitEllipse($pts5);
-		is(scalar @list, 1);	# 4
-	};
-	is($stdout, '');			# 5
-	like($stderr, qr/but .* scaler/); # 6
+$line = __LINE__ + 1;
+eval { my @list = Cv->FitEllipse };
+err_is('Usage: Cv->FitEllipse2(points)');
 
-	Cv::More->unimport(qw(cs-warn));
-	($stdout, $stderr) = capture {
-		my @list = Cv->FitEllipse($pts5);
-	};
-	is($stdout, '');			# 7
-	is($stderr, '');			# 8
+my $pts3 = [[1, 2], [2, 3], [3, 4]];
+my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
-	($stdout, $stderr) = capture {
-		eval {
-			$line = __LINE__ + 1;
-			my @list = Cv->FitEllipse($pts3);
-		};
-	};
-	like($@, qr/Incorrect size/); # 9
-	like($@, qr/line $line/);	# 10
-
+$line = __LINE__ + 1;
+eval { my @list = Cv->FitEllipse($pts3) };
+err_is("OpenCV Error: Incorrect size of input array (Number of points should be >= 5) in cvFitEllipse2");
+ 
+Cv::More->unimport(qw(cs cs-warn));
+Cv::More->import(qw(cs-warn));
+{
+	local *STDERR_COPY;
+	open(STDERR_COPY, '>&STDERR');
+	open(STDERR, ">$$.tmp");
+	$line = __LINE__ + 1;
+	eval { my @line = Cv->FitLine($pts5); };
+	open(STDERR, ">&STDERR_COPY");
+	$@ = `cat $$.tmp; rm $$.tmp`;
+	err_is("called in list context, but returning scaler");
 }

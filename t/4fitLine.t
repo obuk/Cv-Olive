@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 11;
+# use Test::More qw(no_plan);
+use Test::More tests => 25;
 BEGIN { use_ok('Cv') }
 
 if (1) {
@@ -86,42 +86,39 @@ if (14) {
 	cmp_ok(abs($z0 - ($vz / $vx) * $x0), '<', 1 + 1e-6);
 }
 
-SKIP: {
-	skip "can't use Capture::Tiny", 10 unless eval {
-		require Capture::Tiny;
-		sub capture (&;@) { goto &Capture::Tiny::capture };
-	};
 
-	my ($stdout, $stderr); my $line;
-	Cv::More->unimport(qw(cs cs-warn));
-	Cv::More->import(qw(cs-warn));
-	($stdout, $stderr) = capture {
-		my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
-		is(scalar @line, 1);	# 4
-	};
-	is($stdout, '');			# 5
-	like($stderr, qr/but .* scaler/); # 6
+# Cv-0.19
+our $line;
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = shift(@_) . " at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
 
-	Cv::More->unimport(qw(cs-warn));
-	($stdout, $stderr) = capture {
-		my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]);
-	};
-	is($stdout, '');			# 7
-	is($stderr, '');			# 8
+$line = __LINE__ + 1;
+eval { my @line = Cv->FitLine };
+err_is('Usage: Cv->FitLine(points ...)');
 
-	($stdout, $stderr) = capture {
-		eval {
-			$line = __LINE__ + 1;
-			my @line = Cv->FitLine;
-		};
-	};
-	like($@, qr/line $line/);	# 9
+$line = __LINE__ + 1;
+eval { my @line = Cv->FitLine([]) };
+err_is('Cv->FitLine: points is not [ pt1, pt2, ... ]');
 
-	($stdout, $stderr) = capture {
-		eval {
-			my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1);
-		};
-	};
-	like($@, qr/OpenCV Error:/); # 10
+$line = __LINE__ + 1;
+eval { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) };
+err_is('OpenCV Error: Bad argument (User-defined distance is not allowed) in cvFitLine');
 
+Cv::More->unimport(qw(cs cs-warn));
+Cv::More->import(qw(cs-warn));
+{
+	local *STDERR_COPY;
+	open(STDERR_COPY, '>&STDERR');
+	open(STDERR, ">$$.tmp");
+	$line = __LINE__ + 1;
+	eval { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]) };
+	open(STDERR, ">&STDERR_COPY");
+	$@ = `cat $$.tmp; rm $$.tmp`;
+	err_is("called in list context, but returning scaler");
 }

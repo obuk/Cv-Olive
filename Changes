@@ -1,15 +1,16 @@
 Revision history for Cv.pm
 
-0.19 - 2012-12-08 (working)
+0.19 - 2012-12-10 (working)
      * fixed croak error location in AUTOLOAD relaying at first
      * removed Cv::alias
-     * rewrote callbacks
      * removed global data in Cv.xs
-     * separating Highgui
+     * rewrote cv::error to use Perl error handler $Cv::ERROR
+     * rewrote other callbacks
+     * separated Highgui
      * s/:nomore/-more/
      * fixed // op for perl-5.8.9
-     * fixed cvHasGUI() location
      * rewrote CV_FOURCC
+     * MYEXTLIB is no longer needed
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl

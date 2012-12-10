@@ -13,14 +13,14 @@ our $line;
 
 sub err_is {
 	our $line;
-	my $m = shift;
-	chomp(my $e = $@);
-	$e =~ s/\.$//;
-	unshift(@_, $e, "$m at $0 line $line");
+	chop(my $a = $@);
+	my $b = shift(@_) . " at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
 	goto &is;
 }
 
-sub is_ss {
+sub is_array {
 	my $a = shift;
 	my $b = shift;
 	unshift(@_,
@@ -38,24 +38,24 @@ if (1) {
 	is($arr->cols, 1);
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_ss($list[0], [1, 2]);
-	is_ss($list[1], [3, 4]);
-	is_ss($list[2], [5, 6]);
+	is_array($list[0], [1, 2]);
+	is_array($list[1], [3, 4]);
+	is_array($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 1]);
 	is(scalar @list2, 1);
-	is_ss($list2[0], [3, 4]);
+	is_array($list2[0], [3, 4]);
 
 	$arr->toArray(\my @list3);
 	is(scalar @list3, 3);
-	is_ss($list3[0], [1, 2]);
-	is_ss($list3[1], [3, 4]);
-	is_ss($list3[2], [5, 6]);
+	is_array($list3[0], [1, 2]);
+	is_array($list3[1], [3, 4]);
+	is_array($list3[2], [5, 6]);
 
 	$arr->toArray(\my @list4, [0, 1]);
 	is(scalar @list4, 2);
-	is_ss($list4[0], [1, 2]);
-	is_ss($list4[1], [3, 4]);
+	is_array($list4[0], [1, 2]);
+	is_array($list4[1], [3, 4]);
 }
 
 if (2) {
@@ -66,14 +66,14 @@ if (2) {
 
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_ss($list[0], [1, 2]);
-	is_ss($list[1], [3, 4]);
-	is_ss($list[2], [5, 6]);
+	is_array($list[0], [1, 2]);
+	is_array($list[1], [3, 4]);
+	is_array($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 2]);
 	is(scalar @list2, 2);
-	is_ss($list2[0], [3, 4]);
-	is_ss($list2[1], [5, 6]);
+	is_array($list2[0], [3, 4]);
+	is_array($list2[1], [5, 6]);
 }
 
 if (3) {
@@ -88,7 +88,7 @@ if (3) {
 	is($arr->cols, 3);
 	$line = __LINE__ + 1;
 	eval { my @list = @$arr };
-	err_is("can't convert 3x3");
+	err_is("Cv::Arr::ToArray: can't convert 3x3");
 }
 
 
@@ -100,24 +100,24 @@ if (11) {
 	is($arr->cols, 0);
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_ss($list[0], [1, 2]);
-	is_ss($list[1], [3, 4]);
-	is_ss($list[2], [5, 6]);
+	is_array($list[0], [1, 2]);
+	is_array($list[1], [3, 4]);
+	is_array($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 1]);
 	is(scalar @list2, 1);
-	is_ss($list2[0], [3, 4]);
+	is_array($list2[0], [3, 4]);
 
 	$arr->toArray(\my @list3);
 	is(scalar @list3, 3);
-	is_ss($list3[0], [1, 2]);
-	is_ss($list3[1], [3, 4]);
-	is_ss($list3[2], [5, 6]);
+	is_array($list3[0], [1, 2]);
+	is_array($list3[1], [3, 4]);
+	is_array($list3[2], [5, 6]);
 
 	$arr->toArray(\my @list4, [0, 1]);
 	is(scalar @list4, 2);
-	is_ss($list4[0], [1, 2]);
-	is_ss($list4[1], [3, 4]);
+	is_array($list4[0], [1, 2]);
+	is_array($list4[1], [3, 4]);
 }
 
 if (12) {
@@ -128,14 +128,14 @@ if (12) {
 
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_ss($list[0], [1, 2]);
-	is_ss($list[1], [3, 4]);
-	is_ss($list[2], [5, 6]);
+	is_array($list[0], [1, 2]);
+	is_array($list[1], [3, 4]);
+	is_array($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 2]);
 	is(scalar @list2, 2);
-	is_ss($list2[0], [3, 4]);
-	is_ss($list2[1], [5, 6]);
+	is_array($list2[0], [3, 4]);
+	is_array($list2[1], [5, 6]);
 }
 
 if (13) {
@@ -150,5 +150,5 @@ if (13) {
 	is($arr->cols, 3);
 	$line = __LINE__ + 1;
 	eval { my @list = @$arr };
-	err_is("can't convert 3x3");
+	err_is("Cv::Arr::ToArray: can't convert 3x3");
 }

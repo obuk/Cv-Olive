@@ -123,9 +123,6 @@ cover:
 	cover
 	find cover_db -type d |xargs chmod +rx
 
-\$(MYEXTLIB):
-	cd xlib && \$(MAKE) \$(PASSTHRU)
-
 ";
 }
 

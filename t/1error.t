@@ -22,7 +22,7 @@ our $line;
 sub err_is {
 	our $line;
 	chop(my $a = $@);
-	my $b = "$_[0] at $0 line $line";
+	my $b = shift(@_) . " at $0 line $line";
 	$b .= '.' if $a =~ m/\.$/;
 	unshift(@_, "$a\n", "$b\n");
 	goto &is;
@@ -136,7 +136,7 @@ SKIP: {
 		Cv->setErrMode(0);
 		Cv->redirectError(\&myerror);
 		$line = __LINE__ + 1;
-		eval { Cv->createImage([-1, -1], 8, 3); };
-		err_is("OpenCV Error: Unknown error code -25 (Bad input roi)");
+		eval { Cv::cvCreateImage([-1, -1], 8, 3); };
+		err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");
 	}
 }

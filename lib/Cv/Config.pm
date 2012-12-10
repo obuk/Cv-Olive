@@ -116,6 +116,8 @@ sub version {
 }
 
 
+=xxx
+
 sub myextlib {
 	my $self = shift;
 	unless (defined $self->{MYEXTLIB}) {
@@ -133,6 +135,8 @@ sub myextlib {
 	$self->{MYEXTLIB};
 }
 
+=cut
+
 
 sub c {
 	my $self = shift;
@@ -141,7 +145,7 @@ sub c {
 		LD       => $self->cc,
 		CCFLAGS  => $self->ccflags,
 		LIBS     => $self->libs,
-		MYEXTLIB => $self->myextlib,
+		# MYEXTLIB => $self->myextlib,
 		TYPEMAPS => $self->typemaps,
 		AUTO_INCLUDE => join("\n", (
 								 '#undef do_open',

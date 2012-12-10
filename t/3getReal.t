@@ -7,6 +7,18 @@ BEGIN {
 	use_ok('Cv', -more);
 }
 
+
+our $line;
+
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = shift(@_) . " at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
+
 # ------------------------------------------------------------
 # double cvGetReal1D(const CvArr* arr, int idx0)
 # double cvGetReal2D(const CvArr* arr, int idx0, int idx1)

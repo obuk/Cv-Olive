@@ -28,16 +28,16 @@ extern "C" {
 #define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 
-// #include <opencv/cvaux.h>
+#include <opencv/cvaux.h>
 
 #ifdef __cplusplus
 #  ifdef __OPENCV_OLD_CV_H__
 #    include <opencv2/opencv.hpp>
 #  endif
 #else
-// #  if _CV_VERSION() >= _VERSION(2,4,0)
-// #    include <opencv2/photo/photo_c.h>
-// #  endif
+#  if _CV_VERSION() >= _VERSION(2,4,0)
+#    include <opencv2/photo/photo_c.h>
+#  endif
 #endif
 
 #ifdef __cplusplus
@@ -51,10 +51,10 @@ typedef char tiny;
 #define VOID void
 #define CvWindow void
 
-// typedef struct CvCircle {
-// 	CvPoint2D32f center;
-// 	float radius;
-// } CvCircle;
+typedef struct CvCircle {
+	CvPoint2D32f center;
+	float radius;
+} CvCircle;
 
 
 #define DIM(x) (sizeof(x)/sizeof((x)[0]))
@@ -157,7 +157,6 @@ static void cb_trackbar(int pos)
 	}
 }
 
-/* CvMouseCallback */
 
 static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 {
@@ -181,65 +180,31 @@ static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 }
 
 
-#if 0
 #if _CV_VERSION() >= _VERSION(2,0,0)
 #ifdef __cplusplus
 void cv::error(const Exception& exc)
 {
-	int status = exc.code;
-	const char* func_name = exc.func.size() > 0 ?
-		exc.func.c_str() : "unknown function";
-	const char* err_msg = exc.err.c_str();
-	const char* file_name = exc.file.c_str();
-	int line = exc.line;
-	SV* handler = (SV*)0;
-	IV mode = 0;
-	SV* userdata = &PL_sv_undef;
-	HV* Cv_ERROR = get_hv("Cv::ERROR", 0);
-	// fprintf(stderr, "%s(%d): cv::error\n", __FILE__, __LINE__);
-	if (Cv_ERROR) { SV** q;
-		hv_store(Cv_ERROR, "status", 6, newSViv(status), 0);
-		if ((q = hv_fetch(Cv_ERROR, "handler", 7, 0)) &&
-			SvROK(*q) && SvTYPE(SvRV(*q)) == SVt_PVCV) {
-			handler = *q;
-		}
-		if ((q = hv_fetch(Cv_ERROR, "mode", 4, 0)) && SvIOK(*q)) {
-			mode = SvIV(*q);
-		}
-		if ((q = hv_fetch(Cv_ERROR, "userdata", 8, 0)) && SvOK(*q)) {
-			userdata = *q;
-		}
-		if (handler && (mode == 0 || mode == 1)) {
-			dSP;
-			ENTER;
-			SAVETMPS;
-			PUSHMARK(SP);
-			EXTEND(SP, 6);
-			PUSHs(sv_2mortal(newSViv(status)));
-			PUSHs(sv_2mortal(newSVpvn(func_name, strlen(func_name))));
-			PUSHs(sv_2mortal(newSVpvn(err_msg, strlen(err_msg))));
-			PUSHs(sv_2mortal(newSVpvn(file_name, strlen(file_name))));
-			PUSHs(sv_2mortal(newSViv(line)));
-			PUSHs(userdata);
-			PUTBACK;
-			call_sv(handler, G_EVAL|G_DISCARD);
-			FREETMPS;
-			LEAVE;
-		}
-	}
-	if (mode == 0) {
-		int original = 0;
-		if (original) {
-			const char* fmt = "OpenCV Error: %s (%s) in %s, file %s, line %d";
-			Perl_croak(aTHX_ fmt, cvErrorStr(exc.code), err_msg,
-				file_name, line);
-		} else {
-			const char* fmt = "OpenCV Error: %s (%s)";
-			Perl_croak(aTHX_ fmt, cvErrorStr(exc.code), err_msg);
-		}
+	SV* handler = get_sv("Cv::ERROR", 0);
+	if (handler && SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV) {
+		dSP;
+		ENTER;
+		SAVETMPS;
+		PUSHMARK(SP);
+		EXTEND(SP, 5);
+		PUSHs(sv_2mortal(newSViv(exc.code)));
+		PUSHs(sv_2mortal(newSVpv(exc.func.c_str(), 0)));
+		PUSHs(sv_2mortal(newSVpv(exc.err.c_str(), 0)));
+		PUSHs(sv_2mortal(newSVpv(exc.file.c_str(), 0)));
+		PUSHs(sv_2mortal(newSViv(exc.line)));
+		PUTBACK;
+		call_sv(handler, G_VOID|G_DISCARD);
+		FREETMPS;
+		LEAVE;
+	} else {
+		Perl_croak(aTHX_ "cv::error: can't call Cv::ERROR");
+		throw exc;
 	}
 }
-#endif
 #endif
 #endif
 
