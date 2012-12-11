@@ -1496,7 +1496,7 @@ sub Resize {
 	my $dst;
 	if (@_ && ref $_[0] eq 'ARRAY') {
 		my $sizes = shift;
-		$dst = $src->new([reverse @$sizes]);
+		$dst = $src->new($sizes);
 	} else {
 		$dst = dst(@_) || $src->new;
 	}

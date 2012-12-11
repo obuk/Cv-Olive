@@ -13,12 +13,12 @@ my $cap = Cv->captureFromCAM(0);
 # my $fourcc = CV_FOURCC("U263");
 # my $fourcc = CV_FOURCC("FLV1");
 my $fourcc = CV_FOURCC("DIVX");
-my $size = [320, 240];
-my $video = Cv->createVideoWriter("sample.avi", $fourcc, 10, $size);
+my ($w, $h) = (320, 240);
+my $video = Cv->createVideoWriter("sample.avi", $fourcc, 10, [$w, $h]);
 while (my $frame = $cap->query) {
     $frame->flip(\0, 1)->show('Cv');
     my $c = Cv->waitKey(100);
     $c &= 0x7f if ($c >= 0);
     last if ($c == 27);
-    $video->write($frame->resize($size));
+    $video->writeFrame($frame->resize([$h, $w]));
 }

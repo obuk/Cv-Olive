@@ -12,7 +12,6 @@ Revision history for Cv.pm
      * rewrote CV_FOURCC
      * MYEXTLIB is no longer needed
      * fixed ContourArea's retval
-     * fixed resize bug if the size passed instead of dst image
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl
