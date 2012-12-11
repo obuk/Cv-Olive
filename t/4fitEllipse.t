@@ -89,12 +89,9 @@ err_is("OpenCV Error: Incorrect size of input array (Number of points should be 
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
 {
-	local *STDERR_COPY;
-	open(STDERR_COPY, '>&STDERR');
-	open(STDERR, ">$$.tmp");
+	no warnings 'redefine';
+	local *Carp::carp = \&Carp::croak;
 	$line = __LINE__ + 1;
 	eval { my @line = Cv->FitLine($pts5); };
-	open(STDERR, ">&STDERR_COPY");
-	$@ = `cat $$.tmp; rm $$.tmp`;
 	err_is("called in list context, but returning scaler");
 }

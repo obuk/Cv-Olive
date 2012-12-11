@@ -113,12 +113,9 @@ err_is('OpenCV Error: Bad argument (User-defined distance is not allowed) in cvF
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
 {
-	local *STDERR_COPY;
-	open(STDERR_COPY, '>&STDERR');
-	open(STDERR, ">$$.tmp");
+	no warnings 'redefine';
+	local *Carp::carp = \&Carp::croak;
 	$line = __LINE__ + 1;
 	eval { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]) };
-	open(STDERR, ">&STDERR_COPY");
-	$@ = `cat $$.tmp; rm $$.tmp`;
 	err_is("called in list context, but returning scaler");
 }

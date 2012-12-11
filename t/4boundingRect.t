@@ -63,3 +63,27 @@ if (2) {
 sub color {
 	[ map { (rand 128) + 127 } 1..3 ];
 }
+
+
+# Cv-0.19
+our $line;
+
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = shift(@_) . " at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
+
+Cv::More->unimport(qw(cs));
+Cv::More->import(qw(cs-warn));
+
+if (11) {
+	no warnings 'redefine';
+	local *Carp::carp = \&Carp::croak; # capturing carp as croak
+	$line = __LINE__ + 1;
+	eval { my @retval = Cv->boundingRect([10,20], [10,30]) };
+	err_is("called in list context, but returning scaler");
+}
