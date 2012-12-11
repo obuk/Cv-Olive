@@ -5,6 +5,7 @@ package Cv::Highgui;
 use 5.008008;
 use strict;
 use warnings;
+use Carp;
 
 require Exporter;
 
@@ -78,6 +79,20 @@ package Cv::Capture;
 
 package Cv::VideoWriter;
 { *new = \&Cv::CreateVideoWriter }
+
+
+package Cv;
+
+use Scalar::Util qw(looks_like_number);
+
+sub CreateVideoWriter {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	my $filename = shift;
+	my $fourcc = shift;
+	$fourcc = CV_FOURCC($fourcc) unless looks_like_number($fourcc);
+	unshift(@_, $filename, $fourcc);
+	goto &cvCreateVideoWriter;
+}
 
 
 # ============================================================

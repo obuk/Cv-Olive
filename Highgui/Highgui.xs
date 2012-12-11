@@ -540,18 +540,7 @@ cvSetCaptureProperty(CvCapture* capture, int property_id, double value)
 
 MODULE = Cv::Highgui	PACKAGE = Cv
 CvVideoWriter*
-cvCreateVideoWriter(const char* filename, SV* fourcc, double fps, CvSize frame_size, int is_color=1)
-INIT:
-	int cc;
-	if (SvPOK(fourcc)) {
-		char* cp = SvPV_nolen(fourcc);
-		cc = CV_FOURCC(cp[0], cp[1], cp[2], cp[3]);
-	} else if (SvIOK(fourcc)) {
-		cc = SvIV(fourcc);
-	} else {
-		croak("fourcc: expected \"MJPG\" or CV_FOURCC('M', 'J', 'P', 'G')");
-	}
-C_ARGS:	filename, cc, fps, frame_size, is_color
+cvCreateVideoWriter(const char* filename, int fourcc, double fps, CvSize frame_size, int is_color=1)
 
 
 MODULE = Cv::Highgui	PACKAGE = Cv::VideoWriter
