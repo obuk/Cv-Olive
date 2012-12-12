@@ -228,6 +228,7 @@ t/4CvSeq-Point.t
 t/4CvSeq-Point2.t
 t/4CvSeq-Rect.t
 t/4CvSeq-SURFPoint.t
+t/4CvVideoWriter.t
 t/4fitEllipse.t
 t/4fitLine.t
 t/4fontQt.t

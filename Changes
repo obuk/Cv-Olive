@@ -15,7 +15,6 @@ Revision history for Cv.pm
      * rewrote CV_FOURCC
      * MYEXTLIB is no longer needed
      * fixed ContourArea's retval
-     * fixed t/4CvVideoWriter.t
 
 0.18 - 2012-11-28
      * fixed tools/dumpconst.pl
