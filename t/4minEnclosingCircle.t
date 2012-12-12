@@ -55,3 +55,36 @@ if (11) {
 	is(xy($center), xy([150, 150]));
 	ok(abs($radius - 50*sqrt(2)) < 3);
 }
+
+
+# Cv-0.19
+our $line;
+sub err_is {
+	our $line;
+	chop(my $a = $@);
+	my $b = shift(@_) . " at $0 line $line";
+	$b .= '.' if $a =~ m/\.$/;
+	unshift(@_, "$a\n", "$b\n");
+	goto &is;
+}
+
+{
+	Cv::More->unimport(qw(cs cs-warn));
+	Cv::More->import(qw(cs-warn));
+	no warnings 'redefine';
+	local *Carp::carp = \&Carp::croak;
+	$line = __LINE__ + 1;
+	eval { my @line = Cv->minEnclosingCircle(\@points); };
+	err_is("called in list context, but returning scaler");
+}
+
+{
+	Cv::More->unimport(qw(cs cs-warn));
+	Cv::More->import(qw(cs));
+	no warnings 'redefine';
+	local *Carp::carp = \&Carp::croak;
+	eval {
+		my @line = Cv->minEnclosingCircle(\@points);
+		is(@line, 2);
+	};
+}

@@ -85,13 +85,14 @@ my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 $line = __LINE__ + 1;
 eval { my @list = Cv->FitEllipse($pts3) };
 err_is("OpenCV Error: Incorrect size of input array (Number of points should be >= 5) in cvFitEllipse2");
- 
+
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
+
 {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
 	$line = __LINE__ + 1;
-	eval { my @line = Cv->FitLine($pts5); };
+	eval { my @line = Cv->FitEllipse($pts5); };
 	err_is("called in list context, but returning scaler");
 }
