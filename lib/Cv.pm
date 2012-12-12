@@ -341,6 +341,7 @@ sub cvPoint2D64f   { [ unpack("d2", pack("d2", @_)) ]; }
 sub cvPoint3D32f   { [ unpack("f3", pack("f3", @_)) ]; }
 sub cvPoint3D64f   { [ unpack("d3", pack("d3", @_)) ]; }
 sub cvPointFrom32f { cvPoint(@{$_[0]}); }
+sub cvPointTo32f   { cvPoint2D32f(@{$_[0]}); }
 sub cvPointTo2D32f { cvPoint2D32f(@{$_[0]}); }
 sub cvPointTo3D32f { cvPoint3D32f(@{$_[0]}); }
 sub cvPointTo3D64f { cvPoint3D64f(@{$_[0]}); }
