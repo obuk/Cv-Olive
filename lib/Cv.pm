@@ -39,7 +39,7 @@ use Carp;
 use Scalar::Util qw(blessed);
 use warnings::register;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 use Cv::Constant qw(:all);
 
@@ -73,7 +73,6 @@ sub import {
 	my %auto = (
 		more => 'Cv::More',
 		seq => 'Cv::Seq',
-		highgui => 'Cv::Highgui',
 		);
 	for (@_) {
 		if (/^(:no|-)(\w+)$/) {
@@ -253,6 +252,7 @@ sub autoload {
 	my $family = $1;
 	if (my $code = assoc($family, $short)) {
 		{ no strict 'refs'; *$AUTOLOAD = $code }
+		local $@;
 		if (wantarray) {
 			my @cc; eval { @cc = &$code };
 			return @cc unless $@;
@@ -265,7 +265,6 @@ sub autoload {
 		}
 		local $_ = $@;
 		s/\s+at \S+ line \S+\n?$//;
-		# Carp::croak $@;
 		Carp::croak $_;
 	}
 	Carp::croak "can't call $AUTOLOAD";
@@ -1743,6 +1742,69 @@ package Cv::Kalman;
 { *Correct = \&KalmanCorrect }
 { *Predict = \&KalmanPredict }
 
+
+# ============================================================
+#  highgui. High-level GUI and Media I/O: User Interface
+# ============================================================
+
+package Cv;
+
+our %MOUSE = ( );
+our %TRACKBAR = ( );
+
+package Cv::Arr;
+{ *Show = \&ShowImage }
+
+# ============================================================
+#  highgui. High-level GUI and Media I/O: Reading and Writing Images and Video
+# ============================================================
+
+package Cv::Arr;
+
+sub EncodeImage {
+	$_[2] = my $params = \0 unless defined $_[2];
+	goto &cvEncodeImage;
+}
+
+package Cv::Image;
+{ *Load = \&Cv::LoadImage }
+
+package Cv::Mat;
+{ *Load = \&Cv::LoadImageM }
+
+package Cv::Arr;
+{ *Save = \&SaveImage }
+
+package Cv::Capture;
+{ *FromCAM = \&Cv::CaptureFromCAM }
+{ *FromFile = *FromAVI = \&Cv::CaptureFromFile }
+{ *GetProperty = \&GetCaptureProperty }
+{ *Grab = \&GrabFrame }
+{ *Query = \&QueryFrame }
+{ *Retrieve = \&RetrieveFrame }
+{ *SetProperty = \&SetCaptureProperty }
+
+package Cv::VideoWriter;
+{ *new = \&Cv::CreateVideoWriter }
+
+
+package Cv;
+
+use Scalar::Util qw(looks_like_number);
+
+sub CreateVideoWriter {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	my $filename = shift;
+	my $fourcc = shift;
+	$fourcc = CV_FOURCC($fourcc) unless looks_like_number($fourcc);
+	unshift(@_, $filename, $fourcc);
+	goto &cvCreateVideoWriter;
+}
+
+
+# ============================================================
+#  highgui. High-level GUI and Media I/O: Qt new functions
+# ============================================================
 
 # ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera

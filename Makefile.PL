@@ -97,7 +97,7 @@ WriteMakefile(
 	dynamic_lib => $cf->dynamic_lib,
 	INC => "-I. -I..",
 	DIR => [
-		qw(Highgui),
+		# qw(Highgui),
 	],
 	clean => {
 		FILES => [

@@ -11,14 +11,6 @@ fallback/Constant.pm-2.4.0
 fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
-Highgui/Changes
-Highgui/Highgui.xs
-Highgui/lib/Cv/Highgui.pm
-Highgui/Makefile.PL
-Highgui/MANIFEST
-Highgui/ppport.h
-Highgui/README
-Highgui/t/Cv-Highgui.t
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
@@ -35,6 +27,7 @@ lib/Cv/Seq/Point2.pm
 lib/Cv/Seq/Rect.pm
 lib/Cv/Seq/SURFPoint.pm
 lib/Cv/typemap
+lib/t
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -205,6 +198,7 @@ t/3matchTemplate.t
 t/3merge.t
 t/3minMaxLoc.t
 t/3mixChannels.t
+t/3morphologyEx.t
 t/3mouse.t
 t/3polyLine.t
 t/3ptr.t

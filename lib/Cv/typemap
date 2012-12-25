@@ -649,13 +649,13 @@ T_CvSubdiv2DPoint
 				$var.pt.y = SvNV((SV*)*av_fetch(av_pt, 1, 0));
 			} else
 				err++;
-#if CV_MAJOR_VERSION >= 2
-			if (av_len(av_pt) >= 2) {
-				SV* sv_id = (SV*)*av_fetch((AV*)SvRV(av), 3, 0);
-				$var.id = SvIV(sv_id);
-			} else
-				err++;
-#endif
+			if (CV_MAJOR_VERSION >= 2) {
+				if (av_len(av_pt) >= 2) {
+					SV* sv_id = (SV*)*av_fetch((AV*)SvRV(av), 3, 0);
+					$var.id = SvIV(sv_id);
+				} else
+					err++;
+			}
 		} else
 			err++;
 		if (err)
@@ -1012,9 +1012,9 @@ T_CvSubdiv2DPoint
 		av_push(av_pt, newSVnv($var.pt.x));
 		av_push(av_pt, newSVnv($var.pt.y));
 		av_push(av, newRV_inc(sv_2mortal((SV*)av_pt)));
-#if CV_MAJOR_VERSION == 2
-		av_push(av, newSViv($var.id));
-#endif
+		if (CV_MAJOR_VERSION >= 2) {
+			av_push(av, newSViv($var.id));
+		}
 		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
 	} STMT_END;
 
@@ -1036,9 +1036,9 @@ T_CvSubdiv2DPointPtr
 			av_push(av_pt, newSVnv(${var}[i].pt.x));
 			av_push(av_pt, newSVnv(${var}[i].pt.y));
 			av_push(av_point, newRV_inc(sv_2mortal((SV*)av_pt)));
-#if _CV_VERSION() >= _VERSION(2,0,0)
-			av_push(av_point, newSViv(${var}[i].id));
-#endif
+			if (CV_MAJOR_VERSION >= 2) {
+				av_push(av_point, newSViv(${var}[i].id));
+			}
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_pointt)));
 		}
 	} STMT_END;
