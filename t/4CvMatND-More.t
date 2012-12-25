@@ -203,12 +203,7 @@ if (16) {
 our $line;
 
 SKIP: {
-	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
-	Cv->setErrMode(1);
-	my $can_hook = Cv->getErrMode() == 1;
-	$can_hook = 0 if $^O eq 'cygwin';
-	Cv->setErrMode(0);
-	skip("can't hook cv:error", 2) unless $can_hook;
+	skip("can't hook error (cygwin)", 2) if $^O eq 'cygwin';
 
 	if (21) {
 		my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);

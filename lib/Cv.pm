@@ -1238,6 +1238,12 @@ our $ERROR = sub {
 	Carp::croak $long if $mode == 0;
 };
 
+# CV_IMPL void cvError(int code, const char* func_name,
+#  const char* err_msg, const char* file_name, int line)
+sub cvError {
+	goto &$ERROR;
+}
+
 # CvErrorCallback cvRedirectError(
 #  CvErrorCallback error_handler, void* userdata=NULL, void** prevUserdata=NULL)
 sub cvRedirectError {

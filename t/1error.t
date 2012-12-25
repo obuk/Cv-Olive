@@ -2,11 +2,23 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 27;
+use Test::More tests => 33;
 
 BEGIN {
 	use_ok('Cv', -more);
 }
+
+if (1) {
+	my $e = "error";
+	$@ = $e;
+	is(Cv::cvErrorStr(-2), "Unspecified error");
+	is($@, $e);
+	is(Cv->ErrorStr(-2), "Unspecified error");
+	is($@, $e);
+	is(Cv->errorStr(-2), "Unspecified error");
+	is($@, $e);
+}
+
 
 use Data::Dumper;
 
@@ -29,15 +41,23 @@ sub err_is {
 }
 
 SKIP: {
-	skip("need v2.0.0+", 25) unless cvVersion() >= 2.000000;
-	Cv->setErrMode(1);
-	my $can_hook = Cv->getErrMode() == 1;
-	$can_hook = 0 if $^O eq 'cygwin';
-	Cv->setErrMode(0);
-	skip("can't hook cv:error", 25) unless $can_hook;
+	skip("can't hook error (cygwin)", 2) if $^O eq 'cygwin';
 
-	$line = __LINE__; eval { Cv->LoadImage };
-	err_is("Usage: Cv::cvLoadImage(filename, iscolor=CV_LOAD_IMAGE_COLOR)");
+	if (1) {
+		my ($status, $funcName, $errMsg, $fileName);
+		eval {
+			$line = __LINE__ + 1;
+			Cv->error(
+				$status = -1,
+				$funcName = "funcName",
+				$errMsg = "errMsg",
+				$fileName = __FILE__,
+				$line,
+				);
+		};
+		err_is(join(' ', "OpenCV Error:", Cv->errorStr($status),
+					"($errMsg)", "in $funcName"));
+	}
 
 	my $err;
 	sub myerror {
@@ -127,14 +147,14 @@ SKIP: {
 				$line = __LINE__,
 				);
 		};
-		ok(!$@);
+		ok(!$@);				# XXXXX
 		is(Cv->getErrStatus(), $status, "errStatus");
 		is($err2, undef);
 	}
 
 	if (4) {
 		Cv->setErrMode(0);
-		Cv->redirectError(\&myerror);
+		Cv->redirectError(sub {});
 		$line = __LINE__ + 1;
 		eval { Cv::cvCreateImage([-1, -1], 8, 3); };
 		err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");

@@ -95,9 +95,7 @@ static void delete_callback(AV* av)
 		} else {
 			croak("callback is 0");
 		}
-		// SvREFCNT_dec(sv);
 	}
-	// SvREFCNT_dec((SV*)av);
 }
 
 static void delete_all_callback(const char* hash)
@@ -109,7 +107,6 @@ static void delete_all_callback(const char* hash)
 			SV* sv = hv_iterval(hv, he);
 			delete_callback((AV*)SvRV(sv));
 		}
-		// hv_clear(hv);
 		hv_undef(hv);
 	}
 }
@@ -179,10 +176,8 @@ static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 	}
 }
 
-#if _CV_VERSION() >= _VERSION(2,0,0)
-#ifdef __cplusplus
-void cv::error(const Exception& exc)
-{
+static int cb_error(int status, const char* func_name, const char* err_msg,
+					const char* file_name, int line, VOID* userdata)  {
 	SV* handler = get_sv("Cv::ERROR", 0);
 	if (handler && SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV) {
 		dSP;
@@ -190,22 +185,36 @@ void cv::error(const Exception& exc)
 		SAVETMPS;
 		PUSHMARK(SP);
 		EXTEND(SP, 5);
-		PUSHs(sv_2mortal(newSViv(exc.code)));
-		PUSHs(sv_2mortal(newSVpv(exc.func.c_str(), 0)));
-		PUSHs(sv_2mortal(newSVpv(exc.err.c_str(), 0)));
-		PUSHs(sv_2mortal(newSVpv(exc.file.c_str(), 0)));
-		PUSHs(sv_2mortal(newSViv(exc.line)));
+		PUSHs(sv_2mortal(newSViv(status)));
+		PUSHs(sv_2mortal(newSVpv(func_name, 0)));
+		PUSHs(sv_2mortal(newSVpv(err_msg, 0)));
+		PUSHs(sv_2mortal(newSVpv(file_name, 0)));
+		PUSHs(sv_2mortal(newSViv(line)));
 		PUTBACK;
 		call_sv(handler, G_VOID|G_DISCARD);
 		FREETMPS;
 		LEAVE;
+		return 0;
 	} else {
-		Perl_croak(aTHX_ "cv::error: can't call Cv::ERROR");
-		throw exc;
+		Perl_croak(aTHX_ "cb_error: can't call Cv::ERROR");
+		return -1;
 	}
 }
-#endif
-#endif
+
+#ifdef __cplusplus
+void cv::error(const Exception& exc)
+{
+	cb_error(exc.code, exc.func.c_str(), exc.err.c_str(),
+			 exc.file.c_str(), exc.line, (VOID*)0);
+}
+#endif /* __cplusplus */
+
+static int cb_error_c(int status, const char* func_name, const char* err_msg,
+					  const char* file_name, int line, VOID* userdata)  {
+	cb_error(status, func_name, err_msg, file_name, line, userdata);
+	Perl_croak(aTHX_ "cb_error: can't throw exc...");
+}
+
 
 SV*
 newSVpvn_ro(const char* s, const STRLEN len)
@@ -1995,9 +2004,7 @@ MODULE = Cv	PACKAGE = Cv
 #PERL# int cvGetErrMode(void)
 #PERL# int cvSetErrMode(int mode)
 #PERL# CvErrorCallback cvRedirectError(CvErrorCallback error_handler, void* userdata=NULL, void** prevUserdata=NULL)
-
-void
-cvError(int status, const char* func_name, const char* err_msg, const char* filename, int line)
+#PERL# void cvError(int status, const char* func_name, const char* err_msg, const char* filename, int line)
 
 const char*
 cvErrorStr(int status)
@@ -4660,3 +4667,8 @@ OUTPUT:
 	RETVAL
 
 #endif
+
+MODULE = Cv		PACKAGE = Cv
+# ====================
+BOOT:
+	cvRedirectError(&cb_error_c, (VOID*)NULL, NULL);
