@@ -239,7 +239,6 @@ t/4projectPoints2.t
 t/4toArray.t
 t/4transform.t
 t/8flipbook.t
-t/8highgui.t
 t/8pango.t
 t/9inlineC.t
 t/9ref.t
