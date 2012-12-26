@@ -24,7 +24,7 @@ SKIP: {
 
 	my $debug = 1;
 	foreach my $q (0 .. 20) {
-		my $params = [ CV_IMWRITE_JPEG_QUALITY, $q ];
+		my $params = [ eval "&CV_IMWRITE_JPEG_QUALITY", $q ];
 		my $jpg = $img->encodeImage(".jpg", $params);
 		# my $jpg = cvEncodeImage($img, ".jpg", $params);
 		isa_ok($jpg, 'Cv::Mat');

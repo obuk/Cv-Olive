@@ -179,6 +179,7 @@ static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 static int cb_error(int status, const char* func_name, const char* err_msg,
 					const char* file_name, int line, VOID* userdata)  {
 	SV* handler = get_sv("Cv::ERROR", 0);
+	cvSetErrStatus(0);
 	if (handler && SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV) {
 		dSP;
 		ENTER;
@@ -199,20 +200,6 @@ static int cb_error(int status, const char* func_name, const char* err_msg,
 		Perl_croak(aTHX_ "cb_error: can't call Cv::ERROR");
 		return -1;
 	}
-}
-
-#ifdef __cplusplus
-void cv::error(const Exception& exc)
-{
-	cb_error(exc.code, exc.func.c_str(), exc.err.c_str(),
-			 exc.file.c_str(), exc.line, (VOID*)0);
-}
-#endif /* __cplusplus */
-
-static int cb_error_c(int status, const char* func_name, const char* err_msg,
-					  const char* file_name, int line, VOID* userdata)  {
-	cb_error(status, func_name, err_msg, file_name, line, userdata);
-	Perl_croak(aTHX_ "cb_error: can't throw exc...");
 }
 
 
@@ -4671,4 +4658,6 @@ OUTPUT:
 MODULE = Cv		PACKAGE = Cv
 # ====================
 BOOT:
-	cvRedirectError(&cb_error_c, (VOID*)NULL, NULL);
+	cvRedirectError(&cb_error, (VOID*)NULL, NULL);
+    cvSetErrMode(1);
+    cvSetErrStatus(0);

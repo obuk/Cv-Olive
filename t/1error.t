@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-# use Test::More qw(no_plan);
-use Test::More tests => 33;
+use Test::More qw(no_plan);
+# use Test::More tests => 33;
 
 BEGIN {
 	use_ok('Cv', -more);
@@ -147,14 +147,14 @@ SKIP: {
 				$line = __LINE__,
 				);
 		};
-		ok(!$@);				# XXXXX
+		ok(!$@);
 		is(Cv->getErrStatus(), $status, "errStatus");
 		is($err2, undef);
 	}
 
 	if (4) {
 		Cv->setErrMode(0);
-		Cv->redirectError(sub {});
+		Cv->redirectError(sub { });
 		$line = __LINE__ + 1;
 		eval { Cv::cvCreateImage([-1, -1], 8, 3); };
 		err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");
