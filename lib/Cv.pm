@@ -252,20 +252,12 @@ sub autoload {
 	my $family = $1;
 	if (my $code = assoc($family, $short)) {
 		{ no strict 'refs'; *$AUTOLOAD = $code }
-		local $@;
 		if (wantarray) {
-			my @cc; eval { @cc = &$code };
-			return @cc unless $@;
-		} elsif (defined wantarray) {
-			my $cc; eval { $cc = &$code };
-			return $cc unless $@;
+			my @cc = &$code;
+			return @cc;
 		} else {
-			eval { &$code };
-			return unless $@;
+			goto &$code;
 		}
-		local $_ = $@;
-		s/\s+at \S+ line \S+\n?$//;
-		Carp::croak $_;
 	}
 	Carp::croak "can't call $AUTOLOAD";
 }
@@ -1207,7 +1199,7 @@ the error, and you can also redirect to your own error hander.
 our %ERROR = (
 	handler => undef,
     handler_sample => sub {
-		local $Carp::CarpInternal{Cv} = 1;
+		# local $Carp::CarpInternal{Cv} = 1;
 		my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 		Carp::croak("$func_name: @{[ cvErrorStr($status) ]} ($err_msg)");
     },
@@ -1217,8 +1209,8 @@ our %ERROR = (
     );
 
 our $ERROR = sub {
-	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	local $Carp::CarpInternal{Cv} = 1;
+	# local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+	# local $Carp::CarpInternal{Cv} = 1;
 	my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 	$ERROR{status} = $status;
 	$func_name ||= 'unknown function';

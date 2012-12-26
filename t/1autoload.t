@@ -9,33 +9,42 @@ BEGIN {
 
 our $line;
 
+sub err_is {
+	our $line;
+	my $m = shift;
+	chomp(my $e = $@);
+	$e =~ s/\.$//;
+	unshift(@_, $e, "$m at $0 line $line");
+	goto &is;
+}
+
 if (1) {
-	eval { Cv->NotDefined() }; $line = __LINE__;
+	$line = __LINE__; eval { Cv->NotDefined() };
 	err_is("can't call Cv::NotDefined");
 }
 
 if (2) {
-	{ package Cv; sub Foo { die "ok" } }
-	eval { Cv->FOO() };
-	like($@, qr/can't/);
-	eval { Cv->Foo() };
-	like($@, qr/^ok at/);
-	eval { Cv->foo() };
-	like($@, qr/^ok at/);
-	eval { Cv->fOO() };
-	like($@, qr/can't/);
+	{ package Cv; sub Foo { } }
+	$line = __LINE__; eval { Cv->FOO() };
+	err_is("can't call Cv::FOO");
+	$line = __LINE__; eval { Cv->Foo() };
+	is($@, '');
+	$line = __LINE__; eval { Cv->foo() };
+	is($@, '');
+	$line = __LINE__; eval { Cv->fOO() };
+	err_is("can't call Cv::fOO");
 }
 
 if (3) {
-	{ package Cv; sub BAR { die "ok" } }
-	eval { Cv->BAR() };
-	like($@, qr/^ok at/);
-	eval { Cv->Bar() };
-	like($@, qr/can't/);
-	eval { Cv->bar() };
-	like($@, qr/^ok at/);
-	eval { Cv->bAR() };
-	like($@, qr/^ok at/);
+	{ package Cv; sub BAR { } }
+	$line = __LINE__; eval { Cv->BAR() };
+	is($@, '');
+	$line = __LINE__; eval { Cv->Bar() };
+	err_is("can't call Cv::Bar");
+	$line = __LINE__; eval { Cv->bar() };
+	is($@, '');
+	$line = __LINE__; eval { Cv->bAR() };
+	is($@, '');
 }
 
 if (4) {
@@ -47,13 +56,4 @@ if (5) {
 	my $cv = bless [], 'Cv';
 	$line = __LINE__; eval { $cv->alloc() };
 	err_is("class name needed");
-}
-
-sub err_is {
-	our $line;
-	my $m = shift;
-	chomp(my $e = $@);
-	$e =~ s/\.$//;
-	unshift(@_, $e, "$m at $0 line $line");
-	goto &is;
 }
