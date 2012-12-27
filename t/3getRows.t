@@ -93,7 +93,8 @@ if (8) {
 }
 
 
-if (11) {
+SKIP: {
+	skip "need OpenCV-2.0+", 1 unless cvVersion() >= 2.0;
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
 	my $submat = eval { $src->GetRows(10, 10) };
 	ok(!$@);

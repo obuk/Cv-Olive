@@ -6,7 +6,7 @@ Revision history for Cv.pm
      * mearged Highgui ...
      * fixed cvError if CC=cc
      * fixed cvError on OpenCV-1.1
-     * fixed some skipped tests (cygwin)
+     * fixed some skipped tests (cygwin, OpenCv-1.1)
 
 0.19a - 2012-12-12
      * fixed t/4CvVideoWriter.t
