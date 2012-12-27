@@ -1184,22 +1184,11 @@ protected as eval { ... }. (Cv-0.13)
     print STDERR "*** got error ***";
  }
 
-But, when you build Cv you have to compile with c++.  You can catch
-the error, and you can also redirect to your own error hander.
-
- Cv->redirectError(
-   sub { my ($status, $funcName, $errMsg, $fileName, $line, $data) = @_;
-       ...
-   },
-   my $data = ...;
- );
-
 =cut
 
 our %ERROR = (
 	handler => undef,
     handler_sample => sub {
-		# local $Carp::CarpInternal{Cv} = 1;
 		my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 		Carp::croak("$func_name: @{[ cvErrorStr($status) ]} ($err_msg)");
     },
@@ -1209,8 +1198,6 @@ our %ERROR = (
     );
 
 our $ERROR = sub {
-	# local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	# local $Carp::CarpInternal{Cv} = 1;
 	my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 	$ERROR{status} = $status;
 	$func_name ||= 'unknown function';
@@ -1225,7 +1212,6 @@ our $ERROR = sub {
 	}
 	my $long = join(' ', "OpenCV Error:", cvErrorStr($status), "($err_msg)",
 					"in $func_name");
-	my $morelong = join(', ', $long, "file $file_name", "line $line");
 	my $short = "$func_name: @{[cvErrorStr($status)]} ($err_msg)";
 	Carp::croak $long if $mode == 0;
 };

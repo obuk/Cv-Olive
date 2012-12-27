@@ -1,10 +1,10 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 6;
+# use Test::More qw(no_pla);
+use Test::More tests => 8;
 BEGIN {
-	use_ok('Cv', qw(:nomore /^cv/));
+	use_ok('Cv', qw(-more /^cv/));
 }
 
 sub err_is {

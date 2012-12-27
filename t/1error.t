@@ -1,32 +1,18 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 33;
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 35;
 
 BEGIN {
 	use_ok('Cv', -more);
 }
 
-if (1) {
-	my $e = "error";
-	$@ = $e;
-	is(Cv::cvErrorStr(-2), "Unspecified error");
-	is($@, $e);
-	is(Cv->ErrorStr(-2), "Unspecified error");
-	is($@, $e);
-	is(Cv->errorStr(-2), "Unspecified error");
-	is($@, $e);
-}
-
-
 use Data::Dumper;
 
 sub D (\@) {
-	Data::Dumper->Dump(
-		[@{$_[0]}],
-		[map { "\$_[$_]" } 0 .. $#{$_[0]}]
-		);
+	Data::Dumper->Dump([@{$_[0]}], [map { "\$_[$_]" } 0 .. $#{$_[0]}]);
 }
 
 our $line;
@@ -41,6 +27,17 @@ sub err_is {
 }
 
 if (1) {
+	my $e = "error";
+	$@ = $e;
+	is(Cv::cvErrorStr(-2), "Unspecified error");
+	is($@, $e);
+	is(Cv->ErrorStr(-2), "Unspecified error");
+	is($@, $e);
+	is(Cv->errorStr(-2), "Unspecified error");
+	is($@, $e);
+}
+
+if (2) {
 	my ($status, $funcName, $errMsg, $fileName);
 	eval {
 		$line = __LINE__ + 1;
@@ -56,49 +53,53 @@ if (1) {
 				"($errMsg)", "in $funcName"));
 }
 
-my $err;
-sub myerror {
-	$err = \@_;
-	# print STDERR "myerror:\n", D(@_);
-}
-
-if (1) {
+if (3) {
+	Cv->setErrMode(0);
 	is(Cv->getErrMode(), 0, "errMode");
-	my ($status, $funcName, $errMsg, $fileName, $line, $data);
+	my ($status, $funcName, $errMsg, $fileName);
+	my $err;
+	sub myError {
+		$err = \@_;
+		# print STDERR "myerror:\n", D(@_);
+	}
 	my $prevError = Cv->redirectError(
-		\&myerror, $data = "mydata",
+		\&myError, my $myData = "mydata",
 		my $prevData,
 		);
 	eval {
+		$line = __LINE__ + 1;
 		Cv->error(
 			$status = -1,
 			$funcName = "funcName",
-			$errMsg = "errMsg",
+			$errMsg = "errMsg0",
 			$fileName = __FILE__,
-			$line = __LINE__,
+			$line,
 			);
 	};
-	ok($@);
+	err_is("OpenCV Error: Backtrace ($errMsg) in $funcName");
 	is(Cv->getErrStatus(), $status, "errStatus");
 	is($err->[0], $status);
 	is($err->[1], $funcName);
 	is($err->[2], $errMsg);
 	is($err->[3], $fileName);
 	is($err->[4], $line);
-	is($err->[5], $data);
+	is($err->[5], $myData);
+	my $prevError2 = Cv->redirectError($prevError, $prevData, my $prevData2);
+	is($prevError2, \&myError);
+	is($prevData2, $myData);
 }
 
-if (2) {
+if (4) {
 	Cv->setErrMode(1);
 	is(Cv->getErrMode(), 1, "errMode1");
-	my ($status, $funcName, $errMsg, $fileName, $line, $data);
-	my $err1;
+	my ($status, $funcName, $errMsg, $fileName);
+	my $err;
 	my $prevError = Cv->redirectError(
-		sub {
-			$err1 = \@_;
+		my $myError = sub {
+			$err = \@_;
 			# print STDERR "myerror1:\n", D(@_);
 		},
-		$data = "mydata1",
+		my $myData = "mydata1",
 		my $prevData,
 		);
 	eval {
@@ -110,46 +111,49 @@ if (2) {
 			$line = __LINE__,
 			);
 	};
-	ok(!$@);
+	is($@, '');
 	is(Cv->getErrStatus(), $status, "errStatus");
-	is($err1->[0], $status);
-	is($err1->[1], $funcName);
-	is($err1->[2], $errMsg);
-	is($err1->[3], $fileName);
-	is($err1->[4], $line);
-	is($err1->[5], $data);
-	is($prevError, \&myerror);
-	is($prevData, "mydata");
+	is($err->[0], $status);
+	is($err->[1], $funcName);
+	is($err->[2], $errMsg);
+	is($err->[3], $fileName);
+	is($err->[4], $line);
+	is($err->[5], $myData);
+	my $prevError2 = Cv->redirectError($prevError, $prevData, my $prevData2);
+	is($prevError2, $myError);
+	is($prevData2, $myData);
 }
 
-if (3) {
+if (5) {
 	Cv->setErrMode(2);
 	is(Cv->getErrMode(), 2, "errMode2");
-	my ($status, $funcName, $errMsg, $fileName, $line, $data);
-	my $err2;
+	my ($status, $funcName, $errMsg, $fileName);
+	my $err;
 	my $prevError = Cv->redirectError(
 		sub {
-			$err2 = \@_;
+			$err = \@_;
 			# print STDERR "myerror1:\n", D(@_);
 		},
-		$data = "mydata2",
+		my $myData = "mydata2",
 		my $prevData,
 		);
 	eval {
+		$line = __LINE__ + 1;
 		Cv->error(
 			$status = -3,
 			$funcName = "funcName2",
 			$errMsg = "errMsg2",
 			$fileName = __FILE__,
-			$line = __LINE__,
+			$line,
 			);
 	};
-	ok(!$@);
+	is($@, '');
 	is(Cv->getErrStatus(), $status, "errStatus");
-	is($err2, undef);
+	is($err, undef);
+	Cv->redirectError($prevError, $prevData);
 }
 
-if (4) {
+if (6) {
 	Cv->setErrMode(0);
 	Cv->redirectError(sub { });
 	$line = __LINE__ + 1;

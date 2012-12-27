@@ -178,7 +178,7 @@ t/3cvtColor.t
 t/3dst.t
 t/3encode.t
 t/3font.t
-t/3GEMM.t
+t/3gemm.t
 t/3getAffineTransform.t
 t/3getCols.t
 t/3getDims.t
