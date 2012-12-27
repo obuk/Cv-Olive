@@ -245,7 +245,12 @@ t/9threads.t
 t/baboon.jpg
 t/hackcv.pm
 t/lena.jpg
+tools/checkref.pl
+tools/cleanup.sh
+tools/cover.sh
 tools/dumpconst-all.pl
 tools/dumpconst.pl
 tools/ref2pl-all.pl
 tools/ref2pl.pl
+tools/test.sh
+tools/testdist.pl

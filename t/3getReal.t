@@ -70,18 +70,15 @@ if (1) {
 	}
 }
 
-SKIP: {
-	skip("can't hook error (cygwin)", 2) if $^O eq 'cygwin';
-	for my $n (1..4) {
-		my $m = Cv::Mat->new([240, 320], CV_64FC($n));
-		my $v = cvScalar(map { rand 1 } 1..$n);
-		my $i = [map { int rand $_ } @{$m->sizes}];
-		eval { $m->set($i, $v) };
-		if ($n == 1) {
-			is($m->getReal($i), $v->[0]);
-		} else {
-			eval { $m->getReal($i) };
-			like($@, qr/OpenCV Error:/i);
-		}
+for my $n (1..4) {
+	my $m = Cv::Mat->new([240, 320], CV_64FC($n));
+	my $v = cvScalar(map { rand 1 } 1..$n);
+	my $i = [map { int rand $_ } @{$m->sizes}];
+	eval { $m->set($i, $v) };
+	if ($n == 1) {
+		is($m->getReal($i), $v->[0]);
+	} else {
+		eval { $m->getReal($i) };
+		like($@, qr/OpenCV Error:/i);
 	}
 }

@@ -203,21 +203,17 @@ if (17) {
 
 our $line;
 
-SKIP: {
-	skip("can't hook error (cygwin)", 2) if $^O eq 'cygwin';
+if (21) {
+	my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
+	$line = __LINE__ + 1;
+	eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
+	err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtr2D");
+}
 
-	if (21) {
-		my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
-		$line = __LINE__ + 1;
-		eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
-		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtr2D");
-	}
-
-	if (22) {
-		$line = __LINE__ + 1;
-		eval { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) };
-		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtr2D");
-	}
+if (22) {
+	$line = __LINE__ + 1;
+	eval { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) };
+	err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtr2D");
 }
 
 

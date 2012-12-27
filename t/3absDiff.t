@@ -54,27 +54,22 @@ if (22) {
 }
 
 
-SKIP: {
-	skip("can't hook error (cygwin)", 2) if $^O eq 'cygwin';
-
-	# broken new
-	if (31) {
-		my $src2 = $src->new;
-		$src->fill([ 21, 22, 23, 24 ]);
-		$src2->fill([ 11, 12, 13, 14 ]);
-		no warnings 'redefine';
-		local *Cv::Mat::new = sub { undef };
-		eval { $src->absDiff($src2) };
-		like($@, qr/dst is not of type CvArr/);
-	}
-
-	# OpenCV Error:
-	if (32) {
-		my $src2 = $src->new;
-		$src->fill([ 21, 22, 23, 24 ]);
-		$src2->fill([ 11, 12, 13, 14 ]);
-		eval { $src->absDiff($src2, \0) };
-		like($@, qr/OpenCV Error:/);
-	}
+# broken new
+if (31) {
+	my $src2 = $src->new;
+	$src->fill([ 21, 22, 23, 24 ]);
+	$src2->fill([ 11, 12, 13, 14 ]);
+	no warnings 'redefine';
+	local *Cv::Mat::new = sub { undef };
+	eval { $src->absDiff($src2) };
+	like($@, qr/dst is not of type CvArr/);
 }
 
+# OpenCV Error:
+if (32) {
+	my $src2 = $src->new;
+	$src->fill([ 21, 22, 23, 24 ]);
+	$src2->fill([ 11, 12, 13, 14 ]);
+	eval { $src->absDiff($src2, \0) };
+	like($@, qr/OpenCV Error:/);
+}

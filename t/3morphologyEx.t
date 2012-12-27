@@ -19,6 +19,7 @@ if (21) {
 	my $element = Cv->CreateStructuringElementEx(3, 3, 1, 1, CV_SHAPE_RECT);
 	my $av;
 	no strict 'refs';
+	no warnings 'redefine';
 	local *Cv::Arr::cvMorphologyEx = sub { $av = \@_; $_[0]; };
 	my $src = Cv->CreateImage([ 320, 240 ], 8, 3);
 	eval { $src->MorphologyEx($element, CV_MOP_OPEN); };
@@ -33,6 +34,7 @@ if (22) {
 	my $element = Cv->CreateStructuringElementEx(3, 3, 1, 1, CV_SHAPE_RECT);
 	my $av;
 	no strict 'refs';
+	no warnings 'redefine';
 	local *Cv::Arr::cvMorphologyEx = sub { $av = \@_; $_[0]; };
 	my $src = Cv->CreateImage([ 320, 240 ], 8, 3);
 	eval { $src->MorphologyEx($element, CV_MOP_TOPHAT); };
@@ -47,6 +49,7 @@ if (23) {
 	my $element = Cv->CreateStructuringElementEx(3, 3, 1, 1, CV_SHAPE_RECT);
 	my $av;
 	no strict 'refs';
+	no warnings 'redefine';
 	local *Cv::Arr::cvMorphologyEx = sub { $av = \@_; $_[0]; };
 	my $src = Cv->CreateImage([ 320, 240 ], 8, 3);
 	my $dst = $src->new;
