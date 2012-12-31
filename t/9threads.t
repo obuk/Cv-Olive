@@ -17,6 +17,7 @@ use Config;
 
 SKIP: {
 	skip('can not use threads', 1) unless $Config{useithreads};
+	skip('need OpenCV 2.0+', 1) unless cvVersion() >= 2.0;
 	eval 'use threads;';
 	eval 'use Thread::Queue;';
 

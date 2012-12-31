@@ -72,31 +72,22 @@ if (6) {
 	is($v1->[$_], $v2->[$_]) for 0 .. $src->channels - 1;
 }
 
-SKIP: {
-	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
-	Cv->setErrMode(1);
-	my $can_hook = Cv->getErrMode() == 1;
-	$can_hook = 0 if $^O eq 'cygwin';
-	Cv->setErrMode(0);
-	skip("can't hook cv:error", 2) unless $can_hook;
+if (0) {
+	my $src = Cv::Mat->new([240, 320], CV_8UC3);
+	my $submat = eval { $src->GetCols(10, 10) };
+	is($@, '');
+}
 
-	if (0) {
-		my $src = Cv::Mat->new([240, 320], CV_8UC3);
-		my $submat = eval { $src->GetCols(10, 10) };
-		is($@, '');
-	}
+if (12) {
+	my $src = Cv::Mat->new([240, 320], CV_8UC3);
+	my $submat = eval { $src->GetCols(10, 0) };
+	ok($@);
+}
 
-	if (12) {
-		my $src = Cv::Mat->new([240, 320], CV_8UC3);
-		my $submat = eval { $src->GetCols(10, 0) };
-		ok($@);
-	}
-
-	if (13) {
-		my $src = Cv::Mat->new([240, 320], CV_8UC3);
-		no warnings 'redefine';
-		local *Cv::Mat::new = sub { undef };
-		my $submat = eval { $src->GetCols(100, 200) };
-		like($@, qr/submat is not of type CvMat/);
-	}
+if (13) {
+	my $src = Cv::Mat->new([240, 320], CV_8UC3);
+	no warnings 'redefine';
+	local *Cv::Mat::new = sub { undef };
+	my $submat = eval { $src->GetCols(100, 200) };
+	like($@, qr/submat is not of type CvMat/);
 }

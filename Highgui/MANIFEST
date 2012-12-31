@@ -1,8 +1,0 @@
-Changes
-Highgui.xs
-Makefile.PL
-MANIFEST
-ppport.h
-README
-t/Cv-Highgui.t
-lib/Cv/Highgui.pm

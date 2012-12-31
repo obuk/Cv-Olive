@@ -54,32 +54,22 @@ if (22) {
 }
 
 
-SKIP: {
-	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
-	Cv->setErrMode(1);
-	my $can_hook = Cv->getErrMode() == 1;
-	$can_hook = 0 if $^O eq 'cygwin';
-	Cv->setErrMode(0);
-	skip("can't hook cv:error", 2) unless $can_hook;
-
-	# broken new
-	if (31) {
-		my $src2 = $src->new;
-		$src->fill([ 21, 22, 23, 24 ]);
-		$src2->fill([ 11, 12, 13, 14 ]);
-		no warnings 'redefine';
-		local *Cv::Mat::new = sub { undef };
-		eval { $src->absDiff($src2) };
-		like($@, qr/dst is not of type CvArr/);
-	}
-
-	# OpenCV Error:
-	if (32) {
-		my $src2 = $src->new;
-		$src->fill([ 21, 22, 23, 24 ]);
-		$src2->fill([ 11, 12, 13, 14 ]);
-		eval { $src->absDiff($src2, \0) };
-		like($@, qr/OpenCV Error:/);
-	}
+# broken new
+if (31) {
+	my $src2 = $src->new;
+	$src->fill([ 21, 22, 23, 24 ]);
+	$src2->fill([ 11, 12, 13, 14 ]);
+	no warnings 'redefine';
+	local *Cv::Mat::new = sub { undef };
+	eval { $src->absDiff($src2) };
+	like($@, qr/dst is not of type CvArr/);
 }
 
+# OpenCV Error:
+if (32) {
+	my $src2 = $src->new;
+	$src->fill([ 21, 22, 23, 24 ]);
+	$src2->fill([ 11, 12, 13, 14 ]);
+	eval { $src->absDiff($src2, \0) };
+	like($@, qr/OpenCV Error:/);
+}

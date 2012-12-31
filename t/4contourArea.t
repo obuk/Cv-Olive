@@ -14,7 +14,7 @@ if (1) {
 	$img->polyLine([\@pts], -1, [ 100, 255, 255], 1, CV_AA);
 	$img->circle($_, 3, [100, 255, 100], -1, CV_AA) for @pts;
 	my $s = Cv->contourArea(\@pts);
-	is($s, 10000);
+	is(abs($s), 10000);
 	if ($verbose) {
 		$img->show;
 		Cv->waitKey(1000);
@@ -23,6 +23,6 @@ if (1) {
 
 if (2) {
 	my @pts = ([100, 100], [100, 200], [200, 200], [200, 100]);
-	my @s = Cv->contourArea(\@pts);
-	is($s[0], 10000);
+	my ($s) = Cv->contourArea(\@pts);
+	is(abs($s), 10000);
 }

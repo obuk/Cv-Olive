@@ -70,23 +70,15 @@ if (1) {
 	}
 }
 
-SKIP: {
-	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
-	Cv->setErrMode(1);
-	my $can_hook = Cv->getErrMode() == 1;
-	$can_hook = 0 if $^O eq 'cygwin';
-	Cv->setErrMode(0);
-	skip("can't hook cv:error", 4) unless $can_hook;
-	for my $n (1..4) {
-		my $m = Cv::Mat->new([240, 320], CV_64FC($n));
-		my $v = cvScalar(map { rand 1 } 1..$n);
-		my $i = [map { int rand $_ } @{$m->sizes}];
-		eval { $m->set($i, $v) };
-		if ($n == 1) {
-			is($m->getReal($i), $v->[0]);
-		} else {
-			eval { $m->getReal($i) };
-			like($@, qr/OpenCV Error:/i);
-		}
+for my $n (1..4) {
+	my $m = Cv::Mat->new([240, 320], CV_64FC($n));
+	my $v = cvScalar(map { rand 1 } 1..$n);
+	my $i = [map { int rand $_ } @{$m->sizes}];
+	eval { $m->set($i, $v) };
+	if ($n == 1) {
+		is($m->getReal($i), $v->[0]);
+	} else {
+		eval { $m->getReal($i) };
+		like($@, qr/OpenCV Error:/i);
 	}
 }

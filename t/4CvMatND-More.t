@@ -202,27 +202,17 @@ if (16) {
 
 our $line;
 
-SKIP: {
-	skip("need v2.0.0+", 2) unless cvVersion() >= 2.000000;
-	Cv->setErrMode(1);
-	my $can_hook = Cv->getErrMode() == 1;
-	$can_hook = 0 if $^O eq 'cygwin';
-	Cv->setErrMode(0);
-	skip("can't hook cv:error", 2) unless $can_hook;
+if (21) {
+	my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
+	$line = __LINE__ + 1;
+	eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
+	err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtrND");
+}
 
-	if (21) {
-		my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
-		$line = __LINE__ + 1;
-		eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
-		err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtrND");
-	}
-
-	if (22) {
-		$line = __LINE__ + 1;
-		eval { Cv::MatND->new([], CV_8UC1, []) };
-		err_is("OpenCV Error: One of arguments' values is out of range (non-positive or too large number of dimensions) in cvCreateMatNDHeader");
-	}
-
+if (22) {
+	$line = __LINE__ + 1;
+	eval { Cv::MatND->new([], CV_8UC1, []) };
+	err_is("OpenCV Error: One of arguments' values is out of range (non-positive or too large number of dimensions) in cvCreateMatNDHeader");
 }
 
 sub err_is {

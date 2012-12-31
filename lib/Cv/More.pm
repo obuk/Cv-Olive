@@ -71,6 +71,7 @@ package Cv::Mat;
 }
 
 sub m_new {
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_ ? shift : $self->type;
@@ -89,8 +90,8 @@ sub m_new {
 		my @dims = Cv::m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
 		return undef unless my ($rows, $cols) = @dims; $cols ||= 1;
-		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 		$mat = Cv::cvCreateMat($rows, $cols, $type);
+		local $Carp::CarpLevel = $Carp::CarpLevel + 2;
 		$mat->m_set([], \@_);
 	}
 	$mat;
@@ -105,6 +106,7 @@ package Cv::MatND;
 }
 
 sub m_new {
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	my $self = shift;
 	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
 	my $type = @_ ? shift : $self->type;
@@ -119,8 +121,8 @@ sub m_new {
 	} elsif (@_) {
 		my @dims = Cv::m_dims(@_);
 		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($type);
-		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 		$mat = Cv::cvCreateMatND(\@dims, $type);
+		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 		$mat->m_set([], \@_);
 	}
 	$mat;

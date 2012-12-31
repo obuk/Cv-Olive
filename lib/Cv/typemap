@@ -104,8 +104,6 @@ const CvTreeNodeIterator*	T_CvPTROBJ
 CvTypeInfo*					T_CvPTROBJ
 const CvTypeInfo*			T_CvPTROBJ
 CvVideoWriter*				T_CvPTROBJ
-#	CvWindow*					T_CvPTROBJ
-#	const CvWindow*				T_CvPTROBJ
 CvWindow*					T_PTRREF
 const CvWindow*				T_PTRREF
 double*						T_floatPtr
@@ -1012,7 +1010,7 @@ T_CvSubdiv2DPoint
 		av_push(av_pt, newSVnv($var.pt.x));
 		av_push(av_pt, newSVnv($var.pt.y));
 		av_push(av, newRV_inc(sv_2mortal((SV*)av_pt)));
-#if CV_MAJOR_VERSION == 2
+#if CV_MAJOR_VERSION >= 2
 		av_push(av, newSViv($var.id));
 #endif
 		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
@@ -1036,7 +1034,7 @@ T_CvSubdiv2DPointPtr
 			av_push(av_pt, newSVnv(${var}[i].pt.x));
 			av_push(av_pt, newSVnv(${var}[i].pt.y));
 			av_push(av_point, newRV_inc(sv_2mortal((SV*)av_pt)));
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if CV_MAJOR_VERSION >= 2
 			av_push(av_point, newSViv(${var}[i].id));
 #endif
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_pointt)));

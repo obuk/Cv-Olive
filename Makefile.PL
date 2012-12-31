@@ -70,7 +70,7 @@ my $PREREQ_PM = {
 	File::Basename => 0,
 	List::Util => 0,
 	Time::HiRes => 0,
-	ExtUtils::ParseXS => 2.22,
+	ExtUtils::ParseXS => 3.07,
 	Cwd => 0,
 };
 
@@ -96,9 +96,6 @@ WriteMakefile(
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
 	INC => "-I. -I..",
-	DIR => [
-		qw(Highgui),
-	],
 	clean => {
 		FILES => [
 			'_Inline', 'cover_db',

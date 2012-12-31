@@ -1,5 +1,13 @@
 Revision history for Cv.pm
 
+0.21 - 2012-12-27 (working)
+     * fixed compile error on cygwin (can't handle pp-stmt in typemap?)
+     * fixed AUTOLOAD to keep $@
+     * mearged Highgui ...
+     * fixed cvError if CC=cc
+     * fixed cvError on OpenCV-1.1
+     * fixed some skipped tests (cygwin, OpenCv-1.1)
+
 0.19a - 2012-12-12
      * fixed t/4CvVideoWriter.t
 

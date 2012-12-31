@@ -39,7 +39,7 @@ use Carp;
 use Scalar::Util qw(blessed);
 use warnings::register;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 use Cv::Constant qw(:all);
 
@@ -73,7 +73,6 @@ sub import {
 	my %auto = (
 		more => 'Cv::More',
 		seq => 'Cv::Seq',
-		highgui => 'Cv::Highgui',
 		);
 	for (@_) {
 		if (/^(:no|-)(\w+)$/) {
@@ -254,19 +253,11 @@ sub autoload {
 	if (my $code = assoc($family, $short)) {
 		{ no strict 'refs'; *$AUTOLOAD = $code }
 		if (wantarray) {
-			my @cc; eval { @cc = &$code };
-			return @cc unless $@;
-		} elsif (defined wantarray) {
-			my $cc; eval { $cc = &$code };
-			return $cc unless $@;
+			my @cc = &$code;
+			return @cc;
 		} else {
-			eval { &$code };
-			return unless $@;
+			goto &$code;
 		}
-		local $_ = $@;
-		s/\s+at \S+ line \S+\n?$//;
-		# Carp::croak $@;
-		Carp::croak $_;
 	}
 	Carp::croak "can't call $AUTOLOAD";
 }
@@ -1193,22 +1184,11 @@ protected as eval { ... }. (Cv-0.13)
     print STDERR "*** got error ***";
  }
 
-But, when you build Cv you have to compile with c++.  You can catch
-the error, and you can also redirect to your own error hander.
-
- Cv->redirectError(
-   sub { my ($status, $funcName, $errMsg, $fileName, $line, $data) = @_;
-       ...
-   },
-   my $data = ...;
- );
-
 =cut
 
 our %ERROR = (
 	handler => undef,
     handler_sample => sub {
-		local $Carp::CarpInternal{Cv} = 1;
 		my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 		Carp::croak("$func_name: @{[ cvErrorStr($status) ]} ($err_msg)");
     },
@@ -1218,8 +1198,6 @@ our %ERROR = (
     );
 
 our $ERROR = sub {
-	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	local $Carp::CarpInternal{Cv} = 1;
 	my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 	$ERROR{status} = $status;
 	$func_name ||= 'unknown function';
@@ -1234,10 +1212,15 @@ our $ERROR = sub {
 	}
 	my $long = join(' ', "OpenCV Error:", cvErrorStr($status), "($err_msg)",
 					"in $func_name");
-	my $morelong = join(', ', $long, "file $file_name", "line $line");
 	my $short = "$func_name: @{[cvErrorStr($status)]} ($err_msg)";
 	Carp::croak $long if $mode == 0;
 };
+
+# CV_IMPL void cvError(int code, const char* func_name,
+#  const char* err_msg, const char* file_name, int line)
+sub cvError {
+	goto &$ERROR;
+}
 
 # CvErrorCallback cvRedirectError(
 #  CvErrorCallback error_handler, void* userdata=NULL, void** prevUserdata=NULL)
@@ -1743,6 +1726,69 @@ package Cv::Kalman;
 { *Correct = \&KalmanCorrect }
 { *Predict = \&KalmanPredict }
 
+
+# ============================================================
+#  highgui. High-level GUI and Media I/O: User Interface
+# ============================================================
+
+package Cv;
+
+our %MOUSE = ( );
+our %TRACKBAR = ( );
+
+package Cv::Arr;
+{ *Show = \&ShowImage }
+
+# ============================================================
+#  highgui. High-level GUI and Media I/O: Reading and Writing Images and Video
+# ============================================================
+
+package Cv::Arr;
+
+sub EncodeImage {
+	$_[2] = my $params = \0 unless defined $_[2];
+	goto &cvEncodeImage;
+}
+
+package Cv::Image;
+{ *Load = \&Cv::LoadImage }
+
+package Cv::Mat;
+{ *Load = \&Cv::LoadImageM }
+
+package Cv::Arr;
+{ *Save = \&SaveImage }
+
+package Cv::Capture;
+{ *FromCAM = \&Cv::CaptureFromCAM }
+{ *FromFile = *FromAVI = \&Cv::CaptureFromFile }
+{ *GetProperty = \&GetCaptureProperty }
+{ *Grab = \&GrabFrame }
+{ *Query = \&QueryFrame }
+{ *Retrieve = \&RetrieveFrame }
+{ *SetProperty = \&SetCaptureProperty }
+
+package Cv::VideoWriter;
+{ *new = \&Cv::CreateVideoWriter }
+
+
+package Cv;
+
+use Scalar::Util qw(looks_like_number);
+
+sub CreateVideoWriter {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	my $filename = shift;
+	my $fourcc = shift;
+	$fourcc = CV_FOURCC($fourcc) unless looks_like_number($fourcc);
+	unshift(@_, $filename, $fourcc);
+	goto &cvCreateVideoWriter;
+}
+
+
+# ============================================================
+#  highgui. High-level GUI and Media I/O: Qt new functions
+# ============================================================
 
 # ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera
