@@ -73,7 +73,7 @@ CvSet*						T_CvPTROBJ
 const CvSet*				T_CvPTROBJ
 CvSeq*						T_CvPTROBJ
 const CvSeq*				T_CvPTROBJ
-Econst CvSeqBlock*			T_CvPTROBJ
+const CvSeqBlock*			T_CvPTROBJ
 CvSeqReader*				T_CvPTROBJ
 const CvSeqReader*			T_CvPTROBJ
 CvSeqWriter*				T_CvPTROBJ
@@ -152,8 +152,9 @@ T_CvArrPtrPtr
 				SV* p = (SV*)*av_fetch(av, i, 0);
 				if (SvROK(p) && sv_derived_from(p, \"@{
 						$type =~ /\b(Cv|Ipl)(\w+)/; ['Cv::'.$2] }\"))
-					${var}[i] = (@{$type =~ /(const\s)?(\w+)[\s\*]+$/; [$2.'*']
-					})SvIV((SV*)SvRV(p));
+					${var}[i] = INT2PTR(@{
+						$type =~ /(const\s)?(\w+)[\s\*]+$/; [$2.'*']
+					}, SvIV((SV*)SvRV(p)));
 				else if (SvROK(p) && SvIOK(SvRV(p)) && SvIV(SvRV(p)) == 0)
 					${var}[i] = (@{$type =~ /(const\s)?(\w+)[\s\*]+$/; [$2.'*']
 					})0;
@@ -299,7 +300,7 @@ T_CvMemStoragePos
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
 			SV* sv_top        = (SV*)*av_fetch((AV*)SvRV(sv), 0, 0);
 			SV* sv_free_space = (SV*)*av_fetch((AV*)SvRV(sv), 1, 0);
-			$var.top        = (CvMemBlock*)SvIV(sv_top);
+			$var.top        = INT2PTR(CvMemBlock*, SvIV(sv_top));
 			$var.free_space = SvIV(sv_free_space);
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
@@ -623,7 +624,7 @@ T_CvString
 			SV* sv_len = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_ptr = (SV*)*av_fetch(av, 1, 0);
 			$var.len = SvIV(sv_len);
-			$var.ptr = (char*)SvIV(sv_ptr);
+			$var.ptr = INT2PTR(char*, SvIV(sv_ptr));
 		} else
 			Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -647,13 +648,13 @@ T_CvSubdiv2DPoint
 				$var.pt.y = SvNV((SV*)*av_fetch(av_pt, 1, 0));
 			} else
 				err++;
-#if CV_MAJOR_VERSION >= 2
+	/* TODO: OpenCV-2.0+
 			if (av_len(av_pt) >= 2) {
 				SV* sv_id = (SV*)*av_fetch((AV*)SvRV(av), 3, 0);
 				$var.id = SvIV(sv_id);
 			} else
 				err++;
-#endif
+	*/
 		} else
 			err++;
 		if (err)
@@ -848,7 +849,7 @@ T_CvConnectedComp
 T_CvMemStoragePos
 	STMT_START {
 		AV* av = newAV();
-		av_push(av, newSViv((IV)$var.top));
+		av_push(av, newSViv(PTR2IV($var.top)));
 		av_push(av, newSViv($var.free_space));
 		SV* sv = sv_2mortal(newRV_inc(sv_2mortal((SV*)av)));
 		sv_setsv($arg, sv_bless(sv, gv_stashpv("Cv::MemStoragePos", 1)));
@@ -997,7 +998,7 @@ T_CvString
 		AV* av = newAV();
 		SV* sv = sv_2mortal(newRV_inc(sv_2mortal((SV*)av)));
 		av_push(av, newSViv($var.len));
-		av_push(av, newSViv((IV)$var.ptr));
+		av_push(av, newSViv(PTR2IV($var.ptr)));
 		sv_setsv($arg, sv_bless(sv, gv_stashpv("Cv::String", 1)));
 	} STMT_END;
 
@@ -1010,9 +1011,9 @@ T_CvSubdiv2DPoint
 		av_push(av_pt, newSVnv($var.pt.x));
 		av_push(av_pt, newSVnv($var.pt.y));
 		av_push(av, newRV_inc(sv_2mortal((SV*)av_pt)));
-#if CV_MAJOR_VERSION >= 2
+	/* TODO: OpenCV-2.0+
 		av_push(av, newSViv($var.id));
-#endif
+	*/
 		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
 	} STMT_END;
 
@@ -1034,9 +1035,9 @@ T_CvSubdiv2DPointPtr
 			av_push(av_pt, newSVnv(${var}[i].pt.x));
 			av_push(av_pt, newSVnv(${var}[i].pt.y));
 			av_push(av_point, newRV_inc(sv_2mortal((SV*)av_pt)));
-#if CV_MAJOR_VERSION >= 2
+	/* TODO: OpenCV-2.0+
 			av_push(av_point, newSViv(${var}[i].id));
-#endif
+	*/
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_pointt)));
 		}
 	} STMT_END;
