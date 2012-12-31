@@ -21,6 +21,7 @@ lib/Cv/More.pm
 lib/Cv/Pango-ja.pod
 lib/Cv/Pango.pm
 lib/Cv/Seq.pm
+lib/Cv/Seq-ja.pod
 lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm
 lib/Cv/Seq/Point2.pm
@@ -128,7 +129,7 @@ sample/stereo_calib.txt
 sample/stereo_match.pl
 sample/stuff.jpg
 sample/tiehash.pl
-sample/train.png
+sample/trains.png
 sample/video-thread.pl
 sample/video.pl
 sample/watershed.pl
