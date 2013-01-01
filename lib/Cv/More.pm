@@ -179,7 +179,7 @@ use overload
 	'<=>' => \&overload_cmp,
 	cmp => \&overload_cmp,
 	fallback => undef,
-	nomethod => \&overload_nomethod
+	# nomethod => \&overload_nomethod
 	;
 
 sub overload_cmp {
