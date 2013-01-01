@@ -283,7 +283,7 @@ T_CvConnectedComp
 			} else
 				err++;
 			if (SvROK(sv_contour) && sv_derived_from(sv_contour, \"Cv::Seq\")) {
-				$var.contour = (CvSeq*)SvIV(sv_contour);
+				$var.contour = INT2PTR(CvSeq*, SvIV(sv_contour));
 			} else
 				err++;
 		} else
