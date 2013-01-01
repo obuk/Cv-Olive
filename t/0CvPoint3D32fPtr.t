@@ -2,50 +2,43 @@
 
 use strict;
 # use Test::More qw(no_plan);
-use Test::More tests => 15;
+use Test::More tests => 10;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my ($x, $y, $z) = map { (int rand 16384) + 0.5 } 0..2;
+my ($x, $y, $z) = unpack("f*", pack("f*", map { rand 1 } 0..2));
 
 SKIP: {
-	skip "no T", 14 unless Cv->can('CvPoint3D32fPtr');
-	my $line;
+	skip "no T", 9 unless Cv->can('CvPoint3D32fPtr');
 
 	my $arr = Cv::cvPoint3D32fPtr($x, $y, $z);
 	is(ref $arr, 'ARRAY');
 	is(scalar @$arr, 1);
+	is_deeply($arr, [ [ $x, $y, $z ] ]);
 
-	my $pt = $arr->[0];
-	is($pt->[0], $x);
-	is($pt->[1], $y);
-	is($pt->[2], $z);
+	{
+		my $arr2 = Cv::CvPoint3D32fPtr($arr->[0]);
+		is_deeply($arr2, $arr);
+	}
 
-	my $out = Cv::CvPoint3D32fPtr($pt);
-	is($out->[0]->[0], $pt->[0]);
-	is($out->[0]->[1], $pt->[1]);
-	is($out->[0]->[2], $pt->[2]);
+	e { Cv::CvPoint3D32fPtr([]) };
+	err_is("Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr() };
-	is($@, "Usage: Cv::CvPoint3D32fPtr(pt) at $0 line $line.\n");
+	e { Cv::CvPoint3D32fPtr([1]) };
+	err_is("Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr([]) };
-	is($@, "Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr([1]) };
-	is($@, "Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f at $0 line $line.\n");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr([1, 2]) };
-	is($@, "Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f at $0 line $line.\n");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr(['x', 'y']) };
-	is($@, "Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f at $0 line $line.\n");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
-	is($@, "");
+	{
+		no warnings 'numeric';
+		my $arr2 = e { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
+		err_is("");
+		is_deeply($arr2, [ [1, 2, 3] ]);
+	}
 }

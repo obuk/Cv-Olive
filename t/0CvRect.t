@@ -1,47 +1,46 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 15;
+use Test::More tests => 10;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
 my ($x, $y, $width, $height) = map { int rand 16384 } 0..3;
-
 my $rect = Cv::cvRect($x, $y, $width, $height);
-is($rect->[0], $x);
-is($rect->[1], $y);
-is($rect->[2], $width);
-is($rect->[3], $height);
+is_deeply($rect, [$x, $y, $width, $height]);
 
 SKIP: {
-	skip "no T", 10 unless Cv->can('CvRect');
-	my $line;
+	skip "no T", 8 unless Cv->can('CvRect');
 
-	my $out = Cv::CvRect($rect);
-	is($out->[$_], $rect->[$_]) for 0 .. 3;
+	{
+		my $rect2 = Cv::CvRect($rect);
+		is_deeply($rect2, $rect);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvRect() };
-	is($@, "Usage: Cv::CvRect(rect) at $0 line $line.\n");
+	e { Cv::CvRect([]) };
+	err_is("Cv::CvRect: rect is not of type CvRect");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvRect([]) };
-	is($@, "Cv::CvRect: rect is not of type CvRect at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvRect(['1x', $y, $width, $height]) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+		e { Cv::CvRect([$x, '2x', $width, $height]) };
+		err_is("Argument \"2x\" isn't numeric in subroutine entry");
+		e { Cv::CvRect([$x, $y, '3x', $height]) };
+		err_is("Argument \"3x\" isn't numeric in subroutine entry");
+		e { Cv::CvRect([$x, $y, $width, '4x']) };
+		err_is("Argument \"4x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvRect(['1x', $y, $width, $height]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvRect([$x, '2x', $width, $height]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvRect([$x, $y, '3x', $height]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvRect([$x, $y, $width, '4x']) };
-	is($@, "");
-
+	{
+		no warnings 'numeric';
+		my $rect2 = e { Cv::CvRect(['1x', '2x', '3x', '4x']) };
+		err_is("");
+		is_deeply($rect2, [ 1, 2, 3, 4 ]);
+	}
 }
+

@@ -1,40 +1,43 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 8;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my $center = [ map { (int rand 16384) + 0.5 } 0..1 ];
-my $radius = (int rand 16384) + 0.5;
+my $center = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];
+my $radius = unpack("f", pack("f", map { rand 1 } 0));
 
 SKIP: {
-	skip "no T", 11 unless Cv->can('CvCircle');
-	my $line;
+	skip "no T", 7 unless Cv->can('CvCircle');
 
-	my $circle = Cv::cvCircle($center, $radius);
-	is($circle->[0]->[$_], $center->[$_]) for 0 .. 1;
-	is($circle->[1], $radius);
+	{
+		my $c = Cv::cvCircle($center, $radius);
+		is_deeply($c, [$center, $radius]);
+		my $c2 = Cv::CvCircle($c);
+		is_deeply($c2, $c);
+	}
 
-	my $out = Cv::CvCircle($circle);
-	is($out->[0]->[$_], $circle->[0]->[$_]) for 0 .. 1;
-	is($out->[1],       $circle->[1]);
+	e { Cv::CvCircle([]) };
+	err_is("Cv::CvCircle: circle is not of type CvCircle");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvCircle() };
-	is($@, "Usage: Cv::CvCircle(circle) at $0 line $line.\n");
+	e { Cv::CvCircle(['x', $radius]) };
+	err_is("Cv::CvCircle: circle is not of type CvCircle");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvCircle([]) };
-	is($@, "Cv::CvCircle: circle is not of type CvCircle at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvCircle([$center, '2x']) };
+		err_is("Argument \"2x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvCircle(['x', $radius]) };
-	is($@, "Cv::CvCircle: circle is not of type CvCircle at $0 line $line.\n");
-
-	$line = __LINE__ + 1;
-	my $pt2 = eval { Cv::CvCircle([$center, '2x']) };
-	is($@, "");
-	is($pt2->[1], 2);
-
+	{
+		no warnings 'numeric';
+		my $c = e { Cv::CvCircle([$center, '2x']) };
+		err_is("");
+		is_deeply($c, [$center, 2]);
+	}
 }

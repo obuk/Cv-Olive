@@ -1,33 +1,37 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 102;
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 6;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my @floatPtr = map { int rand 1 } 1 .. 100;
+my @floatPtr = unpack("f*", pack("f*", map { rand 1 } 1 .. 100));
 
 SKIP: {
-	skip "no T", 100 unless Cv->can('floatPtr');
-	my $line;
+	skip "no T", 5 unless Cv->can('floatPtr');
 
-	my $floatPtr = Cv::floatPtr(\@floatPtr);
-	is($floatPtr->[$_], $floatPtr[$_]) for 0 .. $#floatPtr;
+	{
+		my $floatPtr = Cv::floatPtr(\@floatPtr);
+		is_deeply($floatPtr, \@floatPtr);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::floatPtr() };
-	is($@, "Usage: Cv::floatPtr(values) at $0 line $line.\n");
+	e { Cv::floatPtr({}) };
+	err_is("Cv::floatPtr: values is not of type float *");
 
-	$line = __LINE__ + 1;
-	eval { Cv::floatPtr({}) };
-	is($@, "Cv::floatPtr: values is not of type float * at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::floatPtr(['1x']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::floatPtr(['1x']) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::floatPtr([1, '2x', 3]) };
-	is($@, "");
-
+	{
+		no warnings 'numeric';
+		my $floatPtr2 = e { Cv::floatPtr([1, '2x', 3]) };
+		err_is("");
+		is_deeply($floatPtr2, [1, 2, 3]);
+	}
 }

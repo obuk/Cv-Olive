@@ -1,38 +1,42 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
+use Test::More tests => 8;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my ($x, $y) = map { (int rand 16384) + 0.5 } 0..1;
+my ($x, $y) = unpack("f*", pack("f*", map { rand 1 } 0..1));
 my $pt = cvPoint2D32f($x, $y);
-is($pt->[0], $x);
-is($pt->[1], $y);
+is_deeply($pt, [ $x, $y ]);
 
 SKIP: {
-	skip "no T", 8 unless Cv->can('CvPoint2D32f');
-	my $line;
+	skip "no T", 6 unless Cv->can('CvPoint2D32f');
 
-	my $out = Cv::CvPoint2D32f($pt);
-	is($out->[0], $pt->[0]);
-	is($out->[1], $pt->[1]);
+	{
+		my $pt2 = Cv::CvPoint2D32f($pt);
+		is_deeply($pt2, $pt);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint2D32f() };
-	is($@, "Usage: Cv::CvPoint2D32f(pt) at $0 line $line.\n");
+	e { Cv::CvPoint2D32f([]) };
+	err_is("Cv::CvPoint2D32f: pt is not of type CvPoint2D32f");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint2D32f([]) };
-	is($@, "Cv::CvPoint2D32f: pt is not of type CvPoint2D32f at $0 line $line.\n");
+	e { Cv::CvPoint2D32f([1]) };
+	err_is("Cv::CvPoint2D32f: pt is not of type CvPoint2D32f");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint2D32f([1]) };
-	is($@, "Cv::CvPoint2D32f: pt is not of type CvPoint2D32f at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvPoint2D32f(['1x', '2y']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	my $pt2 = eval { Cv::CvPoint2D32f(['1x', '2y']) };
-	is($@, "");
-	is($pt2->[0], 1);
-	is($pt2->[1], 2);
+	{
+		no warnings 'numeric';
+		my $pt2 = e { Cv::CvPoint2D32f(['1x', '2y']) };
+		err_is("");
+		is_deeply($pt2, [1, 2]);
+	}
 }
