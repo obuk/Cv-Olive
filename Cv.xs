@@ -4308,7 +4308,7 @@ CODE:
 	else if (strcmp(t, "CvSet") == 0 || strcmp(t, "Cv::Set") == 0)
 		RETVAL = sizeof(CvSet);
 	else
-		croak("sizeof %s: unknown", t);
+		croak("CV_SIZEOF: %s unknwon", t);
 OUTPUT:
 	RETVAL
 
@@ -4545,7 +4545,7 @@ OUTPUT:
 
 
 CvPoint3D64f*
-cvPoint3D64fPtr(float x, float y, float z)
+cvPoint3D64fPtr(double x, double y, double z)
 CODE:
 	CvPoint3D64f pt = cvPoint3D64f(x, y, z);
 	int length_RETVAL = 1;
