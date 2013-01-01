@@ -95,14 +95,12 @@ WriteMakefile(
 	CCFLAGS => $cf->ccflags,
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
-	INC => "-I. -I..",
 	clean => {
 		FILES => [
 			'_Inline', 'cover_db',
 			'camera.xml', 'contours.xml', 'sample.avi', '*.tmp',
 			'auto', @perl_h_patched,
-			't/ref-*.pm',
-			'lib/Cv/Constant.pm',
+			't/ref-*.pm', 'lib/Cv/Constant.pm', 'a.pm',
 			] },
 	);
 
