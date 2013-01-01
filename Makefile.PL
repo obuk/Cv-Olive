@@ -30,31 +30,19 @@ my @perl_h_patched = ();
 	}
 }
 
-sub decr (\@) {
-	my $v = shift;
-	if (--$v->[2] < 0) {
-		$v->[2] = 99;
-		if (--$v->[1] < 0) {
-			$v->[1] = 99;
-			--$v->[0];
-		}
-	}
-}
-
 
 # make lib/Cv/Constant.pm
 {
+	use version;
 	my $dst = "lib/Cv/Constant.pm";
 	my $tmp = "a.pm";
 	unless (&dumpconst('-v', '-o', $tmp, @{$cf->{include}}) == 0) {
-		my @v = map { $_ + 0 } ($cf->version =~ /(\d+)\.(\d{3})(\d{3})/);
-		for (; $v[0] >= 0; decr(@v)) {
-			if (-f (my $f = "./fallback/Constant.pm-".join('.', @v))) {
-				$tmp = $f;
-				last;
-			}
-		}
-		die "$0: can't make $dst\n" unless $v[0] >= 0;
+		my $fallback = 'fallback/Constant.pm-';
+		my $ver = version->parse(join('.', $cf->_version));
+		my @ver = sort { $b <=> $a } grep { ref $_ && $_ <= $ver } map {
+			/\d+(\.\d+)+/ && version->parse(my $v = $&) } glob("$fallback*");
+		die "$0: can't make $dst\n" unless @ver;
+		&cp("$fallback$ver[0]", $tmp);
 	}
 	if (!-f $dst || &cmp('-s', $tmp, $dst) != 0) {
 		&mv($dst, "$dst.bak") if -f $dst;
@@ -65,13 +53,13 @@ sub decr (\@) {
 
 
 my $PREREQ_PM = {
-	Data::Dumper => 0,
-	Scalar::Util => 0,
-	File::Basename => 0,
-	List::Util => 0,
-	Time::HiRes => 0,
+	#Data::Dumper => 0,
+	#Scalar::Util => 0,
+	#File::Basename => 0,
+	#List::Util => 0,
+	#Time::HiRes => 0,
 	ExtUtils::ParseXS => 3.07,
-	Cwd => 0,
+	#Cwd => 0,
 };
 
 if ($^O eq 'cygwin') {
@@ -97,10 +85,9 @@ WriteMakefile(
 	dynamic_lib => $cf->dynamic_lib,
 	clean => {
 		FILES => [
+			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
+			't/ref-*.pm', 'camera.xml', 'contours.xml', 'sample.avi',
 			'_Inline', 'cover_db',
-			'camera.xml', 'contours.xml', 'sample.avi', '*.tmp',
-			'auto', @perl_h_patched,
-			't/ref-*.pm', 'lib/Cv/Constant.pm', 'a.pm',
 			] },
 	);
 
