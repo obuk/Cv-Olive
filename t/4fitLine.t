@@ -4,6 +4,9 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 25;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN { use_ok('Cv') }
 
 if (1) {
@@ -88,26 +91,13 @@ if (14) {
 
 
 # Cv-0.19
-our $line;
-sub err_is {
-	our $line;
-	chop(my $a = $@);
-	my $b = shift(@_) . " at $0 line $line";
-	$b .= '.' if $a =~ m/\.$/;
-	unshift(@_, "$a\n", "$b\n");
-	goto &is;
-}
-
-$line = __LINE__ + 1;
-eval { my @line = Cv->FitLine };
+e { my @line = Cv->FitLine };
 err_is('Usage: Cv->FitLine(points ...)');
 
-$line = __LINE__ + 1;
-eval { my @line = Cv->FitLine([]) };
+e { my @line = Cv->FitLine([]) };
 err_is('Cv->FitLine: points is not [ pt1, pt2, ... ]');
 
-$line = __LINE__ + 1;
-eval { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) };
+e { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) };
 err_is('OpenCV Error: Bad argument (User-defined distance is not allowed) in cvFitLine');
 
 Cv::More->unimport(qw(cs cs-warn));
@@ -115,7 +105,6 @@ Cv::More->import(qw(cs-warn));
 {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
-	$line = __LINE__ + 1;
-	eval { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]) };
+	e { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]) };
 	err_is("called in list context, but returning scaler");
 }

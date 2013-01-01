@@ -1,15 +1,17 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 43;
-
-BEGIN {
-	use_ok('Cv');
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 84;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN {	use_ok('Cv') }
 
 if (1) {
-	my $arr = eval { Cv::MatND->new([], CV_32FC1) };
+	my $arr = e { Cv::MatND->new([], CV_32FC1) };
+	err_is("");
 	ok(!$arr);
 }
 
@@ -200,26 +202,13 @@ if (16) {
 }
 
 
-our $line;
-
 if (21) {
 	my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
-	$line = __LINE__ + 1;
-	eval { $arr->set([ 3, 3 ], [ 1, 2 ]) };
+	e { $arr->set([ 3, 3 ], [ 1, 2 ]) };
 	err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtrND");
 }
 
 if (22) {
-	$line = __LINE__ + 1;
-	eval { Cv::MatND->new([], CV_8UC1, []) };
+	e { Cv::MatND->new([], CV_8UC1, []) };
 	err_is("OpenCV Error: One of arguments' values is out of range (non-positive or too large number of dimensions) in cvCreateMatNDHeader");
-}
-
-sub err_is {
-	our $line;
-	my $m = shift;
-	chomp(my $e = $@);
-	$e =~ s/\.$//;
-	unshift(@_, $e, "$m at $0 line $line");
-	goto &is;
 }
