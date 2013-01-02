@@ -134,10 +134,12 @@ You can omit parameters and that will be inherited.
 
 sub Cv::Image::new {
 	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_? shift : $self->type;
+	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
+		Carp::croak 'Cv::Image::new: ?sizes';
+	my $type = @_? shift : ref $self? $self->type :
+		Carp::croak 'Cv::Image::new: ?type';
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
-	Carp::croak "usage: Cv::Image->new(sizes, type)" unless $depth;
+	# Carp::croak "usage: Cv::Image::new(sizes, type)" unless $depth;
 	my ($rows, $cols) = @$sizes;
 	my $image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
 	$image->origin($self->origin) if ref $self;
@@ -147,37 +149,45 @@ sub Cv::Image::new {
 
 sub Cv::Mat::new {
 	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_? shift : $self->type;
+	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
+		Carp::croak 'Cv::Mat::new: ?sizes';
+	my $type = @_? shift : ref $self? $self->type :
+		Carp::croak 'Cv::Mat::new: ?type';
 	if (@_) {
 		eval "use Cv::More";
 		die $@ if $@;
 		$self->new($sizes, $type, @_);
 	} else {
 		my ($rows, $cols) = @$sizes; $cols ||= 1;
-		Cv::cvCreateMat($rows, $cols, $type);
+		unshift(@_, $rows, $cols, $type);
+		goto &Cv::cvCreateMat;
 	}
 }
 
 
 sub Cv::MatND::new {
 	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_? shift : $self->type;
+	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
+		Carp::croak 'Cv::MatND::new: ?sizes';
+	my $type = @_? shift : ref $self? $self->type :
+		Carp::croak 'Cv::MatND::new: ?type';
 	if (@_) {
 		eval "use Cv::More";
 		die $@ if $@;
 		$self->new($sizes, $type, @_);
 	} else {
-		Cv::cvCreateMatND($sizes, $type);
+		unshift(@_, $sizes, $type);
+		goto &Cv::cvCreateMatND;
 	}
 }
 
 
 sub Cv::SparseMat::new {
 	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_? shift : $self->type;
+	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
+		Carp::croak 'Cv::SparseMat::new: ?sizes';
+	my $type = @_? shift : ref $self? $self->type :
+		Carp::croak 'Cv::SparseMat::new: ?type';
 	unshift(@_, $sizes, $type);
 	goto &Cv::cvCreateSparseMat;
 }
