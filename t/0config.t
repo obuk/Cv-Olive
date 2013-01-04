@@ -1,9 +1,11 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 10;
-use Data::Dumper;
+# use Data::Dumper;
+use version;
 
 BEGIN {
 	chop(my $ccflags = eval { `pkg-config opencv` });
@@ -13,7 +15,7 @@ BEGIN {
 
 if (1) {
 	no warnings;
-	local $Data::Dumper::Terse = 1;
+	# local $Data::Dumper::Terse = 1;
 	local $Cv::Config::cf = undef;
 	undef *{Cv::Config::cf};
 	undef $ENV{CC}, $ENV{CXX};
@@ -21,13 +23,16 @@ if (1) {
 	like($cf->cvdir, qr{/blib/lib/Cv});
 	like(${$cf->typemaps}[0], qr{/blib/lib/Cv/typemap});
 	is($cf->cc, 'c++');
-	ok($cf->version >= 1.001);
+	my $min = version->parse('1.1');
+	local $Cv::Config::verbose = 1;
+	ok($cf->_version >= $min);
+	ok(version->parse($cf->version) >= $min);
 	# like($cf->myextlib, qr{/blib/arch/auto/Cv/Cv.(dll|so)});
 }
 
 if (2) {
 	no warnings;
-	local $Data::Dumper::Terse = 1;
+	# local $Data::Dumper::Terse = 1;
 	local $Cv::Config::cf = undef;
 	my $dynamic_lib = 0;
 	my @cxx = ();
@@ -52,7 +57,7 @@ if (2) {
 
 if (3) {
 	no warnings;
-	local $Data::Dumper::Terse = 1;
+	# local $Data::Dumper::Terse = 1;
 	local $Cv::Config::cf = undef;
 	local %Cv::Config::opencv = ();
 	my $include = '/path/to/include';

@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use Carp;
 use Cwd qw(abs_path);
+use File::Basename;
+use version;
 BEGIN { eval "use Cv::Constant" };
 
 our $VERSION = '0.22';
@@ -13,7 +15,7 @@ our $VERSION = '0.22';
 our %opencv;
 our %C;
 our $cf;
-our $verbose = 1;
+our $verbose = 0;
 
 sub new {
 	$cf ||= bless {};
@@ -23,9 +25,8 @@ sub new {
 sub cvdir {
 	my $self = shift;
 	unless (defined $self->{cvdir}) {
-		my @mypath = split(/\/+/, $INC{'Cv/Config.pm'});
-		my $cvdir = join('/', @mypath[0..$#mypath-1]);
-		$self->{cvdir} = abs_path($cvdir);
+		(my $me = __PACKAGE__ . '.pm') =~ s|::|/|g;
+		$self->{cvdir} = abs_path(dirname($INC{$me}));
 	}
 	$self->{cvdir};
 }
@@ -125,15 +126,14 @@ sub _version {
 		}
 		if (open C, ">$c") {
 			print C <<"----";
-			#include <stdio.h>
-			#include <opencv/cv.h>
-			main()
-			{
-				printf("%d %d %d\\n",
-					   CV_MAJOR_VERSION, CV_MINOR_VERSION,
-					   CV_SUBMINOR_VERSION);
-				exit(0);
-			}
+#include <stdio.h>
+#include <opencv/cv.h>
+main()
+{
+	printf("%d.%d.%d\\n",
+		   CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
+	exit(0);
+}
 ----
 	;
 			close C;
@@ -145,18 +145,21 @@ sub _version {
 				"$0: your system has installed opencv?\n";
 			}
 			unlink($c, 'a.exe');
-			$self->{version} = [split(/\s+/, $v)];
+			$self->{version} = version->parse($v);
 		} else {
 			die "$0: can't open $c.\n";
 		}
 	}
-	wantarray? @{$self->{version}} : $self->{version};
+	$self->{version};
 }
 
 
 sub version {
 	my $self = shift;
-	sprintf("%d.%03d%03d", $self->_version);
+	if ($self->_version->normal =~ /v?(\d+)\.(\d+)\.(\d+)/) {
+		return sprintf("%d.%03d%03d", $1, $2, $3);
+	}
+	undef;
 }
 
 
