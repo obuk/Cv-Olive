@@ -18,7 +18,7 @@ sub D (\@) {
 if (1) {
 	my $e = "error";
 	$@ = $e;
-	is(Cv::cvErrorStr(-2), "Unspecified error");
+	is(cvErrorStr(-2), "Unspecified error");
 	is($@, $e);
 	is(Cv->ErrorStr(-2), "Unspecified error");
 	is($@, $e);
@@ -29,7 +29,7 @@ if (1) {
 if (2) {
 	my ($status, $funcName, $errMsg);
 	eval {
-		_e; Cv->error(
+		_e; cvError(
 			$status = -1,
 			$funcName = "funcName",
 			$errMsg = "errMsg",
@@ -40,20 +40,20 @@ if (2) {
 }
 
 if (3) {
-	Cv->setErrMode(0);
-	is(Cv->getErrMode(), 0, "errMode");
+	cvSetErrMode(0);
+	is(cvGetErrMode(), 0, "errMode");
 	my ($status, $funcName, $errMsg, $file, $line);
 	my $err;
 	sub myError {
 		$err = \@_;
 		# print STDERR "myerror:\n", D(@_);
 	}
-	my $prevError = Cv->redirectError(
+	my $prevError = cvRedirectError(
 		\&myError, my $myData = "mydata",
 		my $prevData,
 		);
 	eval {
-		_e; Cv->error(
+		_e; cvError(
 			$status = -1,
 			$funcName = "funcName",
 			$errMsg = "errMsg0",
@@ -62,14 +62,14 @@ if (3) {
 			);
 	};
 	err_is("OpenCV Error: Backtrace ($errMsg) in $funcName");
-	is(Cv->getErrStatus(), $status, "errStatus");
+	is(cvGetErrStatus(), $status, "errStatus");
 	is($err->[0], $status);
 	is($err->[1], $funcName);
 	is($err->[2], $errMsg);
 	is($err->[3], $file);
 	is($err->[4], $line);
 	is($err->[5], $myData);
-	my $prevError2 = Cv->redirectError($prevError, $prevData, my $prevData2);
+	my $prevError2 = cvRedirectError($prevError, $prevData, my $prevData2);
 	is($prevError2, \&myError);
 	is($prevData2, $myData);
 }

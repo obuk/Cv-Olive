@@ -2,11 +2,14 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 66;
+# use Test::More qw(no_plan);
+use Test::More tests => 103;
+BEGIN { use_ok('Cv', -more, '/do not import/') }
 
-BEGIN {
-	use_ok('Cv', -more);
+if (1) {
+	for (qw(cvScalar cvVersion)) {
+		ok(!__PACKAGE__->can($_));
+	}
 }
 
 if (98) {

@@ -49,18 +49,12 @@ XSLoader::load('Cv', $VERSION);
 require Exporter;
 our @ISA = qw(Exporter);
 
-our @EXPORT_MISC = grep { Cv->can($_) } ( qw( cvCbrt cvCeil
-	cvFastArctan cvFloor cvMSERParams cvPoint cvPoint2D32f
-	cvPointTo32f cvPoint3D32f cvPoint2D64f cvPointTo64f cvPoint3D64f
-	cvRealScalar cvRect cvRound cvSURFParams cvScalar cvScalarAll
-	cvSize cvSize2D32f cvSlice cvSqrt cvTermCriteria cvVersion ) );
+our @EXPORT_OK = grep /^(IPL|CV|cv)/, (keys %Cv::);
 
 our %EXPORT_TAGS = (
-	'all' => [ (grep /^(IPL|CV|cv)/, keys %Cv::) ],
-	'std' => [ (grep /^(IPL|CV)/, keys %Cv::), @EXPORT_MISC ],
+	'all' => \@EXPORT_OK,
+	'std' => \@EXPORT_OK,
 	);
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = ( );
 
@@ -1198,18 +1192,18 @@ protected as eval { ... }. (Cv-0.13)
 
 our %ERROR = (
 	handler => undef,
-    handler_sample => sub {
+	handler_sample => sub {
 		my ($status, $func_name, $err_msg, $file_name, $line) = @_;
 		Carp::croak("$func_name: @{[ cvErrorStr($status) ]} ($err_msg)");
-    },
-    mode => 0,
+	},
+	mode => 0,
 	status => undef,
-    userdata => undef,
-    );
+	userdata => undef,
+	);
 
 our $ERROR = sub {
 	my ($status, $func_name, $err_msg, $file_name, $line) = @_;
-	$ERROR{status} = $status;
+	cvSetErrStatus($status);
 	$func_name ||= 'unknown function';
 	my $mode = $ERROR{mode};
 	if ($mode == 0 || $mode == 1) {
