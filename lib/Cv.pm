@@ -36,7 +36,7 @@ use 5.008008;
 use strict;
 use warnings;
 use Carp;
-use Scalar::Util qw(blessed);
+use Scalar::Util;
 use warnings::register;
 
 our $VERSION = '0.22';
@@ -321,7 +321,7 @@ C<NULL> for the destination.
 package Cv;
 
 sub is_null { ref $_[0] eq 'SCALAR' && ${$_[0]} == 0 }
-sub is_cvarr { blessed $_[0] && $_[0]->isa('Cv::Arr') }
+sub is_cvarr { Scalar::Util::blessed $_[0] && $_[0]->isa('Cv::Arr') }
 
 
 # ============================================================
@@ -1089,7 +1089,7 @@ sub Transpose {
 
 package Cv;
 
-sub is_cvmem { blessed $_[0] && $_[0]->isa('Cv::MemStorage') }
+sub is_cvmem { Scalar::Util::blessed $_[0] && $_[0]->isa('Cv::MemStorage') }
 
 package Cv::MemStorage;
 { *new = \&Cv::CreateMemStorage }
@@ -1113,33 +1113,27 @@ package Cv::Font;
 
 package Cv;
 
-our %TYPENAME2CLASS;
-
-for ([ qw(CV_TYPE_NAME_GRAPH Cv::Graph) ],
-	 [ qw(CV_TYPE_NAME_HAAR Cv::HaarClassifierCascade) ],
-	 [ qw(CV_TYPE_NAME_IMAGE Cv::Image) ],
-	 [ qw(CV_TYPE_NAME_MAT Cv::Mat) ],
-	 [ qw(CV_TYPE_NAME_MATND Cv::MatND) ],
-	 [ qw(CV_TYPE_NAME_SEQ Cv::Seq) ],
-	 [ qw(CV_TYPE_NAME_SEQ_TREE Cv::Seq) ],
-	 [ qw(CV_TYPE_NAME_SPARSE_MAT Cv::SparseMat) ]) {
-	next unless my $t = eval $_->[0];
-	$TYPENAME2CLASS{$t} = $_->[1];
-}
-
+our %CLASS = (
+	&Cv::CV_TYPE_NAME_GRAPH      => 'Cv::Graph',
+	&Cv::CV_TYPE_NAME_HAAR       => 'Cv::HaarClassifierCascade',
+	&Cv::CV_TYPE_NAME_IMAGE      => 'Cv::Image',
+	&Cv::CV_TYPE_NAME_MAT        => 'Cv::Mat',
+	&Cv::CV_TYPE_NAME_MATND      => 'Cv::MatND',
+	&Cv::CV_TYPE_NAME_SEQ        => 'Cv::Seq',
+	&Cv::CV_TYPE_NAME_SEQ_TREE   => 'Cv::Seq',
+	&Cv::CV_TYPE_NAME_SPARSE_MAT => 'Cv::SparseMat',
+	);
 
 package Cv::FileStorage;
 { *new = \&Cv::OpenFileStorage }
 
 sub fsbless {
-	my $ptr = shift;
-	if ($ptr) {
-		if (my $info = Cv::cvTypeOf($ptr)) {
-			if (my $class = $Cv::TYPENAME2CLASS{$info->type_name}) {
-				bless $ptr, $class;
-			}
+	my ($ptr) = @_;
+	eval {
+		if (my $class = $Cv::CLASS{Cv::cvTypeOf($ptr)->type_name}) {
+			bless $ptr, $class;
 		}
-	}
+	};
 	$ptr;
 }
 
@@ -1152,12 +1146,22 @@ sub Cv::Load {
 
 sub Load {
 	ref (my $class = shift) and Carp::croak 'class name needed';
-	fsbless Cv::cvLoad(@_);
+	my $ref = fsbless Cv::cvLoad(@_);
+	Carp::croak __PACKAGE__, "::Load: can't bless"
+		unless Scalar::Util::blessed $ref;
+	$ref;
 }
 
 
 sub Read {
-	fsbless cvRead(@_);
+	my $ref = eval { fsbless cvRead(@_) }; # XXXXX
+	if (my $e = $@) {
+		chomp($e); $e =~ s/ at .* line \d+\.?$//;
+		Carp::Croak $e;
+	}
+	Carp::croak __PACKAGE__, "::Read: can't bless"
+		unless Scalar::Util::blessed $ref;
+	$ref;
 }
 
 
