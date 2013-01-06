@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 141;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use Test::More tests => 143;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 if (1) {
 	my $b = Cv::Image->new([3, 3], CV_8UC1);
@@ -67,11 +68,19 @@ if (1) {
 	}
 }
 
-if (2) {
-	eval { Cv->Merge; };
-	like($@, qr/usage:/);
+if (10) {
+	e { Cv->Merge; };
+	err_is("usage: Merge([src0, src1, ...], dst)");
 	my $cv = bless [], 'Cv';
-	eval { $cv->Merge; };
-	like($@, qr/class name needed/);
+	e { $cv->Merge; };
+	err_is("class name needed");
 }
 
+if (11) {
+	my $x = Cv::Mat->new([320, 240], CV_8UC1);
+	my ($b, $g, $r, $a) = ($x->new, $x->new, $x->new, $x->new);
+	e { Cv->Merge($b, $g, $r, $a, $x->new) };
+	err_like('OpenCV Error: .*');
+	e { Cv->Merge([$b, $g, $r, $a], $x->new) };
+	err_like('OpenCV Error: .*');
+}

@@ -12,6 +12,7 @@ our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	err_is
+	err_like
 	_e e
 ) ] );
 
@@ -33,6 +34,18 @@ sub err_is ($;$) {
 		unshift(@_, $@, $m);
 	}
 	goto &Test::More::is;
+}
+
+sub err_like ($;$) {
+	my $m = shift;
+	if ($m && $@) {
+		chomp(my $e = $@);
+		$e =~ s/\.$//;
+		unshift(@_, $e, qr/$m at $CALLER[1] line $CALLER[2]/);
+	} else {
+		unshift(@_, $@, $m);
+	}
+	goto &Test::More::like;
 }
 
 sub _e {

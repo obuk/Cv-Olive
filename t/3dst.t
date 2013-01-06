@@ -18,7 +18,7 @@ use Scalar::Util qw(blessed);
 
 foreach my $xs (qw(
 
-AbsDiff Add And Cmp Max Min Or Sub Xor
+AbsDiff Add And Max Min Or Sub Xor
 
 )) {
 

@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 78;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use Test::More tests => 80;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 if (1) {
 	my $arr = Cv::Image->new([3, 4], CV_8UC3);
@@ -38,4 +39,14 @@ if (2) {
 			is(${$r->Get([$row, $col])}[0], 3);
 		}
 	}
+}
+
+
+if (10) {
+	my $matn = Cv::MatND->new([320, 240], CV_8UC4);
+	e { $matn->split };
+	err_is('');
+	my $mats = Cv::SparseMat->new([320, 240], CV_8UC4);
+	e { $mats->split };
+	err_is('OpenCV Error: Bad argument (Unknown array type) in cvarrToMat');
 }

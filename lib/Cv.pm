@@ -558,16 +558,19 @@ sub Split {
 			push(@_, $dst);
 		}
 	}
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	cvSplit($src, @_);
-	wantarray ? @_ : \@_;	# XXXXX
+	wantarray ? @_ : \@_;
 }
 
 
 sub Cv::Merge {
 	ref (my $class = shift) and Carp::croak 'class name needed';
 	if (ref $_[0] eq 'ARRAY') {
+		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 		Cv::Arr::Merge(@_);
 	} elsif (Cv::is_cvarr($_[0])) {
+		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 		if (@_ <= 4) {
 			Cv::Arr::Merge(\@_);
 		} else {
@@ -724,9 +727,9 @@ sub Cmp {
 	# Cmp(src, src2, [dst], cmpOp)
 	# CmpS(src, value, [dst], cmpOp)
 	my ($src, $src2_value) = splice(@_, 0, 2);
-	my $dst = dst(@_) || $src->new(&Cv::CV_8UC(&Cv::CV_MAT_CN($src->type)));
+	my $dst = dst(@_) || $src->new(&Cv::CV_8UC1);
 	unshift(@_, $src, $src2_value, $dst);
-	if (ref $src2_value eq 'ARRAY') {
+	if (!ref $src2_value) {
 		goto &cvCmpS;
 	} else {
 		goto &cvCmp;
@@ -963,8 +966,9 @@ sub LUT {
 		my @lut = $lut->split;
 		$dst ||= $src->new($lut->type);
 		my @dsts = $dst->split;
+		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 		cvLUT($src, $dsts[$_], $lut[$_]) for 0 .. $#lut;
-		Cv->Merge(\@dsts, $dst); # XXXXX
+		Cv->Merge(\@dsts, $dst);
 	} else {
 		$dst ||= $src->new(&Cv::CV_MAKETYPE($lut->type, 1));
 		unshift(@_, $src, $dst, $lut);
