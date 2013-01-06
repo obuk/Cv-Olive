@@ -740,20 +740,21 @@ MODULE = Cv	PACKAGE = Cv::Arr
 void
 cvGetRawData(const CvArr* arr, SV* data, OUT int step, OUT CvSize roiSize)
 INIT:
-	CvSize size = cvGetSize(arr);
-	uchar* _data;
+	uchar* p;
+	int sz;
 CODE:
-	cvGetRawData(arr, &_data, &step, &roiSize);
+	cvGetRawData(arr, &p, &step, &roiSize);
 	sv_upgrade(data, SVt_PV);
-	SvPV_set(data, (char*)_data);
-	if (roiSize.height < size.height) {
-		CvRect roi = cvGetImageROI((IplImage*)arr);
-		int sz = step * (roi.height - roi.y) - (step * roi.x) / size.width;
-		SvCUR_set(data, sz);
-	} else {
-		int sz = step * roiSize.height;
-		SvCUR_set(data, sz);
+	SvPV_set(data, (char*)p);
+	sz = step * roiSize.height;
+	if (CV_IS_IMAGE(arr)) {
+		CvSize size = cvGetSize(arr);
+		if (roiSize.height < size.height) {
+			CvRect roi = cvGetImageROI((IplImage*)arr);
+			sz = step * (roi.height - roi.y) - (step * roi.x) / size.width;
+		}
 	}
+	SvCUR_set(data, sz);
 	SvPOK_on(data);
 	SvREADONLY_on(data); // XXXXX
 
