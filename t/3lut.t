@@ -75,12 +75,12 @@ if (12) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
 	my $lut = Cv::Mat->new([256], CV_8UC1);
 	e { $arr->LUT($lut) };
-	err_like("OpenCV Error: .*");
+	err_like('OpenCV Error:');
 }
 
 if (13) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
 	my $lut = Cv::Mat->new([256], CV_8UC3);
 	e { $arr->LUT($lut) };
-	err_like("OpenCV Error: .*");
+	err_like('OpenCV Error:');
 }

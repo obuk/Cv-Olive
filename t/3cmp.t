@@ -44,11 +44,11 @@ if (10) {
 if (11) {
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
 	e { $src->cmp(0, -1) };
-	err_like('OpenCV Error: .*');
+	err_like('OpenCV Error:');
 }
 
 if (12) {
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
 	e { $src->cmp(Cv::Image->new([10, 10], CV_8UC1), CV_CMP_EQ) };
-	err_like('OpenCV Error: .*');
+	err_like('OpenCV Error:');
 }

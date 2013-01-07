@@ -80,7 +80,7 @@ if (11) {
 	my $x = Cv::Mat->new([320, 240], CV_8UC1);
 	my ($b, $g, $r, $a) = ($x->new, $x->new, $x->new, $x->new);
 	e { Cv->Merge($b, $g, $r, $a, $x->new) };
-	err_like('OpenCV Error: .*');
+	err_like('OpenCV Error:');
 	e { Cv->Merge([$b, $g, $r, $a], $x->new) };
-	err_like('OpenCV Error: .*');
+	err_like('OpenCV Error:');
 }

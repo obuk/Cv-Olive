@@ -41,7 +41,7 @@ sub err_like ($;$) {
 	if ($m && $@) {
 		chomp(my $e = $@);
 		$e =~ s/\.$//;
-		unshift(@_, $e, qr/$m at $CALLER[1] line $CALLER[2]/);
+		unshift(@_, $e, qr/$m.* at $CALLER[1] line $CALLER[2]/);
 	} else {
 		unshift(@_, $@, $m);
 	}

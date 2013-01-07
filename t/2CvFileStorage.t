@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 25;
+# use Test::More qw(no_plan);
+use Test::More tests => 25;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -68,12 +68,6 @@ if (8) {
 	}
 }
 
-if (9) {
-	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
-	_e; eval { $fs->Read($fs->getFileNodeByName(\0, "lena")) };
-	err_is('Cv::FileStorage::Read: can\'t bless');
-}
-
 if (10) {
 	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
 	e { $fs->Read($fs->getFileNodeByName(\0, "lena")) };
@@ -88,7 +82,8 @@ if (11) {
 
 unlink($yml);
 
-if (12) {
+SKIP: {
+	skip "opencv-2.x", 1 unless cvVersion() >= 2.004;
 	e { Cv->OpenFileStorage('', 0) };
-	err_is('OpenCV Error: Null pointer (NULL or empty buffer) in cvOpenFileStorage');
+	err_like('OpenCV Error:');
 }

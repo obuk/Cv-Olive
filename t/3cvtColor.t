@@ -1,15 +1,16 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
-# use Test::More tests => 13;
+# use Test::More tests => 25;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
+
 use Scalar::Util qw(blessed);
 
-BEGIN {
-	use_ok('Cv', -more);
-}
-
-use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
 my $verbose = Cv->hasGUI;
 
@@ -50,7 +51,7 @@ if (1) {
 	}
 }
 
-if (1) {
+if (2) {
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
 	my $gray = $image->cvtColor(
@@ -60,4 +61,21 @@ if (1) {
 		$image->show($lena);
 		Cv->waitKey(1000);
 	}
+}
+
+if (3) {
+	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
+	isa_ok($image, 'Cv::Image');
+	my $gray = $image->cvtColor(CV_BGR2RGB);
+	if ($verbose) {
+		$image->show($lena);
+		Cv->waitKey(1000);
+	}
+}
+
+if (10) {
+	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
+	isa_ok($image, 'Cv::Image');
+	e { $image->cvtColor };
+	err_like('Usage:');
 }

@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 63;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 63;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $stor = Cv::MemStorage->new;
 
@@ -32,12 +33,12 @@ if (1) {
 	is($new, 1);
 
 	my $Cv = bless [], 'Cv';
-	eval { $Cv->CreateSeq() };
-	like($@, qr/class name needed/);
+	e { $Cv->CreateSeq() };
+	err_is('class name needed');
 
 	my $Cv_Seq = bless [], 'Cv::Seq';
-	eval { $Cv_Seq->CreateSeq() };
-	like($@, qr/class name needed/);
+	e { $Cv_Seq->CreateSeq() };
+	err_is('class name needed');
 }
 
 

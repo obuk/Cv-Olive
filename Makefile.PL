@@ -60,7 +60,7 @@ my $PREREQ_PM = {
 	#version => 0,
 	#List::Util => 0,
 	#Time::HiRes => 0,
-	ExtUtils::ParseXS => 3.07,
+	ExtUtils::ParseXS => 2.22,
 };
 
 if ($^O eq 'cygwin') {

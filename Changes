@@ -1,9 +1,13 @@
 Revision history for Cv.pm
 
-0.22 - 2012-01-01 (working)
+0.22 - 2012-01-04 (working)
      * rewrote t/*t to verify the location of the error.
      * fixed type conversion warnings
-     * fixed fallback code for making Constant.pm
+     * fixed fallback code for making Constant.pm (use version.pm).
+     * simplicity. "use Cv qw(:std)" => "use Cv qw(:all)"
+     * fixed Cmp value must be double (not a cvScalar)
+     * fixed error localtion: split, merge, lut
+     * fixed GetRawData (can't handle CvMatND)
 
 0.21 - 2012-12-27
      * fixed compile error on cygwin (can't handle pp-stmt in typemap?)

@@ -41,12 +41,16 @@ if (2) {
 	}
 }
 
-
 if (10) {
+	my $mats = Cv::SparseMat->new([320, 240], CV_8UC4);
+	e { $mats->split };
+	# err_is('OpenCV Error: Bad argument (Unknown array type) in cvarrToMat');
+	err_like('OpenCV Error:');
+}
+
+SKIP: {
+	skip "opencv-2.x", 1 unless cvVersion() >= 2.004;
 	my $matn = Cv::MatND->new([320, 240], CV_8UC4);
 	e { $matn->split };
 	err_is('');
-	my $mats = Cv::SparseMat->new([320, 240], CV_8UC4);
-	e { $mats->split };
-	err_is('OpenCV Error: Bad argument (Unknown array type) in cvarrToMat');
 }

@@ -23,10 +23,10 @@ if (1) {
 	like($cf->cvdir, qr{/blib/lib/Cv});
 	like(${$cf->typemaps}[0], qr{/blib/lib/Cv/typemap});
 	is($cf->cc, 'c++');
-	my $min = version->parse('1.1');
+	my $min = version->parse('1.001000');
 	local $Cv::Config::verbose = 1;
-	ok($cf->_version >= $min);
-	ok(version->parse($cf->version) >= $min);
+	cmp_ok($cf->_version, '>=', $min);
+	cmp_ok(version->parse($cf->version), '>=', $min);
 	# like($cf->myextlib, qr{/blib/arch/auto/Cv/Cv.(dll|so)});
 }
 

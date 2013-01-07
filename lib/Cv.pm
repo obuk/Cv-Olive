@@ -1129,11 +1129,9 @@ package Cv::FileStorage;
 
 sub fsbless {
 	my ($ptr) = @_;
-	eval {
-		if (my $class = $Cv::CLASS{Cv::cvTypeOf($ptr)->type_name}) {
-			bless $ptr, $class;
-		}
-	};
+	if (my $class = $Cv::CLASS{Cv::cvTypeOf($ptr)->type_name}) {
+		bless $ptr, $class;
+	}
 	$ptr;
 }
 
@@ -1154,11 +1152,7 @@ sub Load {
 
 
 sub Read {
-	my $ref = eval { fsbless cvRead(@_) }; # XXXXX
-	if (my $e = $@) {
-		chomp($e); $e =~ s/ at .* line \d+\.?$//;
-		Carp::Croak $e;
-	}
+	my $ref = fsbless cvRead(@_);
 	Carp::croak __PACKAGE__, "::Read: can't bless"
 		unless Scalar::Util::blessed $ref;
 	$ref;
