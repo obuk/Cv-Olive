@@ -31,19 +31,19 @@ for my $x (-1.5, -1, -0.5, 0, 0.5, 1, 1.5) {
 }
 
 for my $x (-1, -0.5, 0, 0.5, 1) {
-    my $y = POSIX::floor $x;
+    my $y = POSIX::floor($x) + 0;
     is(cvFloor($x), $y, "cvFloor($x)");
 }
 
 for my $x (-1, -0.5, 0, 0.5, 1) {
-    my $y = POSIX::ceil $x;
+    my $y = POSIX::ceil($x) + 0;
     is(cvCeil($x), $y, "cvCeil($x)");
 }
 
 for (1 .. 10) {
     my ($y, $x) = (rand(), rand());
-    my $a = sprintf("%.3g", cvFastArctan($y, $x));
-    my $b = sprintf("%.3g", 180 / CV_PI * atan2($y, $x));
+    my $a = cvFastArctan($y, $x);
+    redo unless my $b = 180 / CV_PI * atan2($y, $x);
     $b = $a if (abs($a / $b) - 1) <= 0.1; # ignoring error < 10%
     is($a, $b, "cvFastArctan($y, $x)");
 }

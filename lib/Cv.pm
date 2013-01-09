@@ -1623,6 +1623,7 @@ package Cv;
 
 sub BoxPoints {
 	ref (my $class = shift) and Carp::croak 'class name needed';
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	cvBoxPoints($_[0], my $pts);
 	$_[1] = [] unless defined $_[1];
 	@{ $_[1] } = @$pts if @_ >= 2;

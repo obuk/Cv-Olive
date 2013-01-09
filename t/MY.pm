@@ -11,6 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
+	is_deeply_rounding
 	err_is
 	err_like
 	_e e
@@ -57,6 +58,22 @@ sub e (&) {
 	_e(1);
 	local $Carp::CarpLevel = $Carp::CarpLevel + 2;
 	eval { &{$_[0]} };
+}
+
+sub round_deeply {
+	my $format = shift;
+	if (ref $_[0] eq 'ARRAY') {
+		round_deeply($format, $_) for @{$_[0]};
+	} else {
+		$_[0] = sprintf($format, $_[0]) + 0;
+	}
+	$_[0];
+}
+
+sub is_deeply_rounding {
+	my $got = shift;
+	unshift(@_, round_deeply('%.0f', $got));
+	goto &Test::More::is_deeply;
 }
 
 1;

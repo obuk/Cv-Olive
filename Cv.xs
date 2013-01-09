@@ -67,6 +67,25 @@ typedef struct CvCircle {
 #define SvREF0(arg) \
 	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
 
+#define Perl_croak Carp_croak
+
+void Carp_croak(pTHX_ char const* fmt, ...)
+{
+	va_list ap;
+	char* str = (char*)alloca(8*1024);
+	char* argv[] = { str, (char*)0 };
+	SV* sv;
+	va_start(ap, fmt);
+	vsprintf(str, fmt, ap);
+	va_end(ap);
+	dSP;
+	if ((sv = get_sv("Carp::CarpLevel", 0)) != NULL) {
+		sv_setiv(sv, SvIV(sv) + 1);
+	}
+	call_argv("Carp::croak", G_VOID|G_DISCARD, argv);
+}
+
+
 typedef struct {
 	SV* callback;
 	union {
@@ -93,7 +112,7 @@ static void delete_callback(AV* av)
 			if (callback->u.t.value) SvREFCNT_dec(callback->u.t.value);
 			safefree(callback);
 		} else {
-			croak("callback is 0");
+			Perl_croak(aTHX_ "callback is 0");
 		}
 	}
 }
@@ -223,7 +242,7 @@ newSVpvn_ro(const char* s, const STRLEN len)
 static SV *unbless(SV * rv)
 {
     SV* sv = SvRV(rv);
-    if (SvREADONLY(sv)) croak("%s", PL_no_modify);
+    if (SvREADONLY(sv)) Perl_croak(aTHX_ "%s", PL_no_modify);
     SvREFCNT_dec(SvSTASH(sv));
     SvSTASH(sv) = NULL;
     SvOBJECT_off(sv);
@@ -268,7 +287,7 @@ cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, 
 void
 cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, CvMSERParams params)
 {
-	croak("TBD: cvExtractMSER");
+	Perl_croak(aTHX_ "TBD: cvExtractMSER");
 }
 #endif
 #endif
@@ -1407,7 +1426,7 @@ cvCvtSeqToArray(const CvSeq* seq, SV* elements, CvSlice slice=CV_WHOLE_SEQ)
 INIT:
 	int n, size;
 CODE:
-	// if (!CV_IS_SEQ(seq)) croak("seq is not a CvSeq");
+	// if (!CV_IS_SEQ(seq)) Perl_croak(aTHX_ "seq is not a CvSeq");
 	if (slice.start_index < 0) slice.start_index = 0;
 	if (slice.end_index > seq->total) slice.end_index = seq->total;
 	if (slice.end_index < slice.start_index) XSRETURN_UNDEF;
@@ -1435,7 +1454,7 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV *
 cvGetSeqElem(const CvSeq* seq, int index)
 CODE:
-	// if (!CV_IS_SEQ(seq)) croak("seq is not a CvSeq");
+	// if (!CV_IS_SEQ(seq)) Perl_croak(aTHX_ "seq is not a CvSeq");
 	RETVAL = newSVpvn_ro((char*)cvGetSeqElem(seq, index), seq->elem_size);
 OUTPUT:
 	RETVAL
@@ -1445,7 +1464,7 @@ cvSetSeqElem(const CvSeq* seq, int index, SV* elements)
 INIT:
 	char* dst;
 CODE:
-	// if (!CV_IS_SEQ(seq)) croak("seq is not a CvSeq");
+	// if (!CV_IS_SEQ(seq)) Perl_croak(aTHX_ "seq is not a CvSeq");
 	dst = (char*)cvGetSeqElem(seq, index);
 	if (dst && seq->elem_size == SvCUR(elements))
 		memcpy(dst, SvPV_nolen(elements), seq->elem_size);
@@ -1709,7 +1728,7 @@ CvFont*
 cvInitFont(int fontFace, double hscale, double vscale, double shear=0, int thickness=1, int lineType=8)
 INIT:
 	Newx(RETVAL, 1, CvFont);
-	if (!RETVAL) Perl_croak(aTHX_ "cvInitFont: no core");
+	// if (!RETVAL) Perl_croak(aTHX_ "cvInitFont: no core");
 #if _CV_VERSION() == _VERSION(2,1,0)
 	if (lineType & CV_AA) lineType |= 1; /* XXXXX */
 #endif
@@ -3285,7 +3304,7 @@ PREINIT:
 	SV** q; AV* av; SV* sv;
 INIT:
 	if (!(Cv_TRACKBAR = get_hv("Cv::TRACKBAR", 0))) {
-		croak("Cv::cvCreateTrackbar: can't get %Cv::TRACKBAR");
+		Perl_croak(aTHX_ "Cv::cvCreateTrackbar: can't get %Cv::TRACKBAR");
 	}
 	RETVAL = -1;
 CODE:
@@ -3311,7 +3330,7 @@ CODE:
 		hv_store(Cv_TRACKBAR, windowName, strlen(windowName),
 			newRV_inc(sv_2mortal((SV*)av)), 0);
 	} else {
-		croak("Cv::cvCreateTrackbar: Cv::TRACKBAR was broken");
+		Perl_croak(aTHX_ "Cv::cvCreateTrackbar: Cv::TRACKBAR was broken");
 	}
 	av_push(av, newSViv(PTR2IV(callback)));
 OUTPUT:
@@ -3387,7 +3406,7 @@ INIT:
 	if (items <= 1) onMouse = (SV*)0;
 	if (items <= 2) userdata = (SV*)0;
 	if (!(Cv_MOUSE = get_hv("Cv::MOUSE", 0))) {
-		croak("Cv::cvSetMouseCallback: can't get %Cv::MOUSE");
+		Perl_croak(aTHX_ "Cv::cvSetMouseCallback: can't get %Cv::MOUSE");
 	}
 CODE:
 	Newx(callback, 1, callback_t);
@@ -3409,7 +3428,7 @@ CODE:
 		hv_store(Cv_MOUSE, windowName, strlen(windowName),
 			newRV_inc(sv_2mortal((SV*)av)), 0);
 	} else {
-		croak("Cv::cvSetMouseCallback: Cv::MOUSE was broken");
+		Perl_croak(aTHX_ "Cv::cvSetMouseCallback: Cv::MOUSE was broken");
 	}
 	if (onMouse) {
 		av_push(av, newSViv(PTR2IV(callback)));
@@ -3506,9 +3525,9 @@ CODE:
 		RETVAL = cvDecodeImage(&m, iscolor);
 	} else {
 		if (SvROK(buf))
-			croak("unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
+			Perl_croak(aTHX_ "unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
 		else
-			croak("unsuported SvTYPE = %d\n", SvTYPE(buf));
+			Perl_croak(aTHX_ "unsuported SvTYPE = %d\n", SvTYPE(buf));
 	}
 OUTPUT:
 	RETVAL
@@ -3529,9 +3548,9 @@ CODE:
 		RETVAL = cvDecodeImageM(&m, iscolor);
 	} else {
 		if (SvROK(buf))
-			croak("unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
+			Perl_croak(aTHX_ "unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
 		else
-			croak("unsuported SvTYPE = %d\n", SvTYPE(buf));
+			Perl_croak(aTHX_ "unsuported SvTYPE = %d\n", SvTYPE(buf));
 	}
 OUTPUT:
 	RETVAL
@@ -3617,7 +3636,7 @@ CvFont*
 cvFontQt(const char* nameFont, int pointSize = -1, CvScalar color = cvScalarAll(0), int weight = CV_FONT_NORMAL, int style = CV_STYLE_NORMAL, int spacing = 0)
 CODE:
 	Newx(RETVAL, 1, CvFont);
-	if (!RETVAL) Perl_croak(aTHX_ "cvFontQt: no core");
+	// if (!RETVAL) Perl_croak(aTHX_ "cvFontQt: no core");
 	*RETVAL = cvFontQt(nameFont, pointSize, color, weight, style, spacing);
 OUTPUT:
 	RETVAL
@@ -4309,7 +4328,7 @@ CODE:
 	else if (strcmp(t, "CvSet") == 0 || strcmp(t, "Cv::Set") == 0)
 		RETVAL = sizeof(CvSet);
 	else
-		croak("CV_SIZEOF: %s unknwon", t);
+		Perl_croak(aTHX_ "CV_SIZEOF: %s unknwon", t);
 OUTPUT:
 	RETVAL
 
