@@ -67,23 +67,28 @@ typedef struct CvCircle {
 #define SvREF0(arg) \
 	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
 
-#define Perl_croak Carp_croak
-
-void Carp_croak(pTHX_ char const* fmt, ...)
+void Carp_croak(pTHX_ char const* format, ...)
 {
 	va_list ap;
-	char* str = (char*)alloca(8*1024);
-	char* argv[] = { str, (char*)0 };
-	SV* sv;
-	va_start(ap, fmt);
-	vsprintf(str, fmt, ap);
+	const size_t size = 1000;
+	char* str = (char*) alloca(size);
+	char* argv[] = { str, 0 };
+	SV* sv_carplevel = get_sv("Carp::CarpLevel", 0);
+	va_start(ap, format);
+	vsnprintf(str, size, format, ap);
 	va_end(ap);
-	dSP;
-	if ((sv = get_sv("Carp::CarpLevel", 0)) != NULL) {
-		sv_setiv(sv, SvIV(sv) + 1);
+	if (sv_carplevel) {
+		IV i = SvIV(sv_carplevel);
+		sv_setiv(sv_carplevel, i + 1);
+		call_argv("Carp::croak", G_VOID|G_DISCARD, argv);
+		/* NOTREACHED, but ... */
+		sv_setiv(sv_carplevel, i);
 	}
-	call_argv("Carp::croak", G_VOID|G_DISCARD, argv);
+	/* plan b */
+	Perl_croak(aTHX_ "%s", str);
 }
+
+#define Perl_croak Carp_croak
 
 
 typedef struct {
