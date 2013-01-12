@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# mkdir opencv
+# git clone https://github.com/Itseez/opencv.git
+# mkdir build
+# cd build
+# cmake.sh   (this script)
+
 src=../opencv
 modules=`pwd`/$src/modules
 cmake \
@@ -28,11 +34,6 @@ cmake \
     -DWITH_1394:BOOL=No \
     -DWITH_CUDA:BOOL=No \
     $src
-
-# -DOPENCV_EXTRA_C_FLAGS=-I$modules/stitching/include/opencv2/stitching \
-# -DCMAKE_C_COMPILER=gcc45 \
-# -DCMAKE_CXX_COMPILER=g++45 \
-# -DOPENCV_EXTRA_C_FLAGS=-Wl,-rpath,/usr/local/lib/gcc45 \
 
 if [ "`uname`" = "FreeBSD" ]; then
   patch=patch-cvconfig.pl
