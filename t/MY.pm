@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	is_deeply_rounding
+	is_round_deeply
 	err_is
 	err_like
 	_e e
