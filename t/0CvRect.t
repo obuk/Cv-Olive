@@ -22,7 +22,7 @@ SKIP: {
 	}
 
 	e { Cv::CvRect([]) };
-	err_is("Cv::CvRect: rect is not of type CvRect");
+	err_is("rect is not of type CvRect in Cv::CvRect");
 
 	{
 		use warnings FATAL => qw(all);

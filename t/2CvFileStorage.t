@@ -71,13 +71,13 @@ if (8) {
 if (10) {
 	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
 	e { $fs->Read($fs->getFileNodeByName(\0, "lena")) };
-	err_is('Cv::FileStorage::Read: can\'t bless');
+	err_is('type_name unknown in Cv::FileStorage::Read');
 }
 
 if (11) {
 	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
 	e { $fs->ReadByName(\0, "lena") };
-	err_is('Cv::FileStorage::Read: can\'t bless');
+	err_is('type_name unknown in Cv::FileStorage::Read');
 }
 
 unlink($yml);

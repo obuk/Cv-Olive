@@ -22,7 +22,7 @@ SKIP: {
 	}
 
 	e { Cv::CvSize2D32f([]) };
-	err_is("Cv::CvSize2D32f: size is not of type CvSize2D32f");
+	err_is("size is not of type CvSize2D32f in Cv::CvSize2D32f");
 
 	{
 		use warnings FATAL => qw(all);

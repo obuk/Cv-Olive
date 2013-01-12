@@ -32,16 +32,16 @@ SKIP: {
 	}
 
 	e { Cv::CvConnectedComp([]) };
-	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
+	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
 
 	e { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) };
-	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
+	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
 
 	e { Cv::CvConnectedComp([$area, $value, 'x', $contour]) };
-	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
+	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
 
 	e { Cv::CvConnectedComp([$area, $value, $rect, 'x']) };
-	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
+	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
 
 	{
 		use warnings FATAL => qw(all);

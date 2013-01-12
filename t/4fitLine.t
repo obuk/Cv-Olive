@@ -95,7 +95,7 @@ e { my @line = Cv->FitLine };
 err_is('Usage: Cv->FitLine(points ...)');
 
 e { my @line = Cv->FitLine([]) };
-err_is('Cv->FitLine: points is not [ pt1, pt2, ... ]');
+err_is('points is not [ pt1, pt2, ... ] in Cv::Arr::FitLine');
 
 e { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) };
 err_is('OpenCV Error: Bad argument (User-defined distance is not allowed) in cvFitLine');

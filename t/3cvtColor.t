@@ -2,14 +2,12 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 25;
+# use Test::More qw(no_plan);
+use Test::More tests => 29;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN { use_ok('Cv', -more) }
-
-use Scalar::Util qw(blessed);
 
 my $lena = dirname($0) . "/lena.jpg";
 my $verbose = Cv->hasGUI;
@@ -23,9 +21,9 @@ if (1) {
 	}
 	my $gray = Cv::Image->new($image->sizes, CV_8UC1);
 	my $gray2 = $image->cvtColor(CV_BGR2GRAY, $gray);
-	is(blessed $image, 'Cv::Image');
-	is(blessed $gray, 'Cv::Image');
-	is(blessed $gray2, 'Cv::Image');
+	isa_ok($image, 'Cv::Image');
+	isa_ok($gray, 'Cv::Image');
+	isa_ok($gray2, 'Cv::Image');
 	if ($verbose) {
 		$gray->show($lena);
 		Cv->waitKey(1000);

@@ -22,7 +22,7 @@ SKIP: {
 	}
 
 	e { Cv::CvSize([]) };
-	err_is("Cv::CvSize: size is not of type CvSize");
+	err_is("size is not of type CvSize in Cv::CvSize");
 
 	{
 		use warnings FATAL => qw(all);

@@ -20,7 +20,7 @@ SKIP: {
 	}
 
 	e { Cv::doublePtr({}) };
-	err_is("Cv::doublePtr: values is not of type double *");
+	err_is("values is not of type double * in Cv::doublePtr");
 
 	{
 		use warnings FATAL => qw(all);

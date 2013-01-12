@@ -61,9 +61,9 @@ for my $class (keys %TYPENAME) {
 			is_deeply(\@sizes, $_->{sizes}, "${class}->getDims(\@sizes)");
 		}
 		e { $class->new };
-		err_is("${class}::new: ?sizes");
+		err_is("size not specified in ${class}::new");
 		e { $class->new([320, 240]) };
-		err_is("${class}::new: ?type");
+		err_is("type not specified in ${class}::new");
 	}
 
 	# inherit parameters if omit

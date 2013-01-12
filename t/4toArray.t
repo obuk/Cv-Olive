@@ -72,7 +72,7 @@ if (3) {
 	is($arr->rows, 3);
 	is($arr->cols, 3);
 	e { my @list = @$arr };
-	err_is("Cv::Arr::ToArray: can't convert 3x3");
+	err_is("can't convert 3x3 in Cv::Arr::ToArray");
 }
 
 
@@ -139,5 +139,5 @@ if (13) {
 	is($arr->rows, 3);
 	is($arr->cols, 3);
 	e { my @list = @$arr };
-	err_is("Cv::Arr::ToArray: can't convert 3x3");
+	err_is("can't convert 3x3 in Cv::Arr::ToArray");
 }

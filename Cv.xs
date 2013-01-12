@@ -1431,7 +1431,6 @@ cvCvtSeqToArray(const CvSeq* seq, SV* elements, CvSlice slice=CV_WHOLE_SEQ)
 INIT:
 	int n, size;
 CODE:
-	// if (!CV_IS_SEQ(seq)) Perl_croak(aTHX_ "seq is not a CvSeq");
 	if (slice.start_index < 0) slice.start_index = 0;
 	if (slice.end_index > seq->total) slice.end_index = seq->total;
 	if (slice.end_index < slice.start_index) XSRETURN_UNDEF;
@@ -1459,7 +1458,6 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV *
 cvGetSeqElem(const CvSeq* seq, int index)
 CODE:
-	// if (!CV_IS_SEQ(seq)) Perl_croak(aTHX_ "seq is not a CvSeq");
 	RETVAL = newSVpvn_ro((char*)cvGetSeqElem(seq, index), seq->elem_size);
 OUTPUT:
 	RETVAL
@@ -1469,7 +1467,6 @@ cvSetSeqElem(const CvSeq* seq, int index, SV* elements)
 INIT:
 	char* dst;
 CODE:
-	// if (!CV_IS_SEQ(seq)) Perl_croak(aTHX_ "seq is not a CvSeq");
 	dst = (char*)cvGetSeqElem(seq, index);
 	if (dst && seq->elem_size == SvCUR(elements))
 		memcpy(dst, SvPV_nolen(elements), seq->elem_size);
@@ -1733,7 +1730,6 @@ CvFont*
 cvInitFont(int fontFace, double hscale, double vscale, double shear=0, int thickness=1, int lineType=8)
 INIT:
 	Newx(RETVAL, 1, CvFont);
-	// if (!RETVAL) Perl_croak(aTHX_ "cvInitFont: no core");
 #if _CV_VERSION() == _VERSION(2,1,0)
 	if (lineType & CV_AA) lineType |= 1; /* XXXXX */
 #endif
@@ -3641,7 +3637,6 @@ CvFont*
 cvFontQt(const char* nameFont, int pointSize = -1, CvScalar color = cvScalarAll(0), int weight = CV_FONT_NORMAL, int style = CV_STYLE_NORMAL, int spacing = 0)
 CODE:
 	Newx(RETVAL, 1, CvFont);
-	// if (!RETVAL) Perl_croak(aTHX_ "cvFontQt: no core");
 	*RETVAL = cvFontQt(nameFont, pointSize, color, weight, style, spacing);
 OUTPUT:
 	RETVAL

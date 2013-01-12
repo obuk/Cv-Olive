@@ -126,14 +126,22 @@ You can omit parameters and that will be inherited.
 
 =cut
 
+sub new_args (\@) {
+	my $x = shift;
+	my $self = shift(@$x);
+	my $sizes = @$x && ref $x->[0] eq 'ARRAY' ? shift(@$x) :
+		ref $self ? $self->sizes : undef;
+	Carp::croak 'size not specified in ', (caller 1)[3] unless defined $sizes;
+	my $type  = @$x ? shift(@$x) :
+		ref $self ? $self->type  : undef;
+	Carp::croak 'type not specified in ', (caller 1)[3] unless defined $type;
+	($self, $sizes, $type);
+}
+
+
 sub Cv::Image::new {
-	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
-		Carp::croak 'Cv::Image::new: ?sizes';
-	my $type = @_? shift : ref $self? $self->type :
-		Carp::croak 'Cv::Image::new: ?type';
+	my ($self, $sizes, $type) = new_args(@_);
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
-	# Carp::croak "usage: Cv::Image::new(sizes, type)" unless $depth;
 	my ($rows, $cols) = @$sizes;
 	my $image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
 	$image->origin($self->origin) if ref $self;
@@ -142,11 +150,7 @@ sub Cv::Image::new {
 
 
 sub Cv::Mat::new {
-	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
-		Carp::croak 'Cv::Mat::new: ?sizes';
-	my $type = @_? shift : ref $self? $self->type :
-		Carp::croak 'Cv::Mat::new: ?type';
+	my ($self, $sizes, $type) = new_args(@_);
 	if (@_) {
 		eval "use Cv::More";
 		die $@ if $@;
@@ -160,11 +164,7 @@ sub Cv::Mat::new {
 
 
 sub Cv::MatND::new {
-	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
-		Carp::croak 'Cv::MatND::new: ?sizes';
-	my $type = @_? shift : ref $self? $self->type :
-		Carp::croak 'Cv::MatND::new: ?type';
+	my ($self, $sizes, $type) = new_args(@_);
 	if (@_) {
 		eval "use Cv::More";
 		die $@ if $@;
@@ -177,11 +177,7 @@ sub Cv::MatND::new {
 
 
 sub Cv::SparseMat::new {
-	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : ref $self? $self->sizes :
-		Carp::croak 'Cv::SparseMat::new: ?sizes';
-	my $type = @_? shift : ref $self? $self->type :
-		Carp::croak 'Cv::SparseMat::new: ?type';
+	my ($self, $sizes, $type) = new_args(@_);
 	unshift(@_, $sizes, $type);
 	goto &Cv::cvCreateSparseMat;
 }
@@ -1145,7 +1141,7 @@ sub Cv::Load {
 sub Load {
 	ref (my $class = shift) and Carp::croak 'class name needed';
 	my $ref = fsbless Cv::cvLoad(@_);
-	Carp::croak __PACKAGE__, "::Load: can't bless"
+	Carp::croak "type_name unknown in ", (caller 0)[3]
 		unless Scalar::Util::blessed $ref;
 	$ref;
 }
@@ -1153,7 +1149,7 @@ sub Load {
 
 sub Read {
 	my $ref = fsbless cvRead(@_);
-	Carp::croak __PACKAGE__, "::Read: can't bless"
+	Carp::croak "type_name unknown in ", (caller 0)[3]
 		unless Scalar::Util::blessed $ref;
 	$ref;
 }

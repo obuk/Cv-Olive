@@ -20,7 +20,7 @@ SKIP: {
 	}
 
 	e { Cv::floatPtr({}) };
-	err_is("Cv::floatPtr: values is not of type float *");
+	err_is("values is not of type float * in Cv::floatPtr");
 
 	{
 		use warnings FATAL => qw(all);

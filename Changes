@@ -6,7 +6,7 @@ Revision history for Cv.pm
      * fixed fallback code for making Constant.pm (use version.pm).
      * simplicity. "use Cv qw(:std)" => "use Cv qw(:all)"
      * fixed Cmp value must be double (not a cvScalar)
-     * fixed error localtion: split, merge, lut
+     * fixed error localtion: split, merge, lut, absdiff, boxpoints
      * fixed GetRawData (can't handle CvMatND)
 
 0.21 - 2012-12-27

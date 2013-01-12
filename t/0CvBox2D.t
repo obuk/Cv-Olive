@@ -24,13 +24,13 @@ SKIP: {
 	}
 
 	e { Cv::CvBox2D([]) };
-	err_is("Cv::CvBox2D: box is not of type CvBox2D");
+	err_is("box is not of type CvBox2D in Cv::CvBox2D");
 
 	e { Cv::CvBox2D(['x', $size, $angle]) };
-	err_is("Cv::CvBox2D: box is not of type CvBox2D");
+	err_is("box is not of type CvBox2D in Cv::CvBox2D");
 
 	e { Cv::CvBox2D([$center, 'x', $angle]) };
-	err_is("Cv::CvBox2D: box is not of type CvBox2D");
+	err_is("box is not of type CvBox2D in Cv::CvBox2D");
 
 	{
 		use warnings FATAL => qw(all);

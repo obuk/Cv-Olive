@@ -36,5 +36,5 @@ if (2) {
 if (10) {
 	my $src = Cv::Mat->new([1, 2], &CV_32FC4);
 	e { $src->subRS };
-	err_is('Cv::Arr::cvSubRS: value is not of type CvScalar');
+	err_is('value is not of type CvScalar in Cv::Arr::cvSubRS');
 }

@@ -75,9 +75,7 @@ my $pts3 = [[1, 2], [2, 3], [3, 4]];
 my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
 e { my @list = Cv->FitEllipse($pts3) };
-chomp($@);
-$@ =~ /Number of points should be >= \d+/;
-err_is("OpenCV Error: Incorrect size of input array ($&) in cvFitEllipse2");
+err_like("OpenCV Error:");
 
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));

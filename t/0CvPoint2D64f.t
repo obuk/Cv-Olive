@@ -22,10 +22,10 @@ SKIP: {
 	}
 
 	e { Cv::CvPoint2D64f([]) };
-	err_is("Cv::CvPoint2D64f: pt is not of type CvPoint2D64f");
+	err_is("pt is not of type CvPoint2D64f in Cv::CvPoint2D64f");
 
 	e { Cv::CvPoint2D64f([1]) };
-	err_is("Cv::CvPoint2D64f: pt is not of type CvPoint2D64f");
+	err_is("pt is not of type CvPoint2D64f in Cv::CvPoint2D64f");
 
 	{
 		use warnings FATAL => qw(all);

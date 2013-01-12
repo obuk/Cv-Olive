@@ -63,7 +63,7 @@ if (10) {
 	no warnings 'redefine';
 	local *Cv::Mat::new = sub { undef };
 	e { $src->absDiff($src2) };
-	err_is('Cv::Arr::cvAbsDiff: dst is not of type CvArr *');
+	err_is('dst is not of type CvArr * in Cv::Arr::cvAbsDiff');
 }
 
 # OpenCV Error:

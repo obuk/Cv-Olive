@@ -70,7 +70,7 @@ sub round_deeply {
 	$_[0];
 }
 
-sub is_deeply_rounding {
+sub is_round_deeply {
 	my $got = shift;
 	unshift(@_, round_deeply('%.0f', $got));
 	goto &Test::More::is_deeply;

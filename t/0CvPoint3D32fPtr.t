@@ -1,6 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 10;
 use File::Basename;
@@ -24,10 +25,10 @@ SKIP: {
 	}
 
 	e { Cv::CvPoint3D32fPtr([]) };
-	err_is("Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f");
+	err_is("pt is not of type CvPoint3D32f in Cv::CvPoint3D32fPtr");
 
 	e { Cv::CvPoint3D32fPtr([1]) };
-	err_is("Cv::CvPoint3D32fPtr: pt is not of type CvPoint3D32f");
+	err_is("pt is not of type CvPoint3D32f in Cv::CvPoint3D32fPtr");
 
 	{
 		use warnings FATAL => qw(all);

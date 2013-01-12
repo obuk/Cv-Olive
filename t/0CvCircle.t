@@ -23,10 +23,10 @@ SKIP: {
 	}
 
 	e { Cv::CvCircle([]) };
-	err_is("Cv::CvCircle: circle is not of type CvCircle");
+	err_is("circle is not of type CvCircle in Cv::CvCircle");
 
 	e { Cv::CvCircle(['x', $radius]) };
-	err_is("Cv::CvCircle: circle is not of type CvCircle");
+	err_is("circle is not of type CvCircle in Cv::CvCircle");
 
 	{
 		use warnings FATAL => qw(all);

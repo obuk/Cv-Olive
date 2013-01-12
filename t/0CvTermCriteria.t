@@ -23,10 +23,10 @@ SKIP: {
 	}
 
 	e { Cv::CvTermCriteria({}) };
-	err_is("Cv::CvTermCriteria: term is not of type CvTermCriteria");
+	err_is("term is not of type CvTermCriteria in Cv::CvTermCriteria");
 
 	e { Cv::CvTermCriteria([]) };
-	err_is("Cv::CvTermCriteria: term is not of type CvTermCriteria");
+	err_is("term is not of type CvTermCriteria in Cv::CvTermCriteria");
 
 	{
 		use warnings FATAL => qw(all);

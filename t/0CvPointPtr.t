@@ -1,6 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 11;
 use File::Basename;
@@ -24,10 +25,10 @@ SKIP: {
 	}
 
 	e { Cv::CvPointPtr([]) };
-	err_is("Cv::CvPointPtr: pt is not of type CvPoint");
+	err_is("pt is not of type CvPoint in Cv::CvPointPtr");
 
 	e { Cv::CvPointPtr([1]) };
-	err_is("Cv::CvPointPtr: pt is not of type CvPoint");
+	err_is("pt is not of type CvPoint in Cv::CvPointPtr");
 
 	{
 		use warnings FATAL => qw(all);

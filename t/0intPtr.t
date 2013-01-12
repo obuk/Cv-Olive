@@ -20,7 +20,7 @@ SKIP: {
 	}
 
 	e { Cv::intPtr({}) };
-	err_is("Cv::intPtr: values is not of type int *");
+	err_is("values is not of type int * in Cv::intPtr");
 
 	{
 		use warnings FATAL => qw(all);
