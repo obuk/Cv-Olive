@@ -1,7 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use 5.008008;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.31;
 
 use lib qw(./lib);
 use Cv::Config;
@@ -53,13 +53,6 @@ my @perl_h_patched = ();
 
 
 my $PREREQ_PM = {
-	#Data::Dumper => 0,
-	#Scalar::Util => 0,
-	#File::Basename => 0,
-	#Cwd => 0,
-	#version => 0,
-	#List::Util => 0,
-	#Time::HiRes => 0,
 	ExtUtils::ParseXS => 2.22,
 };
 
