@@ -92,7 +92,7 @@ if (14) {
 
 # Cv-0.19
 e { my @line = Cv->FitLine };
-err_is('Usage: Cv->FitLine(points ...)');
+err_is('Usage: Cv::Arr::FitLine(points, distType=CV_DIST_L2, param=0, reps=0.01, aeps=0.01)');
 
 e { my @line = Cv->FitLine([]) };
 err_is('points is not [ pt1, pt2, ... ] in Cv::Arr::FitLine');

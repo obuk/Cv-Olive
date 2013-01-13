@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 29;
+use Test::More tests => 31;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -75,5 +75,12 @@ if (10) {
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
 	e { $image->cvtColor };
-	err_like('Usage:');
+	err_is('Usage: Cv::Arr::CvtColor(src, dst, code)');
+}
+
+if (11) {
+	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
+	isa_ok($image, 'Cv::Image');
+	e { $image->cvtColor(-1) };
+	err_is('dst is not of type CvArr * in Cv::Arr::cvCvtColor');
 }

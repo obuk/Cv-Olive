@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 9;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -37,4 +37,9 @@ if (3) {
 if (10) {
 	e { $src->copy };
 	err_is('Usage: Cv::Arr::cvCopy(src, dst, mask=NULL)');
+}
+
+if (11) {
+	e { $src->copy($src->new(CV_8UC1)) };
+	err_like('OpenCV Error:');
 }

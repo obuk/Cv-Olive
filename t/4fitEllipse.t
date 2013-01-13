@@ -69,7 +69,7 @@ sub color {
 
 # Cv-0.19
 e { my @list = Cv->FitEllipse };
-err_is('Usage: Cv->FitEllipse2(points)');
+err_is('Usage: Cv::Arr::FitEllipse2(points)');
 
 my $pts3 = [[1, 2], [2, 3], [3, 4]];
 my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];

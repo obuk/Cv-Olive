@@ -1,13 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
-
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 236;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
@@ -20,7 +20,7 @@ isa_ok($font, 'Cv::Font');
 use Time::HiRes qw(gettimeofday);
 
 SKIP: {
-	skip('version 2.001+', 1) unless cvVersion() >= 2.001;
+	skip('no cvEncodeImage', 233) unless Cv::Arr->can('cvEncodeImage');
 
 	my $debug = 1;
 	foreach my $q (0 .. 20) {
@@ -58,4 +58,10 @@ SKIP: {
 			last if ($c >= 0 && ($c & 0x7f) == 27);
 		}
 	}
+
+	e { Cv::Arr::cvEncodeImage() };
+	err_is('Usage: Cv::Arr::cvEncodeImage(arr, ext, params)');
+
+	e { $img->encodeImage(".xxx") };
+	err_like('OpenCV Error:');
 }

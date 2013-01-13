@@ -71,8 +71,13 @@ sub round_deeply {
 }
 
 sub is_round_deeply {
+	my $format = shift;
 	my $got = shift;
-	unshift(@_, round_deeply('%.0f', $got));
+	my $expected = shift;
+	unshift(@_,
+			round_deeply($format, $got),
+			round_deeply($format, $expected),
+		);
 	goto &Test::More::is_deeply;
 }
 

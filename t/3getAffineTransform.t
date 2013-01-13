@@ -1,18 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
-
-sub is_gg {
-	my ($a, $b) = splice(@_, 0, 2);
-	unshift(@_, map { sprintf("%g", sprintf("%.7f", $_)) } $a, $b);
-	goto &is;
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 10;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
@@ -42,13 +37,13 @@ if (1) {
 	}
 
 	Cv->GetAffineTransform(\@src, \@dst, my $map);
-	# print_map($map);
-	is_gg($map->getReal([0, 0]), -1);
-	is_gg($map->getReal([0, 1]), 0);
-	is_gg($map->getReal([0, 2]), 320);
-	is_gg($map->getReal([1, 0]), 0);
-	is_gg($map->getReal([1, 1]), -1);
-	is_gg($map->getReal([1, 2]), 240);
+
+	is_round_deeply('%.7f', $map->getReal([0, 0]), -1);
+	is_round_deeply('%.7f', $map->getReal([0, 1]), 0);
+	is_round_deeply('%.7f', $map->getReal([0, 2]), 320);
+	is_round_deeply('%.7f', $map->getReal([1, 0]), 0);
+	is_round_deeply('%.7f', $map->getReal([1, 1]), -1);
+	is_round_deeply('%.7f', $map->getReal([1, 2]), 240);
 
 	if ($verbose) {
 		my $img = Cv::Mat->new([2 * $cy, 2 * $cx], CV_8UC3);
@@ -73,17 +68,20 @@ if (1) {
 		Cv->waitKey(1000);
 	}
 
-}
-
-
-sub print_map {
-	my $map = shift;
-	for my $row (0 .. $map->rows - 1) {
-		print STDERR "[ ";
-		for my $col (0 .. $map->cols - 1) {
-			print STDERR $map->getReal([$row, $col]), ", ";
-		}
-		print STDERR "]\n";
+  SKIP: {
+	  eval "use Cv::More;";
+	  skip "can't load Cv::More", 1 if $@;
+	  my $got = Cv->GetAffineTransform(\@src, \@dst)->m_get([]);
+	  is_deeply($got, $map->m_get([]));
 	}
 }
 
+if (10) {
+	e { Cv->GetAffineTransform };
+	err_is('Usage: Cv::cvGetAffineTransform(src, dst, mapMatrix)');
+}
+
+if (11) {
+	e { Cv->GetAffineTransform(1, 2) };
+	err_is('src is not of type CvPoint2D32f * in Cv::cvGetAffineTransform');
+}

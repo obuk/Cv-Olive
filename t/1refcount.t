@@ -17,7 +17,7 @@ if (1) {
 	Cv::Mat::cvReleaseMat($mat);
 	is(ref $mat, 'SCALAR');
 	e { Cv::Mat::refcount($mat) };
-	err_is('mat is not of type const CvMat * in Cv::Mat::refcount');
+	err_is('mat is not of type CvMat * in Cv::Mat::refcount');
 	e { Cv::Mat::cvReleaseMat($mat) };
 	err_is('mat is not of type CvMat * in Cv::Mat::cvReleaseMat');
 }

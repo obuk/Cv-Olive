@@ -70,7 +70,7 @@ if (1) {
 
 if (10) {
 	e { Cv->Merge; };
-	err_is("usage: Merge([src0, src1, ...], dst)");
+	err_is("Usage: Cv::Merge([src0, src1, ...], dst)");
 	my $cv = bless [], 'Cv';
 	e { $cv->Merge; };
 	err_is("class name needed");

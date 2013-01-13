@@ -165,6 +165,7 @@ t/1alias.t
 t/1autoload.t
 t/1croak.t
 t/1error.t
+t/1refcount.t
 t/2CvArr.t
 t/2CvFileStorage.t
 t/2CvImage.t
@@ -202,6 +203,7 @@ t/3lut.t
 t/3matchTemplate.t
 t/3merge.t
 t/3minMaxLoc.t
+t/3misc.t
 t/3mixChannels.t
 t/3morphologyEx.t
 t/3mouse.t
@@ -247,6 +249,7 @@ t/4transform.t
 t/8flipbook.t
 t/8pango.t
 t/9inlineC.t
+t/9pod.t
 t/9ref.t
 t/9threads.t
 t/baboon.jpg
@@ -255,6 +258,7 @@ t/lena.jpg
 t/MY.pm
 tools/checkref.pl
 tools/cleanup.sh
+tools/cmake-FreeBSD.sh
 tools/cover.sh
 tools/dumpconst-all.pl
 tools/dumpconst.pl

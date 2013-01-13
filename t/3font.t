@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 3;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use Test::More tests => 4;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
@@ -24,4 +25,9 @@ if (1) {
 
 if (2) {
 	ok(!Cv->hasQt);
+}
+
+if (10) {
+	e { Cv->InitFont };
+	err_is('Usage: Cv::cvInitFont(fontFace, hscale, vscale, shear=0, thickness=1, lineType=8)');
 }

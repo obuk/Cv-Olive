@@ -328,7 +328,7 @@ sub FitEllipse2 {
 	# $mat->FitEllipse2;                                                        
 	my $self = shift;
 	unless (ref $self) {
-		Carp::croak "Usage: Cv->FitEllipse2(points)"
+		Carp::croak "Usage: ${[ caller 0 ]}[3](points)"
 			unless @_;
 		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
 	}
@@ -347,7 +347,7 @@ sub FitLine {
     my $self = shift;
     unless (ref $self) {
 		my $points = shift;
-		Carp::croak "Usage: Cv->FitLine(points ...)"
+		Carp::croak "Usage: ${[ caller 0 ]}[3](points, distType=CV_DIST_L2, param=0, reps=0.01, aeps=0.01)"
 			unless defined $points;
 		Carp::croak "points is not [ pt1, pt2, ... ] in ", (caller 0)[3]
 			unless my @dims = Cv::m_dims(@$points);

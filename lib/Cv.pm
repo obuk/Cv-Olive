@@ -574,7 +574,7 @@ sub Cv::Merge {
 			Cv::Arr::Merge(\@_, $dst);
 		}
 	} else {
-		Carp::croak "usage: Merge([src0, src1, ...], dst)"
+		Carp::croak "Usage: ${[ caller 0 ]}[3]([src0, src1, ...], dst)";
 	}
 }
 
@@ -1419,15 +1419,15 @@ package Cv;
 sub GetRotationMatrix2D {
 	# Cv->GetRotationMatrix2D($center, $angle, $scale, my $mapMatrix)
 	my $class = shift;
-	$_[3] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
-	goto &cv2DRotationMatrix;
+	$_[3] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1) if @_ >= 3;
+	goto &cvGetRotationMatrix2D;
 }
 
 
 sub GetAffineTransform {
 	# Cv->GetAffineTransform($src, $dst, my $mapMatrix)
 	my $class = shift;
-	$_[2] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1);
+	$_[2] ||= Cv::Mat->new([2, 3], &Cv::CV_32FC1) if @_ >= 2;
 	goto &cvGetAffineTransform;
 }
 
@@ -1435,7 +1435,7 @@ sub GetAffineTransform {
 sub GetPerspectiveTransform {
 	# Cv->GetPerspectiveTransform($src, $dst, my $mapMatrix)
 	my $class = shift;
-	$_[2] ||= Cv::Mat->new([3, 3], &Cv::CV_32FC1);
+	$_[2] ||= Cv::Mat->new([3, 3], &Cv::CV_32FC1) if @_ >= 2;
 	goto &cvGetPerspectiveTransform;
 }
 
@@ -1532,7 +1532,7 @@ sub CvtColor {
 	my $code = shift;
 	unless ($dst) {
 		if (!defined $code) {
-			Carp::croak "Usage: Cv->CvtColor(src, dst, code)";
+			Carp::croak "Usage: ${[ caller 0 ]}[3](src, dst, code)";
 		} elsif ($code == &Cv::CV_BGR2RGB   || $code == &Cv::CV_RGB2BGR) {
 			$dst = $src->new;
 		} elsif ($code == &Cv::CV_BGR2GRAY  || $code == &Cv::CV_RGB2GRAY) {

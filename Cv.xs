@@ -2280,7 +2280,7 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv
 CvMat*
 cv2DRotationMatrix(CvPoint2D32f center, double angle, double scale, CvMat* mapMatrix)
-ALIAS: cvRotationMatrix2D = 1
+ALIAS: cvGetRotationMatrix2D = 1
 OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(3));
 
 MODULE = Cv	PACKAGE = Cv
