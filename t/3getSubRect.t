@@ -1,13 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
-
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 7;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
@@ -101,4 +101,14 @@ if (1) {
 		}
 	}
 
+}
+
+if (10) {
+	e { Cv::Arr::cvGetSubRect };
+	err_is('Usage: Cv::Arr::cvGetSubRect(arr, submat, rect)');
+}
+
+if (11) {
+	e { Cv::Arr::cvGetSubRect(1, 2, 3) };
+	err_is('arr is not of type CvArr * in Cv::Arr::cvGetSubRect');
 }

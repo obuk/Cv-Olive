@@ -1,15 +1,15 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use strict;
-use Test::More qw(no_plan);
-#use Test::More tests => 35;
-BEGIN {
-	use_ok('Cv', -more);
-}
-
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 31;
 use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
+
 use List::Util qw(max min);
-use Data::Dumper;
 
 # my $img = Cv->LoadImage(dirname($0).'/'."baboon.jpg");
 my $img = Cv->LoadImage(dirname($0).'/'."lena.jpg");
@@ -25,8 +25,8 @@ ok($hist, 'Cv->CreateHist');
 if (1) {
 	ok(Cv->CreateHist([256], CV_HIST_ARRAY),
 	   'CreateHist(Cv->CreateHist)');
-	eval { Cv->CreateHist };
-	like($@, qr/Usage:/, 'CvCreateHist(usage)');
+	e { Cv->CreateHist };
+	err_is('Usage: Cv::cvCreateHist(sizes, type, ranges=NULL, uniform=1)', 'CvCreateHist(usage)');
 }
 
 # ------------------------------------------------------------
@@ -35,8 +35,8 @@ if (1) {
 if (1) {
 	$hist->CalcHist([$gray]);
 	ok($hist, 'CalcHist');
-	eval { $hist->CalcHist };
-	like($@, qr/Usage:/, 'CalcHist(usage)');
+	e { $hist->CalcHist };
+	err_is('Usage: Cv::Histogram::cvCalcHist(hist, image, accumulate=0, mask=NULL)', 'CalcHist(usage)');
 }
 
 # ------------------------------------------------------------
@@ -180,4 +180,3 @@ if ($haswin) {
 	$histogram->ShowImage('Histogram');
 	Cv->WaitKey(1000);
 }
-exit (0);

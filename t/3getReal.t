@@ -1,11 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 33;
-BEGIN {
-	use_ok('Cv', -more);
-}
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
 # double cvGetReal1D(const CvArr* arr, int idx0)
@@ -62,11 +64,11 @@ for my $n (1..4) {
 	my $m = Cv::Mat->new([240, 320], CV_64FC($n));
 	my $v = cvScalar(map { rand 1 } 1..$n);
 	my $i = [map { int rand $_ } @{$m->sizes}];
-	eval { $m->set($i, $v) };
+	$m->set($i, $v);
 	if ($n == 1) {
 		is($m->getReal($i), $v->[0]);
 	} else {
-		eval { $m->getReal($i) };
-		like($@, qr/OpenCV Error:/i);
+		e { $m->getReal($i) };
+		err_like('OpenCV Error:');
 	}
 }

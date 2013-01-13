@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 21;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use Test::More tests => 22;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
 # CvMat* cvGetCols(const CvArr* arr, CvMat* submat, int startCol, int endCol)
@@ -72,22 +73,22 @@ if (6) {
 	is($v1->[$_], $v2->[$_]) for 0 .. $src->channels - 1;
 }
 
-if (0) {
+if (10) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	my $submat = eval { $src->GetCols(10, 10) };
-	is($@, '');
+	e { $src->GetCols(10, 10) };
+	err_is('');
 }
 
 if (12) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	my $submat = eval { $src->GetCols(10, 0) };
-	ok($@);
+	e { $src->GetCols(10, 0) };
+	err_like('OpenCV Error:');
 }
 
 if (13) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
 	no warnings 'redefine';
 	local *Cv::Mat::new = sub { undef };
-	my $submat = eval { $src->GetCols(100, 200) };
-	like($@, qr/submat is not of type CvMat/);
+	e { $src->GetCols(100, 200) };
+	err_is('submat is not of type CvMat * in Cv::Arr::cvGetCols');
 }

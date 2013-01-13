@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 17;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
 # int cvGetDims(const CvArr* arr, int* sizes=NULL)
@@ -51,7 +52,6 @@ if (5) {
 	is($dims, 2);
 }
 
-
 if (6) {
 	$src->GetDims(\ my @sizes);
 	is(scalar @sizes, 2);
@@ -64,4 +64,9 @@ if (7) {
 	is(scalar @sizes, 2);
 	is($sizes[0], $src->rows);
 	is($sizes[1], $src->cols);
+}
+
+if (10) {
+	e { Cv::Arr::GetDims(1) };
+	err_is('arr is not of type CvArr * in Cv::Arr::cvGetDims');
 }

@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 28;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
 # CvMat* cvGetRows(const CvArr* arr, CvMat* submat, int startRow, int endRow)
@@ -96,20 +97,20 @@ if (8) {
 SKIP: {
 	skip "need OpenCV-2.0+", 1 unless cvVersion() >= 2.0;
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	my $submat = eval { $src->GetRows(10, 10) };
-	ok(!$@);
+	e { $src->GetRows(10, 10) };
+	err_is('');
 }
 
-if (12) {
+if (11) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	my $submat = eval { $src->GetRows(10, 0) };
-	ok($@);
+	e { $src->GetRows(10, 0) };
+	err_like('OpenCV Error:');
 }
 
 if (13) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
 	no warnings 'redefine';
 	local *Cv::Mat::new = sub { undef };
-	my $submat = eval { $src->GetRows(100, 200) };
-	like($@, qr/submat is not of type CvMat/);
+	e { $src->GetRows(100, 200) };
+	err_is('submat is not of type CvMat * in Cv::Arr::cvGetRows');
 }

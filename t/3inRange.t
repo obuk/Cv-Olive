@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
-# use Test::More tests => 13;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+# use Test::More tests => 31;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 my $win = $0;
@@ -65,6 +66,21 @@ foreach (
 	is(&sumInrange, $_->{Sum});
 }
 
+if (10) {
+	my $src = Cv::Mat->new([240, 320], CV_8UC1);
+	my $lower = Cv::Mat->new([240, 320], CV_8UC2);
+	my $upper = Cv::Mat->new([240, 320], CV_8UC2);
+	e { $src->inRange($lower, $upper) };
+	err_like('OpenCV Error:');
+}
+
+if (11) {
+	my $src = Cv::Mat->new([240, 320], CV_32FC1);
+	my $lower = Cv::Mat->new([240, 320], CV_32FC1);
+	my $upper = Cv::Mat->new([240, 320], CV_32FC1);
+	e { $src->inRange($lower, $upper) };
+	err_is('');
+}
 
 sub makeImage {
 	my $win = shift;
