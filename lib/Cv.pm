@@ -650,7 +650,7 @@ sub MinMaxLoc {
 	# MinMaxLoc($arr, my $minVal, my $maxVal, my $minLoc, my $maxLoc, my $mask)
 	if (@_ >= 3) {
 		$_[3] = my $minLoc unless defined $_[3];
-		$_[4] = my $maxLoc unless defined $_[3];
+		$_[4] = my $maxLoc unless defined $_[4];
 	}
 	goto &cvMinMaxLoc;
 }
@@ -739,7 +739,7 @@ sub InRange {
 	# InRangeS($src, $upper, $lower, [$dst]);
 	my $src = shift;
 	my ($upper, $lower) = splice(@_, 0, 2);
-	my $dst = dst(@_) || $src->new;
+	my $dst = dst(@_) || $src->new(&Cv::CV_8UC1);
 	unshift(@_, $src, $upper, $lower, $dst);
 	if (ref $upper eq 'ARRAY') {
 		goto &cvInRangeS;
@@ -828,7 +828,7 @@ sub Xor {
 sub ConvertScale {
 	# ConvertScale(src, [dst], [scale], [shift])
 	my $src = shift;
-	my $dst = dst(@_) || $src->new;
+	my $dst = dst(@_) || $src->new(&Cv::CV_8UC($src->channels));
 	unshift(@_, $src, $dst);
 	goto &cvConvertScale;
 }
@@ -838,7 +838,7 @@ sub ConvertScale {
 sub ConvertScaleAbs {
 	# ConvertScaleAbs(src, [dst], [scale], [shift])
 	my $src = shift;
-	my $dst = dst(@_) || $src->new;
+	my $dst = dst(@_) || $src->new(&Cv::CV_8UC($src->channels));
 	unshift(@_, $src, $dst);
 	goto &cvConvertScaleAbs;
 }
