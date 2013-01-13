@@ -47,7 +47,7 @@ sub ma (&) {
 	$gray->minMaxLoc(my $min, my $max);
     my $s = sprintf("%.1fms, %g .. %g", (gettimeofday - $t) * 1000, $min, $max);
 	($min, $max) = (0, 255) unless ($max - $min);
-	$gray = $gray->cvtScale($gray->new(CV_8UC1), 255 / ($max - $min), -$min);
+	$gray = $gray->cvtScale(255 / ($max - $min), -$min);
 	# $gray->cvtColor(CV_GRAY2BGR)
 	$gray->LUT($gray->new(CV_8UC3), $lut_gray2thermo)
 		->putText($s, [10 + 1, 20 + 1], $font, [  50,  50, 100 ])
