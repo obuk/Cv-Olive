@@ -1,13 +1,14 @@
 Revision history for Cv.pm
 
-0.22 - 2012-01-09 (working)
-     * rewrote t/*t to verify the location of the error.
-     * fixed type conversion warnings
+0.22 - 2012-01-14 (working)
+     * redefined Perl_croak in Carp::croak to get better location of the error
+     * rewroting t/*t to verify the location of the error.
+     * fixed type conversion warnings in typemap
      * fixed fallback code for making Constant.pm (use version.pm).
      * simplicity. "use Cv qw(:std)" => "use Cv qw(:all)"
-     * fixed Cmp value must be double (not a cvScalar)
-     * fixed error localtion: split, merge, lut, absdiff, boxpoints
-     * fixed GetRawData (can't handle CvMatND)
+     * fixed Cmp value double (not a cvScalar)
+     * fixed GetRawData if CvMatND used
+     * fixed dst CV_8UC1: cvtScale*, inRange*
 
 0.21 - 2012-12-27
      * fixed compile error on cygwin (can't handle pp-stmt in typemap?)

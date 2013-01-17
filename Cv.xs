@@ -1047,7 +1047,7 @@ cvReleaseMat(CvMat* &mat)
 ALIAS: DESTROY = 1
 INIT:
 	unbless(ST(0));
-	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN(0);
+	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::MatND
 void
@@ -1055,7 +1055,7 @@ cvReleaseMatND(CvMatND* &mat)
 ALIAS: DESTROY = 1
 INIT:
 	unbless(ST(0));
-	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN(0);
+	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::SparseMat
 void
@@ -1063,7 +1063,7 @@ cvReleaseSparseMat(CvSparseMat* &mat)
 ALIAS: DESTROY = 1
 INIT:
 	unbless(ST(0));
-	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN(0);
+	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
