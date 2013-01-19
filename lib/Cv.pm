@@ -1696,9 +1696,10 @@ sub MatchTemplate {
 	# MatchTemplate(image, templ, result, method)
 	my $image = shift;
 	my $templ = shift;
-	my $result = dst(@_) || $templ->new(
+	my $result = dst(@_) || $templ && $templ->new(
 		[ $image->rows - $templ->rows + 1,
-		  $image->cols - $templ->cols + 1 ], &Cv::CV_32FC1);
+		  $image->cols - $templ->cols + 1 ],
+		&Cv::CV_32FC1);
 	unshift(@_, $image, $templ, $result);
 	goto &cvMatchTemplate;
 }
@@ -1836,7 +1837,8 @@ package Cv::StereoSGBM;
 
 sub Cv::CreateStereoSGBM {
 	ref (my $class = shift) and Carp::croak 'class name needed';
-	Cv::StereoSGBM->new(@_);
+	unshift(@_, __PACKAGE__);
+	goto &Cv::StereoSGBM::new;
 }
 
 { *FindStereoCorrespondence = *FindCorrespondence = \&FindStereoCorrespondenceSGBM }
