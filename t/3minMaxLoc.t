@@ -43,7 +43,7 @@ if (3) {
 	is($maxVal, $maxValExpect);
 }
 
-if (4) {
+if (10) {
 	e { $arr->MinMaxLoc; };
 	err_is('Usage: Cv::Arr::cvMinMaxLoc(arr, min_val, max_val, min_loc, max_loc, mask= NULL)');
 }

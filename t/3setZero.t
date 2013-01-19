@@ -1,13 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
-use Scalar::Util qw(blessed);
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 12;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
@@ -56,5 +56,10 @@ if (1) {
 		}
 	}
 	is($sum->[$_], 0) for @channels;
+}
 
+if (10) {
+	my $arr = Cv->createMat(240, 320, CV_8UC3);
+	e { $arr->setZero({}) };
+	err_is('Usage: Cv::Arr::cvSetZero(arr)');
 }

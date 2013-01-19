@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 use Test::More qw(no_plan);
-# use Test::More tests => 13;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+# use Test::More tests => 2;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
@@ -57,6 +58,10 @@ SKIP: {
 		$img->rectangle([$x, $y], [$x+$w, $y+$h], $color, -1);
 	}
 	$img->showImage($win);
+	if (10) {
+		e { Cv->setMouseCallback };
+		err_is('Usage: Cv::cvSetMouseCallback(windowName, onMouse= NO_INIT, userdata= NO_INIT)');
+	}
 	Cv->setMouseCallback($win, \&onMouse);
 	while ($remaining >= 0) {
 		my $text = sprintf("remaining: %.1fs", $remaining / 1000);
@@ -70,4 +75,9 @@ SKIP: {
 		last SKIP if Cv->waitKey(100) >= 0;
 		$remaining -= 100;
 	}
+}
+
+
+SKIP: {
+	skip "no window", 1 unless Cv->hasGUI;
 }

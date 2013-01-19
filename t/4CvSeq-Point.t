@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 127;
-
-BEGIN {
-	use_ok('Cv');
-}
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv') }
 
 sub equal($$) {
 	my ($a, $b) = splice(@_, 0, 2);

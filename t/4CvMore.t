@@ -1,7 +1,12 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 5;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN { use_ok('Cv') }
 
 Cv::More->import(qw(cs));

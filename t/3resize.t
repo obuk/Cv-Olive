@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 23;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 # ============================================================
 # my $dst = $src->resize([rows, cols]);
@@ -62,4 +63,16 @@ if (4) {
 	is($dst->cols, $cols);
 	is($src->rows, 2 * $rows);
 	is($src->cols, 2 * $cols);
+}
+
+if (10) {
+	my $src = Cv::Mat->new([100, 10], CV_8UC3);
+	e { $src->resize(1, 2, 3) };
+	err_is('Usage: Cv::Arr::cvResize(src, dst, interpolation=CV_INTER_LINEAR)');
+}
+
+if (11) {
+	my $src = Cv::Mat->new([100, 10], CV_8UC3);
+	e { $src->resize({}) };
+	err_like('OpenCV Error:');
 }

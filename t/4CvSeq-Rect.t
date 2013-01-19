@@ -1,13 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 22;
-
-BEGIN {
-	use_ok('Cv');
-	use_ok('Cv::Seq::Rect');
-}
+use Test::More tests => 21;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv') }
 
 my $stor = Cv::MemStorage->new;
 

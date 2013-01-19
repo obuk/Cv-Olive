@@ -1,11 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
-BEGIN {
-	use_ok('Cv', -more);
-}
+use Test::More tests => 12;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 if (1) {
 	my $mat = Cv::Mat->new([3, 1], CV_8UC1);
@@ -45,4 +47,10 @@ if (5) {
 	is($mat->Ptr, "ABC");
 	my $s = $mat->Ptr([1]);
 	is(length($s), 2);
+}
+
+if (11) {
+	my $mat = Cv::Mat->new([3, 1], CV_8UC1);
+	e { $mat->Ptr({}) };
+	err_like('OpenCV Error:');
 }

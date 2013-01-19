@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 2;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
@@ -21,4 +22,10 @@ if (1) {
 		$img->show("polyLine");
 		Cv->waitKey(1000);
 	}
+}
+
+if (10) {
+	my $img = Cv::Image->new([240, 320], CV_8UC3);
+	e { $img->polyLine };
+	err_is('Usage: Cv::Arr::cvPolyLine(img, pts, is_closed, color, thickness= 1, line_type= 8, shift= 0)');
 }

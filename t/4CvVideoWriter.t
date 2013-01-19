@@ -4,6 +4,9 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 4;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN { use_ok('Cv') }
 
 SKIP: {

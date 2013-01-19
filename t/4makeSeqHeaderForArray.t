@@ -1,29 +1,17 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 10;
-
-BEGIN {
-	use_ok('Cv');
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 28;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv') }
 
 my $verbose = 0;
 
-sub equal($$) {
-	my ($a, $b) = splice(@_, 0, 2);
-	return undef unless ref $a eq 'ARRAY';
-	return undef unless ref $b eq 'ARRAY';
-	return undef unless @$a == @$b;
-	foreach my $i (0 .. $#{$a}) {
-		return undef unless $a->[$i] == $b->[$i];
-	}
-	return 1;
-}
-
 if (1) {
-	my $verbose = 0;
-
 	my $stor = Cv::MemStorage->new(8192);
 	ok($stor->isa('Cv::MemStorage'));
 
@@ -32,7 +20,7 @@ if (1) {
 
 	my @pts = (map { [ $_ * 10 + 1, $_ * 10 + 2 ] } 0 .. 9);
 	$seq->Push(@pts);
-	ok(equal($seq->GetSeqElem($_), $pts[$_])) for 0 .. $#pts;
+	is_deeply([$seq->GetSeqElem($_)], $pts[$_]) for 0 .. $#pts;
 
 	Cv::Seq::CvtSeqToArray($seq, my $elements);
 
@@ -71,7 +59,7 @@ if (1) {
 		print STDERR 'length($tmpblock) = ', length($tmpblock), "\n";
 	}
 
-	ok(equal($seq2->GetSeqElem($_), $pts[$_])) for 0 .. $#pts;
+	is_deeply([$seq2->GetSeqElem($_)], $pts[$_]) for 0 .. $#pts;
 
 	if ($verbose) {
 		use Time::HiRes qw(gettimeofday);

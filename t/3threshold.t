@@ -1,12 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 13;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 7;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
@@ -31,4 +32,9 @@ isnt($thresh2, $thresh);
 if ($verbose) {
 	$bin2->show($window);
 	Cv->WaitKey(1000);
+}
+
+if (10) {
+	e { $image->Threshold };
+	err_is('Usage: Cv::Arr::cvThreshold(src, dst, threshold, maxValue, thresholdType)');
 }

@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 681;
+# use Test::More qw(no_plan);
+use Test::More tests => 5;
 use File::Basename;
 use lib dirname($0);
 use MY;

@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	is_round_deeply
+	is_deeply
 	err_is
 	err_like
 	_e e
@@ -70,14 +70,32 @@ sub round_deeply {
 	$_[0];
 }
 
-sub is_round_deeply {
-	my $format = shift;
-	my $got = shift;
-	my $expected = shift;
-	unshift(@_,
-			round_deeply($format, $got),
-			round_deeply($format, $expected),
-		);
+sub is_deeply {
+	my $opt = ref $_[0] && ref $_[0] eq 'HASH' ? shift : { };
+	my ($got, $exp) = splice(@_, 0, 2);
+	if (my $round = $opt->{round}) {
+		$got = round_deeply($round, $got);
+		$exp = round_deeply($round, $exp);
+	}
+	if (my $rotate = $opt->{rotate}) {
+		my $len = scalar @$exp;
+		my $dim = scalar @{$exp->[0]};
+		my @delta;
+		for my $i (0 .. $len - 1) {
+			my $delta = 0;
+			for my $j (0 .. $len - 1) {
+				$delta += abs($got->[($i + $j) % $len]->[$_] - $exp->[$j]->[$_])
+					for 0 .. $dim - 1;
+			}
+			push(@delta, [$delta, $i]);
+		}
+		@delta = sort { $a->[0] <=> $b->[0] } @delta;
+		if (my $shift = $delta[0]->[1]) {
+			my @tmp = splice(@$got, 0, $shift);
+			push(@$got, @tmp);
+		}
+	}
+	unshift(@_, $got, $exp);
 	goto &Test::More::is_deeply;
 }
 
