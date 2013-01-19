@@ -1830,18 +1830,23 @@ package Cv::StereoBMState;
 
 package Cv::StereoGCState;
 
-{ *new = \&Cv::CreateStereoGCState }
-{ *FindStereoCorrespondence = *FindCorrespondence = \&FindStereoCorrespondenceGC }
+if (Cv->can('cvCreateStereoGCState')) {
+	*new = \&Cv::CreateStereoGCState;
+	*FindStereoCorrespondence = *FindCorrespondence =
+		\&FindStereoCorrespondenceGC;
+}
 
 package Cv::StereoSGBM;
 
-sub Cv::CreateStereoSGBM {
-	ref (my $class = shift) and Carp::croak 'class name needed';
-	unshift(@_, __PACKAGE__);
-	goto &Cv::StereoSGBM::new;
+if (__PACKAGE__->can('new')) {
+	*Cv::CreateStereoSGBM = sub {
+		ref (my $class = shift) and Carp::croak 'class name needed';
+		unshift(@_, __PACKAGE__);
+		goto &{__PACKAGE__ . '::new'};
+	};
+	*FindStereoCorrespondence = *FindCorrespondence =
+		\&FindStereoCorrespondenceSGBM;
 }
-
-{ *FindStereoCorrespondence = *FindCorrespondence = \&FindStereoCorrespondenceSGBM }
 
 
 # ============================================================

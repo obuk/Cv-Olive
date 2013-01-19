@@ -26,8 +26,11 @@ if (98) {
 	ok(Cv->assoc('CreateStereoBMState'));
 	ok(Cv::StereoBMState->Cv::assoc('new'));
 
-	ok(Cv->assoc('CreateStereoGCState'));
-	ok(Cv::StereoGCState->Cv::assoc('new'));
+  SKIP: {
+	  skip "cvCreateStereoGCState", 2 unless Cv->can('cvCreateStereoGCState');
+	  ok(Cv->assoc('CreateStereoGCState'));
+	  ok(Cv::StereoGCState->Cv::assoc('new'));
+	}
 
 	ok(Cv->assoc('CreateStructuringElementEx'));
 	ok(Cv::ConvKernel->Cv::assoc('new'));

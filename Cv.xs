@@ -24,8 +24,10 @@ extern "C" {
 #define _CV_VERSION() _VERSION(CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION)
 
 #ifndef __cplusplus
-#define __OPENCV_BACKGROUND_SEGM_HPP__
-#define __OPENCV_VIDEOSURVEILLANCE_H__
+#  if _CV_VERSION() >= _VERSION(2,4,0)
+#    define __OPENCV_BACKGROUND_SEGM_HPP__
+#  endif
+#  define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 
 #include <opencv/cvaux.h>

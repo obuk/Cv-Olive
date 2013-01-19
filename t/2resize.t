@@ -73,6 +73,6 @@ if (10) {
 
 if (11) {
 	my $src = Cv::Mat->new([100, 10], CV_8UC3);
-	e { $src->resize({}) };
+	e { $src->resize(\0) };
 	err_like('OpenCV Error:');
 }
