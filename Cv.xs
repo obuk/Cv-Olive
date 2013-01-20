@@ -305,6 +305,15 @@ MODULE = Cv	PACKAGE = Cv
 #  core. The Core Functionality: Basic Structures
 # ============================================================
 
+MODULE = Cv	PACKAGE = Cv::Arr
+# ====================
+IV
+phys(CvArr* arr)
+CODE:
+	RETVAL = PTR2IV(arr);
+OUTPUT:
+	RETVAL
+
 MODULE = Cv	PACKAGE = Cv::Mat
 # ====================
 
@@ -1049,7 +1058,7 @@ cvReleaseMat(CvMat* &mat)
 ALIAS: DESTROY = 1
 INIT:
 	unbless(ST(0));
-	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
+	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::MatND
 void
@@ -1057,7 +1066,7 @@ cvReleaseMatND(CvMatND* &mat)
 ALIAS: DESTROY = 1
 INIT:
 	unbless(ST(0));
-	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
+	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::SparseMat
 void
@@ -1065,7 +1074,7 @@ cvReleaseSparseMat(CvSparseMat* &mat)
 ALIAS: DESTROY = 1
 INIT:
 	unbless(ST(0));
-	if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
+	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
