@@ -2,11 +2,15 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 24;
+# use Test::More qw(no_plan);
+use Test::More tests => 24;
 
 BEGIN {
-	use_ok('Cv', -more);
+	use_ok('Cv::Constant', qw(:all));
+}
+
+unless (Cv->can('cvSlice')) {
+	sub Cv::cvSlice { [ unpack('i2', pack('i2', @_)) ]; }
 }
 
 is(CV_8U, 0);
