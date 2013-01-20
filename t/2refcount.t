@@ -2,15 +2,15 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 35;
+# use Test::More qw(no_plan);
+use Test::More tests => 19;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN { use_ok('Cv', -more) }
 
 if (1) {
-	my $mat = cvCreateMat(10, 10, CV_32FC1);
+	my $mat = Cv::Mat->new([10, 10], CV_32FC1);
 	ok($mat);
 	is(ref $mat, 'Cv::Mat');
 	is($mat->refcount, 1);
@@ -18,6 +18,35 @@ if (1) {
 	is(ref $mat, 'SCALAR');
 	e { Cv::Mat::refcount($mat) };
 	err_is('mat is not of type CvMat * in Cv::Mat::refcount');
-	e { Cv::Mat::cvReleaseMat($mat) };
+	e { Cv::Mat::DESTROY($mat) };
 	err_is('mat is not of type CvMat * in Cv::Mat::cvReleaseMat');
+}
+
+if (2) {
+	my $mat = Cv::MatND->new([10, 10], CV_32FC1);
+	ok($mat);
+	is(ref $mat, 'Cv::MatND');
+	is($mat->refcount, 1);
+	Cv::MatND::cvReleaseMatND($mat);
+	is(ref $mat, 'SCALAR');
+	e { Cv::MatND::refcount($mat) };
+	err_is('mat is not of type CvMatND * in Cv::MatND::refcount');
+	e { Cv::MatND::DESTROY($mat) };
+	err_is('mat is not of type CvMatND * in Cv::MatND::cvReleaseMatND');
+}
+
+if (3) {
+	my $mat = Cv::SparseMat->new([10, 10], CV_32FC1);
+	ok($mat);
+	is(ref $mat, 'Cv::SparseMat');
+  TODO: {
+	  local $TODO = "fix refcount (value of refcount is -1)";
+	  is($mat->refcount, 1);
+	}
+	Cv::SparseMat::cvReleaseSparseMat($mat);
+	is(ref $mat, 'SCALAR');
+	e { Cv::SparseMat::refcount($mat) };
+	err_is('mat is not of type CvSparseMat * in Cv::SparseMat::refcount');
+	e { Cv::SparseMat::DESTROY($mat) };
+	err_is('mat is not of type CvSparseMat * in Cv::SparseMat::cvReleaseSparseMat');
 }
