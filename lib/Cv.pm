@@ -828,7 +828,7 @@ sub Xor {
 sub ConvertScale {
 	# ConvertScale(src, [dst], [scale], [shift])
 	my $src = shift;
-	my $dst = dst(@_) || $src->new(&Cv::CV_8UC($src->channels));
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvConvertScale;
 }

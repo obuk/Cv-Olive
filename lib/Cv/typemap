@@ -138,9 +138,6 @@ T_CvPTROBJ
 	} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
 		$var = (${type})0;
 	} else
-		/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\") */
 		Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\")
 
@@ -161,9 +158,6 @@ T_CvArrPtrPtr
 					${var}[i] = (@{$type =~ /(const\s)?(\w+)[\s\*]+$/; [$2.'*']
 					})0;
 				else
-					/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-						${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-						\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 					Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 						\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 			}
@@ -172,9 +166,6 @@ T_CvArrPtrPtr
 	} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
 		$var = ($type)0;
 	} else
-		/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\") */
 		Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\")
 
@@ -192,9 +183,6 @@ T_CvAttrList
 		${var}_attr[i] = (const char*)0;
 		${var} = cvAttrList(${var}_attr, NULL);
 	} else
-		/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$ntype\") */
 		Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\")
 
@@ -226,9 +214,6 @@ T_CvBox2D
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -252,9 +237,6 @@ T_CvCircle
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -301,9 +283,6 @@ T_CvConnectedComp
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -317,9 +296,6 @@ T_CvMemStoragePos
 			$var.top        = INT2PTR(CvMemBlock*, SvIV(sv_top));
 			$var.free_space = SvIV(sv_free_space);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -348,9 +324,6 @@ T_CvMSERParams
 			$var.minMargin     = SvNV(sv_minMargin);
 			$var.edgeBlurSize  = SvIV(sv_edgeBlurSize);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -365,9 +338,6 @@ T_CvPoint
 			$var.x = SvIV(sv_x);
 			$var.y = SvIV(sv_y);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -401,9 +371,6 @@ T_CvPointPtr
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -448,9 +415,6 @@ T_CvPointPtrPtr
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -465,9 +429,6 @@ T_CvPoint2D64f
 			$var.x = SvNV(sv_x);
 			$var.y = SvNV(sv_y);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -500,9 +461,6 @@ T_CvPoint2D64fPtr
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -519,9 +477,6 @@ T_CvPoint3D64f
 			$var.y = SvNV(sv_y);
 			$var.z = SvNV(sv_z);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -557,9 +512,6 @@ T_CvPoint3D64fPtr
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -578,9 +530,6 @@ T_CvRect
 			$var.width  = SvIV(sv_width);
 			$var.height = SvIV(sv_height);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -600,9 +549,6 @@ T_CvScalar
 				$var.val[i] = 0;
 			}
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -617,9 +563,6 @@ T_CvSize
 			$var.width  = SvIV(sv_width);
 			$var.height = SvIV(sv_height);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -634,9 +577,6 @@ T_CvSize2D32f
 			$var.width  = SvNV(sv_width);
 			$var.height = SvNV(sv_height);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -651,9 +591,6 @@ T_CvSlice
 			$var.start_index = SvIV(sv_start);
 			$var.end_index   = SvIV(sv_end);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -668,9 +605,6 @@ T_CvString
 			$var.len = SvIV(sv_len);
 			$var.ptr = INT2PTR(char*, SvIV(sv_ptr));
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -702,9 +636,6 @@ T_CvSubdiv2DPoint
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -723,9 +654,6 @@ T_CvSURFParams
 			$var.nOctaves         = SvIV(sv_nOctaves);
 			$var.nOctaveLayers    = SvIV(sv_nOctaveLayers);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -742,9 +670,6 @@ T_CvTermCriteria
 			$var.max_iter = SvIV(sv_max_iter);
 			$var.epsilon  = SvNV(sv_epsilon);
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -765,9 +690,6 @@ T_floatPtr
 		} else if (SvROK($arg) && SvIOK(SvRV($arg)) && SvIV(SvRV($arg)) == 0) {
 			$var = ($type)0;
 		} else
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -806,9 +728,6 @@ T_floatPtrPtr
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -831,9 +750,6 @@ T_intPtr
 		} else
 			err++;
 		if (err)
-			/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\"); */
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
 	} STMT_END
@@ -842,9 +758,6 @@ O_OBJECT
 	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
 		$var = ($type)SvIV((SV*)SvRV($arg));
 	else
-		/* Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$ntype\") */
 		Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\")
 

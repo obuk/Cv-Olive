@@ -66,7 +66,8 @@ if (1) {
 	my $corner = $arr->CornerEigenValsAndVecs($blockSize, 7)
 		->resize($arr->sizes);
 	$corner->minMaxLoc(my $min, my $max);
-	my $gray = $corner->cvtScale(255 / ($max - $min), -$min);
+	my $gray = $corner->cvtScale(
+		$corner->new(CV_8UC1), 255 / ($max - $min), -$min);
 	my $thermo = $gray->LUT($gray->new(CV_8UC3), $gray2thermo);
 	for my $x (@x) {
 		for my $y (@y) {
@@ -83,7 +84,8 @@ if (2) {
 	my $corner = $arr->CornerHarris($blockSize, 3, 0.04)
 		->resize($arr->sizes);
 	$corner->minMaxLoc(my $min, my $max);
-	my $gray = $corner->cvtScale(255 / ($max - $min), -$min);
+	my $gray = $corner->cvtScale(
+		$corner->new(CV_8UC1), 255 / ($max - $min), -$min);
 	my $gray1 = $gray->copy($gray->new->zero, $mask);
 	my $gray2 = $gray->copy($gray->new->zero, $mask->not);
 	$gray1->avgSdv(my $mean1, my $stdDev1);
@@ -108,7 +110,8 @@ if (3) {
 	my $corner = $arr->CornerMinEigenVal($blockSize, 3)
 		->resize($arr->sizes);
 	$corner->minMaxLoc(my $min, my $max);
-	my $gray = $corner->cvtScale(255 / ($max - $min), -$min);
+	my $gray = $corner->cvtScale(
+		$corner->new(CV_8UC1), 255 / ($max - $min), -$min);
 	my $gray1 = $gray->copy($gray->new->zero, $mask);
 	my $gray2 = $gray->copy($gray->new->zero, $mask->not);
 	$gray1->avgSdv(my $mean1, my $stdDev1);
