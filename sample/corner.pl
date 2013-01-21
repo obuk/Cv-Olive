@@ -17,7 +17,7 @@ if ($videoSource =~ /^\d+$/) {
 }
 $capture or die "can't capture from $videoSource";
 
-Cv->namedWindow($videoSource, CV_WINDOW_NORMAL);
+Cv->namedWindow($videoSource, 0);
 Cv->createTrackbar("blockSize", $videoSource, my $blockSize = 5, 20);
 Cv->createTrackbar("Harris.k", $videoSource, my $k = 4, 10);
 

@@ -40,6 +40,7 @@ foreach my $pt (@{$results->[$best]}) {
     $cimg->set($y, $x, $green);
 }
 
+Cv->namedWindow("result", 0);
 $cimg->show("result");
 Cv->waitKey;
 

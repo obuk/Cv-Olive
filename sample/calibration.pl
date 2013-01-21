@@ -94,6 +94,7 @@ sub Calibrate {
 		for (0 .. $#corners) {
 			$image_points->set([$i*$PAT_SIZE + $_, 0], $corners[$_]);
 		}
+		Cv->NamedWindow("Calibration", 0);
 		$images[$i]->ShowImage("Calibration");
 		Cv->WaitKey(100);
 	}
@@ -158,6 +159,8 @@ sub Undistort {
 	$src_img->Undistort2(my $dst_img = $src_img->new, $intrinsic, $distortion);
 
 	# (4)画像を表示，キーが押されたときに終了
+	Cv->NamedWindow("Distortion", 0);
+	Cv->NamedWindow("UnDistortion", 0);
 	$src_img->ShowImage("Distortion");
 	$dst_img->ShowImage("UnDistortion");
 	Cv->WaitKey;
@@ -185,6 +188,8 @@ sub UndistortMap {
 	# (4) 歪み補正
 	$src_img->Remap(my $dst_img = $src_img->new, $mapx, $mapy);
 
+	Cv->NamedWindow("Distortion", 0);
+	Cv->NamedWindow("UnDistortion", 0);
 	$src_img->ShowImage("Distortion");
 	$dst_img->ShowImage("UnDistortion");
 	Cv->WaitKey;

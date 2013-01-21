@@ -124,6 +124,7 @@ sub StereoCalib {
 			my $cimg = Cv::Image->new([ $w, $h ], &CV_8UC3);
             $cimg = $img->CvtColor(&CV_GRAY2RGB);
             $cimg->DrawChessboardCorners([$nx, $ny], \@temp, $result);
+			Cv->NamedWindow("corners", 0);
             $cimg->ShowImage("corners");
 
 			# Allow ESC to quit
@@ -309,6 +310,8 @@ sub StereoCalib {
 				$img1->Remap($img1r, $mx1, $my1);
 				$img2->Remap($img2r, $mx2, $my2);
 
+				Cv->NamedWindow("img1r", 0);
+				Cv->NamedWindow("img2r", 0);
 				$img1r->ShowImage("img1r");
 				$img2r->ShowImage("img2r");
 				Cv->WaitKey(100);
@@ -324,6 +327,7 @@ sub StereoCalib {
 					# does not support such a case.
 					$BMState->FindStereoCorrespondenceBM($img1r, $img2r, $disp);
 					$disp->Normalize($vdisp, 0, 256, CV_MINMAX);
+					Cv->NamedWindow("disparity", 0);
 					$vdisp->ShowImage("disparity");
 				}
 				unless ($isVerticalStereo) {
@@ -343,6 +347,7 @@ sub StereoCalib {
 							);
 					}
 				}
+				Cv->NamedWindow("rectified", 0);
 				$pair->ShowImage("rectified");
 				my $c = Cv->WaitKey;
 				$c &= 0x7f if ($c >= 0);
