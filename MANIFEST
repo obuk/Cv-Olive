@@ -168,6 +168,7 @@ t/2autoload.t
 t/2boxPoints.t
 t/2cmp.t
 t/2copy.t
+t/2corner.t
 t/2croak.t
 t/2CvArr.t
 t/2CvFileStorage.t
@@ -179,6 +180,7 @@ t/2CvSeq.t
 t/2CvSparseMat.t
 t/2CvString.t
 t/2cvtColor.t
+t/2cvtScale.t
 t/2dst.t
 t/2encode.t
 t/2error.t
