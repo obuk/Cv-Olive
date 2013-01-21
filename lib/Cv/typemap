@@ -11,7 +11,6 @@ CvBGCodeBookModel*			T_CvPTROBJ
 const CvBGCodeBookModel*	T_CvPTROBJ
 CvBox2D						T_CvBox2D
 CvCapture*					T_CvPTROBJ
-CvCircle					T_CvCircle
 CvConDensation*				T_CvPTROBJ
 CvConnectedComp				T_CvConnectedComp
 CvContour*					T_CvPTROBJ
@@ -211,29 +210,6 @@ T_CvBox2D
 			} else
 				err++;
 			$var.angle = SvNV(sv_angle);
-		} else
-			err++;
-		if (err)
-			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
-				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
-	} STMT_END
-
-T_CvCircle
-	STMT_START {
-		SV* sv = $arg; AV* av; int err = 0;
-		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
-			av_len(av = (AV*)SvRV(sv)) >= 1) {
-			SV* sv_center = (SV*)*av_fetch(av, 0, 0); AV* av_center;
-			SV* sv_radius = (SV*)*av_fetch(av, 1, 0);
-			if (SvROK(sv_center) && SvTYPE(SvRV(sv_center)) == SVt_PVAV &&
-				av_len(av_center = (AV*)SvRV(sv_center)) >= 1) {
-				SV* sv_x = (SV*)*av_fetch(av_center, 0, 0);
-				SV* sv_y = (SV*)*av_fetch(av_center, 1, 0);
-				$var.center.x = SvNV(sv_x);
-				$var.center.y = SvNV(sv_y);
-			} else
-				err++;
-			$var.radius = SvNV(sv_radius);
 		} else
 			err++;
 		if (err)
@@ -781,17 +757,6 @@ T_CvBox2D
 		av_push(av_size, newSVnv($var.size.height));
 		av_push(av, newRV_inc(sv_2mortal((SV*)av_size)));
 		av_push(av, newSVnv($var.angle));
-		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
-	} STMT_END;
-
-T_CvCircle
-	STMT_START {
-		AV* av = newAV();
-		AV* av_center = newAV();
-		av_push(av_center, newSVnv($var.center.x));
-		av_push(av_center, newSVnv($var.center.y));
-		av_push(av, newRV_inc(sv_2mortal((SV*)av_center)));
-		av_push(av, newSVnv($var.radius));
 		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
 	} STMT_END;
 

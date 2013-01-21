@@ -53,12 +53,6 @@ typedef char tiny;
 #define VOID void
 #define CvWindow void
 
-typedef struct CvCircle {
-	CvPoint2D32f center;
-	float radius;
-} CvCircle;
-
-
 #define DIM(x) (sizeof(x)/sizeof((x)[0]))
 
 #define length(x) length_ ## x
@@ -4405,27 +4399,6 @@ CODE:
 	RETVAL = box;
 OUTPUT:
 	RETVAL
-
-
-# ============================================================
-#  T_CvCircle
-# ============================================================
-
-CvCircle
-cvCircle(CvPoint2D32f center, float radius)
-CODE:
-	RETVAL.center = center;
-	RETVAL.radius = radius;
-OUTPUT:
-	RETVAL
-
-CvCircle
-CvCircle(CvCircle circle)
-CODE:
-	RETVAL = circle;
-OUTPUT:
-	RETVAL
-
 
 # ============================================================
 #  T_CvConnectedComp
