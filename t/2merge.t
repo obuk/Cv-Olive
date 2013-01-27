@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 143;
+use Test::More tests => 145;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -26,8 +26,9 @@ if (1) {
 			is(${$r->Get([$row, $col])}[0], 3);
 		}
 	}
-
 	my $bgr = Cv->Merge($b, $g, $r);
+	isa_ok($bgr, ref $b);
+	is($bgr->type, CV_8UC3);
 	foreach my $row (0 .. $bgr->rows - 1) {
 		foreach my $col (0 .. $bgr->cols - 1) {
 			my $x = $bgr->Get([$row, $col]);
@@ -70,10 +71,10 @@ if (1) {
 
 if (10) {
 	e { Cv->Merge; };
-	err_is("Usage: Cv::Merge([src0, src1, ...], dst)");
+	err_is("Usage: Cv::Arr::Merge([src0, src1, ...], dst)");
 	my $cv = bless [], 'Cv';
 	e { $cv->Merge; };
-	err_is("class name needed");
+	err_is("Usage: Cv::Arr::Merge([src0, src1, ...], dst)");
 }
 
 if (11) {

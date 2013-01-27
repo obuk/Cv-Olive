@@ -559,36 +559,28 @@ sub Split {
 	wantarray ? @_ : \@_;
 }
 
-
-sub Cv::Merge {
-	ref (my $class = shift) and Carp::croak 'class name needed';
-	if (ref $_[0] eq 'ARRAY') {
-		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-		Cv::Arr::Merge(@_);
-	} elsif (Cv::is_cvarr($_[0])) {
-		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-		if (@_ <= 4) {
-			Cv::Arr::Merge(\@_);
-		} else {
-			my $dst = pop(@_);
-			Cv::Arr::Merge(\@_, $dst);
+{*Cv::Merge = \&Merge }
+sub Merge {
+	my $src = shift;
+	$src = shift unless ref $src; # ignore class
+	my @src;
+	if (ref $src eq 'ARRAY') {
+		@src = @$src;
+	} elsif (Cv::is_cvarr($src)) {
+		@src = ($src);
+		while (@src < 4) {
+			last unless @_ && (Cv::is_cvarr($_[0]) || Cv::is_null($_[0]));
+			push(@src, shift);
 		}
-	} else {
+	}
+	unless (@src) {
 		Carp::croak "Usage: ${[ caller 0 ]}[3]([src0, src1, ...], dst)";
 	}
-}
-
-
-sub Merge {
-	# Merge([src1, src2, ...], [dst]);
-	my $srcs = shift;
 	my $dst = shift;
-	unless ($dst) {
-		my $src0 = $srcs->[0];
-		$dst = $src0->new(&Cv::CV_MAKETYPE($src0->type, scalar @$srcs));
-	}
-	unshift(@_, $srcs, $dst);
-	goto &Cv::cvMerge;
+	$dst ||= $src[0]->new(&Cv::CV_MAKETYPE($src[0]->type, scalar @src));
+	push(@src, (\0) x (4 - @src));
+	unshift(@_, @src, $dst);
+	goto &cvMerge;
 }
 
 
