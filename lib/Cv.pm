@@ -569,7 +569,9 @@ sub Merge {
 	} elsif (Cv::is_cvarr($src)) {
 		@src = ($src);
 		while (@src < 4) {
-			last unless @_ && (Cv::is_cvarr($_[0]) || Cv::is_null($_[0]));
+			last unless @_ &&
+				(Cv::is_cvarr($_[0]) && $_[0]->channels == 1 ||
+				 Cv::is_null($_[0]));
 			push(@src, shift);
 		}
 	}

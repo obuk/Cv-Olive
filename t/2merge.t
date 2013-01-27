@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 145;
+use Test::More tests => 172;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -26,6 +26,7 @@ if (1) {
 			is(${$r->Get([$row, $col])}[0], 3);
 		}
 	}
+
 	my $bgr = Cv->Merge($b, $g, $r);
 	isa_ok($bgr, ref $b);
 	is($bgr->type, CV_8UC3);
@@ -61,7 +62,17 @@ if (1) {
 	Cv->Merge($b, $g, $r, \0, my $bgr4 = Cv::Image->new($b->sizes, CV_8UC3));
 	foreach my $row (0 .. $bgr4->rows - 1) {
 		foreach my $col (0 .. $bgr4->cols - 1) {
-			my $x = $bgr3->Get([$row, $col]);
+			my $x = $bgr4->Get([$row, $col]);
+			is($x->[0], 1);
+			is($x->[1], 2);
+			is($x->[2], 3);
+		}
+	}
+
+	Cv->Merge($b, $g, $r, my $bgr5 = Cv::Image->new($b->sizes, CV_8UC3));
+	foreach my $row (0 .. $bgr5->rows - 1) {
+		foreach my $col (0 .. $bgr5->cols - 1) {
+			my $x = $bgr5->Get([$row, $col]);
 			is($x->[0], 1);
 			is($x->[1], 2);
 			is($x->[2], 3);
