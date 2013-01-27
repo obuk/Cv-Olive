@@ -797,7 +797,7 @@ cvGetRealND(const CvArr* arr, int* idx)
 CvMat*
 cvGetRows(const CvArr* arr, CvMat* submat, int startRow, int endRow = NO_INIT, int deltaRow=1)
 INIT:
-	if (items <= 3) endRow = startRow + 1;
+	if (items <= 4) endRow = startRow + 1;
 OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(1));
 
 CvSize
@@ -875,17 +875,10 @@ POSTCALL:
 	ST(0) = ST(2);
 	XSRETURN(1);
 
-MODULE = Cv	PACKAGE = Cv
 void
-cvMerge(const CvArr** srcs, CvArr* dst)
-INIT:
-	const CvArr* src0 = length(srcs) >= 1 ? srcs[0] : NULL;
-	const CvArr* src1 = length(srcs) >= 2 ? srcs[1] : NULL;
-	const CvArr* src2 = length(srcs) >= 3 ? srcs[2] : NULL;
-	const CvArr* src3 = length(srcs) >= 4 ? srcs[3] : NULL;
-C_ARGS: src0, src1, src2, src3, dst
+cvMerge(const CvArr* src0, const CvArr* src1, const CvArr* src2, const CvArr* src3, CvArr* dst)
 POSTCALL:
-	ST(0) = ST(1);
+	ST(0) = ST(4);
 	XSRETURN(1);
 
 MODULE = Cv	PACKAGE = Cv::Arr
@@ -896,10 +889,13 @@ POSTCALL:
 	XSRETURN(1);
 
 void
-cvMinMaxLoc(IN const CvArr *arr, OUT double min_val, OUT double max_val, OUT CvPoint min_loc, OUT CvPoint max_loc, IN const CvArr* mask = NULL)
+cvMinMaxLoc(const CvArr* arr, OUT double min_val, OUT double max_val, OUT CvPoint min_loc, OUT CvPoint max_loc, const CvArr* mask =NULL)
 
 void
 cvMinS(const CvArr* src, double value, CvArr* dst)
+POSTCALL:
+	ST(0) = ST(2);
+	XSRETURN(1);
 
 
 MODULE = Cv	PACKAGE = Cv
@@ -1156,16 +1152,9 @@ POSTCALL:
 
 int
 cvSolve(const CvArr* src1, const CvArr* src2, CvArr* dst, int method=CV_LU)
-POSTCALL:
-	ST(0) = ST(2);
-	XSRETURN(1);
 
-
-void
+int
 cvSolveCubic(const CvMat* coeffs, CvMat* roots)
-POSTCALL:
-	ST(0) = ST(1);
-	XSRETURN(1);
 
 
 void
