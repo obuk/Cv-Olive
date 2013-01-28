@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 609;
+use Test::More tests => 575;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -19,7 +19,7 @@ BEGIN { use_ok('Cv', -more) }
 
 foreach my $xs (qw(
 
-AbsDiff Add And Max Min Or Sub Xor
+AbsDiff Add And Or Sub Xor
 
 )) {
 
