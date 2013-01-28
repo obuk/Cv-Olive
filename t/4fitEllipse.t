@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 4;
+use Test::More qw(no_plan);
+# use Test::More tests => 4;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -15,21 +15,22 @@ my $verbose = Cv->hasGUI;
 my $img = Cv::Image->new([240, 320], CV_8UC3);
 $img->origin(1);
 
-if (1) {
-	my @points;
-	my $a = $img->height / $img->width;
-	foreach (1 .. 100) {
-		my $b = ((rand 0.2) - 0.10) * $img->height;
-		my $x = ((rand 0.5) + 0.25) * $img->width;
-		my $y = $a * $x + $b;
-		push(@points, [$x, $y]);
-	}
+for (map { [[ 160, 120 ], $_] } 0, 15, 30) {
+	my ($center, $angle) = @$_;
+	my @points = (
+		Cv->boxPoints([ $center, [ 100,  80 ], $angle ]),
+		Cv->boxPoints([ $center, [ 140,  60 ], $angle ]),
+		);
+	$img->zero;
 	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
-	my $box = Cv->fitEllipse(\@points);
-	$_ *= 1.3 for @{$box->[1]};	# size * 1.2
-	my @b4 = Cv->BoxPoints($box);
-	$img->polyLine([\@b4], -1, &color, 1, CV_AA);
-	$img->EllipseBox($box, &color, 1, CV_AA);
+	my $box = aa(Cv->fitEllipse(\@points));
+	is_deeply({ round => "%.0f" }, $box->[0], $center);
+	is_deeply({ round => "%.0f" }, $box->[2], $angle);
+	my @box = Cv->BoxPoints($box);
+	$img->polyLine([\@box], -1, &color, 1, CV_AA);
+	# $img->EllipseBox($box, &color, 1, CV_AA);
+	$img->Ellipse($box->[0], [map { $_ / 2 } @{$box->[1]}], $box->[2],
+				  0, 360, &color, 1, CV_AA);
 	if ($verbose) {
 		$img->show;
 		Cv->waitKey(1000);
@@ -41,20 +42,19 @@ $img->zero;
 # Cv-0.16
 Cv::More->import(qw(cs));
 
-if (2) {
-	my $points = Cv::Seq::Point->new(CV_32FC2);
-	my $a = $img->height / $img->width;
-	foreach (1 .. 100) {
-		my $b = ((rand 0.2) - 0.10) * $img->height;
-		my $x = ((rand 0.5) + 0.25) * $img->width;
-		my $y = $a * $x + $b;
-		$points->push([$x, $y]);
-	}
-	$img->circle($_, 3, &color, 1, CV_AA) for $points->toArray; 
-	my $box = [$points->fitEllipse];
-	$_ *= 1.3 for @{$box->[1]};	# size * 1.2
-	my @b4 = Cv->BoxPoints($box);
-	$img->polyLine([\@b4], -1, &color, 1, CV_AA);
+for (map { [[ 160, 120 ], $_] } 45, 60, 75) {
+	my ($center, $angle) = @$_;
+	my @points = (
+		Cv->boxPoints([ $center, [ 100,  80 ], $angle ]),
+		Cv->boxPoints([ $center, [ 140,  60 ], $angle ]),
+		);
+	$img->zero;
+	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
+	my $box = aa([Cv->fitEllipse(\@points)]);
+	is_deeply({ round => "%.0f" }, $box->[0], $center);
+	is_deeply({ round => "%.0f" }, $box->[2], $angle);
+	my @box = Cv->BoxPoints($box);
+	$img->polyLine([\@box], -1, &color, 1, CV_AA);
 	$img->EllipseBox($box, &color, 1, CV_AA);
 	if ($verbose) {
 		$img->show;
@@ -64,6 +64,19 @@ if (2) {
 
 sub color {
 	[ map { (rand 128) + 127 } 1..3 ];
+}
+
+sub aa {
+	my $box = shift;
+	while ($box->[2] >= 90) {
+		($box->[1]->[0], $box->[1]->[1]) = ($box->[1]->[1], $box->[1]->[0]);
+		$box->[2] -= 90;
+	}
+	while ($box->[2] < 0) {
+		($box->[1]->[0], $box->[1]->[1]) = ($box->[1]->[1], $box->[1]->[0]);
+		$box->[2] += 90;
+	}
+	$box;
 }
 
 

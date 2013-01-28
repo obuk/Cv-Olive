@@ -61,6 +61,8 @@ our @EXPORT = ( );
 our %O;
 our %M;
 
+$O{$_} = 1 for qw(boxhappy);
+
 sub import {
 	my $self = shift;
 	my @std = ();
@@ -1096,6 +1098,33 @@ sub CV_RGB { my ($r, $g, $b, $a) = @_; cvScalar($b, $g, $r, $a || 0) }
 package Cv::Font;
 { *new = \&Cv::InitFont }
 
+package Cv::Arr;
+
+sub Ellipse {
+	# cvEllipse(img, center, axes, angle, start_angle, end_angle,
+	# 		  color, thickness=1, int lineType=8, int shift=0)
+	my ($img, $center, $axes, $angle, $start_angle, $end_angle) =
+		splice(@_, 0, 6);
+	if ($O{boxhappy}) {
+		if (&Cv::cvVersion() < 2.002) {
+			$_ = -$_ for $angle, $start_angle, $end_angle;
+		}
+	}
+	unshift(@_, $img, $center, $axes, $angle, $start_angle, $end_angle);
+	goto &cvEllipse;
+}
+
+sub EllipseBox {
+	# void cvEllipseBox(img, box, color, thickness=1, lineType=8, shift=0)
+	my ($img, $box) = splice(@_, 0, 2);
+	if ($O{boxhappy}) {
+		if (&Cv::cvVersion() < 2.002) {
+			$box = [ $box->[0], $box->[1], 90 - $box->[2] ];
+		}
+	}
+	unshift(@_, $img, $box);
+	goto &cvEllipseBox;
+}
 
 # ============================================================
 #  core. The Core Functionality: XML/YAML Persistence
@@ -1614,7 +1643,13 @@ package Cv;
 sub BoxPoints {
 	ref (my $class = shift) and Carp::croak 'class name needed';
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	cvBoxPoints($_[0], my $pts);
+	my $box = $_[0];
+	if ($O{boxhappy}) {
+		if (&Cv::cvVersion() < 2.002) {
+			$box = [ $box->[0], $box->[1], 90 - $box->[2] ];
+		}
+	}
+	cvBoxPoints($box, my $pts);
 	$_[1] = [] unless defined $_[1];
 	@{ $_[1] } = @$pts if @_ >= 2;
 	wantarray? @$pts : $pts;
