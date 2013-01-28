@@ -33,7 +33,7 @@ if (10) {
 
 if (11) {
 	my $coeffs = Cv::Mat->new([4], CV_64FC1);
-	my $roots = Cv::Mat->new([3], CV_32FC1);
+	my $roots = Cv::Mat->new([1], CV_64FC1);
 	e { $coeffs->solveCubic($roots) };
 	err_like("OpenCV Error:");
 }
