@@ -751,7 +751,7 @@ sub Max {
 	my ($src, $src2_value) = splice(@_, 0, 2);
 	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
-	if (ref $src2_value eq 'ARRAY') {
+	if (!ref $src2_value) {
 		goto &cvMaxS;
 	} else {
 		goto &cvMax;
@@ -765,7 +765,7 @@ sub Min {
 	my ($src, $src2_value) = splice(@_, 0, 2);
 	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $src2_value, $dst);
-	if (ref $src2_value eq 'ARRAY') {
+	if (!ref $src2_value) {
 		goto &cvMinS;
 	} else {
 		goto &cvMin;

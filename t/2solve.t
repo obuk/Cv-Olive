@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
+use Test::More tests => 7;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -35,4 +35,18 @@ if (2) {
 	my $X = Cv::Mat->new([2], CV_32FC1);
 	my $r = $A->Solve($B, $X);
 	is($r, 0);
+}
+
+if (10) {
+	my $A = Cv::Mat->new([2, 2], CV_32FC1);
+	e { $A->solve };
+	err_is("Usage: Cv::Arr::cvSolve(src1, src2, dst, method=CV_LU)");
+}
+
+if (11) {
+	my $A = Cv::Mat->new([2, 2], CV_32FC1);
+	my $B = Cv::Mat->new([2], CV_32FC1);
+	my $X = Cv::Mat->new([2], CV_16SC1);
+	e { $A->solve($B, $X) };
+	err_like("OpenCV Error:");
 }

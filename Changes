@@ -1,6 +1,13 @@
 Revision history for Cv.pm
 
-0.22 - 2012-01-21 (working)
+0.23 - 2012-01-28 (working)
+     * fixed endRow of cvGetRows
+     * fixed cvSolve, cvSolveCubic, cvMinS, Cv::Arr::Min, Cv::Arr::Max
+     * added Cv::More qw(boxhappy) for before OpenCV-2.2.0
+     * removed CvCircle
+     * merged Cv::Merge and Cv::Arr::Merge
+
+0.22 - 2012-01-21
      * fixed fallback code for making Constant.pm (use version.pm).
      * fixed Cmp value double (not a cvScalar)
      * fixed GetRawData if CvMatND used
