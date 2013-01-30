@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 5;
+# use Test::More qw(no_plan);
+use Test::More tests => 5;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -23,7 +23,8 @@ for my $i (0 .. $src->rows - 1) {
 	}
 }
 
-if (1) {
+SKIP: {
+	skip "OpenCV-1.1", 1 unless cvVersion() >= 2.0;
 	my $dft = $src->DFT(CV_DXT_FORWARD);
 	my $re = $src->new;
 	my $im = $src->new;
@@ -38,9 +39,11 @@ if (1) {
 		$im->show("dft");
 		Cv->waitKey(1000);
 	}
+	ok(1);
 }
 
-if (2) {
+SKIP: {
+	skip "OpenCV-1.1", 1 unless cvVersion() >= 2.0;
 	my $dft = $src->DFT($src->new(CV_64FC2), CV_DXT_FORWARD);
 	my $re = $src->new;
 	my $im = $src->new;
@@ -55,6 +58,7 @@ if (2) {
 		$im->show("dft");
 		Cv->waitKey(1000);
 	}
+	ok(1);
 }
 
 if (10) {
