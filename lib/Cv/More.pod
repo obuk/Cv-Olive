@@ -231,29 +231,26 @@ the element.
  my @array = $arr->ToArray();                                           # (1)
  my @array = $arr->ToArray($slice);                                     # (2)
 
-シーケンスまたはマトリクス (1xN, Nx1) を Perl の点の配列に変換します。
-シーケンスを変換する cvCvtSeqToArray() をマトリクスも変換できるように拡
-張したものです。従って、範囲を与える $slice を指定することができます。
-これは、cvSlice() で作るか、単にはじめ $start と終り $end を対にした配
-列のリファレンス [$start, $end] で表わすことができます。省略したときは
-$arr のすべての要素を変換します。
-
-cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。つまり、次の
-使い方もできます。でも使わないかもしれませんね。
+Converted into array of points from sequence or matrix (1xN, Nx1). 
+To be able to convert the matrix, this method has been extended
+cvCvtSeqToArray() to convert the sequence. So can specify a range
+$slice give.  This range can be represented by array reference [$
+start, $ end] or cvSlice().  When you omit the range will convert all
+of the elements.
 
  $arr->ToArray(\my @array);
  $arr->ToArray(\my @attay, $slice);
 
-(注意) Perl の配列のようにインデクスに負数が使えると便利なことがありま
-すが、これはできません。そのうち考えてみようと思っています。
+It is useful if can use negative index like an array of Perl, which
+can not be.
 
- my @array = $arr->ToArray([ -1, 1 ]);
- my @array = $arr->ToArray([ 1, -1 ]);
+ my @array = $arr->ToArray([ -1, 1 ]); # cannot use
+ my @array = $arr->ToArray([ 1, -1 ]); # cannot use
 
 =back
 
 
-=head3 その他のメソッド
+=head3 Other Method
 
 =over
 
