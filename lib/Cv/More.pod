@@ -100,10 +100,10 @@ language. But, Cv-0.16 and later versions do not use memory storage.
  Cv->MinEnclosingCircle($points, my $center, my $radius);               # (2)
 
 The return value is the coordinates of the center $center and the
-radius $radius of the circle.
+radius of the circle $radius.
 
-戻り値は、円の中心の座標 $center と半径 $radius です。CvBox2D の形に合
-わせて重ね合わせてみましょう。
+The following example drawn C<fitEllipse2()>, C<minEnclosingCircle()>
+and C<minAreaRect2()> using a same list of points.
 
  my $rectangle = Cv->minAreaRect2(\@pts);
  my $ellipse = Cv->fitEllipse2(\@pts);
@@ -116,22 +116,14 @@ radius $radius of the circle.
    $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
  }
 
-サンプルで使った乱数による点のリストを処理してもあまり面白くないかもし
-れませね。点が表わすものを C<FitEllipse2()>, C<FitLine()>,
-C<MinAreaRect2()>, C<MinEnclosingCircle()> の中から元の形に合うものを選
-ぶといいでしょう。サンプルはどれも似ているので、そのはじめと終りは
-C<FitEllipse2()> から持って来てください。
-
-
 =item BoundingRect()
 
  my $rect = Cv->BoundingRect($points)
  my ($x, $y, $width, $height) = Cv->BoundingRect($points)
 
-点を囲む傾いていない矩形を求めます。傾いている矩形には
-C<MinAreaRect2()> を使います。戻り値は CvRect なので、CvBox2D に直すと
-C<EllipseBox()> や C<BoxPoints()> とのつながりが良くなります。
-CvRect から CvBox2D への変換は次のとおり。
+Returns the minimal up-right bounding rectangle for the specified
+point set.The return value is CvRect. By converting to CvBox2D from
+CvRect as follows, and usability of BoxPoints EllipseBox better.
 
  my $box2d = [ [ $x + $width / 2, $y + $height / 2 ], [ $width, $height ], 0 ];
 
