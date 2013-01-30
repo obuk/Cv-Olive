@@ -186,11 +186,13 @@ t/2cvtColor.t
 t/2cvtScale.t
 t/2cvtScaleAbs.t
 t/2dct.t
+t/2det.t
 t/2dft.t
 t/2div.t
-t/2dst.t
 t/2encode.t
 t/2error.t
+t/2exp.t
+t/2flip.t
 t/2font.t
 t/2gemm.t
 t/2getAffineTransform.t
@@ -206,7 +208,9 @@ t/2getSubRect.t
 t/2histogram.t
 t/2initSystem.t
 t/2inRange.t
+t/2inv.t
 t/2loadImage.t
+t/2log.t
 t/2lut.t
 t/2matchTemplate.t
 t/2max.t
@@ -217,8 +221,10 @@ t/2misc.t
 t/2mixChannels.t
 t/2morphologyEx.t
 t/2mouse.t
+t/2mul.t
 t/2or.t
 t/2polyLine.t
+t/2pow.t
 t/2ptr.t
 t/2refcount.t
 t/2resize.t
