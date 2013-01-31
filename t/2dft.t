@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
+use Test::More tests => 3;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -15,7 +15,7 @@ my $verbose = Cv->hasGUI;
 #  void cvDFT(const CvArr* src, CvArr* dst, int flags, int nonzeroRows=0)
 # ------------------------------------------------------------
 
-my $src = Cv::Mat->new([100, 100], CV_64FC1);
+my $src = Cv::Image->new([100, 100], CV_64FC1);
 for my $i (0 .. $src->rows - 1) {
 	for my $j (0 .. $src->cols - 1) {
 		my ($x, $y) = ($i / $src->rows, $j / $src->cols);
@@ -23,42 +23,25 @@ for my $i (0 .. $src->rows - 1) {
 	}
 }
 
-SKIP: {
-	skip "OpenCV-1.1", 1 unless cvVersion() >= 2.0;
-	my $dft = $src->DFT(CV_DXT_FORWARD);
-	my $re = $src->new;
-	my $im = $src->new;
-	for my $i (0 .. $dft->rows - 1) {
-		for my $j (0 .. $dft->cols - 1) {
-			my $v = $dft->get([$i, $j]);
-			$re->set([$i, $j], [$v->[0]]);
-			$im->set([$i, $j], [$v->[1]]);
-		}
+if (1) {
+	my $A = Cv->Merge(
+		$src->Scale($src->new(CV_64FC1)),
+		$src->new(CV_64FC1)->Zero,
+		);
+	my $dft = $A->new([cvGetOptimalDFTSize($A->rows - 1),
+					   cvGetOptimalDFTSize($A->cols - 1)],
+		);
+	# copy $A to $dft and pad $dft with zeros
+	my $tmp = $A->copy($dft->GetSubRect([0, 0, @{$A->size}]));
+	if ($dft->cols > $A->cols) {
+		$dft->GetSubRect($tmp, [$A->cols, 0, $dft->cols - $A->cols, $A->rows]);
+		$tmp->Zero;
 	}
+	my ($re, $im) = $dft->DFT(CV_DXT_FORWARD, $src->rows)->split;
 	if ($verbose) {
-		$im->show("dft");
+		$im->show("dft.im");
 		Cv->waitKey(1000);
 	}
-	ok(1);
-}
-
-SKIP: {
-	skip "OpenCV-1.1", 1 unless cvVersion() >= 2.0;
-	my $dft = $src->DFT($src->new(CV_64FC2), CV_DXT_FORWARD);
-	my $re = $src->new;
-	my $im = $src->new;
-	for my $i (0 .. $dft->rows - 1) {
-		for my $j (0 .. $dft->cols - 1) {
-			my $v = $dft->get([$i, $j]);
-			$re->set([$i, $j], [$v->[0]]);
-			$im->set([$i, $j], [$v->[1]]);
-		}
-	}
-	if ($verbose) {
-		$im->show("dft");
-		Cv->waitKey(1000);
-	}
-	ok(1);
 }
 
 if (10) {

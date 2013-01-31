@@ -870,7 +870,7 @@ sub DCT {
 sub DFT {
 	# DFT(src, [dst], flags, [nonzeroRows])
 	my $src = shift;
-	my $dst = dst(@_) || $src->new(Cv::CV_MAKETYPE($src->type, 2));
+	my $dst = dst(@_) || $src->new;
 	unshift(@_, $src, $dst);
 	goto &cvDFT;
 }
