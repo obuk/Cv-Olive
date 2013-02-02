@@ -188,7 +188,7 @@ number of elements.
 The following is an example of a matrix camera. The size of matrix is
 3x3, the element type is CV_32FC1.
 
- my $cmat = Cv::Mat->new([ ], CV_32FC1,
+ my $mat = Cv::Mat->new([ ], CV_32FC1,
     [ $fx,   0, $cx ],
     [   0, $fy, $cy ],
     [   0,   0,   1 ],
@@ -201,29 +201,57 @@ The following is an example of a matrix camera. The size of matrix is
 
  $mat->Set($index, $value);
 
-As follows, C<$index> is an array reference.
-
- $mat->Set([], $value);       # マトリクス $mat 全体に $value を代入する
- $mat->Set([$i], $value);     # マトリクス $mat の $i 行に〜
- $mat->Set([$i, $j], $value); # マトリクス $mat の $i 行 $j 列に〜
-
 C<m_set()> extends the <Set()> to make it possible to collectively set
-the element.
+the element. As follows, C<$index> is an array reference.
 
-それは、C<$index> で指定されたマトリクスの要素の数と C<$value> で指定さ
-れた要素の値の数のバランスがとれるように、C<$index> を補うか C<$value>
-をばらし、そして、マトリクスの要素に値を 1つずつ代入するというものです。
-インデクス C<$index> が C<$mat> の要素を特定するために十分でないときは、
-足りないインデクスを補うために、C<$value> が値のリストなら C<$value> を
-ばらして 1つずつ C<m_set()> で再帰的に処理します。つまり、
+ $mat = Cv::Mat->new([ 2, 2 ], CV_32FC2);
+ $value = [ 100, 100 ];
+ 
+If any part of the index is omitted, 0 is supplemented.
+
+ $mat->m_set([@$index, 0], $value);
+
+In the case where C<$value> is given as a list, the value of the
+element is set as follows in order from C<$index>.
 
  $mat->m_set([@$index, $_], $value->[$_]) for 0 .. $#{$value};
 
-そうでない (C<$value> をばらせない) ときは、次のとおり単にインデクスに
-0 を補います。正確には、Nx1 のマトリクスの x1 のインデクスに相当する部
-分を 0 で補うのがいいと思いますが、次に示す手抜きでも十分でしょう。
+For example,
 
- $mat->m_set([@$index, 0], $value);
+ $mat->Set([ 0, 1 ], $value);
+ # (1) set element [ 0, 1 ]
+ # [
+ #   [ [ 0, 0 ], [ 100, 100 ] ],
+ #   [ [ 0, 0 ], [   0,   0 ] ],
+ # ]
+ 
+ $mat->Set([ 1 ], $value);
+ # (2) set element [ 0, 1 ]
+ # [
+ #   [ [   0,   0 ], [   0,   0 ] ],
+ #   [ [ 100, 100 ], [   0,   0 ] ],
+ # ]
+ 
+ $mat->Set([ 1 ], [ ($value) x 2 ]);
+ # (2)' set element [ 0, 1 ], [ 1, 1 ]
+ # [
+ #   [ [   0,   0 ], [   0,   0 ] ],
+ #   [ [ 100, 100 ], [ 100, 100 ] ],
+ # ]
+ 
+ $mat->Set([], $value);
+ # (3) set element [ 0, 0 ]
+ # [
+ #   [ [ 100, 100 ], [   0,   0 ] ],
+ #   [ [   0,   0 ], [   0,   0 ] ],
+ # ]
+ 
+ $mat->Set([], [ [ $value ], [ ($value) x 2 ] ]);
+ # (3)' set element [ 0, 0 ], [ 0, 1 ], [ 1, 1 ]
+ # [
+ #   [ [ 100, 100 ], [ 100, 100 ] ],
+ #   [ [   0,   0 ], [ 100, 100 ] ],
+ # ]
 
 
 =item ToArray()
