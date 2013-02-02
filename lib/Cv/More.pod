@@ -122,8 +122,8 @@ and C<minAreaRect2()> using a same list of points.
  my ($x, $y, $width, $height) = Cv->BoundingRect($points)
 
 Returns the minimal up-right bounding rectangle for the specified
-point set.The return value is CvRect. By converting to CvBox2D from
-CvRect as follows, and usability of BoxPoints EllipseBox better.
+point set.The return value is C<CvRect>. By converting to C<CvBox2D> from
+C<CvRect> as follows, and usability of C<BoxPoints> EllipseBox better.
 
  my $box2d = [ [ $x + $width / 2, $y + $height / 2 ], [ $width, $height ], 0 ];
 
@@ -133,12 +133,11 @@ CvRect as follows, and usability of BoxPoints EllipseBox better.
  my $s = Cv->ContourArea($points)
  my $s = Cv->ContourArea($points, $slice)
 
-点で囲まれる領域の面積を求めます。
+The function computes the contour area. In the following example, area
+C<$s> is the (100x100) horizontal x vertical.
 
  my @pts = ([100, 100], [100, 200], [200, 200], [200, 100]);
  my $s = Cv->contourArea(\@pts);
-
-この面積 $s は、縦x横 (100x100) になります。
 
 
 =item Transform()
@@ -158,15 +157,15 @@ CvRect as follows, and usability of BoxPoints EllipseBox better.
 
 =item Affine()
 
-GetQuadrangleSubPix() を使って、画像やマトリクスの回転と縮小を行います。
+This method performs a rotation and contraction for images and matrix.
+Implementation is a wrapper for C<GetQuadrangleSubPix()>.
 
   my $mapMatrix = [ [ $A11, $A12, $b1 ],
                     [ $A21, $A22, $b2 ] ];
   my $dst = $src->Affine($mapMatrix);
 
-この Affine() は、GetQuadrangleSubPix() の変換行列を作るのが面倒だった
-ので、その対処として作ったものです。拡張した new() を使えば次の書き方で
-も同じことができます。
+This function makes it easy effort to make the transformation matrix.
+In addition, can also write the same in the following.
 
   $src->GetQuadrangleSubPix(
           Cv::Mat->new([], &Cv::CV_32FC1,
@@ -174,30 +173,26 @@ GetQuadrangleSubPix() を使って、画像やマトリクスの回転と縮小�
                        [ $A21, $A22, $b2 ],
                        ));
 
-こうしてみると、考えずに Affine() のようなものを作るのは良くないことで、
-GetQuadrangleSubPix() が $mapMatrix に C<Cv::Mat> と Perl の配列のどち
-らでも扱えるようにするのが良かったと分りました。これもそのうちに考えて
-みることにします。
-
 =item new()
 
 =item m_new()
 
-OpenCV の画像やマトリクスのオブジェクトは、大きさと要素の型を指定して作
-ります。C<Cv::Createなんとか()> か C<Cv::なんとか::new()> で作ります。
-C<m_new()> は、C<Cv::なんとか::new()> を再定義し、初期値を扱えるように
-拡張します。
+Object of the matrix and the image in OpenCV is made by specifying the
+type and element size. C<m_new()> is a method to redefine the C<new()>
+so as to provide the value of each element. If specify an empty
+arrayref [] to the size of the matrix, the size of the matrix is the
+number of elements.
 
- my $mat1 = Cv::Mat->new([], 要素の型, 初期値のリスト);
- my $mat2 = Cv::Mat->new(マトリクスの大きさ, 要素の型);
- my $mat3 = $mat->new();
- my $mat4 = $mat->new(マトリクスの大きさ);
- my $mat5 = $mat->new(要素の型);
+ my $mat = Cv::Mat->new([], $type, $elements);
 
-C<m_new()> が拡張するのは、上の C<$mat1> を作る例です。マトリクスの大き
-さを指定するところに C<[]> を指定します。具体的な使い方については、
-L</Perlの配列でマトリクスを作る> を参照してください。他の例は、いまの
-C<Cv> の C<new()> でもできます。
+The following is an example of a matrix camera. The size of matrix is
+3x3, the element type is CV_32FC1.
+
+ my $cmat = Cv::Mat->new([ ], CV_32FC1,
+    [ $fx,   0, $cx ],
+    [   0, $fy, $cy ],
+    [   0,   0,   1 ],
+    );
 
 
 =item Set()
@@ -206,14 +201,14 @@ C<Cv> の C<new()> でもできます。
 
  $mat->Set($index, $value);
 
-$index は配列のリファレンスで、より具体的に次のとおり書くことができます。
+As follows, C<$index> is an array reference.
 
  $mat->Set([], $value);       # マトリクス $mat 全体に $value を代入する
  $mat->Set([$i], $value);     # マトリクス $mat の $i 行に〜
  $mat->Set([$i, $j], $value); # マトリクス $mat の $i 行 $j 列に〜
 
-このように C<m_set()> は C<Set()> を拡張し、C<Set()> が 要素を 1つずつ
-代入していたところで、要素をひとまとめに代入することを可能にします。
+C<m_set()> extends the <Set()> to make it possible to collectively set
+the element.
 
 それは、C<$index> で指定されたマトリクスの要素の数と C<$value> で指定さ
 れた要素の値の数のバランスがとれるように、C<$index> を補うか C<$value>
@@ -267,9 +262,10 @@ cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。�
   my $info = Cv->GetBuildInformation()
   my %info = Cv->GetBuildInformation()
 
-OpenCV 2.4.0 からビルド時の情報が取り出せるます。コンテクトがスカラなら
-cv::getBuildInformation() の戻り値を返し、リストなら次のような結果を返
-します。
+Build-time information can be retrieved from OpenCV 2.4.0.  If the
+scalar context, returns the return value of
+C<cv::getBuildInformation().  If the list context, it returns the
+following results.
 
   'OpenCV modules' => {
 	'Disabled by dependency' => '-',
@@ -283,18 +279,19 @@ cv::getBuildInformation() の戻り値を返し、リストなら次のような
   },
   ...
 
-これは、C<HasModule()> でOpenCV で利用可能なモジュールを確認するために
-使用しています。
+t is used in the C <HasModule()>. In order to check the module
+available in OpenCV.
+
 
 =item HasModule()
 
  my $hasCore = Cv->HasModule('core');
 
-OpenCV がどのようなモジュールを有効にしてビルドされたかを返します。
+This method returns what has been built to enable any module in OpenCV.
 
 =back
 
-=head1 バグ
+=head1 BUG
 
 =over
 
@@ -302,11 +299,11 @@ OpenCV がどのようなモジュールを有効にしてビルドされたか�
 
 =back
 
-=head1 参考
+=head1 SEE ALSO
 
 L<Cv::Nihongo|Cv::Nihongo>
 
-=head1 著作権
+=head1 LICENCE
 
 Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
 
