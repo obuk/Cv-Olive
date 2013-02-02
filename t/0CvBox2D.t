@@ -1,47 +1,47 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 17;
+use Test::More tests => 9;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my $center = [ map { (int rand 16384) + 0.5 } 0..1 ];
-my $size = [ map { (int rand 16384) + 0.5 } 0..1 ];
-my $angle = (int rand 16384) + 0.5;
+my $center = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];
+my $size = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];
+my $angle = unpack("f", pack("f", map { rand 1 } 0));
 
 SKIP: {
-	skip "no T", 16 unless Cv->can('CvBox2D');
-	my $line;
+	skip "no T", 8 unless Cv->can('CvBox2D');
 
-	my $box = Cv::cvBox2D($center, $size, $angle);
-	is($box->[0]->[$_], $center->[$_]) for 0 .. 1;
-	is($box->[1]->[$_], $size->[$_]) for 0 .. 1;
-	is($box->[2], $angle);
+	{
+		my $b = Cv::cvBox2D($center, $size, $angle);
+		is_deeply($b, [$center, $size, $angle]);
+		my $b2 = Cv::CvBox2D($b);
+		is_deeply($b2, $b);
+	}
 
-	my $out = Cv::CvBox2D($box);
-	is($out->[0]->[$_], $box->[0]->[$_]) for 0 .. 1;
-	is($out->[1]->[$_], $box->[1]->[$_]) for 0 .. 1;
-	is($out->[2],       $box->[2]);
+	e { Cv::CvBox2D([]) };
+	err_is("Cv::CvBox2D: box is not of type CvBox2D");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvBox2D() };
-	is($@, "Usage: Cv::CvBox2D(box) at $0 line $line.\n");
+	e { Cv::CvBox2D(['x', $size, $angle]) };
+	err_is("Cv::CvBox2D: box is not of type CvBox2D");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvBox2D([]) };
-	is($@, "Cv::CvBox2D: box is not of type CvBox2D at $0 line $line.\n");
+	e { Cv::CvBox2D([$center, 'x', $angle]) };
+	err_is("Cv::CvBox2D: box is not of type CvBox2D");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvBox2D(['x', $size, $angle]) };
-	is($@, "Cv::CvBox2D: box is not of type CvBox2D at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvBox2D([$center, $size, '1.5x']) };
+		err_is("Argument \"1.5x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvBox2D([$center, 'x', $angle]) };
-	is($@, "Cv::CvBox2D: box is not of type CvBox2D at $0 line $line.\n");
-
-	$line = __LINE__ + 1;
-	my $pt2 = eval { Cv::CvBox2D([$center, $size, '1.5x']) };
-	is($@, "");
-	is($pt2->[2], 1.5);
-
+	{
+		no warnings 'numeric';
+		my $b = e { Cv::CvBox2D([$center, $size, '1.5x']) };
+		err_is('');
+		is_deeply($b, [$center, $size, 1.5]);
+	}
 }

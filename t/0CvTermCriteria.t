@@ -1,48 +1,47 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More tests => 10;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
-my ($epsilon) = map { int rand 1 } 3;
+my ($epsilon) = map { int rand 10 } 3;
 my $term = cvTermCriteria($type, $max_iter, $epsilon);
-is($term->[0], $type);
-is($term->[1], $max_iter);
-is($term->[2], $epsilon);
+is_deeply($term, [$type, $max_iter, $epsilon]);
 
 SKIP: {
-	skip "no T", 9 unless Cv->can('CvTermCriteria');
-	my $line;
+	skip "no T", 8 unless Cv->can('CvTermCriteria');
 
-	my $out = Cv::CvTermCriteria($term);
-	is($out->[0], $term->[0]);
-	is($out->[1], $term->[1]);
-	is($out->[2], $term->[2]);
+	{
+		my $term2 = Cv::CvTermCriteria($term);
+		is_deeply($term2, $term);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria() };
-	is($@, "Usage: Cv::CvTermCriteria(term) at $0 line $line.\n");
+	e { Cv::CvTermCriteria({}) };
+	err_is("Cv::CvTermCriteria: term is not of type CvTermCriteria");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria({}) };
-	is($@, "Cv::CvTermCriteria: term is not of type CvTermCriteria at $0 line $line.\n");
+	e { Cv::CvTermCriteria([]) };
+	err_is("Cv::CvTermCriteria: term is not of type CvTermCriteria");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria([]) };
-	is($@, "Cv::CvTermCriteria: term is not of type CvTermCriteria at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvTermCriteria(['1x', 2, 3]) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+		e { Cv::CvTermCriteria([1, '2x', 3]) };
+		err_is("Argument \"2x\" isn't numeric in subroutine entry");
+		e { Cv::CvTermCriteria([1, 2, '3x']) };
+		err_is("Argument \"3x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria(['1x', 2, 3]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria([1, '2x', 3]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::CvTermCriteria([1, 2, '3x']) };
-	is($@, "");
-
+	{
+		no warnings 'numeric';
+		my $term2 = e { Cv::CvTermCriteria(['1x', '2x', '3x']) };
+		err_is("");
+		is_deeply($term2, [ 1, 2, 3 ]);
+	}
 }

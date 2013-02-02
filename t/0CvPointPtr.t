@@ -1,43 +1,44 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-# use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More qw(no_plan);
+# use Test::More tests => 11;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my ($x, $y) = map { int rand 65536 } 0..1;
+my ($x, $y) = map { (int rand 65536) } 0..1;
 
 SKIP: {
-	skip "no T", 12 unless Cv->can('CvPointPtr');
-	my $line;
+	skip "no T", 10 unless Cv->can('CvPointPtr');
 
 	my $arr = Cv::cvPointPtr($x, $y);
 	is(ref $arr, 'ARRAY');
 	is(scalar @$arr, 1);
+	is_deeply($arr, [ [ $x, $y ] ]);
 
-	my $pt = $arr->[0];
-	is($pt->[0], $x);
-	is($pt->[1], $y);
+	{
+		my $arr2 = Cv::CvPointPtr($arr->[0]);
+		is_deeply($arr2, $arr);
+	}
 
-	my $out = Cv::CvPointPtr($pt);
-	is($out->[0]->[0], $pt->[0]);
-	is($out->[0]->[1], $pt->[1]);
+	e { Cv::CvPointPtr([]) };
+	err_is("Cv::CvPointPtr: pt is not of type CvPoint");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPointPtr() };
-	is($@, "Usage: Cv::CvPointPtr(pt) at $0 line $line.\n");
+	e { Cv::CvPointPtr([1]) };
+	err_is("Cv::CvPointPtr: pt is not of type CvPoint");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPointPtr([]) };
-	is($@, "Cv::CvPointPtr: pt is not of type CvPoint at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::CvPointPtr(['1x', '2y']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPointPtr([1]) };
-	is($@, "Cv::CvPointPtr: pt is not of type CvPoint at $0 line $line.\n");
-
-	$line = __LINE__ + 1;
-	my $list = eval { Cv::CvPointPtr(['1x', '2y']) };
-	is($@, "");
-	is($list->[0]->[0], 1);
-	is($list->[0]->[1], 2);
+	{
+		no warnings 'numeric';
+		my $arr2 = e { Cv::CvPointPtr(['1x', '2y']) };
+		err_is("");
+		is_deeply($arr2, [ [1, 2] ]);
+	}
 }

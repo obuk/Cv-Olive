@@ -1,33 +1,37 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 102;
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 6;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
 my @intPtr = map { int rand 65536 } 1 .. 100;
 
 SKIP: {
-	skip "no T", 100 unless Cv->can('intPtr');
-	my $line;
+	skip "no T", 5 unless Cv->can('intPtr');
 
-	my $intPtr = Cv::intPtr(\@intPtr);
-	is($intPtr->[$_], $intPtr[$_]) for 0 .. $#intPtr;
+	{
+		my $intPtr = Cv::intPtr(\@intPtr);
+		is_deeply($intPtr, \@intPtr);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::intPtr() };
-	is($@, "Usage: Cv::intPtr(values) at $0 line $line.\n");
+	e { Cv::intPtr({}) };
+	err_is("Cv::intPtr: values is not of type int *");
 
-	$line = __LINE__ + 1;
-	eval { Cv::intPtr({}) };
-	is($@, "Cv::intPtr: values is not of type int * at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::intPtr(['1x']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::intPtr(['1x']) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::intPtr([1, '2x', 3]) };
-	is($@, "");
-
+	{
+		no warnings 'numeric';
+		my $intPtr2 = e { Cv::intPtr([1, '2x', 3]) };
+		err_is("");
+		is_deeply($intPtr2, [1, 2, 3]);
+	}
 }

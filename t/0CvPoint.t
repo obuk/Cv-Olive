@@ -1,40 +1,44 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 9;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
 my ($x, $y) = map { int rand 65536 } 0..1;
 my $pt = cvPoint($x, $y);
-is($pt->[0], $x);
-is($pt->[1], $y);
+is_deeply($pt, [ $x, $y ]);
 
 SKIP: {
-	skip "no T", 9 unless Cv->can('CvPoint');
-	my $line;
+	skip "no T", 7 unless Cv->can('CvPoint');
 
-	my $out = Cv::CvPoint($pt);
-	is($out->[0], $pt->[0]);
-	is($out->[1], $pt->[1]);
+	{
+		my $pt2 = Cv::CvPoint($pt);
+		is_deeply($pt2, $pt);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint() };
-	is($@, "Usage: Cv::CvPoint(pt) at $0 line $line.\n");
+	e { Cv::CvPoint([]) };
+	err_is("Cv::CvPoint: pt is not of type CvPoint");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint([]) };
-	is($@, "Cv::CvPoint: pt is not of type CvPoint at $0 line $line.\n");
+	e { Cv::CvPoint([1]) };
+	err_is("Cv::CvPoint: pt is not of type CvPoint");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvPoint([1]) };
-	is($@, "Cv::CvPoint: pt is not of type CvPoint at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		my $pt2 = e { Cv::CvPoint(['1x', '2y']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	my $pt2 = eval { Cv::CvPoint(['1x', '2y']) };
-	is($@, "");
-	is($pt2->[0], 1);
-	is($pt2->[1], 2);
+	{
+		no warnings 'numeric';
+		my $pt2 = e { Cv::CvPoint(['1x', '2y']) };
+		err_is($@, "");
+		is_deeply($pt2, [ 1, 2 ]);
+	}
 
 	eval "use Time::Piece";
 	if ($@) {
@@ -43,11 +47,6 @@ SKIP: {
 		my $t1 = Time::Piece->strptime("2012-01-01", "%Y-%m-%d");
 		my $t2 = Time::Piece->strptime("2012-01-02", "%Y-%m-%d");
 		my $pt2 = Cv::CvPoint([$t2 - $t1, 0]);
-		is($pt2->[0], $t2 - $t1);
-		my $dt = $t2 - $t1;
-		use Data::Dumper;
-		print STDERR Data::Dumper->Dump([$dt], [qw($dt)]);
-		print STDERR $t2 - $t1, "\n";
+		is_deeply($pt2, [ $t2 - $t1, 0 ]);
 	}
-
 }

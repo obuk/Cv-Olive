@@ -8,11 +8,12 @@ use Carp;
 use Cwd qw(abs_path);
 BEGIN { eval "use Cv::Constant" };
 
-our $VERSION = '0.14';
+our $VERSION = '0.22';
 
 our %opencv;
 our %C;
 our $cf;
+our $verbose = 1;
 
 sub new {
 	$cf ||= bless {};
@@ -107,40 +108,61 @@ sub ccflags {
 }
 
 
-sub version {
+sub _version {
 	my $self = shift;
-	return Cv::cvVersion() if Cv->can('cvVersion');
-	&Cv::Constant::CV_MAJOR_VERSION +
-		&Cv::Constant::CV_MINOR_VERSION * 1e-3 +
-		&Cv::Constant::CV_SUBMINOR_VERSION * 1e-6;
-}
-
-
-=xxx
-
-sub myextlib {
-	my $self = shift;
-	unless (defined $self->{MYEXTLIB}) {
-		my $extlib;
-		foreach (@INC) {
-			my $ext = $^O eq 'cygwin' ? ".dll" : ".so";
-			my $so = "$_/auto/Cv/Cv$ext";
-			if (-x $so) {
-				$extlib = abs_path($so);
-				last;
+	unless (defined $self->{version}) {
+		return $self->{version} = Cv::cvVersion()
+			if Cv->can('cvVersion');
+		my $c = "/tmp/version$$.c";
+		warn "Compiling $c to get Cv version.\n" if $verbose;
+		my $CC = $self->cc;
+		my $CCFLAGS = $self->ccflags;
+		my $LIBS = join(' ', @{$self->libs});
+		if (my $dynamic_lib = $self->dynamic_lib) {
+			if ($dynamic_lib->{OTHERLDFLAGS}) {
+				$LIBS .= " " . $dynamic_lib->{OTHERLDFLAGS};
 			}
 		}
-		$self->{MYEXTLIB} = $extlib;
+		if (open C, ">$c") {
+			print C <<"----";
+			#include <stdio.h>
+			#include <opencv/cv.h>
+			main()
+			{
+				printf("%d %d %d\\n",
+					   CV_MAJOR_VERSION, CV_MINOR_VERSION,
+					   CV_SUBMINOR_VERSION);
+				exit(0);
+			}
+----
+	;
+			close C;
+			warn "$CC $CCFLAGS -o a.exe $c $LIBS\n" if $verbose;
+			chop(my $v = `$CC $CCFLAGS -o a.exe $c $LIBS && ./a.exe`);
+			unless ($? == 0) {
+				unlink($c);
+				die "$0: can't compile $c to get Cv version.\n",
+				"$0: your system has installed opencv?\n";
+			}
+			unlink($c, 'a.exe');
+			$self->{version} = [split(/\s+/, $v)];
+		} else {
+			die "$0: can't open $c.\n";
+		}
 	}
-	$self->{MYEXTLIB};
+	wantarray? @{$self->{version}} : $self->{version};
 }
 
-=cut
+
+sub version {
+	my $self = shift;
+	sprintf("%d.%03d%03d", $self->_version);
+}
 
 
 sub c {
 	my $self = shift;
-	my %C = (
+	my %c = (
 		CC       => $self->cc,
 		LD       => $self->cc,
 		CCFLAGS  => $self->ccflags,
@@ -152,8 +174,8 @@ sub c {
 								 '#undef do_close',
 							 )),
 		);
-	# print STDERR "\$C{$_} = $C{$_}\n" for keys %C;
-	%C;
+	# print STDERR "\$C{$_} = $C{$_}\n" for keys %c;
+	%c;
 }
 
 

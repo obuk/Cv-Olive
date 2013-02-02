@@ -1,34 +1,13 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 21;
-
-BEGIN {
-	use_ok('Cv');
-}
-
-
-our $line;
-
-sub err_is {
-	our $line;
-	chop(my $a = $@);
-	my $b = shift(@_) . " at $0 line $line";
-	$b .= '.' if $a =~ m/\.$/;
-	unshift(@_, "$a\n", "$b\n");
-	goto &is;
-}
-
-sub is_array {
-	my $a = shift;
-	my $b = shift;
-	unshift(@_,
-			sprintf("[%s]", join(', ', @{$a}[0..$#{$b}])),
-			sprintf("[%s]", join(', ', @$b)),
-		);
-	goto &is;
-}
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 61;
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv') }
 
 # CvtMatToArray()
 if (1) {
@@ -38,24 +17,28 @@ if (1) {
 	is($arr->cols, 1);
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_array($list[0], [1, 2]);
-	is_array($list[1], [3, 4]);
-	is_array($list[2], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list; # XXXXX
+	is_deeply($list[0], [1, 2]);
+	is_deeply($list[1], [3, 4]);
+	is_deeply($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 1]);
 	is(scalar @list2, 1);
-	is_array($list2[0], [3, 4]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list2; # XXXXX
+	is_deeply($list2[0], [3, 4]);
 
 	$arr->toArray(\my @list3);
 	is(scalar @list3, 3);
-	is_array($list3[0], [1, 2]);
-	is_array($list3[1], [3, 4]);
-	is_array($list3[2], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list3; # XXXXX
+	is_deeply($list3[0], [1, 2]);
+	is_deeply($list3[1], [3, 4]);
+	is_deeply($list3[2], [5, 6]);
 
 	$arr->toArray(\my @list4, [0, 1]);
 	is(scalar @list4, 2);
-	is_array($list4[0], [1, 2]);
-	is_array($list4[1], [3, 4]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list4; # XXXXX
+	is_deeply($list4[0], [1, 2]);
+	is_deeply($list4[1], [3, 4]);
 }
 
 if (2) {
@@ -66,14 +49,16 @@ if (2) {
 
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_array($list[0], [1, 2]);
-	is_array($list[1], [3, 4]);
-	is_array($list[2], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list; # XXXXX
+	is_deeply($list[0], [1, 2]);
+	is_deeply($list[1], [3, 4]);
+	is_deeply($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 2]);
 	is(scalar @list2, 2);
-	is_array($list2[0], [3, 4]);
-	is_array($list2[1], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list2; # XXXXX
+	is_deeply($list2[0], [3, 4]);
+	is_deeply($list2[1], [5, 6]);
 }
 
 if (3) {
@@ -86,8 +71,7 @@ if (3) {
 	ok($arr);
 	is($arr->rows, 3);
 	is($arr->cols, 3);
-	$line = __LINE__ + 1;
-	eval { my @list = @$arr };
+	e { my @list = @$arr };
 	err_is("Cv::Arr::ToArray: can't convert 3x3");
 }
 
@@ -100,24 +84,28 @@ if (11) {
 	is($arr->cols, 0);
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_array($list[0], [1, 2]);
-	is_array($list[1], [3, 4]);
-	is_array($list[2], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list;	# XXXXX
+	is_deeply($list[0], [1, 2]);
+	is_deeply($list[1], [3, 4]);
+	is_deeply($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 1]);
 	is(scalar @list2, 1);
-	is_array($list2[0], [3, 4]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list2; # XXXXX
+	is_deeply($list2[0], [3, 4]);
 
 	$arr->toArray(\my @list3);
 	is(scalar @list3, 3);
-	is_array($list3[0], [1, 2]);
-	is_array($list3[1], [3, 4]);
-	is_array($list3[2], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list3; # XXXXX
+	is_deeply($list3[0], [1, 2]);
+	is_deeply($list3[1], [3, 4]);
+	is_deeply($list3[2], [5, 6]);
 
 	$arr->toArray(\my @list4, [0, 1]);
 	is(scalar @list4, 2);
-	is_array($list4[0], [1, 2]);
-	is_array($list4[1], [3, 4]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list4; # XXXXX
+	is_deeply($list4[0], [1, 2]);
+	is_deeply($list4[1], [3, 4]);
 }
 
 if (12) {
@@ -128,14 +116,16 @@ if (12) {
 
 	my @list = $arr->toArray;
 	is(scalar @list, 3);
-	is_array($list[0], [1, 2]);
-	is_array($list[1], [3, 4]);
-	is_array($list[2], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list; # XXXXX
+	is_deeply($list[0], [1, 2]);
+	is_deeply($list[1], [3, 4]);
+	is_deeply($list[2], [5, 6]);
 
 	my @list2 = $arr->toArray([1, 2]);
 	is(scalar @list2, 2);
-	is_array($list2[0], [3, 4]);
-	is_array($list2[1], [5, 6]);
+	splice(@$_, CV_MAT_CN($arr->type)) for @list2; # XXXXX
+	is_deeply($list2[0], [3, 4]);
+	is_deeply($list2[1], [5, 6]);
 }
 
 if (13) {
@@ -148,7 +138,6 @@ if (13) {
 	ok($arr);
 	is($arr->rows, 3);
 	is($arr->cols, 3);
-	$line = __LINE__ + 1;
-	eval { my @list = @$arr };
+	e { my @list = @$arr };
 	err_is("Cv::Arr::ToArray: can't convert 3x3");
 }

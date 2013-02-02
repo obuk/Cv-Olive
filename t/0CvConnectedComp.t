@@ -1,8 +1,12 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
+use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 26;
+use Test::More tests => 16;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
 my $area = int rand 16384;
@@ -11,44 +15,47 @@ my $rect = [ map { int rand 16384 } 0..3 ];
 my $contour = Cv::Seq->new(CV_8UC4);
 
 SKIP: {
-	skip "no T", 25 unless Cv->can('CvConnectedComp');
-	my $line;
+	skip "no T", 15 unless Cv->can('CvConnectedComp');
 
-	my $cc = Cv::cvConnectedComp($area, $value, $rect, $contour);
-	is($cc->[0], $area);
-	is($cc->[1]->[$_], $value->[$_]) for 0 .. 3;
-	is($cc->[2]->[$_], $rect->[$_]) for 0 .. 3;
-	# is($cc->[3], $contour);
+	{
+		my $cc = Cv::cvConnectedComp($area, $value, $rect, $contour);
+		is($cc->[0], $area);
+		is_deeply($cc->[1], $value);
+		is_deeply($cc->[2], $rect);
+		# is($cc->[3], $contour);
 
-	my $out = Cv::CvConnectedComp($cc);
-	is($out->[0], $cc->[0]);
-	is($out->[1]->[$_], $cc->[1]->[$_]) for 0 .. 3;
-	is($out->[2]->[$_], $cc->[2]->[$_]) for 0 .. 3;
-	# is($out->[3], $cc->[3]);
+		my $cc2 = Cv::CvConnectedComp($cc);
+		is($cc2->[0], $cc->[0]);
+		is_deeply($cc2->[1], $cc->[1]);
+		is_deeply($cc2->[2], $cc->[2]);
+		# is($out->[3], $cc->[3]);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvConnectedComp() };
-	is($@, "Usage: Cv::CvConnectedComp(cc) at $0 line $line.\n");
+	e { Cv::CvConnectedComp([]) };
+	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvConnectedComp([]) };
-	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
+	e { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) };
+	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
 
-	$line = __LINE__ + 1;
-	my $cc2 = eval { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
-	is($@, "");
-	is($cc2->[0], 1);
+	e { Cv::CvConnectedComp([$area, $value, 'x', $contour]) };
+	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) };
-	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
+	e { Cv::CvConnectedComp([$area, $value, $rect, 'x']) };
+	err_is("Cv::CvConnectedComp: cc is not of type CvConnectedComp");
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvConnectedComp([$area, $value, 'x', $contour]) };
-	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		my $cc = e { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::CvConnectedComp([$area, $value, $rect, 'x']) };
-	is($@, "Cv::CvConnectedComp: cc is not of type CvConnectedComp at $0 line $line.\n");
-
+	{
+		no warnings 'numeric';
+		my $cc = e { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
+		err_is("");
+		is($cc->[0], 1);
+		is_deeply($cc->[1], $value);
+		is_deeply($cc->[2], $rect);
+		# is($cc->[3], $contour);
+	}
 }

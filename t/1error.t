@@ -4,26 +4,15 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 35;
-
-BEGIN {
-	use_ok('Cv', -more);
-}
+use File::Basename;
+use lib dirname($0);
+use MY;
+BEGIN { use_ok('Cv', -more) }
 
 use Data::Dumper;
 
 sub D (\@) {
 	Data::Dumper->Dump([@{$_[0]}], [map { "\$_[$_]" } 0 .. $#{$_[0]}]);
-}
-
-our $line;
-
-sub err_is {
-	our $line;
-	chop(my $a = $@);
-	my $b = shift(@_) . " at $0 line $line";
-	$b .= '.' if $a =~ m/\.$/;
-	unshift(@_, "$a\n", "$b\n");
-	goto &is;
 }
 
 if (1) {
@@ -38,15 +27,12 @@ if (1) {
 }
 
 if (2) {
-	my ($status, $funcName, $errMsg, $fileName);
+	my ($status, $funcName, $errMsg);
 	eval {
-		$line = __LINE__ + 1;
-		Cv->error(
+		_e; Cv->error(
 			$status = -1,
 			$funcName = "funcName",
 			$errMsg = "errMsg",
-			$fileName = __FILE__,
-			$line,
 			);
 	};
 	err_is(join(' ', "OpenCV Error:", Cv->errorStr($status),
@@ -56,7 +42,7 @@ if (2) {
 if (3) {
 	Cv->setErrMode(0);
 	is(Cv->getErrMode(), 0, "errMode");
-	my ($status, $funcName, $errMsg, $fileName);
+	my ($status, $funcName, $errMsg, $file, $line);
 	my $err;
 	sub myError {
 		$err = \@_;
@@ -67,13 +53,12 @@ if (3) {
 		my $prevData,
 		);
 	eval {
-		$line = __LINE__ + 1;
-		Cv->error(
+		_e; Cv->error(
 			$status = -1,
 			$funcName = "funcName",
 			$errMsg = "errMsg0",
-			$fileName = __FILE__,
-			$line,
+			$file = rand,
+			$line = rand,
 			);
 	};
 	err_is("OpenCV Error: Backtrace ($errMsg) in $funcName");
@@ -81,7 +66,7 @@ if (3) {
 	is($err->[0], $status);
 	is($err->[1], $funcName);
 	is($err->[2], $errMsg);
-	is($err->[3], $fileName);
+	is($err->[3], $file);
 	is($err->[4], $line);
 	is($err->[5], $myData);
 	my $prevError2 = Cv->redirectError($prevError, $prevData, my $prevData2);
@@ -92,7 +77,7 @@ if (3) {
 if (4) {
 	Cv->setErrMode(1);
 	is(Cv->getErrMode(), 1, "errMode1");
-	my ($status, $funcName, $errMsg, $fileName);
+	my ($status, $funcName, $errMsg, $file, $line);
 	my $err;
 	my $prevError = Cv->redirectError(
 		my $myError = sub {
@@ -103,12 +88,12 @@ if (4) {
 		my $prevData,
 		);
 	eval {
-		Cv->error(
+		_e; Cv->error(
 			$status = -2,
 			$funcName = "funcName1",
 			$errMsg = "errMsg1",
-			$fileName = __FILE__,
-			$line = __LINE__,
+			$file = rand,
+			$line = rand,
 			);
 	};
 	is($@, '');
@@ -116,7 +101,7 @@ if (4) {
 	is($err->[0], $status);
 	is($err->[1], $funcName);
 	is($err->[2], $errMsg);
-	is($err->[3], $fileName);
+	is($err->[3], $file);
 	is($err->[4], $line);
 	is($err->[5], $myData);
 	my $prevError2 = Cv->redirectError($prevError, $prevData, my $prevData2);
@@ -127,7 +112,7 @@ if (4) {
 if (5) {
 	Cv->setErrMode(2);
 	is(Cv->getErrMode(), 2, "errMode2");
-	my ($status, $funcName, $errMsg, $fileName);
+	my ($status, $funcName, $errMsg, $file, $line);
 	my $err;
 	my $prevError = Cv->redirectError(
 		sub {
@@ -138,13 +123,12 @@ if (5) {
 		my $prevData,
 		);
 	eval {
-		$line = __LINE__ + 1;
-		Cv->error(
+		_e; Cv->error(
 			$status = -3,
 			$funcName = "funcName2",
 			$errMsg = "errMsg2",
-			$fileName = __FILE__,
-			$line,
+			$file = rand,
+			$line = rand,
 			);
 	};
 	is($@, '');
@@ -156,7 +140,6 @@ if (5) {
 if (6) {
 	Cv->setErrMode(0);
 	Cv->redirectError(sub { });
-	$line = __LINE__ + 1;
-	eval { Cv::cvCreateImage([-1, -1], 8, 3); };
+	e { Cv::cvCreateImage([-1, -1], 8, 3); };
 	err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");
 }

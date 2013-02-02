@@ -2,8 +2,11 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 23;
+# use Test::More qw(no_plan);
+use Test::More tests => 4;
+use File::Basename;
+use lib dirname($0);
+use MY;
 use List::Util qw(sum min max);
 BEGIN { use_ok('Cv') }
 
@@ -65,28 +68,16 @@ sub color {
 
 
 # Cv-0.19
-our $line;
-sub err_is {
-	our $line;
-	chop(my $a = $@);
-	my $b = shift(@_) . " at $0 line $line";
-	$b .= '.' if $a =~ m/\.$/;
-	unshift(@_, "$a\n", "$b\n");
-	goto &is;
-}
-
-$line = __LINE__ + 1;
-eval { my @list = Cv->FitEllipse };
+e { my @list = Cv->FitEllipse };
 err_is('Usage: Cv->FitEllipse2(points)');
 
 my $pts3 = [[1, 2], [2, 3], [3, 4]];
 my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
-$line = __LINE__ + 1;
-eval { my @list = Cv->FitEllipse($pts3) };
+e { my @list = Cv->FitEllipse($pts3) };
 chomp($@);
 $@ =~ /Number of points should be >= \d+/;
-is($@, "OpenCV Error: Incorrect size of input array ($&) in cvFitEllipse2 at $0 line $line");
+err_is("OpenCV Error: Incorrect size of input array ($&) in cvFitEllipse2");
 
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
@@ -94,7 +85,6 @@ Cv::More->import(qw(cs-warn));
 {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
-	$line = __LINE__ + 1;
-	eval { my @line = Cv->FitEllipse($pts5); };
+	e { my @line = Cv->FitEllipse($pts5); };
 	err_is("called in list context, but returning scaler");
 }

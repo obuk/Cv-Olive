@@ -1,37 +1,37 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 use strict;
-use Test::More qw(no_plan);
-# use Test::More tests => 102;
+use warnings;
+# use Test::More qw(no_plan);
+use Test::More tests => 6;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN {	use_ok('Cv', -more) }
 
-my @doublePtr = map { int rand 1 } 1 .. 100;
+my @doublePtr = unpack("d*", pack("d*", map { rand 1 } 1 .. 100));
 
 SKIP: {
-	skip "no T", 100 unless Cv->can('doublePtr');
-	my $line;
+	skip "no T", 5 unless Cv->can('doublePtr');
 
-	my $doublePtr = Cv::doublePtr(\@doublePtr);
-	is($doublePtr->[$_], $doublePtr[$_]) for 0 .. $#doublePtr;
+	{
+		my $doublePtr = Cv::doublePtr(\@doublePtr);
+		is_deeply($doublePtr, \@doublePtr);
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::doublePtr() };
-	is($@, "Usage: Cv::doublePtr(values) at $0 line $line.\n");
+	e { Cv::doublePtr({}) };
+	err_is("Cv::doublePtr: values is not of type double *");
 
-	$line = __LINE__ + 1;
-	eval { Cv::doublePtr({}) };
-	is($@, "Cv::doublePtr: values is not of type double * at $0 line $line.\n");
+	{
+		use warnings FATAL => qw(all);
+		e { Cv::doublePtr(['1x']) };
+		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+	}
 
-	$line = __LINE__ + 1;
-	eval { Cv::doublePtr([ '1x' ]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::doublePtr([1, "2x", 3]) };
-	is($@, "");
-
-	$line = __LINE__ + 1;
-	eval { Cv::doublePtr([1, 2, "3x"]) };
-	is($@, "");
-
+	{
+		no warnings 'numeric';
+		my $doublePtr2 = e { Cv::doublePtr([1, '2x', 3]) };
+		err_is("");
+		is_deeply($doublePtr2, [1, 2, 3]);
+	}
 }

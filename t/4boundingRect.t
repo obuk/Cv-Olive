@@ -2,8 +2,11 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 23;
+# use Test::More qw(no_plan);
+use Test::More tests => 2;
+use File::Basename;
+use lib dirname($0);
+use MY;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -66,16 +69,6 @@ sub color {
 
 
 # Cv-0.19
-our $line;
-
-sub err_is {
-	our $line;
-	chop(my $a = $@);
-	my $b = shift(@_) . " at $0 line $line";
-	$b .= '.' if $a =~ m/\.$/;
-	unshift(@_, "$a\n", "$b\n");
-	goto &is;
-}
 
 Cv::More->unimport(qw(cs));
 Cv::More->import(qw(cs-warn));
@@ -83,7 +76,6 @@ Cv::More->import(qw(cs-warn));
 if (11) {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak; # capturing carp as croak
-	$line = __LINE__ + 1;
-	eval { my @retval = Cv->boundingRect([10,20], [10,30]) };
+	e { my @retval = Cv->boundingRect([10, 20], [10, 30]) };
 	err_is("called in list context, but returning scaler");
 }
