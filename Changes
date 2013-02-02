@@ -1,6 +1,8 @@
 Revision history for Cv.pm
 
-0.22 - 2012-01-21 (working)
+0.22 - 2012-01-31
+     * added More.pod
+     * fixed pod error
      * fixed fallback code for making Constant.pm (use version.pm).
      * fixed Cmp value double (not a cvScalar)
      * fixed GetRawData if CvMatND used

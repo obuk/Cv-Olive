@@ -289,7 +289,7 @@ can not be.
 
 Build-time information can be retrieved from OpenCV 2.4.0.  If the
 scalar context, returns the return value of
-C<cv::getBuildInformation().  If the list context, it returns the
+C<cv::getBuildInformation()>.  If the list context, it returns the
 following results.
 
   'OpenCV modules' => {

@@ -18,6 +18,7 @@ lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
 lib/Cv/More-ja.pod
 lib/Cv/More.pm
+lib/Cv/More.pod
 lib/Cv/Pango-ja.pod
 lib/Cv/Pango.pm
 lib/Cv/Seq-ja.pod
@@ -134,9 +135,12 @@ sample/trains.png
 sample/video-thread.pl
 sample/video.pl
 sample/watershed.pl
+t/1alias.t
+t/1autoload.t
 t/1config.t
 t/1const-old.t
 t/1const.t
+t/1croak.t
 t/1CvBox2D.t
 t/1CvCircle.t
 t/1CvConnectedComp.t
@@ -156,6 +160,7 @@ t/1CvSize.t
 t/1CvSize2D32f.t
 t/1CvTermCriteria.t
 t/1doublePtr.t
+t/1error.t
 t/1floatPtr.t
 t/1intPtr.t
 t/1sizeof.t
