@@ -120,17 +120,49 @@ our $VERSION = '0.14';
 __END__
 # Below is stub documentation for your module. You'd better edit it!
 
+=encoding utf8
+
 =head1 NAME
 
-Cv::Pango - Perl extension for blah blah blah
+Cv::Pango - Draw a variety of characters using the Pango
 
 =head1 SYNOPSIS
 
+ use Cv;
+ use Cv::Pango;
+ 
+ my $img = Cv::Mat->new([240, 320], CV_8UC4);
+ $img->putText(
+	"\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
+	[20, 200], 'Sans Serif 42',
+	);
+ $img->showImage;
+ $img->waitKey;
+
 =head1 DESCRIPTION
 
-=head2 EXPORT
+C<Cv::Pango> draw a variety of characters by using Pango.
+Replace C<Cv::Arr::PutText()> itself.
+
+=head2 BUGS
+
+=over
+
+=item *
+
+Can use CV_8UC4 and CV_8UC1 only.
+
+=item *
+
+This package uses the object of Pango :: FontDescription. So put cvGetTextSize() for this namespace.
+
+Please tell me if you know how patch better.
+
+=back
 
 =head1 SEE ALSO
+
+C<Cv>, C<Pang>
 
 =head1 AUTHOR
 
