@@ -1,6 +1,8 @@
 Revision history for Cv.pm
 
 0.22 - 2012-01-01 (working)
+     * added More.pod
+     * fixed pod error
      * rewrote t/*t to verify the location of the error.
      * fixed type conversion warnings
      * fixed fallback code for making Constant.pm

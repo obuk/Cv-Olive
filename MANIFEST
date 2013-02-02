@@ -16,6 +16,7 @@ lib/Cv-ja.pod
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
+lib/Cv/More.pod
 lib/Cv/More-ja.pod
 lib/Cv/More.pm
 lib/Cv/Pango-ja.pod
@@ -164,6 +165,7 @@ t/1alias.t
 t/1autoload.t
 t/1croak.t
 t/1error.t
+t/2CvArr.t
 t/2CvFileStorage.t
 t/2CvImage.t
 t/2CvMat.t
@@ -247,6 +249,7 @@ t/9threads.t
 t/baboon.jpg
 t/hackcv.pm
 t/lena.jpg
+t/MY.pm
 tools/checkref.pl
 tools/cleanup.sh
 tools/cover.sh
