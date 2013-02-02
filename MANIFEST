@@ -18,7 +18,6 @@ lib/Cv/Flipbook.pm
 lib/Cv/Nihongo.pod
 lib/Cv/More-ja.pod
 lib/Cv/More.pm
-lib/Cv/More.pod
 lib/Cv/Pango-ja.pod
 lib/Cv/Pango.pm
 lib/Cv/Seq-ja.pod
