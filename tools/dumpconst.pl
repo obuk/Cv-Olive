@@ -4,6 +4,8 @@
 use strict;
 use warnings;
 
+=encoding utf8
+
 =head1 NAME
 
 dumpconst - convert opencv header files to Perl constants
