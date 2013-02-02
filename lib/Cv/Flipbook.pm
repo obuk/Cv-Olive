@@ -146,17 +146,42 @@ sub SetCaptureProperty {
 __END__
 # Below is stub documentation for your module. You'd better edit it!
 
+=encoding utf8
+
 =head1 NAME
 
-Cv::Flipbook - Perl extension for blah blah blah
+Cv::Flipbook - Handle flipbook like a video.
 
 =head1 SYNOPSIS
 
+ use Cv;
+ use Cv::Flipbook;
+ 
+ my $capture = Cv->CaptureFromFlipbook("/path/to/flipbook");
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
+
 =head1 DESCRIPTION
 
-=head2 EXPORT
+Read sequential image files in the directory, C<Cv::Flipbook> is
+treated as a video input it.
+
+It is important to note the following points.
+
+=over
+
+=item * Align the size of all images.
+
+=item * Include the file name number for ordering.
+
+=back
 
 =head1 SEE ALSO
+
+L<Cv>
 
 =head1 AUTHOR
 
