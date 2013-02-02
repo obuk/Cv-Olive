@@ -18,6 +18,7 @@ lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
 lib/Cv/More-ja.pod
 lib/Cv/More.pm
+lib/Cv/More.pod
 lib/Cv/Pango-ja.pod
 lib/Cv/Pango.pm
 lib/Cv/Seq-ja.pod
@@ -189,6 +190,7 @@ t/2dct.t
 t/2det.t
 t/2dft.t
 t/2div.t
+t/2dst.t
 t/2encode.t
 t/2error.t
 t/2exp.t

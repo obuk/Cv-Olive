@@ -1,0 +1,340 @@
+# -*- mode: pod; coding: utf-8; tab-width: 4; -*-
+
+=encoding utf8
+
+=head1 NAME
+
+Cv::More - A little more easy to using L<Cv> in Perl.
+
+=head1 SYNOPSIS
+
+ use Cv::More qw(cs);
+
+=head1 DESCRIPTION
+
+C<Cv::More> is a package to organize some of the experimental features
+from L<Cv|Cv::Nihongo>. I believe it will be easier to extend the
+C<Cv>. C<Cv::More> is what separated the part of the C<Cv>. So, it is
+enabled by default. Please make a explicit if you do not use.
+
+ use Cv;              # enabled Cv::More
+ use Cv qw(:nomore);  # disabled Cv::More
+
+=head2 Added or Extended Method
+
+=head3 Cv::Arr - Using Perl Array
+
+=over
+
+=item FitEllipse2()
+
+ my $box2d = Cv->FitEllipse2($points);
+
+The return value is CvBox2D. If you specify C<cs>, and called in
+listcontext, the following elements will be expanded.
+
+ use Cv::More qw(cs);
+ my ($center, $size, $angle) = Cv->FitEllipse2($points);
+
+The following example shows how to draw a list of points
+FitEllipse2().
+
+ my $img = Cv::Image->new([250, 250], CV_8UC3)->fill(cvScalarAll(255));
+ $img->origin(1);
+ my @pts = (map { [ map { $_ / 4 + rand $_ / 2 } @{$img->size} ] } 1 .. 20);
+ $img->circle($_, 3, &color, 1, CV_AA) for @pts;
+ my $box = Cv->fitEllipse(\@pts);
+ $img->polyLine([[Cv->boxPoints($box)]], -1, &color, 1, CV_AA);
+ $img->ellipseBox($box, &color, 1, CV_AA);
+ $img->show("FitEllipse2");
+ Cv->waitKey;
+ sub color { [ map { rand 255 } 1 .. 3 ] }
+
+
+=item FitLine()
+
+FitLine() has the following two methods call.
+
+ my $line = Cv->FitLine($points, $dist_type, $param, $reps, $aeps);     # (1)
+ Cv->FitLine($points, $dist_type, $param, $reps, $aeps, my $line);      # (2)
+
+Can omit the parameters other than $points. $points is a list of
+points in two-or three-dimensional. The return value is determined by
+the number of dimensions of $points.
+
+ my $points2d = [ [$x1, $y1], [$x2, $y2], ... ];
+ my ($vx, $vy, $x0, $y0) = Cv->FitLine($points2d, ...);
+ my $points3d = [ [$x1, $y1, $z1], [$x2, $y2, $z2], ... ];
+ my ($vx, $vy, $vz, $x0, $y0, $z0) = Cv->FitLine($points3d, ...);
+
+The following examples, draw a straight line fit to a collection of
+some points.
+
+ my @pts = ([ 50, 50 ], [ 100, 120 ], [ 150, 150 ], [ 200, 150 ]);
+ my ($vx, $vy, $x0, $y0) = Cv->fitLine(\@pts); 
+ $img->line((map { [ $_, $vy / $vx * ($_ - $x0) + $y0 ] } 20, 230),
+			cvScalarAll(200), 3, CV_AA);
+
+
+=item MinAreaRect2()
+
+ my $box2d = Cv->MinAreaRect2($points);
+ my ($center, $size, $angle) = Cv->MinAreaRect2($points);
+
+The return value is CvBox2D, means the smallest rectangle enclosing a
+list of points.
+
+ for ([ [ Cv->fitEllipse(\@pts)  ], [ 200, 200, 200 ] ],
+      [ [ Cv->minAreaRect(\@pts) ], [ 100, 100, 255 ] ]) {
+   $img->polyLine([[Cv->boxPoints($_->[0])]], -1, $_->[1], 1, CV_AA);
+   $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
+ }
+
+To Cv-0.15, used the memory storage same as the interface of C
+language. But, Cv-0.16 and later versions do not use memory storage.
+
+=item MinEnclosingCircle()
+
+ my $circle = Cv->MinEnclosingCircle($points);                          # (1)
+ my ($center, $radius) = Cv->MinEnclosingCircle($points);               # (1')
+ Cv->MinEnclosingCircle($points, my $center, my $radius);               # (2)
+
+The return value is the coordinates of the center $center and the
+radius of the circle $radius.
+
+The following example drawn C<fitEllipse2()>, C<minEnclosingCircle()>
+and C<minAreaRect2()> using a same list of points.
+
+ my $rectangle = Cv->minAreaRect2(\@pts);
+ my $ellipse = Cv->fitEllipse2(\@pts);
+ my ($center, $radius) = Cv->minEnclosingCircle(\@pts);
+ my $circle = [ $center, [ ($radius * 2) x 2 ], 0 ];
+ for ([ $rectangle, [ 200, 200, 200 ] ],
+      # [ $ellipse,   [ 200, 200, 200 ] ],
+      [ $circle,    [ 100, 100, 255 ] ]) {
+   $img->polyLine([[Cv->boxPoints($_->[0])]], -1, $_->[1], 1, CV_AA);
+   $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
+ }
+
+=item BoundingRect()
+
+ my $rect = Cv->BoundingRect($points)
+ my ($x, $y, $width, $height) = Cv->BoundingRect($points)
+
+Returns the minimal up-right bounding rectangle for the specified
+point set.The return value is C<CvRect>. By converting to C<CvBox2D> from
+C<CvRect> as follows, and usability of C<BoxPoints> EllipseBox better.
+
+ my $box2d = [ [ $x + $width / 2, $y + $height / 2 ], [ $width, $height ], 0 ];
+
+
+=item ContourArea()
+
+ my $s = Cv->ContourArea($points)
+ my $s = Cv->ContourArea($points, $slice)
+
+The function computes the contour area. In the following example, area
+C<$s> is the (100x100) horizontal x vertical.
+
+ my @pts = ([100, 100], [100, 200], [200, 200], [200, 100]);
+ my $s = Cv->contourArea(\@pts);
+
+
+=item Transform()
+
+ my $dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1)
+ my @dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1')
+ Cv->Transform([ $pt1, $pt2, ... ], my $dst, $transmat);                # (2)
+
+ my @points = ( [$x1, $y1], [$x2, $y2], ... );
+ my $arr = Cv::Mat->new([], CV_32FC2, @points);
+ my $dst = $arr->Transform($transmat);                                  # (3)
+ $arr->Transform(my $dst, $transmat);                                   # (4)
+
+ my $dst = $arr->WarpAffine($transmat);                                 # (5)
+ $arr->warpTransform(my $dst, $transmat);                               # (6)
+
+
+=item Affine()
+
+This method performs a rotation and contraction for images and matrix.
+Implementation is a wrapper for C<GetQuadrangleSubPix()>.
+
+  my $mapMatrix = [ [ $A11, $A12, $b1 ],
+                    [ $A21, $A22, $b2 ] ];
+  my $dst = $src->Affine($mapMatrix);
+
+This function makes it easy effort to make the transformation matrix.
+In addition, can also write the same in the following.
+
+  $src->GetQuadrangleSubPix(
+          Cv::Mat->new([], &Cv::CV_32FC1,
+                       [ $A11, $A12, $b1 ],
+                       [ $A21, $A22, $b2 ],
+                       ));
+
+=item new()
+
+=item m_new()
+
+Object of the matrix and the image in OpenCV is made by specifying the
+type and element size. C<m_new()> is a method to redefine the C<new()>
+so as to provide the value of each element. If specify an empty
+arrayref [] to the size of the matrix, the size of the matrix is the
+number of elements.
+
+ my $mat = Cv::Mat->new([], $type, $elements);
+
+The following is an example of a matrix camera. The size of matrix is
+3x3, the element type is CV_32FC1.
+
+ my $mat = Cv::Mat->new([ ], CV_32FC1,
+    [ $fx,   0, $cx ],
+    [   0, $fy, $cy ],
+    [   0,   0,   1 ],
+    );
+
+
+=item Set()
+
+=item m_set()
+
+ $mat->Set($index, $value);
+
+C<m_set()> extends the <Set()> to make it possible to collectively set
+the element. As follows, C<$index> is an array reference.
+
+ $mat = Cv::Mat->new([ 2, 2 ], CV_32FC2);
+ $value = [ 100, 100 ];
+ 
+If any part of the index is omitted, 0 is supplemented.
+
+ $mat->m_set([@$index, 0], $value);
+
+In the case where C<$value> is given as a list, the value of the
+element is set as follows in order from C<$index>.
+
+ $mat->m_set([@$index, $_], $value->[$_]) for 0 .. $#{$value};
+
+For example,
+
+ $mat->Set([ 0, 1 ], $value);
+ # (1) set element [ 0, 1 ]
+ # [
+ #   [ [ 0, 0 ], [ 100, 100 ] ],
+ #   [ [ 0, 0 ], [   0,   0 ] ],
+ # ]
+ 
+ $mat->Set([ 1 ], $value);
+ # (2) set element [ 0, 1 ]
+ # [
+ #   [ [   0,   0 ], [   0,   0 ] ],
+ #   [ [ 100, 100 ], [   0,   0 ] ],
+ # ]
+ 
+ $mat->Set([ 1 ], [ ($value) x 2 ]);
+ # (2)' set element [ 0, 1 ], [ 1, 1 ]
+ # [
+ #   [ [   0,   0 ], [   0,   0 ] ],
+ #   [ [ 100, 100 ], [ 100, 100 ] ],
+ # ]
+ 
+ $mat->Set([], $value);
+ # (3) set element [ 0, 0 ]
+ # [
+ #   [ [ 100, 100 ], [   0,   0 ] ],
+ #   [ [   0,   0 ], [   0,   0 ] ],
+ # ]
+ 
+ $mat->Set([], [ [ $value ], [ ($value) x 2 ] ]);
+ # (3)' set element [ 0, 0 ], [ 0, 1 ], [ 1, 1 ]
+ # [
+ #   [ [ 100, 100 ], [ 100, 100 ] ],
+ #   [ [   0,   0 ], [ 100, 100 ] ],
+ # ]
+
+
+=item ToArray()
+
+ my @array = $arr->ToArray();                                           # (1)
+ my @array = $arr->ToArray($slice);                                     # (2)
+
+Converted into array of points from sequence or matrix (1xN, Nx1). 
+To be able to convert the matrix, this method has been extended
+cvCvtSeqToArray() to convert the sequence. So can specify a range
+$slice give.  This range can be represented by array reference [$
+start, $ end] or cvSlice().  When you omit the range will convert all
+of the elements.
+
+ $arr->ToArray(\my @array);
+ $arr->ToArray(\my @attay, $slice);
+
+It is useful if can use negative index like an array of Perl, which
+can not be.
+
+ my @array = $arr->ToArray([ -1, 1 ]); # cannot use
+ my @array = $arr->ToArray([ 1, -1 ]); # cannot use
+
+=back
+
+
+=head3 Other Method
+
+=over
+
+=item GetBuildInformation()
+
+  my $info = Cv->GetBuildInformation()
+  my %info = Cv->GetBuildInformation()
+
+Build-time information can be retrieved from OpenCV 2.4.0.  If the
+scalar context, returns the return value of
+C<cv::getBuildInformation()>.  If the list context, it returns the
+following results.
+
+  'OpenCV modules' => {
+	'Disabled by dependency' => '-',
+	'Unavailable' => 'androidcamera java ocl',
+	'Disabled' => 'world',
+	'To be built' => 'core imgproc flann highgui features2d calib3d ml video objdetect contrib nonfree photo legacy gpu python stitching ts videostab'
+  },
+  'Version control' => 'commit:6484732',
+  'Linker flags (Debug)' => {
+	'Precompiled headers' => 'YES'
+  },
+  ...
+
+t is used in the C <HasModule()>. In order to check the module
+available in OpenCV.
+
+
+=item HasModule()
+
+ my $hasCore = Cv->HasModule('core');
+
+This method returns what has been built to enable any module in OpenCV.
+
+=back
+
+=head1 BUG
+
+=over
+
+=item *
+
+=back
+
+=head1 SEE ALSO
+
+L<Cv::Nihongo|Cv::Nihongo>
+
+=head1 LICENCE
+
+Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+
+Copyright (c) 2012 by Yuta MASUDA.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
