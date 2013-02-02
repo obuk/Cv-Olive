@@ -1,5 +1,8 @@
 Revision history for Cv.pm
 
+0.24 - 2012-02-02
+     * added init for Cv::Seq::Point->new
+
 0.23 - 2012-01-31
      * fixed endRow of cvGetRows
      * fixed cvSolve, cvSolveCubic, cvMinS, Cv::Arr::Min, Cv::Arr::Max

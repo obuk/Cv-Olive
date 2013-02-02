@@ -15,7 +15,13 @@ our @ISA = qw(Cv::Seq);
 { *new = \&CreateSeq }
 sub CreateSeq {
 	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	$class->SUPER::new(@_);
+	my @init = ();
+	while (ref $_[-1] && ref $_[-1] eq 'ARRAY') {
+		CORE::unshift(@init, CORE::pop);
+	}
+	my $self = $class->SUPER::new(@_);
+	$self->Push(@init);
+	$self;
 }
 
 { *Get = \&GetSeqElem }
