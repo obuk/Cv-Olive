@@ -20,16 +20,16 @@ $src->set([2], [rand 3]);
 
 if (1) {
 	my $dst = $src->pow(2);
-	is_deeply({ round => "%.6g" }, $dst->getReal(0), pow2($src->getReal(0)));
-	is_deeply({ round => "%.6g" }, $dst->getReal(1), pow2($src->getReal(1)));
-	is_deeply({ round => "%.6g" }, $dst->getReal(2), pow2($src->getReal(2)));
+	is_deeply({ round => "%.5g" }, $dst->getReal(0), pow2($src->getReal(0)));
+	is_deeply({ round => "%.5g" }, $dst->getReal(1), pow2($src->getReal(1)));
+	is_deeply({ round => "%.5g" }, $dst->getReal(2), pow2($src->getReal(2)));
 }
 
 if (2) {
 	$src->pow(my $dst = $src->new, 2);
-	is_deeply({ round => "%.6g" }, $dst->getReal(0), pow2($src->getReal(0)));
-	is_deeply({ round => "%.6g" }, $dst->getReal(1), pow2($src->getReal(1)));
-	is_deeply({ round => "%.6g" }, $dst->getReal(2), pow2($src->getReal(2)));
+	is_deeply({ round => "%.5g" }, $dst->getReal(0), pow2($src->getReal(0)));
+	is_deeply({ round => "%.5g" }, $dst->getReal(1), pow2($src->getReal(1)));
+	is_deeply({ round => "%.5g" }, $dst->getReal(2), pow2($src->getReal(2)));
 }
 
 if (10) {
