@@ -11,11 +11,11 @@ fallback/Constant.pm-2.4.0
 fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
-lib/Cv-ja.pod
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
+lib/Cv/Nihongo.pod
 lib/Cv/More-ja.pod
 lib/Cv/More.pm
 lib/Cv/More.pod
