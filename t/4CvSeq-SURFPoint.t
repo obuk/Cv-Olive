@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 31;
+use Test::More tests => 32;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -12,7 +12,13 @@ BEGIN { use_ok('Cv') }
 my $stor = Cv::MemStorage->new;
 
 if (1) {
-	my $seq = bless Cv::Seq->new(0, 0, 4 * 6), 'Cv::Seq::SURFPoint';
+	local $Cv::Seq::FLAGS = 0;
+	my $elemSize = CV_ELEM_SIZE(CV_32FC2) +
+		CV_ELEM_SIZE(CV_32SC2) + CV_ELEM_SIZE(CV_32FC2);
+	# my $seq = Cv::Seq->new(0, 0, $elemSize);
+	my $seq = Cv::Seq->new([ 0, $elemSize ]);
+	isa_ok($seq, 'Cv::Seq');
+	bless $seq, 'Cv::Seq::SURFPoint';
 
 	$seq->push([[ 1, 2 ], 3, 4, 5, 6]);
 	my $x = $seq->pop;

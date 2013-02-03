@@ -1274,6 +1274,7 @@ OUTPUT:
 
 int
 mat_type(CvSeq* seq)
+ALIAS: type = 1
 CODE:
 	RETVAL = CV_MAT_TYPE(seq->flags);
 OUTPUT:

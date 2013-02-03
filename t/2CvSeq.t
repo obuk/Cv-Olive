@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 63;
+use Test::More tests => 59;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -27,11 +27,6 @@ if (1) {
 	}
 	is($destroy, 4);
 
-	my $new = 0;
-	local *{Cv::Seq::new} = sub { $new++; };
-	Cv->CreateSeq();
-	is($new, 1);
-
 	my $Cv = bless [], 'Cv';
 	e { $Cv->CreateSeq() };
 	err_is('class name needed');
@@ -40,7 +35,6 @@ if (1) {
 	e { $Cv_Seq->CreateSeq() };
 	err_is('class name needed');
 }
-
 
 if (2) {
 	my $cn = 3;
@@ -64,24 +58,22 @@ if (2) {
 
 if (3) {
 	my $seq = Cv::Seq->new;
-
 	$seq->push(pack("i2", 100, 200));
 	my @pt = unpack("i2", $seq->pop);
-	is($pt[0], 100);
-	is($pt[1], 200);
-
+	is_deeply([@pt], [100, 200]);
 	$seq->push(pack("i2", 101, 201));
 	my @pt2 = unpack("i2", $seq->get(0));
-	is($pt2[0], 101);
-	is($pt2[1], 201);
-
+	is_deeply([@pt2], [101, 201]);
 	$seq->set(0, pack("i2", 111, 222));
 	my @pt3 = unpack("i2", $seq->shift);
-	is($pt3[0], 111);
-	is($pt3[1], 222);
-
+	is_deeply([@pt3], [111, 222]);
 	$seq->unshift(pack("i2", @pt3));
 	my @pt4 = unpack("i2", $seq->shift);
-	is($pt4[0], 111);
-	is($pt4[1], 222);
+	is_deeply([@pt4], [111, 222]);
+}
+
+if (4) {
+	my $seq = Cv::Seq->new;
+	my $seq2 = $seq->new;
+	is($seq2->type, $seq->type);
 }

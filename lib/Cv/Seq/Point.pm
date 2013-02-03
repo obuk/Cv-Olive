@@ -12,16 +12,14 @@ our @ISA = qw(Cv::Seq);
 
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
-{ *new = \&CreateSeq }
+sub new {
+	my $self = shift;
+	$self->SUPER::new(@_);
+}
+
 sub CreateSeq {
-	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	my @init = ();
-	while (ref $_[-1] && ref $_[-1] eq 'ARRAY') {
-		CORE::unshift(@init, CORE::pop);
-	}
-	my $self = $class->SUPER::new(@_);
-	$self->Push(@init);
-	$self;
+	my $self = shift;
+	$self->SUPER::CreateSeq(@_);
 }
 
 { *Get = \&GetSeqElem }
