@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 87;
+use Test::More tests => 65;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -21,7 +21,7 @@ if (2) {
 	is($arr->rows, 1);
 	is($arr->cols, 1);
 	my $x = $arr->sum;
-	is($x->[0], 1);
+	is_deeply(cvScalar(@$x), cvScalar(1));
 }
 
 if (3) {
@@ -30,7 +30,7 @@ if (3) {
 	is($arr->rows, 1);
 	is($arr->cols, 3);
 	my $x = $arr->sum;
-	is($x->[0], 1 + 2 + 3);
+	is_deeply(cvScalar(@$x), cvScalar(1 + 2 + 3));
 }
 
 if (4) {
@@ -39,7 +39,7 @@ if (4) {
 	is($arr->rows, 1);
 	is($arr->cols, 3);
 	my $x = $arr->sum;
-	is($x->[0], 1 + 2 + 3);
+	is_deeply(cvScalar(@$x), cvScalar(1 + 2 + 3));
 }
 
 if (5) {
@@ -48,9 +48,7 @@ if (5) {
 	is($arr->rows, 1);
 	is($arr->cols, 1);
 	my $x = $arr->sum;
-	is($x->[0], 1);
-	is($x->[1], 2);
-	is($x->[2], 3);
+	is_deeply(cvScalar(@$x), cvScalar(1, 2, 3));
 }
 
 if (6) {
@@ -62,7 +60,7 @@ if (6) {
 	is($arr->rows, 2);
 	is($arr->cols, 3);
 	my $x = $arr->sum;
-	is($x->[0], (1 + 2 + 3) * 2);
+	is_deeply(cvScalar(@$x), cvScalar((1 + 2 + 3)*2));
 }
 
 if (7) {
@@ -74,9 +72,7 @@ if (7) {
 	is($arr->rows, 2);
 	is($arr->cols, 1);
 	my $x = $arr->sum;
-	is($x->[0], 1 * 2);
-	is($x->[1], 2 * 2);
-	is($x->[2], 3 * 2);
+	is_deeply(cvScalar(@$x), cvScalar(map { $_ * 2 } (1, 2, 3)));
 }
 
 if (8) {
@@ -90,9 +86,7 @@ if (8) {
 	is($arr->rows, 1);
 	is($arr->cols, 2);
 	my $x = $arr->sum;
-	is($x->[0], 1 * 2);
-	is($x->[1], 2 * 2);
-	is($x->[2], 3 * 2);
+	is_deeply(cvScalar(@$x), cvScalar(map { $_ * 2 } (1, 2, 3)));
 }
 
 if (9) {
@@ -104,9 +98,7 @@ if (9) {
 	is($arr->rows, 2);
 	is($arr->cols, 1);
 	my $x = $arr->sum;
-	is($x->[0], 1 * 2);
-	is($x->[1], 2 * 2);
-	is($x->[2], 3 * 2);
+	is_deeply(cvScalar(@$x), cvScalar(map { $_ * 2 } (1, 2, 3)));
 }
 
 if (10) {
@@ -115,41 +107,41 @@ if (10) {
 	is($arr->rows, 3);
 	is($arr->cols, 3);
 
-	my @list = ();
-	
 	$arr->set(
 		[],
 		[ [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ], ],
 		  [ [ 1, 0 ], [ 1, 1 ], [ 1, 2 ], ],
 		  [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ], ], ],
 		);
-
-	is($arr->get([ 1, 0 ])->[0], 1); is($arr->get([ 1, 0 ])->[1], 0);
-	is($arr->get([ 1, 1 ])->[0], 1); is($arr->get([ 1, 1 ])->[1], 1);
-	is($arr->get([ 1, 2 ])->[0], 1); is($arr->get([ 1, 2 ])->[1], 2);
+	is_deeply(cvScalar(@{$arr->get([1, 0])}), cvScalar(1, 0));
+	is_deeply(cvScalar(@{$arr->get([1, 1])}), cvScalar(1, 1));
+	is_deeply(cvScalar(@{$arr->get([1, 2])}), cvScalar(1, 2));
 
 	$arr->set(
 		[ 1 ],
 		[ [ 11, 10 ], [ 11, 11 ], [ 11, 12 ], ],
 		);
-
-	is($arr->get([ 0, 0 ])->[0], 0); is($arr->get([ 0, 0 ])->[1], 0);
-	is($arr->get([ 0, 1 ])->[0], 0); is($arr->get([ 0, 1 ])->[1], 1);
-	is($arr->get([ 0, 2 ])->[0], 0); is($arr->get([ 0, 2 ])->[1], 2);
-
-	is($arr->get([ 1, 0 ])->[0], 11); is($arr->get([ 1, 0 ])->[1], 10);
-	is($arr->get([ 1, 1 ])->[0], 11); is($arr->get([ 1, 1 ])->[1], 11);
-	is($arr->get([ 1, 2 ])->[0], 11); is($arr->get([ 1, 2 ])->[1], 12);
-
-	is($arr->get([ 2, 0 ])->[0], 2); is($arr->get([ 2, 0 ])->[1], 0);
-	is($arr->get([ 2, 1 ])->[0], 2); is($arr->get([ 2, 1 ])->[1], 1);
-	is($arr->get([ 2, 2 ])->[0], 2); is($arr->get([ 2, 2 ])->[1], 2);
+	is_deeply(cvScalar(@{$arr->get([0, 0])}), cvScalar( 0,  0));
+	is_deeply(cvScalar(@{$arr->get([0, 1])}), cvScalar( 0,  1));
+	is_deeply(cvScalar(@{$arr->get([0, 2])}), cvScalar( 0,  2));
+	is_deeply(cvScalar(@{$arr->get([1, 0])}), cvScalar(11, 10));
+	is_deeply(cvScalar(@{$arr->get([1, 1])}), cvScalar(11, 11));
+	is_deeply(cvScalar(@{$arr->get([1, 2])}), cvScalar(11, 12));
+	is_deeply(cvScalar(@{$arr->get([2, 0])}), cvScalar( 2,  0));
+	is_deeply(cvScalar(@{$arr->get([2, 1])}), cvScalar( 2,  1));
+	is_deeply(cvScalar(@{$arr->get([2, 2])}), cvScalar( 2,  2));
 
 	$arr->set([ 1 ], [ 21, 0 ]);
+	is_deeply(cvScalar(@{$arr->get([1, 0])}), cvScalar(21,  0));
+	is_deeply(cvScalar(@{$arr->get([1, 1])}), cvScalar(11, 11));
+	is_deeply(cvScalar(@{$arr->get([1, 2])}), cvScalar(11, 12));
 
 	$arr->set([ 1, 0 ], [ 31, 0 ]);
 	$arr->set([ 1, 1 ], [ 31, 1 ]);
 	$arr->set([ 1, 2 ], [ 31, 2 ]);
+	is_deeply(cvScalar(@{$arr->get([1, 0])}), cvScalar(31,  0));
+	is_deeply(cvScalar(@{$arr->get([1, 1])}), cvScalar(31,  1));
+	is_deeply(cvScalar(@{$arr->get([1, 2])}), cvScalar(31,  2));
 }
 
 
@@ -162,7 +154,9 @@ if (12) {
 	my $data = chr(0) x ($rows * $step);
 	substr($data, 0 + $_, 1) = chr(0x41 + $_) for 0 .. $cn - 1;
 	my $mat = Cv::Mat->new([ $rows, $cols ], CV_8UC($cn), $data);
-	is($mat->get([0, 0])->[$_], 0x41 + $_) for 0 .. $cn - 1;
+	is_deeply(cvScalar(@{$mat->get([0, 0])}),
+			  cvScalar(map { 0x41 + $_ } 0 .. $cn - 1),
+		);
 }
 
 if (13) {
@@ -173,7 +167,9 @@ if (13) {
 	my $data = chr(0) x ($rows * $step);
 	substr($data, 0 + $_, 1) = chr(0x41 + $_) for 0 .. $cn - 1;
 	my $mat = Cv::Mat->new([ $rows, $cols ], CV_8UC($cn), $data, $step);
-	is($mat->get([0, 0])->[$_], 0x41 + $_) for 0 .. $cn - 1;
+	is_deeply(cvScalar(@{$mat->get([0, 0])}),
+			  cvScalar(map { 0x41 + $_ } 0 .. $cn - 1),
+		);
 }
 
 # cover
@@ -185,7 +181,7 @@ if (14) {
 	my ($x1, $y1) = (0, 0);
 	$src->set([$y0 + $y1, $x0 + $x1], my $v1 = [1, 2, 3]);
 	my $v2 = $submat->get([$y1, $x1]);
-	is($v1->[$_], $v2->[$_]) for 0 .. $src->channels - 1;
+	is_deeply(cvScalar(@$v1), cvScalar(@$v2));
 }
 
 if (15) {

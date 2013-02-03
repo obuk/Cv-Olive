@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 693;
+use Test::More tests => 733;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -116,4 +116,27 @@ for my $class (keys %TYPENAME) {
 		my $arr2_phys = $arr2->phys;
 		is($arr2_phys, $arr_phys);
 	}
+}
+
+for my $src_class (keys %TYPENAME) {
+	my $src = $src_class->new([240, 320], CV_32FC2);
+
+	if (6) {
+		for my $dst_class (keys %TYPENAME) {
+			my $new = "${dst_class}::new";
+			my $dst = $src->$new;
+			is_deeply($dst->sizes, $src->sizes);
+			is_deeply($dst->type, $src->type);
+		}
+	}
+
+	if (7) {
+		for my $dst_class (qw(Cv::Seq Cv::Seq::Point)) {
+			my $stor = Cv::MemStorage->new;
+			my $new = "${dst_class}::new";
+			my $seq = $src->$new($stor);
+			is($seq->mat_type, $src->type);
+		}
+	}
+
 }

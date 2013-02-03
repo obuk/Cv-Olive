@@ -146,6 +146,7 @@ if (6) {
 	is($p1->[0], 3);
 }
 
+
 # new() with init
 if (7) {
 	my $stor = Cv::MemStorage->new;

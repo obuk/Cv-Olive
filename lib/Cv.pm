@@ -134,8 +134,7 @@ sub new_args (\@) {
 	my $sizes = @$x && ref $x->[0] eq 'ARRAY' ? shift(@$x) :
 		ref $self ? $self->sizes : undef;
 	Carp::croak 'size not specified in ', (caller 1)[3] unless defined $sizes;
-	my $type  = @$x ? shift(@$x) :
-		ref $self ? $self->type  : undef;
+	my $type  = @$x ? shift(@$x) : ref $self ? $self->type : undef;
 	Carp::croak 'type not specified in ', (caller 1)[3] unless defined $type;
 	($self, $sizes, $type);
 }
@@ -146,7 +145,7 @@ sub Cv::Image::new {
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
 	my ($rows, $cols) = @$sizes;
 	my $image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
-	$image->origin($self->origin) if ref $self;
+	$image->origin($self->origin) if ref $self && $self->isa('Cv::Image');
 	$image;
 }
 
@@ -1368,7 +1367,7 @@ sub Filter2D {
 sub Laplace {
 	# Laplace(src, dst, [apertureSize])
 	my $src = shift;
-	my $dst = dst(@_) || $src->new(&Cv::CV_16SC(&Cv::CV_MAT_CN($src->type)));
+	my $dst = dst(@_) || $src->new(&Cv::CV_16SC($src->channels));
 	unshift(@_, $src, $dst);
 	goto &cvLaplace;
 }
@@ -1559,12 +1558,12 @@ sub CvtColor {
 		} elsif ($code == &Cv::CV_BGR2RGB   || $code == &Cv::CV_RGB2BGR) {
 			$dst = $src->new;
 		} elsif ($code == &Cv::CV_BGR2GRAY  || $code == &Cv::CV_RGB2GRAY) {
-			$dst = $src->new($src->sizes, &Cv::CV_MAKETYPE($src->type, 1));
+			$dst = $src->new(&Cv::CV_MAKETYPE($src->type, 1));
 		} elsif ($code == &Cv::CV_GRAY2BGR  || $code == &Cv::CV_GRAY2RGB  ||
 				 $code == &Cv::CV_BGR2HSV   || $code == &Cv::CV_RGB2HSV   ||
 				 $code == &Cv::CV_BGR2YCrCb || $code == &Cv::CV_RGB2YCrCb ||
 				 $code == &Cv::CV_YCrCb2BGR || $code == &Cv::CV_YCrCb2RGB) {
-			$dst = $src->new($src->sizes, &Cv::CV_MAKETYPE($src->type, 3));
+			$dst = $src->new(&Cv::CV_MAKETYPE($src->type, 3));
 		}
 	}
 	unshift(@_, $src, $dst, $code);
