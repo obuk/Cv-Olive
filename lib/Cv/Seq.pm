@@ -69,7 +69,8 @@ sub new {
 	$flags = $FLAGS unless defined $flags;
 	$hSize ||= &Cv::CV_SIZEOF('CvSeq'),
 	$eSize ||= &Cv::CV_ELEM_SIZE($flags);
-	my $class = $self->isa('Cv::Seq') && ref $self || __PACKAGE__;
+	my $class = $self->isa('Cv::Seq') && $self || __PACKAGE__;
+	$class = ref $class if ref $class;
 	bless Cv::cvCreateSeq($flags, $hSize, $eSize, $stor), $class;
 }
 

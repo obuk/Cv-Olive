@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 59;
+use Test::More tests => 63;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -73,7 +73,13 @@ if (3) {
 }
 
 if (4) {
-	my $seq = Cv::Seq->new;
-	my $seq2 = $seq->new;
-	is($seq2->type, $seq->type);
+	my $src = Cv::Seq->new;
+	my $seq = $src->new;
+	is($seq->type, $src->type);
+
+	for my $dst_class (qw(Cv::Mat Cv::MatND Cv::SparseMat Cv::Image)) {
+		my $new = "${dst_class}::new";
+		my $mat = $src->$new([240, 320]);
+		is($mat->type, $src->type);
+	}
 }
