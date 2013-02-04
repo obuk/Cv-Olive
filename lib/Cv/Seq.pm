@@ -23,20 +23,6 @@ package Cv::Seq;
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 our %TEMPLATE;
-our $STORAGE;
-
-sub STORAGE {
-	$STORAGE ||= Cv::MemStorage->new();
-}
-
-sub stor (\@) {
-	my $storage;
-	for (my $i = 0; $i < @{$_[0]}; $i++) {
-		($storage) = splice(@{$_[0]}, $i, 1), last
-			if Cv::is_cvmem(${$_[0]}[$i]);
-	}
-	$storage ||= &STORAGE;
-}
 
 sub template {
 	my $self = CORE::shift;
@@ -62,7 +48,7 @@ our @SIZES = (0, 0);
 
 sub new {
 	my $self = CORE::shift;
-	my $stor = stor(@_);
+	my $stor = Cv::stor(@_);
 	my $sizes = @_ && ref $_[0] eq 'ARRAY' ? CORE::shift : undef;
 	my ($hSize, $eSize) = $sizes ? @$sizes : @SIZES;
 	my $flags = @_ ? CORE::shift : ref $self ? $self->type : undef;
@@ -81,7 +67,7 @@ sub CreateSeq {
 	#	int seqType, int headerSize, int elemSize,
 	#	CvMemStorage* storage)
 	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	my $stor = stor(@_);
+	my $stor = Cv::stor(@_);
 	my $flags = CORE::shift;
 	$flags = $FLAGS unless defined $flags;
 	my $hSize = CORE::shift || $SIZES[0] || &Cv::CV_SIZEOF('CvSeq');

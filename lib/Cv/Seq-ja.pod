@@ -67,6 +67,23 @@ C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
 
 =back
 
+=head2 ヒント
+
+=head3 メモリの解放
+
+動的なメモリは、主にシーケンスを置く領域として使います。Cv の中はそれが
+必要な呼出しにおいて与えられないとき、内部で確保することがあります。確
+保した領域は $Cv::STORAGE に置きますが、動的なメモリは、使い方によって
+は、その成長を制限する必要があります。OpenCV は cvClearMemStorage() を
+呼んでリセットできるようにしていますが、Perl では、次のとおり local を
+使うと簡単です。
+
+ {
+   local $Cv::STORAGE = $Cv::STORAGE;
+   my $seq = Cv::Seq::Point->new();
+   ...
+ }
+
 =head1 バグ
 
 =head1 参考

@@ -2,7 +2,8 @@ Revision history for Cv.pm
 
 0.24 - 2012-02-02
      * added init for Cv::Seq::Point->new
-     * reduced constraints in the object inheritance
+     * fixed CvSeq object inheritance
+     * changed Cv::Seq::STORAGE to Cv::STORAGE
 
 0.23 - 2012-01-31
      * fixed endRow of cvGetRows

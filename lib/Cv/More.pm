@@ -393,7 +393,7 @@ sub FitLine {
 { *Cv::MinAreaRect = *Cv::MinAreaRect2 = \&MinAreaRect2 }
 sub MinAreaRect2 {
     my $self = shift;
-	&Cv::Seq::stor(\@_);		# remove memstorage;
+	&Cv::stor(@_);				# remove memstorage;
     unless (ref $self) {
 		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
 	}

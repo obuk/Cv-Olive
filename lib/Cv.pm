@@ -1082,6 +1082,21 @@ package Cv;
 
 sub is_cvmem { Scalar::Util::blessed $_[0] && $_[0]->isa('Cv::MemStorage') }
 
+our $STORAGE;
+
+sub STORAGE {
+	$STORAGE ||= &cvCreateMemStorage(0);
+}
+
+sub stor (\@) {
+	my $storage;
+	for (my $i = 0; $i < @{$_[0]}; $i++) {
+		($storage) = splice(@{$_[0]}, $i, 1), last
+			if Cv::is_cvmem(${$_[0]}[$i]);
+	}
+	$storage ||= &STORAGE;
+}
+
 package Cv::MemStorage;
 { *new = \&Cv::CreateMemStorage }
 
