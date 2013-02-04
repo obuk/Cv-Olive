@@ -139,7 +139,21 @@ sub s_new {
 		CORE::unshift(@init, CORE::pop);
 	}
 	my $self = $class->SUPER::new(@_);
-	$self->Push(@init);
+	if (@init) {
+		my @dims = Cv::m_dims(@init);
+		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($self->type);
+		if (@dims > 1 && $dims[0] == 1) {
+			shift(@dims); @init = @{$init[0]};
+		}
+		if (@dims == 1 && $dims[0] > 1) {
+			@init = map { [ $_ ] } @init if &Cv::CV_MAT_CN($self->type) == 1;
+		}
+		if (@dims == 1) {
+			$self->Push(@init);
+		} else {
+			Carp::croak "can't init in ", (caller 0)[3];
+		}
+	}
 	$self;
 }
 

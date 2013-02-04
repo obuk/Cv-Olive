@@ -145,7 +145,7 @@ sub Cv::Image::new {
 	my ($channels, $depth) = (&Cv::CV_MAT_CN($type), &Cv::CV2IPL_DEPTH($type));
 	my ($rows, $cols) = @$sizes;
 	my $image = Cv::cvCreateImage([$cols, $rows], $depth, $channels);
-	$image->origin($self->origin) if ref $self && $self->isa('Cv::Image');
+	$image->origin($self->origin) if ref $self && $self->can('origin');
 	$image;
 }
 
