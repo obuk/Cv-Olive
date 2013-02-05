@@ -98,7 +98,7 @@ e { my @line = Cv->FitLine([]) };
 err_is('points is not [ pt1, pt2, ... ] in Cv::Arr::FitLine');
 
 e { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) };
-err_is('OpenCV Error: Bad argument (User-defined distance is not allowed) in cvFitLine');
+err_like("OpenCV Error:");
 
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
