@@ -44,7 +44,6 @@ if (2) {
 if (10) {
 	my $mats = Cv::SparseMat->new([320, 240], CV_8UC4);
 	e { $mats->split };
-	# err_is('OpenCV Error: Bad argument (Unknown array type) in cvarrToMat');
 	err_like('OpenCV Error:');
 }
 

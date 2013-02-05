@@ -17,7 +17,7 @@ if (1) {
 	isa_ok($arr, $class);
 
 	e { $arr->size };
-	err_is("OpenCV Error: Bad argument (Array should be CvMat or IplImage) in cvGetSize");
+	err_like("OpenCV Error:");
 
 	e { $arr->origin };
 	err_is("can't call ${class}::origin");
@@ -46,7 +46,7 @@ if (2) {
 	}
 	
 	e { $class->new([-1, -1], CV_8UC3) };
-	err_is("OpenCV Error: Incorrect size of input array (one of dimesion sizes is non-positive) in cvInitMatNDHeader");
+	err_like("OpenCV Error:");
 	# e { $class->new };
 	# err_is("${class}::new: ?sizes");
 	# e { $class->new([320, 240]) };

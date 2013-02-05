@@ -44,5 +44,5 @@ if (10) {
 	my $class = qw(Cv::SparseMat);
 	my $mat = $class->new([320, 240], CV_8UC3);
 	e { $mat->getRawData(my $rawData, my $rawStep, my $rawSize) };
-	err_is('OpenCV Error: Bad argument (unrecognized or unsupported array type) in cvGetRawData', "$class->getRowData");
+	err_like("OpenCV Error:");
 }

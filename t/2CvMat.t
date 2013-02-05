@@ -14,7 +14,7 @@ my $class = 'Cv::Mat';
 # type: ${class}->new([ $rows, $cols ], $type);
 if (2) {
 	e { ${class}->new([-1, -1], CV_8UC3) };
-	err_is("OpenCV Error: Incorrect size of input array (Non-positive width or height) in cvCreateMatHeader");
+	err_like("OpenCV Error:");
 	# e { ${class}->new };
 	# err_is("${class}::new: ?sizes");
 	# e { ${class}->new([320, 240]) };
