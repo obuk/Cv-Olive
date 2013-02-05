@@ -1428,14 +1428,17 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV*
 cvCvtSeqToArray(const CvSeq* seq, SV* elements, CvSlice slice=CV_WHOLE_SEQ)
 INIT:
-	int n, size;
-CODE:
-	if (slice.start_index < 0) slice.start_index = 0;
-	if (slice.end_index > seq->total) slice.end_index = seq->total;
-	if (slice.end_index < slice.start_index) XSRETURN_UNDEF;
-	n = slice.end_index - slice.start_index; size = n*seq->elem_size;
+	int s = slice.start_index, e = slice.end_index - 1, n = seq->total, size;
+	if (e == CV_WHOLE_SEQ_END_INDEX - 1) e = n - 1;
+	if (n) {
+		s %= n; if (s < 0) s += n;
+		e %= n; if (e < 0) e += n;
+	}
+	n = ((s <= e)? e - s : n - (s - e)) + 1;
+	size = n * seq->elem_size;
 	sv_setpvn(elements, "", size);
 	SvCUR_set(elements, size);
+CODE:
 	cvCvtSeqToArray(seq, SvPV_nolen(elements), slice);
 OUTPUT:
 	RETVAL ST(0) = SvREFCNT_inc(elements);
