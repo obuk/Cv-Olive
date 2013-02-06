@@ -9,7 +9,7 @@
 \~$
 lib/Cv/(perl|pp|sv)\.h$
 lib/Cv/Constant\.pm$
-^Cv\.(bs|c|o)$
+*\.(bs|c|o)$
 ^const-(c|xs).inc$
 Makefile$
 MYMETA\.yml$
