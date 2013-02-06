@@ -26,7 +26,7 @@ if (1) {
 	$B->set([2], [$bz]);
 	my $X = $A->crossProduct($B);
 	my ($x, $y, $z) = ($X->getReal(0), $X->getReal(1), $X->getReal(2));
-	is_deeply({ round => "%.4g" }, cvScalar($x, $y, $z),
+	is_deeply({ round => "%.3g" }, cvScalar($x, $y, $z),
 			  cvScalar($ay * $bz - $az * $by,
 					   $az * $bx - $ax * $bz,
 					   $ax * $by - $ay * $bx),

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
+use Test::More tests => 7;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -44,10 +44,11 @@ if (3) {
 	my $det = $src->invert(my $inv = $src->new);
 	my $D = ($a * $d - $b * $c);
 	is($det != 0, $D != 0);
-	if ($D) { is($inv->getReal([0, 0]),  $d / $D) } else { ok(1) }
-	if ($D) { is($inv->getReal([0, 1]), -$b / $D) } else { ok(1) }
-	if ($D) { is($inv->getReal([1, 0]), -$c / $D) } else { ok(1) }
-	if ($D) { is($inv->getReal([1, 1]),  $a / $D) } else { ok(1) }
+	is_deeply({ round => '%.13g' },
+			  [ map { $inv->getReal($_) * $D }
+				[0, 0], [0, 1], [1, 0], [1, 1] ],
+			  [ $d, -$b, -$c, $a ]
+		);
 }
 
 if (10) {
