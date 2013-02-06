@@ -3,19 +3,18 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 9;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
+BEGIN {	use_ok('Cv::Typemap') }
 
 my ($x, $y) = unpack("f*", pack("f*", map { rand 1 } 0..1));
 my $pt = cvPoint2D32f($x, $y);
 is_deeply($pt, [ $x, $y ]);
 
-SKIP: {
-	skip "no T", 6 unless Cv->can('CvPoint2D32f');
-
+if (1) {
 	{
 		my $pt2 = Cv::CvPoint2D32f($pt);
 		is_deeply($pt2, $pt);

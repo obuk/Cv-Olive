@@ -138,7 +138,6 @@ t/1config.t
 t/1const-old.t
 t/1const.t
 t/1CvBox2D.t
-t/1CvCircle.t
 t/1CvConnectedComp.t
 t/1CvPoint.t
 t/1CvPoint2D32f.t

@@ -3,20 +3,19 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
+use Test::More tests => 11;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
+BEGIN {	use_ok('Cv::Typemap') }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
 my ($epsilon) = map { int rand 10 } 3;
 my $term = cvTermCriteria($type, $max_iter, $epsilon);
 is_deeply($term, [$type, $max_iter, $epsilon]);
 
-SKIP: {
-	skip "no T", 8 unless Cv->can('CvTermCriteria');
-
+if (1) {
 	{
 		my $term2 = Cv::CvTermCriteria($term);
 		is_deeply($term2, $term);

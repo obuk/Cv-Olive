@@ -2,18 +2,17 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 11;
+# use Test::More qw(no_plan);
+use Test::More tests => 11;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
+BEGIN {	use_ok('Cv::Typemap') }
 
 my ($x, $y) = map { (int rand 65536) } 0..1;
 
-SKIP: {
-	skip "no T", 10 unless Cv->can('CvPointPtr');
-
+if (1) {
 	my $arr = Cv::cvPointPtr($x, $y);
 	is(ref $arr, 'ARRAY');
 	is(scalar @$arr, 1);

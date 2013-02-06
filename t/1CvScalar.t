@@ -3,11 +3,12 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 17;
+use Test::More tests => 18;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
+BEGIN {	use_ok('Cv::Typemap') }
 
 my @val = unpack("d*", pack("d*", map { rand 1 } 0..3));
 my $scalar = Cv::cvScalar(@val);
@@ -38,9 +39,7 @@ TODO: {
 	err_is("Usage: Cv::cvScalar(val0, val1=0, val2=0, val3=0)");
 }
 
-SKIP: {
-	skip "no T", 10 unless Cv->can('CvScalar');
-
+if (1) {
 	{
 		my $sc = Cv::CvScalar($scalar);
 		is_deeply($sc, $scalar);

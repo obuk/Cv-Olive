@@ -3,17 +3,16 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 7;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
+BEGIN {	use_ok('Cv::Typemap') }
 
 my @doublePtr = unpack("d*", pack("d*", map { rand 1 } 1 .. 100));
 
-SKIP: {
-	skip "no T", 5 unless Cv->can('doublePtr');
-
+if (1) {
 	{
 		my $doublePtr = Cv::doublePtr(\@doublePtr);
 		is_deeply($doublePtr, \@doublePtr);

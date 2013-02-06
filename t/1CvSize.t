@@ -3,19 +3,18 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 9;
 use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
+BEGIN {	use_ok('Cv::Typemap') }
 
 my ($width, $height) = map { int rand 16384 } 0..1;
 my $size = Cv::cvSize($width, $height);
 is_deeply($size, [$width, $height]);
 
-SKIP: {
-	skip "no T", 6 unless Cv->can('CvSize');
-
+if (1) {
 	{
 		my $size2 = Cv::CvSize($size);
 		is_deeply($size2, $size);
