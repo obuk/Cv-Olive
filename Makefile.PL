@@ -77,9 +77,7 @@ WriteMakefile(
 	CCFLAGS => $cf->ccflags,
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
-	DIR => [
-		qw(Typemap),
-	],
+	DIR => [ qw(T) ],
 	clean => {
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',

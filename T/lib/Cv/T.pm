@@ -1,8 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
-package Cv::Typemap;
+package Cv::T;
 
-use 5.014002;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -23,30 +23,25 @@ our @EXPORT = qw(
 our $VERSION = '0.01';
 
 require XSLoader;
-XSLoader::load('Cv::Typemap', $VERSION);
-
-# Preloaded methods go here.
+XSLoader::load('Cv::T', $VERSION);
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+=encoding utf8
 
 =head1 NAME
 
-Cv::Typemap - Perl extension for blah blah blah
+Cv::T - Cv extension for internal testing
 
 =head1 SYNOPSIS
 
-  use Cv::Typemap;
-  blah blah blah
+  use Cv::T;
 
 =head1 DESCRIPTION
 
-Stub documentation for Cv::Typemap, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+This module provides functions for internal testing.  e.g. test the
+typemap of Cv.  If you use this module, It's a harmless but you got
+nothing to be obtained.
 
 =head2 EXPORT
 

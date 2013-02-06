@@ -1,6 +1,6 @@
-Revision history for Perl extension Cv::Typemap.
+Revision history for Perl extension Cv::T
 
 0.01  Wed Feb  6 20:42:00 2013
 	- original version; created by h2xs 1.23 with options
-		-An Cv::Typemap
+		-An Cv::T
 

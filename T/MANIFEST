@@ -3,6 +3,6 @@ Makefile.PL
 MANIFEST
 ppport.h
 README
-Typemap.xs
-t/Cv-Typemap.t
-lib/Cv/Typemap.pm
+T.xs
+t/T.t
+lib/Cv/T.pm

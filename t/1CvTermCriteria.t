@@ -8,7 +8,7 @@ use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
-BEGIN {	use_ok('Cv::Typemap') }
+BEGIN {	use_ok('Cv::T') }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
 my ($epsilon) = map { int rand 10 } 3;

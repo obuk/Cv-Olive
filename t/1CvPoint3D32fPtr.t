@@ -8,7 +8,7 @@ use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
-BEGIN {	use_ok('Cv::Typemap') }
+BEGIN {	use_ok('Cv::T') }
 
 my ($x, $y, $z) = unpack("f*", pack("f*", map { rand 1 } 0..2));
 

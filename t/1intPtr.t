@@ -8,7 +8,7 @@ use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
-BEGIN {	use_ok('Cv::Typemap') }
+BEGIN {	use_ok('Cv::T') }
 
 my @intPtr = map { int rand 65536 } 1 .. 100;
 

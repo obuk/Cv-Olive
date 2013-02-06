@@ -106,7 +106,7 @@ static int cb_error(int status, const char* func_name, const char* err_msg,
 	}
 }
 
-MODULE = Cv::Typemap	PACKAGE = Cv
+MODULE = Cv::T		PACKAGE = Cv
 
 # ============================================================
 #  T_CvBox2D
@@ -393,7 +393,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-MODULE = Cv::Typemap	PACKAGE = Cv
+MODULE = Cv::T		PACKAGE = Cv
 # ====================
 BOOT:
 	cvRedirectError(&cb_error, (VOID*)NULL, NULL);

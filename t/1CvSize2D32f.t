@@ -8,7 +8,7 @@ use File::Basename;
 use lib dirname($0);
 use MY;
 BEGIN {	use_ok('Cv', -more) }
-BEGIN {	use_ok('Cv::Typemap') }
+BEGIN {	use_ok('Cv::T') }
 
 my ($width, $height) = unpack("f2", pack("f2", map { rand 1 } 0..1));
 my $size = Cv::cvSize2D32f($width, $height);

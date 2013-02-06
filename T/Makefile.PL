@@ -8,10 +8,10 @@ use Cv::Config;
 my $cf = new Cv::Config;
 
 WriteMakefile(
-	NAME => 'Cv::Typemap',
-	VERSION_FROM => 'lib/Cv/Typemap.pm',
+	NAME => 'Cv::T',
+	VERSION_FROM => 'lib/Cv/T.pm',
 	PREREQ_PM => {},
-	ABSTRACT_FROM => 'lib/Cv/Typemap.pm',
+	ABSTRACT_FROM => 'lib/Cv/T.pm',
 	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	INC => '-I. -I..',
 	LIBS => $cf->libs,
