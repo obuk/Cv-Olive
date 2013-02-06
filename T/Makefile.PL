@@ -20,4 +20,11 @@ WriteMakefile(
 	XSOPT => '-C++ -hiertype',
 	TYPEMAPS => $cf->typemaps,
 	CCFLAGS => $cf->ccflags,
+
+	INST_ARCHLIB => '../tlib/arch',
+	INST_SCRIPT => '../tlib/script',
+	INST_BIN => '../tlib/bin',
+	INST_LIB => '../tlib/lib',
+	INST_MAN1DIR => '../tlib/man1',
+	INST_MAN3DIR => '../tlib/man3',
 );

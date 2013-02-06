@@ -13,7 +13,7 @@ use File::Basename;
 
 our %cv;
 our %CLASS;
-use lib dirname($0);
+use lib map { dirname($0) . "/$_" } qw(. ../tlib/arch ../tlib/lib); # XXXXX
 require "hackcv.pm";
 
 use IO::File;

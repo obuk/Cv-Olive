@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
 use File::Basename;
-use lib dirname($0);
+use lib map { dirname($0) . "/$_" } qw(. ../tlib/arch ../tlib/lib); # XXXXX
 use MY;
 BEGIN {	use_ok('Cv', -more) }
 BEGIN {	use_ok('Cv::T') }
