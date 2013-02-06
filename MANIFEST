@@ -268,6 +268,10 @@ t/4pointSeqFromMat.t
 t/4projectPoints2.t
 t/4toArray.t
 t/4transform.t
+t/8issue10.t
+t/8issue11.t
+t/8issue8.t
+t/8issue9.t
 t/9flipbook.t
 t/9inlineC.t
 t/9pango.t
@@ -275,9 +279,16 @@ t/9pod.t
 t/9ref.t
 t/9threads.t
 t/baboon.jpg
+T/Changes
 t/hackcv.pm
 t/lena.jpg
+T/lib/Cv/T.pm
+T/Makefile.PL
+T/MANIFEST
 t/MY.pm
+T/README
+T/T.xs
+T/t/T.t
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh

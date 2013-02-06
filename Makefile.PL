@@ -82,7 +82,7 @@ WriteMakefile(
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
 			't/ref-*.pm', 'camera.xml', 'contours.xml', 'sample.avi',
-			'_Inline', 'cover_db',
+			'_Inline', 'cover_db', '.lib',
 			] },
 	);
 

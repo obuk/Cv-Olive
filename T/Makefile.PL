@@ -21,10 +21,10 @@ WriteMakefile(
 	TYPEMAPS => $cf->typemaps,
 	CCFLAGS => $cf->ccflags,
 
-	INST_ARCHLIB => '../tlib/arch',
-	INST_SCRIPT => '../tlib/script',
-	INST_BIN => '../tlib/bin',
-	INST_LIB => '../tlib/lib',
-	INST_MAN1DIR => '../tlib/man1',
-	INST_MAN3DIR => '../tlib/man3',
+	INST_ARCHLIB => '../.lib/arch',
+	INST_SCRIPT => '../.lib/script',
+	INST_BIN => '../.lib/bin',
+	INST_LIB => '../.lib/lib',
+	INST_MAN1DIR => '../.lib/man1',
+	INST_MAN3DIR => '../.lib/man3',
 );

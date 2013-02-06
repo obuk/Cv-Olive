@@ -1,7 +1,6 @@
 Changes
 Makefile.PL
 MANIFEST
-ppport.h
 README
 T.xs
 t/T.t
