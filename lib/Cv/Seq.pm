@@ -6,6 +6,8 @@ use 5.008008;
 use strict;
 use warnings;
 
+our $VERSION = '0.24';
+
 use Cv::Seq::Point;
 use Cv::Seq::Point2;
 use Cv::Seq::Circle;
