@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 21;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 22;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv') }
 
 my $stor = Cv::MemStorage->new;

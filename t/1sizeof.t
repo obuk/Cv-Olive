@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
-use File::Basename;
-use lib map { dirname($0) . "/$_" } qw(. ../.lib/arch ../.lib/lib); # XXXXX
-use MY;
+use Test::More tests => 9;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 ok(CV_SIZEOF('CvSeq'));

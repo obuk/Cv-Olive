@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 89;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 90;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 my $class = 'Cv::Image';

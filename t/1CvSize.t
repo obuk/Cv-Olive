@@ -4,11 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
-use File::Basename;
-use lib map { dirname($0) . "/$_" } qw(. ../.lib/arch ../.lib/lib); # XXXXX
-use MY;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
-BEGIN {	use_ok('Cv::T') }
 
 my ($width, $height) = map { int rand 16384 } 0..1;
 my $size = Cv::cvSize($width, $height);

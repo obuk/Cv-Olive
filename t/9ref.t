@@ -10,8 +10,6 @@ BEGIN {
 use File::Basename;
 
 our %cv;
-# our %CLASS;
-use lib dirname($0);
 require "hackcv.pm";
 
 my @TBD = (

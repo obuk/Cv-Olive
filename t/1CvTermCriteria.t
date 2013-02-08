@@ -4,11 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
-use File::Basename;
-use lib map { dirname($0) . "/$_" } qw(. ../.lib/arch ../.lib/lib); # XXXXX
-use MY;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
-BEGIN {	use_ok('Cv::T') }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
 my ($epsilon) = map { int rand 10 } 3;
