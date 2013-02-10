@@ -3363,19 +3363,9 @@ CODE:
 void
 cvSetTrackbarPos(const char* trackbarName, const char* windowName, int pos)
 
-MODULE = Cv	PACKAGE = Cv::Arr
 void
-cvShowImage(const CvArr* image, const char* name = "Cv", int flags = CV_WINDOW_AUTOSIZE)
-CODE:
-	CvWindow* win = cvGetWindowHandle(name);
-	if (!win) {
-		cvNamedWindow(name, flags);
-		win = cvGetWindowHandle(name);
-	}
-	if (win) {
-		cvShowImage(name, image);
-	}
-	XSRETURN(1);
+cvShowImage(const char* name, const CvArr* image)
+
 
 MODULE = Cv	PACKAGE = Cv
 int
@@ -3391,25 +3381,28 @@ cvLoadImage(const char* filename, int iscolor=CV_LOAD_IMAGE_COLOR)
 CvMat*
 cvLoadImageM(const char* filename, int iscolor=CV_LOAD_IMAGE_COLOR)
 
-MODULE = Cv	PACKAGE = Cv::Arr
-NO_OUTPUT int
-cvSaveImage(const CvArr* image, const char* filename, const int* params=0)
-CODE:
-	RETVAL = cvSaveImage(filename, image
+
 #if _CV_VERSION() >= _VERSION(2,0,0)
-		, params
+
+int
+cvSaveImage(const char* filename, const CvArr* image, const int* params=0)
+
+#else
+
+int
+cvSaveImage(const char* filename, const CvArr* image)
+
 #endif
-		);
-POSTCALL:
-	if (!RETVAL) XSRETURN_UNDEF;
-	XSRETURN(1);
+
+
+MODULE = Cv	PACKAGE = Cv::Arr
 
 #if _CV_VERSION() >= _VERSION(2,0,0)
 
 CvMat*
 cvEncodeImage(const CvArr* arr, const char* ext, int* params)
 CODE:
-    int i = length_params & ~1;
+    int i = length(params) & ~1;
 #ifdef __cplusplus
     cv::Mat img = cv::cvarrToMat(arr);
     if (CV_IS_IMAGE(arr) && ((const IplImage*)arr)->origin == IPL_ORIGIN_BL) {

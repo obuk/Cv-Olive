@@ -1787,8 +1787,27 @@ package Cv;
 our %MOUSE = ( );
 our %TRACKBAR = ( );
 
+
 package Cv::Arr;
+
 { *Show = \&ShowImage }
+sub ShowImage {
+	unless (@_ >= 1 && @_ <= 3) {
+		Carp::croak "Usage: ${[ caller 0 ]}[3](image, name, flags=CV_WINDOW_AUTOSIZE)";
+	}
+	my $image = shift;
+	my $name = shift;
+	$name = 'Cv' unless defined $name;
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+	unless (Cv::cvGetWindowHandle($name)) {
+		my $flags = shift;
+		$flags = &Cv::CV_WINDOW_AUTOSIZE unless defined $flags;
+		Cv::cvNamedWindow($name, $flags);
+	}
+	Cv::cvShowImage($name, $image);
+	$image;
+}
+
 
 # ============================================================
 #  highgui. High-level GUI and Media I/O: Reading and Writing Images and Video
@@ -1808,7 +1827,17 @@ package Cv::Mat;
 { *Load = \&Cv::LoadImageM }
 
 package Cv::Arr;
+
 { *Save = \&SaveImage }
+sub SaveImage {
+	unless (@_ >= 2 && @_ <= 3) {
+		Carp::croak "Usage: ${[ caller 0 ]}[3](image, filename, params=0)";
+	}
+	my ($image, $filename) = splice(@_, 0, 2);
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+	my $r = &Cv::cvSaveImage($filename, $image, @_);
+	$r > 0 ? $image : undef;
+}
 
 package Cv::Capture;
 { *FromCAM = \&Cv::CaptureFromCAM }

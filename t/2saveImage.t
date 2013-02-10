@@ -37,7 +37,7 @@ SKIP: {
 
 if (10) {
 	e { $arr->saveImage };
-	err_is('Usage: Cv::Arr::cvSaveImage(image, filename, params=0)');
+	err_is('Usage: Cv::Arr::SaveImage(image, filename, params=0)');
 }
 
 if (11) {

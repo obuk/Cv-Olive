@@ -656,7 +656,7 @@ T_floatPtr
 		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) { int i;
-				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				$var = ($type)alloca(sizeof(${var}[0]) * (length_$var + 1)); /* +1 for safety */
 				for (i = 0; i < length_$var; i++) {
 					SV* p = (SV*)*av_fetch(av, i, 0);
 					((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i] = SvNV(p);
@@ -677,7 +677,7 @@ T_floatPtrPtr
 		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av_outer = (AV*)SvRV($arg); length_$var = av_len(av_outer) + 1;
 			if (length_$var > 0) { int i;
-				$var = ($type)alloca(sizeof(${var}[0])*length_$var);
+				$var = ($type)alloca(sizeof(${var}[0]) * (length_$var + 1)); /* +1 for safety */
 				length_inner_$var = (int*)alloca(sizeof(int*)*length_$var);
 				for (i = 0; i < length_$var; i++) {
 					SV* sv_inner = (SV*)*av_fetch(av_outer, i, 0);
@@ -714,7 +714,7 @@ T_intPtr
 		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
 			AV* av = (AV*)SvRV($arg); length_$var = av_len(av) + 1;
 			if (length_$var > 0) { int i;
-				$var = ($type)alloca(sizeof(${var}[0]) * length_$var);
+				$var = ($type)alloca(sizeof(${var}[0]) * (length_$var + 1)); /* +1 for safety */
 				for (i = 0; i < length_$var; i++) {
 					SV* p = (SV*)*av_fetch(av, i, 0);
 					((@{$type =~ /(const\s+)?(.*)/; [$2]})${var})[i] = SvIV(p);
