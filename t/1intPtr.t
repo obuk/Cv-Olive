@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-BEGIN { use_ok('Cv::T') };
-BEGIN {	use_ok('Cv', -more) }
+BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv', -more) }
 
 my @intPtr = map { int rand 65536 } 1 .. 100;
 

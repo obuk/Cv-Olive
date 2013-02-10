@@ -7,9 +7,10 @@ BEGIN {
 	use_ok('Cv', -more);
 }
 
-use File::Basename;
-
 our %cv;
+
+use File::Basename;
+use lib dirname($0);
 require "hackcv.pm";
 
 my @TBD = (

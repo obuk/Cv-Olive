@@ -392,10 +392,3 @@ CODE:
 	RETVAL = values;
 OUTPUT:
 	RETVAL
-
-MODULE = Cv::T		PACKAGE = Cv
-# ====================
-BOOT:
-	cvRedirectError(&cb_error, (VOID*)NULL, NULL);
-	cvSetErrMode(1);
-	cvSetErrStatus(0);

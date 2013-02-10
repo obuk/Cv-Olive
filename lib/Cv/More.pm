@@ -506,7 +506,8 @@ sub HasModule {
 	no warnings 'redefine';
 	sub cvHasQt {
 		my $hasQt;
-		if (Cv->can('cvFontQt')) {
+		# if (Cv->can('cvFontQt')) {
+		if (1) {
 			my %x = Cv->GetBuildInformation;
 			while (my ($k, $v) = each %{$x{GUI}}) {
 				$hasQt = $k if ($k =~ /^QT \d\.\w+$/i && $v =~ /^YES\.*/i)
@@ -516,15 +517,15 @@ sub HasModule {
 	}
 }
 
-unless (Cv->hasQt) {
-	*Cv::cvSetWindowProperty =
-	*Cv::cvGetWindowProperty =
-	*Cv::cvFontQt =
-	*Cv::Arr::cvAddText =
-	*Cv::cvDisplayOverlay =
-	*Cv::cvDisplayStatusBar =
-	*Cv::cvCreateOpenGLCallback = sub { Carp::croak "no Qt" };
-}
+# unless (Cv->hasQt) {
+# 	*Cv::cvSetWindowProperty =
+# 	*Cv::cvGetWindowProperty =
+# 	*Cv::cvFontQt =
+# 	*Cv::Arr::cvAddText =
+# 	*Cv::cvDisplayOverlay =
+# 	*Cv::cvDisplayStatusBar =
+# 	*Cv::cvCreateOpenGLCallback = sub { Carp::croak "no Qt" };
+# }
 
 1;
 __END__

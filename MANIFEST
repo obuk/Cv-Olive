@@ -32,6 +32,12 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
+Qt/Changes
+Qt/lib/Cv/Qt.pm
+Qt/Makefile.PL
+Qt/MANIFEST
+Qt/Qt.xs
+Qt/README
 README
 sample/aloeL.jpg
 sample/aloeR.jpg
@@ -255,7 +261,6 @@ t/4CvSeq-SURFPoint.t
 t/4CvVideoWriter.t
 t/4fitEllipse.t
 t/4fitLine.t
-t/4fontQt.t
 t/4getBuildInformation.t
 t/4houghCircle.t
 t/4m_get.t
@@ -268,6 +273,7 @@ t/4pointSeqFromMat.t
 t/4projectPoints2.t
 t/4toArray.t
 t/4transform.t
+t/5qt.t
 t/8issue10.t
 t/8issue11.t
 t/8issue8.t
@@ -279,16 +285,14 @@ t/9pod.t
 t/9ref.t
 t/9threads.t
 t/baboon.jpg
-T/Changes
 t/hackcv.pm
 t/lena.jpg
 T/lib/Cv/T.pm
+T/Changes
 T/Makefile.PL
 T/MANIFEST
-t/MY.pm
 T/README
 T/T.xs
-T/t/T.t
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh

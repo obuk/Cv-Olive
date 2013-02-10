@@ -4,9 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 17;
-BEGIN {
-	use_ok('Cv', -more);
-}
+BEGIN { use_ok('Cv', -more) }
 
 # test CV_*_VERSION defined OpenCV
 my @v = Cv::CV_VERSION;

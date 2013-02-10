@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
-BEGIN { use_ok('Cv::T') };
+use Test::More tests => 4;
+BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
@@ -19,10 +19,6 @@ if (1) {
 		$img->show("Font");
 		Cv->waitKey(1000);
 	}
-}
-
-if (2) {
-	ok(!Cv->hasQt);
 }
 
 if (10) {

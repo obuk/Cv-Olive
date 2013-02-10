@@ -9,11 +9,11 @@ BEGIN {
 	use_ok('Cv', -more);
 }
 
-use File::Basename;
-
 our %cv;
 our %CLASS;
 
+use File::Basename;
+use lib dirname($0);
 require "hackcv.pm";
 
 use IO::File;

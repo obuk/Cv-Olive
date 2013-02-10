@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 66;
-BEGIN { use_ok('Cv::T') };
-BEGIN {	use_ok('Cv') }
+BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv') }
 
 if (1) {
 	my $arr = e { Cv::Mat->new([], CV_32FC1) };

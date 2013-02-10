@@ -3373,9 +3373,6 @@ cvGetWindowName(CvWindow* windowHandle)
 int
 cvInitSystem(AV* argv)
 CODE:
-#if !WITH_QT
-	XSRETURN_UNDEF;
-#endif
 	if (av_len(argv) >= 0) {
 		char **av = (char**)alloca(sizeof(char*) * (av_len(argv) + 2)); int ac;
 		if (av == NULL) XSRETURN_UNDEF;
@@ -3619,58 +3616,6 @@ INIT:
 
 int
 cvWriteFrame(CvVideoWriter* writer, const IplImage* image)
-
-# ============================================================
-#  highgui. High-level GUI and Media I/O: Qt new functions
-# ============================================================
-
-#if WITH_QT
-
-#if _CV_VERSION() >= _VERSION(2,0,0)
-
-MODULE = Cv	PACKAGE = Cv
-void
-cvSetWindowProperty(const char* name, int prop_id, double prop_value)
-
-void
-cvGetWindowProperty(const char* name, int prop_id)
-
-#endif
-
-#if _CV_VERSION() >= _VERSION(2,2,0)
-
-CvFont*
-cvFontQt(const char* nameFont, int pointSize = -1, CvScalar color = cvScalarAll(0), int weight = CV_FONT_NORMAL, int style = CV_STYLE_NORMAL, int spacing = 0)
-CODE:
-	Newx(RETVAL, 1, CvFont);
-	*RETVAL = cvFontQt(nameFont, pointSize, color, weight, style, spacing);
-OUTPUT:
-	RETVAL
-
-MODULE = Cv	PACKAGE = Cv::Arr
-void
-cvAddText(const CvArr* img, const char* text, CvPoint location, CvFont *font)
-
-MODULE = Cv	PACKAGE = Cv
-void
-cvDisplayOverlay(const char* name, const char* text, int delay)
-
-void
-cvDisplayStatusBar(const char* name, const char* text, int delayms)
-
-#TBD# void cvCreateOpenGLCallback(const char* window_name, CvOpenGLCallback callbackOpenGL, VOID* userdata = NULL, double angle = -1, double zmin = -1, double zmax = -1)
-
-void
-cvSaveWindowParameters(const char* name)
-
-void
-cvLoadWindowParameters(const char* name)
-
-#TBD# int cvCreateButton(const char* button_name=NULL, CvButtonCallback on_change = NULL, VOID* userdata = NULL, int button_type = CV_PUSH_BUTTON, int initial_button_state = 0)
-
-#endif
-
-#endif /* WITH_QT */
 
 # ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera

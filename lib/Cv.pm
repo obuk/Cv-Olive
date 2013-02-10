@@ -58,28 +58,32 @@ our %EXPORT_TAGS = (
 
 our @EXPORT = ( );
 
+our %IMPORT;
 our %O;
 our %M;
 
-$O{$_} = 1 for qw(boxhappy);
+BEGIN {
+	$IMPORT{$_} = 1 for qw(seq more);
+	$IMPORT{$_} = 0 for qw(qt);
+	$O{$_} = 1 for qw(boxhappy);
+}
 
 sub import {
 	my $self = shift;
 	my @std = ();
-	my %auto = (
-		more => 'Cv::More',
-		seq => 'Cv::Seq',
-		);
 	for (@_) {
-		if (/^(:no|-)(\w+)$/) {
-			delete $auto{lc $2};
+		if (/^-(\w+)$/) {
+			$IMPORT{lc $1} = !$IMPORT{lc $1};
+		} elsif (/^:no(\w+)$/) {
+			$IMPORT{lc $1} = 0;
 		} else {
 			push(@std, $_);
 		}
 	}
-	for (grep { defined $auto{$_} } keys %auto) {
-		eval "use $auto{$_}";
-		die "can't use $auto{$_}; $@" if $@;
+	for (grep { $IMPORT{$_} } keys %IMPORT) {
+		s/./\U$&/;
+		eval "use Cv::$_";
+		die "can't use Cv::$_; $@" if $@;
 	}
 	push(@std, ":std") unless @std;
 	$self->export_to_level(1, $self, @std);
@@ -1931,6 +1935,14 @@ sub cvHasGUI {
 }
 
 sub cvHasQt { 0 }
+
+sub InitSystem {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	if (Cv->can('cvGetBuildInformation')) {
+		goto &cvInitSystem if cvHasQt();
+	}
+	return undef;
+}
 
 1;
 __END__

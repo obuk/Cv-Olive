@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
-BEGIN { use_ok('Cv::T') };
+use Test::More tests => 6;
+BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
@@ -30,23 +30,6 @@ if (2) {
 	$src->set([1, 1], [-1]);
 	my $det = $src->inv(my $inv = $src->new);
 	ok($det == 0);
-}
-
-if (3) {
-	my $src = Cv::Mat->new([2, 2], CV_64FC1);
-	my ($a, $b, $c, $d) = map { int rand 10 } 1 .. 4;
-	$src->set([0, 0], [$a]);
-	$src->set([0, 1], [$b]);
-	$src->set([1, 0], [$c]);
-	$src->set([1, 1], [$d]);
-	my $det = $src->invert(my $inv = $src->new);
-	my $D = ($a * $d - $b * $c);
-	is($det != 0, $D != 0);
-	is_deeply({ round => '%.13g' },
-			  [ map { $inv->getReal($_) * $D }
-				[0, 0], [0, 1], [1, 0], [1, 1] ],
-			  [ $d, -$b, -$c, $a ]
-		);
 }
 
 if (10) {

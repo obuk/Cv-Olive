@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
-BEGIN { use_ok('Cv::T') };
-BEGIN {	use_ok('Cv', -more) }
+BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv', -more) }
 
 my ($x, $y, $z) = unpack("d*", pack("d*", map { rand 1 } 0..2));
 

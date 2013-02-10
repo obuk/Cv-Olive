@@ -77,7 +77,7 @@ WriteMakefile(
 	CCFLAGS => $cf->ccflags,
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
-	DIR => [ qw(T) ],
+	DIR => [ qw(Qt T) ],
 	clean => {
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
@@ -89,7 +89,7 @@ WriteMakefile(
 sub MY::test_via_harness {
     my($self, $perl, $tests) = @_;
     return qq{\t$perl "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)', '.lib/lib', '.lib/arch', 't')" $tests\n};
+           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)', '.lib/lib', '.lib/arch')" $tests\n};
 }
 
 sub MY::postamble {
