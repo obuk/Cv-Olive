@@ -1,4 +1,4 @@
-# -*- mode: perl; coding: utf-8; tab-width: 4; -*-
+# -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
 package Cv::T;
 

@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker 6.31;
 use lib qw(./lib);
 use Cv::Config;
 my $cf = new Cv::Config;
-my %with = ( QT => 0 );
+# my %with = ( QT => 0 );
 
 my @perl_h = qw(perl.h sv.h pp.h);
 my @perl_h_patched = ();
