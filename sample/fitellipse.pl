@@ -105,19 +105,9 @@ sub process_image {
 			0, 360,
 			cvScalar(0, 255, 255), 1, &CV_AA,
 			);
-		if (1) {
-			$cimage->polyLine(
-				[[Cv->boxPoints($box)]], -1, cvScalar(0, 255, 0), 1, &CV_AA
-				);
-		} else {
-			my @vtx = Cv->boxPoints($box);
-			for (my $j = 0; $j < 4; $j++) {
-				$cimage->line(
-					$vtx[$j], $vtx[($j + 1) % 4], cvScalar(0, 255, 0), 1, &CV_AA
-					);
-			}
-		}
-
+		$cimage->polyLine(
+			[[Cv->boxPoints($box)]], -1, cvScalar(0, 255, 0), 1, &CV_AA
+			);
 	}
     
 	# Show image. HighGUI use.

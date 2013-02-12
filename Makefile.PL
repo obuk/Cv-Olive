@@ -1,7 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use 5.008008;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.31;
 
 use lib qw(./lib);
 use Cv::Config;
@@ -37,12 +37,12 @@ my @perl_h_patched = ();
 	my $dst = "lib/Cv/Constant.pm";
 	my $tmp = "a.pm";
 	unless (&dumpconst('-v', '-o', $tmp, @{$cf->{include}}) == 0) {
-		my $fallback = 'fallback/Constant.pm-';
-		my $ver = version->parse(join('.', $cf->_version));
+		my $fallback = 'fallback/Constant.pm';
+		my $ver = $cf->_version;
 		my @ver = sort { $b <=> $a } grep { ref $_ && $_ <= $ver } map {
-			/\d+(\.\d+)+/ && version->parse(my $v = $&) } glob("$fallback*");
+			/-([\d\.]+)$/ && version->parse($1) } glob("$fallback-*");
 		die "$0: can't make $dst\n" unless @ver;
-		&cp("$fallback$ver[0]", $tmp);
+		&cp("$fallback-$ver[0]", $tmp);
 	}
 	if (!-f $dst || &cmp('-s', $tmp, $dst) != 0) {
 		&mv($dst, "$dst.bak") if -f $dst;
@@ -53,13 +53,7 @@ my @perl_h_patched = ();
 
 
 my $PREREQ_PM = {
-	#Data::Dumper => 0,
-	#Scalar::Util => 0,
-	#File::Basename => 0,
-	#List::Util => 0,
-	#Time::HiRes => 0,
-	ExtUtils::ParseXS => 3.07,
-	#Cwd => 0,
+	ExtUtils::ParseXS => 2.22,
 };
 
 if ($^O eq 'cygwin') {

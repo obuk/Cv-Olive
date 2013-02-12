@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 91;
+use Test::More tests => 89;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -31,10 +31,10 @@ if (1) {
 if (2) {
 	e { $class->new([-1, -1], CV_8UC3) };
 	err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");
-	e { $class->new };
-	err_is("${class}::new: ?sizes");
-	e { $class->new([320, 240]) };
-	err_is("${class}::new: ?type");
+	# e { $class->new };
+	# err_is("${class}::new: ?sizes");
+	# e { $class->new([320, 240]) };
+	# err_is("${class}::new: ?type");
 }
 
 

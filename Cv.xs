@@ -24,8 +24,10 @@ extern "C" {
 #define _CV_VERSION() _VERSION(CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION)
 
 #ifndef __cplusplus
-#define __OPENCV_BACKGROUND_SEGM_HPP__
-#define __OPENCV_VIDEOSURVEILLANCE_H__
+#  if _CV_VERSION() >= _VERSION(2,4,0)
+#    define __OPENCV_BACKGROUND_SEGM_HPP__
+#  endif
+#  define __OPENCV_VIDEOSURVEILLANCE_H__
 #endif
 
 #include <opencv/cvaux.h>
@@ -51,12 +53,6 @@ typedef char tiny;
 #define VOID void
 #define CvWindow void
 
-typedef struct CvCircle {
-	CvPoint2D32f center;
-	float radius;
-} CvCircle;
-
-
 #define DIM(x) (sizeof(x)/sizeof((x)[0]))
 
 #define length(x) length_ ## x
@@ -66,6 +62,30 @@ typedef struct CvCircle {
 
 #define SvREF0(arg) \
 	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
+
+void Carp_croak(pTHX_ char const* format, ...)
+{
+	va_list ap;
+	const size_t size = 1000;
+	char* str = (char*) alloca(size);
+	char* argv[] = { str, 0 };
+	SV* sv_carplevel = get_sv("Carp::CarpLevel", 0);
+	va_start(ap, format);
+	vsnprintf(str, size, format, ap);
+	va_end(ap);
+	if (sv_carplevel) {
+		IV i = SvIV(sv_carplevel);
+		sv_setiv(sv_carplevel, i + 1);
+		call_argv("Carp::croak", G_VOID|G_DISCARD, argv);
+		/* NOTREACHED, but ... */
+		sv_setiv(sv_carplevel, i);
+	}
+	/* plan b */
+	Perl_croak(aTHX_ "%s", str);
+}
+
+#define Perl_croak Carp_croak
+
 
 typedef struct {
 	SV* callback;
@@ -93,7 +113,7 @@ static void delete_callback(AV* av)
 			if (callback->u.t.value) SvREFCNT_dec(callback->u.t.value);
 			safefree(callback);
 		} else {
-			croak("callback is 0");
+			Perl_croak(aTHX_ "callback is 0");
 		}
 	}
 }
@@ -223,7 +243,7 @@ newSVpvn_ro(const char* s, const STRLEN len)
 static SV *unbless(SV * rv)
 {
     SV* sv = SvRV(rv);
-    if (SvREADONLY(sv)) croak("%s", PL_no_modify);
+    if (SvREADONLY(sv)) Perl_croak(aTHX_ "%s", PL_no_modify);
     SvREFCNT_dec(SvSTASH(sv));
     SvSTASH(sv) = NULL;
     SvOBJECT_off(sv);
@@ -268,7 +288,7 @@ cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, 
 void
 cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, CvMSERParams params)
 {
-	croak("TBD: cvExtractMSER");
+	Perl_croak(aTHX_ "TBD: cvExtractMSER");
 }
 #endif
 #endif
@@ -278,6 +298,15 @@ MODULE = Cv	PACKAGE = Cv
 # ============================================================
 #  core. The Core Functionality: Basic Structures
 # ============================================================
+
+MODULE = Cv	PACKAGE = Cv::Arr
+# ====================
+IV
+phys(CvArr* arr)
+CODE:
+	RETVAL = PTR2IV(arr);
+OUTPUT:
+	RETVAL
 
 MODULE = Cv	PACKAGE = Cv::Mat
 # ====================
@@ -740,20 +769,21 @@ MODULE = Cv	PACKAGE = Cv::Arr
 void
 cvGetRawData(const CvArr* arr, SV* data, OUT int step, OUT CvSize roiSize)
 INIT:
-	CvSize size = cvGetSize(arr);
-	uchar* _data;
+	uchar* p;
+	int sz;
 CODE:
-	cvGetRawData(arr, &_data, &step, &roiSize);
+	cvGetRawData(arr, &p, &step, &roiSize);
 	sv_upgrade(data, SVt_PV);
-	SvPV_set(data, (char*)_data);
-	if (roiSize.height < size.height) {
-		CvRect roi = cvGetImageROI((IplImage*)arr);
-		int sz = step * (roi.height - roi.y) - (step * roi.x) / size.width;
-		SvCUR_set(data, sz);
-	} else {
-		int sz = step * roiSize.height;
-		SvCUR_set(data, sz);
+	SvPV_set(data, (char*)p);
+	sz = step * roiSize.height;
+	if (CV_IS_IMAGE(arr)) {
+		CvSize size = cvGetSize(arr);
+		if (roiSize.height < size.height) {
+			CvRect roi = cvGetImageROI((IplImage*)arr);
+			sz = step * (roi.height - roi.y) - (step * roi.x) / size.width;
+		}
 	}
+	SvCUR_set(data, sz);
 	SvPOK_on(data);
 	SvREADONLY_on(data); // XXXXX
 
@@ -767,7 +797,7 @@ cvGetRealND(const CvArr* arr, int* idx)
 CvMat*
 cvGetRows(const CvArr* arr, CvMat* submat, int startRow, int endRow = NO_INIT, int deltaRow=1)
 INIT:
-	if (items <= 3) endRow = startRow + 1;
+	if (items <= 4) endRow = startRow + 1;
 OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(1));
 
 CvSize
@@ -845,17 +875,10 @@ POSTCALL:
 	ST(0) = ST(2);
 	XSRETURN(1);
 
-MODULE = Cv	PACKAGE = Cv
 void
-cvMerge(const CvArr** srcs, CvArr* dst)
-INIT:
-	const CvArr* src0 = length(srcs) >= 1 ? srcs[0] : NULL;
-	const CvArr* src1 = length(srcs) >= 2 ? srcs[1] : NULL;
-	const CvArr* src2 = length(srcs) >= 3 ? srcs[2] : NULL;
-	const CvArr* src3 = length(srcs) >= 4 ? srcs[3] : NULL;
-C_ARGS: src0, src1, src2, src3, dst
+cvMerge(const CvArr* src0, const CvArr* src1, const CvArr* src2, const CvArr* src3, CvArr* dst)
 POSTCALL:
-	ST(0) = ST(1);
+	ST(0) = ST(4);
 	XSRETURN(1);
 
 MODULE = Cv	PACKAGE = Cv::Arr
@@ -866,10 +889,13 @@ POSTCALL:
 	XSRETURN(1);
 
 void
-cvMinMaxLoc(IN const CvArr *arr, OUT double min_val, OUT double max_val, OUT CvPoint min_loc, OUT CvPoint max_loc, IN const CvArr* mask = NULL)
+cvMinMaxLoc(const CvArr* arr, OUT double min_val, OUT double max_val, OUT CvPoint min_loc, OUT CvPoint max_loc, const CvArr* mask =NULL)
 
 void
 cvMinS(const CvArr* src, double value, CvArr* dst)
+POSTCALL:
+	ST(0) = ST(2);
+	XSRETURN(1);
 
 
 MODULE = Cv	PACKAGE = Cv
@@ -977,9 +1003,10 @@ MODULE = Cv	PACKAGE = Cv::RNG
 void
 cvReleaseRNG(CvRNG* rng)
 ALIAS: DESTROY = 1
+INIT:
+	unbless(ST(0));
 CODE:
 	if (rng) safefree(rng);
-	unbless(ST(0));
 
 void
 cvRandArr(CvRNG* rng, CvArr* arr, int distType, CvScalar param1, CvScalar param2)
@@ -1005,36 +1032,39 @@ POSTCALL:
 
 void
 cvReleaseData(CvArr* &arr)
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Image
 void
 cvReleaseImage(IplImage* &image)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Mat
 void
 cvReleaseMat(CvMat* &mat)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
+	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::MatND
 void
 cvReleaseMatND(CvMatND* &mat)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
+	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::SparseMat
 void
 cvReleaseSparseMat(CvSparseMat* &mat)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
+	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
@@ -1122,16 +1152,9 @@ POSTCALL:
 
 int
 cvSolve(const CvArr* src1, const CvArr* src2, CvArr* dst, int method=CV_LU)
-POSTCALL:
-	ST(0) = ST(2);
-	XSRETURN(1);
 
-
-void
+int
 cvSolveCubic(const CvMat* coeffs, CvMat* roots)
-POSTCALL:
-	ST(0) = ST(1);
-	XSRETURN(1);
 
 
 void
@@ -1406,7 +1429,6 @@ cvCvtSeqToArray(const CvSeq* seq, SV* elements, CvSlice slice=CV_WHOLE_SEQ)
 INIT:
 	int n, size;
 CODE:
-	// if (!CV_IS_SEQ(seq)) croak("seq is not a CvSeq");
 	if (slice.start_index < 0) slice.start_index = 0;
 	if (slice.end_index > seq->total) slice.end_index = seq->total;
 	if (slice.end_index < slice.start_index) XSRETURN_UNDEF;
@@ -1434,7 +1456,6 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV *
 cvGetSeqElem(const CvSeq* seq, int index)
 CODE:
-	// if (!CV_IS_SEQ(seq)) croak("seq is not a CvSeq");
 	RETVAL = newSVpvn_ro((char*)cvGetSeqElem(seq, index), seq->elem_size);
 OUTPUT:
 	RETVAL
@@ -1444,7 +1465,6 @@ cvSetSeqElem(const CvSeq* seq, int index, SV* elements)
 INIT:
 	char* dst;
 CODE:
-	// if (!CV_IS_SEQ(seq)) croak("seq is not a CvSeq");
 	dst = (char*)cvGetSeqElem(seq, index);
 	if (dst && seq->elem_size == SvCUR(elements))
 		memcpy(dst, SvPV_nolen(elements), seq->elem_size);
@@ -1510,7 +1530,7 @@ C_ARGS:
 void
 cvReleaseMemStorage(CvMemStorage* &storage)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 void
@@ -1623,9 +1643,10 @@ MODULE = Cv	PACKAGE = Cv::SeqReader
 void
 cvReleaseSeqReader(CvSeqReader* reader)
 ALIAS: DESTROY = 1
+INIT:
+	unbless(ST(0));
 CODE:
 	if (reader) safefree(reader);
-	unbless(ST(0));
 
 void
 cvNextSeqElem(CvSeqReader* reader)
@@ -1708,7 +1729,6 @@ CvFont*
 cvInitFont(int fontFace, double hscale, double vscale, double shear=0, int thickness=1, int lineType=8)
 INIT:
 	Newx(RETVAL, 1, CvFont);
-	if (!RETVAL) Perl_croak(aTHX_ "cvInitFont: no core");
 #if _CV_VERSION() == _VERSION(2,1,0)
 	if (lineType & CV_AA) lineType |= 1; /* XXXXX */
 #endif
@@ -1721,9 +1741,10 @@ MODULE = Cv	PACKAGE = Cv::Font
 void
 cvReleaseFont(CvFont* font)
 ALIAS: DESTROY = 1
+INIT:
+	unbless(ST(0));
 CODE:
 	safefree(font);
-	unbless(ST(0));
 
 #TBD# int cvInitLineIterator(const CvArr* image, CvPoint pt1, CvPoint pt2, CvLineIterator* line_iterator, int connectivity=8, int left_to_right=0)
 
@@ -1896,14 +1917,14 @@ cvReadStringByName(const CvFileStorage* fs, const CvFileNode* map, const char* n
 MODULE = Cv	PACKAGE = Cv
 void
 cvRelease(VOID* &structPtr)
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::FileStorage
 void
 cvReleaseFileStorage(CvFileStorage* &fs)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv
@@ -2259,7 +2280,7 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv
 CvMat*
 cv2DRotationMatrix(CvPoint2D32f center, double angle, double scale, CvMat* mapMatrix)
-ALIAS: cvRotationMatrix2D = 1
+ALIAS: cvGetRotationMatrix2D = 1
 OUTPUT: RETVAL ST(0) = SvREFCNT_inc(ST(3));
 
 MODULE = Cv	PACKAGE = Cv
@@ -2643,9 +2664,10 @@ MODULE = Cv	PACKAGE = Cv::HuMoments
 void
 cvReleaseHuMoments(CvHuMoments* hu_moments)
 ALIAS: DESTROY = 1
+INIT:
+	unbless(ST(0));
 CODE:
 	safefree(hu_moments);
-	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::HuMoments
 # ====================
@@ -2747,9 +2769,10 @@ MODULE = Cv	PACKAGE = Cv::Moments
 void
 cvReleaseMoments(CvMoments* moments)
 ALIAS: DESTROY = 1
+INIT:
+	unbless(ST(0));
 CODE:
 	safefree(moments);
-	unbless(ST(0));
 
 
 MODULE = Cv	PACKAGE = Cv::Arr
@@ -3046,7 +3069,7 @@ cvSetImagesForHaarClassifierCascade(CvHaarClassifierCascade* cascade, const CvAr
 void
 cvReleaseHaarClassifierCascade(CvHaarClassifierCascade* &cascade)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 int
@@ -3252,7 +3275,7 @@ MODULE = Cv	PACKAGE = Cv::Kalman
 void
 cvReleaseKalman(CvKalman* &kalman)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Arr
@@ -3284,7 +3307,7 @@ PREINIT:
 	SV** q; AV* av; SV* sv;
 INIT:
 	if (!(Cv_TRACKBAR = get_hv("Cv::TRACKBAR", 0))) {
-		croak("Cv::cvCreateTrackbar: can't get %Cv::TRACKBAR");
+		Perl_croak(aTHX_ "Cv::cvCreateTrackbar: can't get %Cv::TRACKBAR");
 	}
 	RETVAL = -1;
 CODE:
@@ -3310,7 +3333,7 @@ CODE:
 		hv_store(Cv_TRACKBAR, windowName, strlen(windowName),
 			newRV_inc(sv_2mortal((SV*)av)), 0);
 	} else {
-		croak("Cv::cvCreateTrackbar: Cv::TRACKBAR was broken");
+		Perl_croak(aTHX_ "Cv::cvCreateTrackbar: Cv::TRACKBAR was broken");
 	}
 	av_push(av, newSViv(PTR2IV(callback)));
 OUTPUT:
@@ -3386,7 +3409,7 @@ INIT:
 	if (items <= 1) onMouse = (SV*)0;
 	if (items <= 2) userdata = (SV*)0;
 	if (!(Cv_MOUSE = get_hv("Cv::MOUSE", 0))) {
-		croak("Cv::cvSetMouseCallback: can't get %Cv::MOUSE");
+		Perl_croak(aTHX_ "Cv::cvSetMouseCallback: can't get %Cv::MOUSE");
 	}
 CODE:
 	Newx(callback, 1, callback_t);
@@ -3408,7 +3431,7 @@ CODE:
 		hv_store(Cv_MOUSE, windowName, strlen(windowName),
 			newRV_inc(sv_2mortal((SV*)av)), 0);
 	} else {
-		croak("Cv::cvSetMouseCallback: Cv::MOUSE was broken");
+		Perl_croak(aTHX_ "Cv::cvSetMouseCallback: Cv::MOUSE was broken");
 	}
 	if (onMouse) {
 		av_push(av, newSViv(PTR2IV(callback)));
@@ -3505,9 +3528,9 @@ CODE:
 		RETVAL = cvDecodeImage(&m, iscolor);
 	} else {
 		if (SvROK(buf))
-			croak("unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
+			Perl_croak(aTHX_ "unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
 		else
-			croak("unsuported SvTYPE = %d\n", SvTYPE(buf));
+			Perl_croak(aTHX_ "unsuported SvTYPE = %d\n", SvTYPE(buf));
 	}
 OUTPUT:
 	RETVAL
@@ -3528,9 +3551,9 @@ CODE:
 		RETVAL = cvDecodeImageM(&m, iscolor);
 	} else {
 		if (SvROK(buf))
-			croak("unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
+			Perl_croak(aTHX_ "unsuported reference SvTYPE = %d\n", SvTYPE(SvRV(buf)));
 		else
-			croak("unsuported SvTYPE = %d\n", SvTYPE(buf));
+			Perl_croak(aTHX_ "unsuported SvTYPE = %d\n", SvTYPE(buf));
 	}
 OUTPUT:
 	RETVAL
@@ -3561,7 +3584,7 @@ OUTPUT: RETVAL bless(ST(0), "Cv::Image::Ghost", RETVAL);
 void
 cvReleaseCapture(CvCapture* &capture)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 IplImage*
@@ -3587,7 +3610,7 @@ MODULE = Cv	PACKAGE = Cv::VideoWriter
 void
 cvReleaseVideoWriter(CvVideoWriter* &writer)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 int
@@ -3616,7 +3639,6 @@ CvFont*
 cvFontQt(const char* nameFont, int pointSize = -1, CvScalar color = cvScalarAll(0), int weight = CV_FONT_NORMAL, int style = CV_STYLE_NORMAL, int spacing = 0)
 CODE:
 	Newx(RETVAL, 1, CvFont);
-	if (!RETVAL) Perl_croak(aTHX_ "cvFontQt: no core");
 	*RETVAL = cvFontQt(nameFont, pointSize, color, weight, style, spacing);
 OUTPUT:
 	RETVAL
@@ -3972,7 +3994,7 @@ MODULE = Cv	PACKAGE = Cv::StereoBMState
 void
 cvReleaseStereoBMState(CvStereoBMState* &state)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 
@@ -3982,7 +4004,7 @@ MODULE = Cv	PACKAGE = Cv::StereoGCState
 void 
 cvReleaseStereoGCState(CvStereoGCState* &state)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 #endif
@@ -4168,7 +4190,7 @@ MODULE = Cv	PACKAGE = Cv::BGCodeBookModel
 void
 cvReleaseBGCodeBookModel(CvBGCodeBookModel* &model)
 ALIAS: DESTROY = 1
-POSTCALL:
+INIT:
 	unbless(ST(0));
 
 void
@@ -4308,7 +4330,7 @@ CODE:
 	else if (strcmp(t, "CvSet") == 0 || strcmp(t, "Cv::Set") == 0)
 		RETVAL = sizeof(CvSet);
 	else
-		croak("CV_SIZEOF: %s unknwon", t);
+		Perl_croak(aTHX_ "CV_SIZEOF: %s unknwon", t);
 OUTPUT:
 	RETVAL
 
@@ -4366,27 +4388,6 @@ CODE:
 	RETVAL = box;
 OUTPUT:
 	RETVAL
-
-
-# ============================================================
-#  T_CvCircle
-# ============================================================
-
-CvCircle
-cvCircle(CvPoint2D32f center, float radius)
-CODE:
-	RETVAL.center = center;
-	RETVAL.radius = radius;
-OUTPUT:
-	RETVAL
-
-CvCircle
-CvCircle(CvCircle circle)
-CODE:
-	RETVAL = circle;
-OUTPUT:
-	RETVAL
-
 
 # ============================================================
 #  T_CvConnectedComp

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 47;
+use Test::More tests => 45;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -47,8 +47,8 @@ if (2) {
 	
 	e { $class->new([-1, -1], CV_8UC3) };
 	err_is("OpenCV Error: Incorrect size of input array (one of dimesion sizes is non-positive) in cvCreateSparseMat");
-	e { $class->new };
-	err_is("${class}::new: ?sizes");
-	e { $class->new([320, 240]) };
-	err_is("${class}::new: ?type");
+	# e { $class->new };
+	# err_is("${class}::new: ?sizes");
+	# e { $class->new([320, 240]) };
+	# err_is("${class}::new: ?type");
 }

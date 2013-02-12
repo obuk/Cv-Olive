@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 681;
+use Test::More tests => 693;
 use File::Basename;
 use lib dirname($0);
 use MY;
@@ -61,9 +61,9 @@ for my $class (keys %TYPENAME) {
 			is_deeply(\@sizes, $_->{sizes}, "${class}->getDims(\@sizes)");
 		}
 		e { $class->new };
-		err_is("${class}::new: ?sizes");
+		err_is("size not specified in ${class}::new");
 		e { $class->new([320, 240]) };
-		err_is("${class}::new: ?type");
+		err_is("type not specified in ${class}::new");
 	}
 
 	# inherit parameters if omit
@@ -103,5 +103,17 @@ for my $class (keys %TYPENAME) {
 		$arr = undef;
 		is($destroy, 0, "${class}->DESTROY");
 		is($destroy_ghost, 1, "${class}::Ghost->DESTROY");
+	}
+
+	# test memory leak
+	if (5) {
+		my $arr = $class->new(my $sizes = [240, 320], my $type = CV_8UC3);
+		isa_ok($arr, $class);
+		my $arr_phys = $arr->phys;
+		$arr->DESTROY;
+		my $arr2 = $class->new($sizes, $type);
+		isa_ok($arr2, $class);
+		my $arr2_phys = $arr2->phys;
+		is($arr2_phys, $arr_phys);
 	}
 }

@@ -31,7 +31,7 @@ sub import {
 		if (defined $Cv::O{$_}) {
 			$O{$_} = 1;
 		} else {
-			Carp::croak "Cv::More: can't import $_";
+			Carp::croak join(' ', "can't import", $_, 'in', (caller 0)[3]);
 		}
 	}
 }
@@ -42,7 +42,7 @@ sub unimport {
 		if (defined $Cv::O{$_}) {
 			$O{$_} = 0;
 		} else {
-			Carp::croak "Cv::More: can't unimport $_";
+			Carp::croak join(' ', "can't unimport", $_, 'in', (caller 0)[3]);
 		}
 	}
 }
@@ -178,9 +178,7 @@ use overload
 	bool => sub { $_[0] },
 	'<=>' => \&overload_cmp,
 	cmp => \&overload_cmp,
-	fallback => undef,
-	# nomethod => \&overload_nomethod
-	;
+	fallback => undef;
 
 sub overload_cmp {
 	my ($l, $r) = @_;
@@ -191,10 +189,6 @@ sub overload_cmp {
 	bless $l, $lc;
 	bless $r, $rc;
 	$cmp;
-}
-
-sub overload_nomethod {
-	Carp::croak "$0: can't overload ", ref $_[0], "::", $_[3]
 }
 
 
@@ -234,7 +228,8 @@ sub ToArray {
 			$end = $self->cols - 1 if $end == Cv::CV_WHOLE_SEQ_END_INDEX;
 			@{$_[0]} = map { $self->get([0, $_]) } $start .. $end;
 		} else {
-			Carp::croak "Cv::Arr::ToArray: can't convert ", join('x', $self->getDims);
+			Carp::croak join(' ', "can't convert", join('x', $self->getDims),
+							 'in', (caller 0)[3]);
 		}
 	}
 	wantarray? @{$_[0]} : $_[0];
@@ -333,7 +328,7 @@ sub FitEllipse2 {
 	# $mat->FitEllipse2;                                                        
 	my $self = shift;
 	unless (ref $self) {
-		Carp::croak "Usage: Cv->FitEllipse2(points)"
+		Carp::croak "Usage: ${[ caller 0 ]}[3](points)"
 			unless @_;
 		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
 	}
@@ -352,9 +347,9 @@ sub FitLine {
     my $self = shift;
     unless (ref $self) {
 		my $points = shift;
-		Carp::croak "Usage: Cv->FitLine(points ...)"
+		Carp::croak "Usage: ${[ caller 0 ]}[3](points, distType=CV_DIST_L2, param=0, reps=0.01, aeps=0.01)"
 			unless defined $points;
-		Carp::croak "Cv->FitLine: points is not [ pt1, pt2, ... ]"
+		Carp::croak "points is not [ pt1, pt2, ... ] in ", (caller 0)[3]
 			unless my @dims = Cv::m_dims(@$points);
 		$self = Cv::Mat->new([], &Cv::CV_32FC($dims[-1]), @$points);
     }
