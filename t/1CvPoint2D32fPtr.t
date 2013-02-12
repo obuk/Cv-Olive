@@ -2,18 +2,14 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 11;
-use File::Basename;
-use lib dirname($0);
-use MY;
+# use Test::More qw(no_plan);
+use Test::More tests => 11;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my ($x, $y) = unpack("f*", pack("f*", map { rand 1 } 0..1));
 
-SKIP: {
-	skip "no T", 10 unless Cv->can('CvPoint2D32fPtr');
-
+if (1) {
 	my $arr = Cv::cvPoint2D32fPtr($x, $y);
 	is(ref $arr, 'ARRAY');
 	is(scalar @$arr, 1);

@@ -3,19 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 10;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my $center = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];
 my $size = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];
 my $angle = unpack("f", pack("f", map { rand 1 } 0));
 
-SKIP: {
-	skip "no T", 8 unless Cv->can('CvBox2D');
-
+if (1) {
 	{
 		my $b = Cv::cvBox2D($center, $size, $angle);
 		is_deeply($b, [$center, $size, $angle]);

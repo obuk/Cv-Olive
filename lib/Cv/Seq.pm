@@ -6,6 +6,8 @@ use 5.008008;
 use strict;
 use warnings;
 
+our $VERSION = '0.24';
+
 use Cv::Seq::Point;
 use Cv::Seq::Point2;
 use Cv::Seq::Circle;
@@ -23,20 +25,6 @@ package Cv::Seq;
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 our %TEMPLATE;
-our $STORAGE;
-
-sub STORAGE {
-	$STORAGE ||= Cv::MemStorage->new();
-}
-
-sub stor (\@) {
-	my $storage;
-	for (my $i = 0; $i < @{$_[0]}; $i++) {
-		($storage) = splice(@{$_[0]}, $i, 1), last
-			if Cv::is_cvmem(${$_[0]}[$i]);
-	}
-	$storage ||= &STORAGE;
-}
 
 sub template {
 	my $self = CORE::shift;
@@ -56,31 +44,50 @@ sub template {
 	wantarray ? @{$TEMPLATE{$self->mat_type}} : $TEMPLATE{$self->mat_type}[0];
 }
 
-sub Cv::CreateSeq {
-	ref (my $class = shift) and Carp::croak 'class name needed';
-	Cv::Seq->new(@_)
+
+our $FLAGS = &Cv::CV_32SC2;
+our @SIZES = (0, 0);
+
+sub new {
+	my $self = CORE::shift;
+	my $stor = Cv::stor(@_);
+	my $sizes = @_ && ref $_[0] eq 'ARRAY' ? CORE::shift : undef;
+	my ($hSize, $eSize) = $sizes ? @$sizes : @SIZES;
+	my $flags = @_ ? CORE::shift : ref $self ? $self->type : undef;
+	$flags = $FLAGS unless defined $flags;
+	$hSize ||= &Cv::CV_SIZEOF('CvSeq'),
+	$eSize ||= &Cv::CV_ELEM_SIZE($flags);
+	my $class = $self->isa('Cv::Seq') && $self || __PACKAGE__;
+	$class = ref $class if ref $class;
+	bless Cv::cvCreateSeq($flags, $hSize, $eSize, $stor), $class;
 }
 
 
-{ *new = \&CreateSeq }
+{ *Cv::CreateSeq = \&CreateSeq }
 sub CreateSeq {
+	# CvSeq* cvCreateSeq(
+	#	int seqType, int headerSize, int elemSize,
+	#	CvMemStorage* storage)
 	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	my $stor = stor(@_);
-	my $seqFlags = CORE::shift;
-	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
-	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
-	my $elemSize = CORE::shift || &Cv::CV_ELEM_SIZE($seqFlags);
-	bless Cv::cvCreateSeq($seqFlags, $headerSize, $elemSize, $stor), $class;
+	my $stor = Cv::stor(@_);
+	my $flags = CORE::shift;
+	$flags = $FLAGS unless defined $flags;
+	my $hSize = CORE::shift || $SIZES[0] || &Cv::CV_SIZEOF('CvSeq');
+	my $eSize = CORE::shift || $SIZES[1] || &Cv::CV_ELEM_SIZE($flags);
+	bless Cv::cvCreateSeq($flags, $hSize, $eSize, $stor), $class;
 }
 
 
 sub MakeSeqHeaderForArray {
+	# CvSeq* cvMakeSeqHeaderForArray(
+	# 	int seqType, int headerSize, int elemSize,
+	#	void* elements, int total, CvSeq* seq, CvSeqBlock* block)
 	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	my $seqFlags = CORE::shift;
-	$seqFlags = &Cv::CV_32SC2 unless defined $seqFlags;
-	my $headerSize = CORE::shift || &Cv::CV_SIZEOF('CvSeq');
-	my $elemSize = CORE::shift || &Cv::CV_ELEM_SIZE($seqFlags);
-	bless Cv::cvMakeSeqHeaderForArray($seqFlags, $headerSize, $elemSize, @_), $class;
+	my $flags = CORE::shift;
+	$flags = $FLAGS unless defined $flags;
+	my $hSize = CORE::shift || $SIZES[0] || &Cv::CV_SIZEOF('CvSeq');
+	my $eSize = CORE::shift || $SIZES[1] || &Cv::CV_ELEM_SIZE($flags);
+	bless Cv::cvMakeSeqHeaderForArray($flags, $hSize, $eSize, @_), $class;
 }
 
 

@@ -3,19 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 9;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my ($width, $height) = unpack("f2", pack("f2", map { rand 1 } 0..1));
 my $size = Cv::cvSize2D32f($width, $height);
 is_deeply($size, [$width, $height]);
 
-SKIP: {
-	skip "no T", 6 unless Cv->can('CvSize2D32f');
-
+if (1) {
 	{
 		my $size2 = Cv::CvSize2D32f($size);
 		is_deeply($size2, $size);

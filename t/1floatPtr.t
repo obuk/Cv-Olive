@@ -3,17 +3,13 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 7;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my @floatPtr = unpack("f*", pack("f*", map { rand 1 } 1 .. 100));
 
-SKIP: {
-	skip "no T", 5 unless Cv->can('floatPtr');
-
+if (1) {
 	{
 		my $floatPtr = Cv::floatPtr(\@floatPtr);
 		is_deeply($floatPtr, \@floatPtr);

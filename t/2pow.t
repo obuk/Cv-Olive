@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 9;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
@@ -20,16 +18,16 @@ $src->set([2], [rand 3]);
 
 if (1) {
 	my $dst = $src->pow(2);
-	is_deeply({ round => "%.5g" }, $dst->getReal(0), pow2($src->getReal(0)));
-	is_deeply({ round => "%.5g" }, $dst->getReal(1), pow2($src->getReal(1)));
-	is_deeply({ round => "%.5g" }, $dst->getReal(2), pow2($src->getReal(2)));
+	is_deeply({ round => "%.4g" }, $dst->getReal(0), pow2($src->getReal(0)));
+	is_deeply({ round => "%.4g" }, $dst->getReal(1), pow2($src->getReal(1)));
+	is_deeply({ round => "%.4g" }, $dst->getReal(2), pow2($src->getReal(2)));
 }
 
 if (2) {
 	$src->pow(my $dst = $src->new, 2);
-	is_deeply({ round => "%.5g" }, $dst->getReal(0), pow2($src->getReal(0)));
-	is_deeply({ round => "%.5g" }, $dst->getReal(1), pow2($src->getReal(1)));
-	is_deeply({ round => "%.5g" }, $dst->getReal(2), pow2($src->getReal(2)));
+	is_deeply({ round => "%.4g" }, $dst->getReal(0), pow2($src->getReal(0)));
+	is_deeply({ round => "%.4g" }, $dst->getReal(1), pow2($src->getReal(1)));
+	is_deeply({ round => "%.4g" }, $dst->getReal(2), pow2($src->getReal(2)));
 }
 
 if (10) {

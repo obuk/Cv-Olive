@@ -3,19 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 11;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my ($x, $y, $width, $height) = map { int rand 16384 } 0..3;
 my $rect = Cv::cvRect($x, $y, $width, $height);
 is_deeply($rect, [$x, $y, $width, $height]);
 
-SKIP: {
-	skip "no T", 8 unless Cv->can('CvRect');
-
+if (1) {
 	{
 		my $rect2 = Cv::CvRect($rect);
 		is_deeply($rect2, $rect);

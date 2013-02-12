@@ -3,12 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
-use List::Util qw(min);
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 12;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
+use List::Util qw(min);
 
 if (1) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC1);

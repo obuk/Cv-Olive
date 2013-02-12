@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 6;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
@@ -26,7 +24,7 @@ if (1) {
 	$B->set([2], [$bz]);
 	my $X = $A->crossProduct($B);
 	my ($x, $y, $z) = ($X->getReal(0), $X->getReal(1), $X->getReal(2));
-	is_deeply({ round => "%.5g" }, cvScalar($x, $y, $z),
+	is_deeply({ round => "%.3g" }, cvScalar($x, $y, $z),
 			  cvScalar($ay * $bz - $az * $by,
 					   $az * $bx - $ax * $bz,
 					   $ax * $by - $ay * $bx),
@@ -41,7 +39,7 @@ if (2) {
 	$A->set([0], [$ax, $ay, $az]);
 	$B->set([0], [$bx, $by, $bz]);
 	$A->crossProduct($B, my $X = $A->new);
-	is_deeply({ round => "%.5g" }, $X->get([0]),
+	is_deeply({ round => "%.4g" }, $X->get([0]),
 			  cvScalar($ay * $bz - $az * $by,
 					   $az * $bx - $ax * $bz,
 					   $ax * $by - $ay * $bx),

@@ -3,17 +3,13 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 11;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my ($x, $y, $z) = unpack("d*", pack("d*", map { rand 1 } 0..2));
 
-SKIP: {
-	skip "no T", 9 unless Cv->can('CvPoint3D64fPtr');
-
+if (1) {
 	my $arr = Cv::cvPoint3D64fPtr($x, $y, $z);
 	is(ref $arr, 'ARRAY');
 	is(scalar @$arr, 1);

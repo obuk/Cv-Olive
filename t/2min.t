@@ -3,12 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 18;
-use File::Basename;
-use List::Util qw(min);
-use lib dirname($0);
-use MY;
+use Test::More tests => 19;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
+use List::Util qw(min);
 
 # ------------------------------------------------------------
 # void cvMin(const CvArr* src1, const CvArr* src2, CvArr* dst)

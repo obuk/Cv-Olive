@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 35;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 36;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
@@ -44,5 +42,5 @@ if (10) {
 	my $class = qw(Cv::SparseMat);
 	my $mat = $class->new([320, 240], CV_8UC3);
 	e { $mat->getRawData(my $rawData, my $rawStep, my $rawSize) };
-	err_is('OpenCV Error: Bad argument (unrecognized or unsupported array type) in cvGetRawData', "$class->getRowData");
+	err_like("OpenCV Error:");
 }

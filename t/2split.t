@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 80;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 81;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 if (1) {
@@ -44,7 +42,6 @@ if (2) {
 if (10) {
 	my $mats = Cv::SparseMat->new([320, 240], CV_8UC4);
 	e { $mats->split };
-	# err_is('OpenCV Error: Bad argument (Unknown array type) in cvarrToMat');
 	err_like('OpenCV Error:');
 }
 

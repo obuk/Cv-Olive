@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 84;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 85;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv') }
 
 if (1) {
@@ -205,10 +203,10 @@ if (16) {
 if (21) {
 	my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
 	e { $arr->set([ 3, 3 ], [ 1, 2 ]) };
-	err_is("OpenCV Error: One of arguments' values is out of range (index is out of range) in cvPtrND");
+	err_like("OpenCV Error:");
 }
 
 if (22) {
 	e { Cv::MatND->new([], CV_8UC1, []) };
-	err_is("OpenCV Error: One of arguments' values is out of range (non-positive or too large number of dimensions) in cvCreateMatNDHeader");
+	err_like("OpenCV Error:");
 }

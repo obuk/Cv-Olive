@@ -8,14 +8,19 @@ use warnings;
 
 use Cv::Seq;
 
+our $VERSION = '0.24';
 our @ISA = qw(Cv::Seq);
 
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
-{ *new = \&CreateSeq }
+sub new {
+	my $self = shift;
+	$self->SUPER::new(@_);
+}
+
 sub CreateSeq {
-	ref (my $class = CORE::shift) and Carp::croak 'class name needed';
-	$class->SUPER::new(@_);
+	my $self = shift;
+	$self->SUPER::CreateSeq(@_);
 }
 
 { *Get = \&GetSeqElem }

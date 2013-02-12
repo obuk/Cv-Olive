@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 16;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 17;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my $area = int rand 16384;
@@ -14,9 +12,7 @@ my $value = [ map { (int rand 16384) + 0.5 } 0..3 ];
 my $rect = [ map { int rand 16384 } 0..3 ];
 my $contour = Cv::Seq->new(CV_8UC4);
 
-SKIP: {
-	skip "no T", 15 unless Cv->can('CvConnectedComp');
-
+if (1) {
 	{
 		my $cc = Cv::cvConnectedComp($area, $value, $rect, $contour);
 		is($cc->[0], $area);

@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker 6.31;
 use lib qw(./lib);
 use Cv::Config;
 my $cf = new Cv::Config;
-my %with = ( QT => 0, T => 0 );
+my %with = ( QT => 0 );
 
 my @perl_h = qw(perl.h sv.h pp.h);
 my @perl_h_patched = ();
@@ -77,13 +77,20 @@ WriteMakefile(
 	CCFLAGS => $cf->ccflags,
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
+	DIR => [ qw(T) ],
 	clean => {
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
 			't/ref-*.pm', 'camera.xml', 'contours.xml', 'sample.avi',
-			'_Inline', 'cover_db',
+			'_Inline', 'cover_db', '.lib',
 			] },
 	);
+
+sub MY::test_via_harness {
+    my($self, $perl, $tests) = @_;
+    return qq{\t$perl "-MExtUtils::Command::MM" }.
+           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)', '.lib/lib', '.lib/arch', 't')" $tests\n};
+}
 
 sub MY::postamble {
 	"

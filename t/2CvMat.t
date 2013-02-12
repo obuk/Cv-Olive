@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 438;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 439;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 my $class = 'Cv::Mat';
@@ -14,7 +12,7 @@ my $class = 'Cv::Mat';
 # type: ${class}->new([ $rows, $cols ], $type);
 if (2) {
 	e { ${class}->new([-1, -1], CV_8UC3) };
-	err_is("OpenCV Error: Incorrect size of input array (Non-positive width or height) in cvCreateMatHeader");
+	err_like("OpenCV Error:");
 	# e { ${class}->new };
 	# err_is("${class}::new: ?sizes");
 	# e { ${class}->new([320, 240]) };

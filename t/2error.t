@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 35;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 36;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 use Data::Dumper;
@@ -141,5 +139,5 @@ if (6) {
 	Cv->setErrMode(0);
 	Cv->redirectError(sub { });
 	e { Cv::cvCreateImage([-1, -1], 8, 3); };
-	err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");
+	err_like("OpenCV Error:");
 }

@@ -15,9 +15,9 @@ lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
-lib/Cv/Nihongo.pod
 lib/Cv/More-ja.pod
 lib/Cv/More.pm
+lib/Cv/Nihongo.pod
 lib/Cv/Pango-ja.pod
 lib/Cv/Pango.pm
 lib/Cv/Seq-ja.pod
@@ -138,7 +138,6 @@ t/1config.t
 t/1const-old.t
 t/1const.t
 t/1CvBox2D.t
-t/1CvCircle.t
 t/1CvConnectedComp.t
 t/1CvPoint.t
 t/1CvPoint2D32f.t
@@ -269,6 +268,10 @@ t/4pointSeqFromMat.t
 t/4projectPoints2.t
 t/4toArray.t
 t/4transform.t
+t/8issue10.t
+t/8issue11.t
+t/8issue8.t
+t/8issue9.t
 t/9flipbook.t
 t/9inlineC.t
 t/9pango.t
@@ -276,9 +279,16 @@ t/9pod.t
 t/9ref.t
 t/9threads.t
 t/baboon.jpg
+T/Changes
 t/hackcv.pm
 t/lena.jpg
+T/lib/Cv/T.pm
+T/Makefile.PL
+T/MANIFEST
 t/MY.pm
+T/README
+T/T.xs
+T/t/T.t
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh

@@ -3,17 +3,13 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 7;
+BEGIN { use_ok('Cv::T') };
 BEGIN {	use_ok('Cv', -more) }
 
 my @intPtr = map { int rand 65536 } 1 .. 100;
 
-SKIP: {
-	skip "no T", 5 unless Cv->can('intPtr');
-
+if (1) {
 	{
 		my $intPtr = Cv::intPtr(\@intPtr);
 		is_deeply($intPtr, \@intPtr);

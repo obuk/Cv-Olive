@@ -72,9 +72,7 @@ package Cv::Mat;
 
 sub m_new {
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_ ? shift : $self->type;
+	my ($self, $sizes, $type) = Cv::new_args(@_);
 	my $mat;
 	if (@$sizes) {
 		my ($rows, $cols) = @$sizes; $cols ||= 1;
@@ -107,9 +105,7 @@ package Cv::MatND;
 
 sub m_new {
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	my $self = shift;
-	my $sizes = @_ && ref $_[0] eq 'ARRAY'? shift : $self->sizes;
-	my $type = @_ ? shift : $self->type;
+	my ($self, $sizes, $type) = Cv::new_args(@_);
 	my $mat;
 	if (@$sizes) {
 		if (@_) {
@@ -127,6 +123,40 @@ sub m_new {
 	}
 	$mat;
 }
+
+
+package Cv::Seq::Point;
+
+{
+	no warnings 'redefine';
+	*new = \&s_new;
+}
+
+sub s_new {
+	my $class = shift;
+	my @init = ();
+	while (ref $_[-1] && ref $_[-1] eq 'ARRAY') {
+		CORE::unshift(@init, CORE::pop);
+	}
+	my $self = $class->SUPER::new(@_);
+	if (@init) {
+		my @dims = Cv::m_dims(@init);
+		pop(@dims) if $dims[-1] == &Cv::CV_MAT_CN($self->type);
+		if (@dims > 1 && $dims[0] == 1) {
+			shift(@dims); @init = @{$init[0]};
+		}
+		if (@dims == 1 && $dims[0] > 1) {
+			@init = map { [ $_ ] } @init if &Cv::CV_MAT_CN($self->type) == 1;
+		}
+		if (@dims == 1) {
+			$self->Push(@init);
+		} else {
+			Carp::croak "can't init in ", (caller 0)[3];
+		}
+	}
+	$self;
+}
+
 
 # ============================================================
 #  core. The Core Functionality: Operations on Arrays
@@ -377,7 +407,7 @@ sub FitLine {
 { *Cv::MinAreaRect = *Cv::MinAreaRect2 = \&MinAreaRect2 }
 sub MinAreaRect2 {
     my $self = shift;
-	&Cv::Seq::stor(\@_);		# remove memstorage;
+	&Cv::stor(@_);				# remove memstorage;
     unless (ref $self) {
 		$self = Cv::Mat->new([], &Cv::CV_32SC2, @_);
 	}

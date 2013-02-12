@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 6;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 # ------------------------------------------------------------
@@ -24,7 +22,7 @@ if (1) {
 	$src2->set([1], [1 + rand]);
 	$src2->set([2], [1 + rand]);
 	my $dst = $src1->div($src2);
-	is_deeply({ round => "%.5g" },
+	is_deeply({ round => "%.4g" },
 			  [ $dst->getReal(0),
 				$dst->getReal(1),
 				$dst->getReal(2),
@@ -45,7 +43,7 @@ if (2) {
 	$src2->set([1], [1 + rand]);
 	$src2->set([2], [1 + rand]);
 	$src1->div($src2, my $dst = $src1->new);
-	is_deeply({ round => "%.5g" },
+	is_deeply({ round => "%.4g" },
 			  [ $dst->getReal(0),
 				$dst->getReal(1),
 				$dst->getReal(2),

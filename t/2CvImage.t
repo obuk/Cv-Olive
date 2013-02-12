@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 89;
-use File::Basename;
-use lib dirname($0);
-use MY;
+use Test::More tests => 90;
+BEGIN { use_ok('Cv::T') };
 BEGIN { use_ok('Cv', -more) }
 
 my $class = 'Cv::Image';
@@ -24,13 +22,13 @@ if (1) {
 	is($arr->origin, 0);
 
 	e { ${class}->new([240, 320], 7) };
-	err_is("OpenCV Error: Input image depth is not supported by function (Unsupported format) in cvInitImageHeader");
+	err_like("OpenCV Error:");
 }
 
 # type: $class->new([ $rows, $cols ], $type);
 if (2) {
 	e { $class->new([-1, -1], CV_8UC3) };
-	err_is("OpenCV Error: Unknown error code -25 (Bad input roi) in cvInitImageHeader");
+	err_like("OpenCV Error:");
 	# e { $class->new };
 	# err_is("${class}::new: ?sizes");
 	# e { $class->new([320, 240]) };
