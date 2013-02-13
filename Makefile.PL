@@ -78,6 +78,7 @@ WriteMakefile(
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
 	DIR => [ qw(Qt T) ],
+	LICENSE => 'perl',
 	clean => {
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
