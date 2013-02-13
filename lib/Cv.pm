@@ -68,22 +68,60 @@ BEGIN {
 	$O{$_} = 1 for qw(boxhappy);
 }
 
+use Getopt::Long;
+
 sub import {
 	my $self = shift;
-	my @std = ();
-	for (@_) {
-		if (/^-(\w+)$/) {
-			$IMPORT{lc $1} = !$IMPORT{lc $1};
-		} elsif (/^:no(\w+)$/) {
-			$IMPORT{lc $1} = 0;
-		} else {
-			push(@std, $_);
+	local @ARGV = @_;
+	my $opt_ok = GetOptions(
+		"more!"     => \$IMPORT{more},
+		"seq!"      => \$IMPORT{seq},
+		"qt!"       => \$IMPORT{qt},
+		"boxhappy!" => \$O{boxhappy},
+		);
+	unless ($opt_ok) {
+		die << "----";
+Usage: use Cv qw(-nomore -noseq -noboxhappy -qt)
+----
+;
+	}
+	if (@ARGV) {
+		my @argv = ();
+		for (@ARGV) {
+			if (/^:no(\w+)$/) {
+				$IMPORT{lc $1} = 0;
+			} else {
+				push(@argv, $_);
+			}
 		}
+		@ARGV = @argv;
 	}
 	for (grep { $IMPORT{$_} } keys %IMPORT) {
 		s/./\U$&/;
 		eval "use Cv::$_";
 		die "can't use Cv::$_; $@" if $@;
+	}
+	push(@ARGV, ":std") unless @ARGV;
+	$self->export_to_level(1, $self, @ARGV);
+}
+
+sub import024 {
+	my $self = shift;
+	my @std = ();
+	my %auto = (
+		more => 'Cv::More',
+		seq => 'Cv::Seq',
+		);
+	for (@_) {
+		if (/^(:no|-)(\w+)$/) {
+			delete $auto{lc $2};
+		} else {
+			push(@std, $_);
+		}
+	}
+	for (grep { defined $auto{$_} } keys %auto) {
+		eval "use $auto{$_}";
+		die "can't use $auto{$_}; $@" if $@;
 	}
 	push(@std, ":std") unless @std;
 	$self->export_to_level(1, $self, @std);
@@ -294,6 +332,12 @@ sub assoc {
 		}
 	}
 	return undef;
+}
+
+
+sub Usage {
+	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+	Carp::croak "Usage: ${[ caller 1 ]}[3](", join('', @_), ")";
 }
 
 
@@ -580,9 +624,7 @@ sub Merge {
 			push(@src, shift);
 		}
 	}
-	unless (@src) {
-		Carp::croak "Usage: ${[ caller 0 ]}[3]([src0, src1, ...], dst)";
-	}
+	Cv::Usage("[src0, src1, ...], dst") unless @src;
 	my $dst = shift;
 	$dst ||= $src[0]->new(&Cv::CV_MAKETYPE($src[0]->type, scalar @src));
 	push(@src, (\0) x (4 - @src));
@@ -1571,10 +1613,9 @@ sub CvtColor {
 	my $src = shift;
 	my $dst = dst(@_);
 	my $code = shift;
+	Cv::Usage("src, dst, code") unless defined $code;
 	unless ($dst) {
-		if (!defined $code) {
-			Carp::croak "Usage: ${[ caller 0 ]}[3](src, dst, code)";
-		} elsif ($code == &Cv::CV_BGR2RGB   || $code == &Cv::CV_RGB2BGR) {
+		if ($code == &Cv::CV_BGR2RGB   || $code == &Cv::CV_RGB2BGR) {
 			$dst = $src->new;
 		} elsif ($code == &Cv::CV_BGR2GRAY  || $code == &Cv::CV_RGB2GRAY) {
 			$dst = $src->new(&Cv::CV_MAKETYPE($src->type, 1));
@@ -1792,17 +1833,15 @@ package Cv::Arr;
 
 { *Show = \&ShowImage }
 sub ShowImage {
-	unless (@_ >= 1 && @_ <= 3) {
-		Carp::croak "Usage: ${[ caller 0 ]}[3](image, name, flags=CV_WINDOW_AUTOSIZE)";
-	}
+	Cv::Usage("image, name, flags=CV_WINDOW_AUTOSIZE")
+		unless @_ >= 1 && @_ <= 3;
 	my $image = shift;
 	my $name = shift;
 	$name = 'Cv' unless defined $name;
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	unless (Cv::cvGetWindowHandle($name)) {
-		my $flags = shift;
-		$flags = &Cv::CV_WINDOW_AUTOSIZE unless defined $flags;
-		Cv::cvNamedWindow($name, $flags);
+		my @name_flags = ($name, splice(@_));
+		Cv::cvNamedWindow(@name_flags);
 	}
 	Cv::cvShowImage($name, $image);
 	$image;
@@ -1830,9 +1869,8 @@ package Cv::Arr;
 
 { *Save = \&SaveImage }
 sub SaveImage {
-	unless (@_ >= 2 && @_ <= 3) {
-		Carp::croak "Usage: ${[ caller 0 ]}[3](image, filename, params=0)";
-	}
+	Cv::Usage("image, filename, params=0")
+		unless @_ >= 2 && @_ <= 3;
 	my ($image, $filename) = splice(@_, 0, 2);
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	my $r = &Cv::cvSaveImage($filename, $image, @_);

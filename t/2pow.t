@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
 BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', -more) }
+BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
 #  void cvPow(const CvArr* src, CvArr* dst, double power)

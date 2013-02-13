@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
 BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', -more) }
+BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC1);

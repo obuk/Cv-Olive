@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
 BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', qw(-more /^cv/)) }
+BEGIN { use_ok('Cv', qw(-nomore /^cv/)) }
 
 e { cvCreateImage() };
 err_is("Usage: Cv::cvCreateImage(size, depth, channels)");

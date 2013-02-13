@@ -9,7 +9,7 @@ BEGIN {
 }
 
 BEGIN {
-	use_ok('Cv', -more);
+	use_ok('Cv', -nomore);
 }
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";

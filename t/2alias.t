@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 103;
-BEGIN { use_ok('Cv', -more, '/do not import/') }
+BEGIN { use_ok('Cv', -nomore, '/do not import/') }
 
 if (1) {
 	for (qw(cvScalar cvVersion)) {

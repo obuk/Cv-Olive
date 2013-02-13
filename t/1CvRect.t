@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
 BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', -more) }
+BEGIN { use_ok('Cv', -nomore) }
 
 my ($x, $y, $width, $height) = map { int rand 16384 } 0..3;
 my $rect = Cv::cvRect($x, $y, $width, $height);

@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
 BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', -more) }
+BEGIN { use_ok('Cv', -nomore) }
 
 my ($width, $height) = unpack("f2", pack("f2", map { rand 1 } 0..1));
 my $size = Cv::cvSize2D32f($width, $height);

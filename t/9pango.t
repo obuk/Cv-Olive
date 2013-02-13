@@ -15,7 +15,7 @@ BEGIN {
 }
 
 BEGIN {
-	use_ok('Cv', -more);
+	use_ok('Cv', -nomore);
 	use_ok('Cv::Pango');
 }
 

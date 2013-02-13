@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 23;
 BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', -more) }
+BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
 # CvMat* cvGetCols(const CvArr* arr, CvMat* submat, int startCol, int endCol)

@@ -17,7 +17,9 @@ package Cv;
 
 our %O;
 
-$O{$_} = 0 for qw(cs cs-warn);
+BEGIN {
+	$O{$_} ||= 0 for qw(cs cs-warn);
+}
 
 our %M;
 
@@ -516,16 +518,6 @@ sub HasModule {
 		$hasQt;
 	}
 }
-
-# unless (Cv->hasQt) {
-# 	*Cv::cvSetWindowProperty =
-# 	*Cv::cvGetWindowProperty =
-# 	*Cv::cvFontQt =
-# 	*Cv::Arr::cvAddText =
-# 	*Cv::cvDisplayOverlay =
-# 	*Cv::cvDisplayStatusBar =
-# 	*Cv::cvCreateOpenGLCallback = sub { Carp::croak "no Qt" };
-# }
 
 1;
 __END__
