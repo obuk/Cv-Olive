@@ -54,6 +54,7 @@ my @perl_h_patched = ();
 
 my $PREREQ_PM = {
 	ExtUtils::ParseXS => 2.22,
+	Getopt::Long => 2.38,
 };
 
 if ($^O eq 'cygwin') {
