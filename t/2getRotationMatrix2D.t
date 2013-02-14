@@ -4,12 +4,10 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 21;
-BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -nomore) }
+BEGIN { use_ok('Cv::Test') }
 
-# ============================================================
 #  Cv->getRotationMatrix2D($center, $angle, $scale, $map);
-# ============================================================
 
 if (1) {
 	my ($x, $y) = (0, 0);

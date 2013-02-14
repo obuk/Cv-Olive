@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 13;
-BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -nomore) }
+BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $mat = Cv::Mat->new([3, 1], CV_8UC1);

@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 6;
-BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -nomore) }
+BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  double cvDet(const CvArr* mat)

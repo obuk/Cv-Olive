@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -nomore) }
+BEGIN { use_ok('Cv::Test') }
 
 SKIP: {
 	skip "no Cv->CreateStereoSGBM", 5 unless Cv->can('CreateStereoSGBM');

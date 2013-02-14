@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
-BEGIN { use_ok('Cv::T') }
-BEGIN { use_ok('Cv', qw(-nomore /^cv/)) }
+BEGIN { use_ok('Cv', qw(-nomore)) }
+BEGIN { use_ok('Cv::Test') }
 
 e { cvCreateImage() };
 err_is("Usage: Cv::cvCreateImage(size, depth, channels)");

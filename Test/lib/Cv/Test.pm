@@ -1,6 +1,6 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4 -*-
 
-package Cv::T;
+package Cv::Test;
 
 use 5.008008;
 use strict;
@@ -21,10 +21,10 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = @EXPORT_OK;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
-XSLoader::load('Cv::T', $VERSION);
+XSLoader::load('Cv::Test', $VERSION);
 
 our @CALLER; #($package, $filename, $line);
 
@@ -108,11 +108,11 @@ __END__
 
 =head1 NAME
 
-Cv::T - Cv extension for internal testing
+Cv::Test - Cv extension for internal testing
 
 =head1 SYNOPSIS
 
-  use Cv::T;
+  use Cv::Test;
 
 =head1 DESCRIPTION
 

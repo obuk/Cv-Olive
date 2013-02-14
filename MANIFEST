@@ -39,6 +39,7 @@ Qt/Makefile.PL
 Qt/MANIFEST
 Qt/Qt.xs
 Qt/README
+Qt/t/Cv-Qt.t
 README
 sample/aloeL.jpg
 sample/aloeR.jpg
@@ -274,7 +275,6 @@ t/4pointSeqFromMat.t
 t/4projectPoints2.t
 t/4toArray.t
 t/4transform.t
-t/5qt.t
 t/8issue10.t
 t/8issue11.t
 t/8issue8.t
@@ -288,12 +288,13 @@ t/9threads.t
 t/baboon.jpg
 t/hackcv.pm
 t/lena.jpg
-T/lib/Cv/T.pm
-T/Changes
-T/Makefile.PL
-T/MANIFEST
-T/README
-T/T.xs
+Test/Changes
+Test/lib/Cv/Test.pm
+Test/Makefile.PL
+Test/MANIFEST
+Test/README
+Test/t/Cv-Test.t
+Test/Test.xs
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh

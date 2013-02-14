@@ -2,14 +2,12 @@
 
 use strict;
 use warnings;
+# use Test::More qw(no_plan);
 use Test::More;
-use Cv::T;
-use Cv;
+BEGIN { use_ok('Cv::Test') }
+BEGIN { use_ok('Cv') }
 eval "use Cv::Qt qw(:all)";
 plan skip_all => "Qt required for testing" unless !$@ && cvHasQt();
-plan tests => 8;
-
-# can_ok('Cv', $_) for @Cv::Qt::EXPORT_OK;
 
 # ============================================================
 #  CvFont cvFontQt(
@@ -61,3 +59,5 @@ SKIP: {
 	$img->show('Cv');
 	Cv->waitKey(1000);
 }
+
+plan tests => 10;

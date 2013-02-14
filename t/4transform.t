@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 40;
-BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -37,9 +37,7 @@ if (1) {
 }
 
 
-# ============================================================
 #  cvTransform(CvArr* src, CvArr* dst, CvMat* transmat, CvMat* shiftvec)
-# ============================================================
 
 if (2) {
 	my $src2 = Cv::Mat->new([], &Cv::CV_32FC2, @src);

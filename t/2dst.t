@@ -4,16 +4,14 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 576;
-BEGIN { use_ok('Cv::T') }
 BEGIN { use_ok('Cv', -nomore) }
+BEGIN { use_ok('Cv::Test') }
 
 
-# ============================================================
 #  (1) $src1->XXX($src2);
 #  (2) $src1->XXX($val2);
 #  (3) $src1->XXX($src2, $dst);
 #  (4) $src1->XXX($src2); # new returns undef
-# ============================================================
 
 foreach my $xs (qw(
 
@@ -103,11 +101,9 @@ AbsDiff Add And Or Sub Xor
 
 
 
-# ============================================================
 #  (1) $src1->XXX();
 #  (3) $src1->XXX($dst);
 #  (4) $src1->XXX(); # new returns undef
-# ============================================================
 
 # WarpAffine
 # WarpPerspective
@@ -181,11 +177,9 @@ PyrMeanShiftFiltering PyrSegmentation Threshold Canny
 
 
 
-# ============================================================
 #  (1) $src1->XXX($src2);
 #  (3) $src1->XXX($src2, $dst);
 #  (4) $src1->XXX($src2); # new returns undef
-# ============================================================
 
 foreach my $xs (
 	qw(CrossProduct Div Mul MulSpectrums MulTransposed),
@@ -251,12 +245,10 @@ foreach my $xs (
 }
 
 
-# ============================================================
 #  (1) $src->XXX($arr_upper, $arr_lower);
 #  (2) $src->XXX($arr_upper, $arr_lower, $dst);
 #  (3) $src->XXX($val_upper, $val_lower);
 #  (4) $src->XXX($val_upper, $val_lower, $dst);
-# ============================================================
 
 foreach my $xs (qw(
 
