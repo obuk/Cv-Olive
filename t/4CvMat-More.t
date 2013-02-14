@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 66;
-BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv') }
 
 if (1) {

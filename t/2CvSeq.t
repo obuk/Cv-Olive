@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 64;
-BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv', -more) }
 
 my $stor = Cv::MemStorage->new;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 13;
-BEGIN { use_ok('Cv::T') }
+BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv', -more) }
 
 my $src = Cv->createImage([320, 240], 8, 3);
