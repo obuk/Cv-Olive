@@ -214,6 +214,18 @@ cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, 
 #endif
 #endif
 
+
+const char*
+cvGetBuildInformation()
+{
+#if defined __cplusplus && _CV_VERSION() >= _VERSION(2,4,0)
+	string s = cv::getBuildInformation();
+	return s.c_str();
+#else
+	return "";
+#endif
+}
+
 MODULE = Cv	PACKAGE = Cv
 
 # ============================================================
@@ -4129,21 +4141,8 @@ OUTPUT:
 MODULE = Cv	PACKAGE = Cv
 # ====================
 
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
 const char*
 cvGetBuildInformation()
-CODE:
-#ifdef __cplusplus
-	string s = cv::getBuildInformation();
-	RETVAL = s.c_str();
-#else
-	XSRETURN_UNDEF;
-#endif
-OUTPUT:
-	RETVAL
-
-#endif
 
 double
 cvVersion()

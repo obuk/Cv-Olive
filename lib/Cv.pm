@@ -1787,6 +1787,11 @@ package Cv;
 our %MOUSE = ( );
 our %TRACKBAR = ( );
 
+sub InitSystem {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	goto &cvInitSystem if cvHasQt();
+	return undef;
+}
 
 package Cv::Arr;
 
@@ -1963,14 +1968,63 @@ sub cvHasGUI {
 	}
 }
 
-sub cvHasQt { 0 }
-
-sub InitSystem {
+sub GetBuildInformation {
 	ref (my $class = shift) and Carp::croak 'class name needed';
-	if (Cv->can('cvGetBuildInformation')) {
-		goto &cvInitSystem if cvHasQt();
+	our $BuildInformation;
+	if (Cv->version >= 2.004) {
+		$BuildInformation = cvGetBuildInformation()
+			unless defined $BuildInformation;
 	}
-	return undef;
+	$BuildInformation ||= '';
+	our %BuildInformation = ();
+	unless (%BuildInformation) {
+		for ($BuildInformation) {
+			my $g = '';
+			for (split(/\n/)) {
+				s/^\s+//;
+				s/\s+$//;
+				if (s/([^\:]+):\s*//) {
+					my $k = $1;
+					if (/^$/) {
+						$g = $k;
+					} elsif ($g) {
+						$BuildInformation{$g}{$k} = $_;
+					} else {
+						$BuildInformation{$k} = $_;
+					}
+				} else {
+					$g = undef;
+				}
+			}
+		}
+	}
+	wantarray? %BuildInformation : $BuildInformation;
+}
+
+sub HasModule {
+	ref (my $class = shift) and Carp::croak 'class name needed';
+	our %OpenCV_modules;
+	unless (%OpenCV_modules) {
+		my %x = Cv->GetBuildInformation();
+		if (my $m = $x{q(OpenCV modules)}) {
+			$OpenCV_modules{$_}++ for split(/\s+/, $m->{'To be built'});
+			delete $OpenCV_modules{$_} for split(/\s+/, $m->{Disabled});
+			delete $OpenCV_modules{$_} for split(/\s+/, $m->{Unavailable});
+		}
+	}
+	grep { $OpenCV_modules{$_} } @_ ? @_ : keys %OpenCV_modules;
+}
+
+sub cvHasQt {
+	my $hasQt;
+	# if (Cv->can('cvFontQt')) {
+	if (1) {
+		my %x = Cv->GetBuildInformation;
+		while (my ($k, $v) = each %{$x{GUI}}) {
+			$hasQt = $k if ($k =~ /^QT \d\.\w+$/i && $v =~ /^YES\.*/i)
+		}
+	}
+	$hasQt;
 }
 
 1;
