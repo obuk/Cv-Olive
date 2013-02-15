@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 32;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 use File::Basename;
 use List::Util qw(max min);
 

@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
 ok(CV_SIZEOF('CvSeq'));
 ok(CV_SIZEOF('CvContour'));

@@ -17,7 +17,9 @@ package Cv;
 
 our %O;
 
-$O{$_} = 0 for qw(cs cs-warn);
+BEGIN {
+	$O{$_} ||= 0 for qw(cs cs-warn);
+}
 
 our %M;
 

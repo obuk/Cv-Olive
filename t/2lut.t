@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 

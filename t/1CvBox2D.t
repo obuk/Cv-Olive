@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 10;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
 my $center = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];
 my $size = [ unpack("f*", pack("f*", map { rand 1 } 0..1)) ];

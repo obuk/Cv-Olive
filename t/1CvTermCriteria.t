@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
 my ($epsilon) = map { int rand 10 } 3;

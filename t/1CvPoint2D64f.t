@@ -4,8 +4,8 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
 my ($x, $y) = unpack("d*", pack("d*", map { rand 1 } 0..1));
 my $pt = cvPoint2D64f($x, $y);

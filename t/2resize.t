@@ -4,12 +4,10 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 24;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
-# ============================================================
 # my $dst = $src->resize([rows, cols]);
-# ============================================================
 
 if (1) {
 	my $rows = 120;
@@ -35,9 +33,7 @@ if (2) {
 	is($src->cols, 2 * $cols);
 }
 
-# ============================================================
 # my $dst = $src->resize($src->new([rows, cols]));
-# ============================================================
 
 if (3) {
 	my $rows = 120;

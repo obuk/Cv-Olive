@@ -4,14 +4,12 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
-# ============================================================
 #  cvMatchTemplate(image, templ, [result], method)
 #  (1) $image->MatchTemplate($templ, CV_TM_SQDIFF);
 #  (2) $image->MatchTemplate($templ, $result, CV_TM_SQDIFF);
-# ============================================================
 
 if (1) {
 	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;

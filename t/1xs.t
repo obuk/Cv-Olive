@@ -6,7 +6,7 @@ use Test::More qw(no_plan);
 # use Test::More tests => 3;
 
 BEGIN {
-	use_ok('Cv', -more);
+	use_ok('Cv', -nomore);
 }
 
 our %cv;

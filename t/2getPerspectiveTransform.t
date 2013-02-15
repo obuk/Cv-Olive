@@ -4,14 +4,12 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
 my $verbose = Cv->hasGUI;
 
-# ============================================================
 #  Cv->GetPerspectiveTransform($src, $dst, my $mapMatrix)
-# ============================================================
 
 if (1) {
 	my ($cx, $cy) = (160, 120);

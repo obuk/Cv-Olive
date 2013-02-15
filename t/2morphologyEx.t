@@ -4,15 +4,13 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 18;
+BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv', -more) }
 
-# ============================================================
 #  void cvMorphologyEx(src, dst, temp, element, operation, iterations=1)
 #  (1) $src->MorphologyEx($element, CV_MOP_OPEN);
 #  (2) $src->MorphologyEx($element, CV_MOP_TOPHAT);
 #  (3) $src->MorphologyEx($dst, $tmp, $element, CV_MOP_BLACKHAT);
-# ============================================================
 
 if (1) {
 	my $element = Cv->CreateStructuringElementEx(3, 3, 1, 1, CV_SHAPE_RECT);
