@@ -6,12 +6,9 @@ use utf8;
 
 use Test::More;
 BEGIN {
-	eval("use Pango");
-	if ($@) {
-		plan skip_all => "can't use Pango";
-	} else {
-		plan qw(no_plan);
-	}
+	plan skip_all => "Pango required"
+        unless eval "use Pango; 1";
+	plan qw(no_plan);
 }
 
 BEGIN {
