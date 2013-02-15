@@ -62,6 +62,9 @@ if ($^O eq 'cygwin') {
 	};
 }
 
+my @dir = qw(Test);
+push(@dir, qw(Qt)) if $cf->hasqt;
+
 WriteMakefile(
 	NAME => 'Cv',
 	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
@@ -76,7 +79,7 @@ WriteMakefile(
 	CCFLAGS => $cf->ccflags,
 	DEFINE => join(' ', map { "-DWITH_$_=$with{$_}" } keys %with),
 	dynamic_lib => $cf->dynamic_lib,
-	DIR => [ qw(Test Qt) ],
+	DIR => [ @dir ],
 	LICENSE => 'perl',
 	clean => {
 		FILES => [

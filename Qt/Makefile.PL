@@ -7,10 +7,21 @@ use lib qw(../lib);
 use Cv::Config;
 my $cf = new Cv::Config;
 
+my $PREREQ_PM = {
+	ExtUtils::ParseXS => 2.22,
+};
+
+if ($^O eq 'cygwin') {
+	$PREREQ_PM = {
+		%$PREREQ_PM,
+		ExtUtils::MM_Cygwin => 6.62,
+	};
+}
+
 WriteMakefile(
 	NAME => 'Cv::Qt',
 	VERSION_FROM => 'lib/Cv/Qt.pm',
-	PREREQ_PM => {},
+	PREREQ_PM => $PREREQ_PM,
 	ABSTRACT_FROM => 'lib/Cv/Qt.pm',
 	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	INC => '-I. -I..',

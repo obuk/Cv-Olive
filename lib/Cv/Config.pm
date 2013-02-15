@@ -108,13 +108,48 @@ sub ccflags {
 	$self->{CCFLAGS};
 }
 
+sub hasqt {
+	my $self = shift;
+	unless (defined $self->{hasqt}) {
+		my $c = "/tmp/cv$$.c";
+		warn "Compiling $c to check you have qt.\n" if $verbose;
+		my $CC = $self->cc;
+		my $CCFLAGS = $self->ccflags;
+		my $LIBS = join(' ', @{$self->libs});
+		if (my $dynamic_lib = $self->dynamic_lib) {
+			if ($dynamic_lib->{OTHERLDFLAGS}) {
+				$LIBS .= " " . $dynamic_lib->{OTHERLDFLAGS};
+			}
+		}
+		if (open C, ">$c") {
+			print C <<"----";
+#include <stdio.h>
+#include <opencv/cv.h>
+main()
+{
+	CvFont font = cvFontQt("Times");
+	exit(0);
+}
+----
+	;
+			close C;
+			warn "$CC $CCFLAGS -o a.exe $c $LIBS\n" if $verbose;
+			chop(my $v = `$CC $CCFLAGS -o a.exe $c $LIBS && ./a.exe`);
+			$self->{hasqt} = $? == 0;
+			unlink($c, 'a.exe');
+		} else {
+			die "$0: can't open $c.\n";
+		}
+	}
+	$self->{hasqt};
+}
 
 sub _version {
 	my $self = shift;
 	unless (defined $self->{version}) {
 		return $self->{version} = Cv::cvVersion()
 			if Cv->can('cvVersion');
-		my $c = "/tmp/version$$.c";
+		my $c = "/tmp/cv$$.c";
 		warn "Compiling $c to get Cv version.\n" if $verbose;
 		my $CC = $self->cc;
 		my $CCFLAGS = $self->ccflags;
