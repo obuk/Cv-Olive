@@ -1361,14 +1361,7 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV*
 cvCvtSeqToArray(const CvSeq* seq, SV* elements, CvSlice slice=CV_WHOLE_SEQ)
 INIT:
-	int s = slice.start_index, e = slice.end_index - 1, n = seq->total, size;
-	if (e == CV_WHOLE_SEQ_END_INDEX - 1) e = n - 1;
-	if (n) {
-		s %= n; if (s < 0) s += n;
-		e %= n; if (e < 0) e += n;
-	}
-	n = ((s <= e)? e - s : n - (s - e)) + 1;
-	size = n * seq->elem_size;
+	int size = cvSliceLength(slice, seq) * seq->elem_size;
 	sv_setpvn(elements, "", size);
 	SvCUR_set(elements, size);
 CODE:

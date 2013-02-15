@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More tests => 13;
 BEGIN { use_ok('Cv::Test') }
-BEGIN { use_ok('Cv') }
+BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
 	my $seq = Cv::Seq::Point->new(CV_32SC1);
@@ -17,27 +17,43 @@ if (1) {
 		my @got = unpack("i*", $elements);
 		my @expect = (0 .. 9);
 		is_deeply(\@got, \@expect);
+		is($seq->SliceLength(CV_WHOLE_SEQ), scalar @expect);
 	}
 
 	if (1.2) {
-		Cv::Arr::cvCvtSeqToArray($seq, my $elements, [1, 3]);
+		my $slice = [1, 3];
+		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = (1 .. 2);
 		is_deeply(\@got, \@expect);
+		is($seq->SliceLength($slice), scalar @expect);
 	}
 
 	if (1.3) {
-		Cv::Arr::cvCvtSeqToArray($seq, my $elements, [-1, 3]);
+		my $slice = [-1, 3];
+		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = (9, 0 .. 2);
 		is_deeply(\@got, \@expect);
+		is($seq->SliceLength($slice), scalar @expect);
 	}
 
 	if (1.4) {
-		Cv::Arr::cvCvtSeqToArray($seq, my $elements, [0, -1]);
+		my $slice = [0, -1];
+		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = (0 .. 8);
 		is_deeply(\@got, \@expect);
+		is($seq->SliceLength($slice), scalar @expect);
+	}
+
+	if (1.5) {
+		my $slice = [1, 1];
+		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
+		my @got = unpack("i*", $elements);
+		my @expect = ();
+		is_deeply(\@got, \@expect);
+		is($seq->SliceLength($slice), scalar @expect);
 	}
 
 }
