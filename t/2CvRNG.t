@@ -38,8 +38,8 @@ if (2) {
 	$arr->avgSdv(my $mean, my $stdDev);
 	my @mean = map { $_ / $p1 } @{$mean}[0 .. $ch - 1];
 	my @stdDev = map { $_ / $p2 } @{$stdDev}[0 .. $ch - 1];
-	is_deeply({ round => "%.1f" }, \@mean, [ (1.0) x $ch ]);
-	is_deeply({ round => "%.1f" }, \@stdDev, [ (1.0) x $ch ]);
+	is_({ round => "%.1f" }, \@mean, [ (1.0) x $ch ]);
+	is_({ round => "%.1f" }, \@stdDev, [ (1.0) x $ch ]);
 }
 
 if (2) {
@@ -60,8 +60,8 @@ if (2) {
 	$arr->avgSdv(my $mean, my $stdDev);
 	my @mean = map { $_ / $p1 } @{$mean}[0 .. $ch - 1];
 	my @stdDev = map { $_ / $p2 } @{$stdDev}[0 .. $ch - 1];
-	is_deeply({ round => "%.1f" }, \@mean, [ (1.0) x $ch ]);
-	is_deeply({ round => "%.1f" }, \@stdDev, [ (1.0) x $ch ]);
+	is_({ round => "%.1f" }, \@mean, [ (1.0) x $ch ]);
+	is_({ round => "%.1f" }, \@stdDev, [ (1.0) x $ch ]);
 }
 
 if (10) {

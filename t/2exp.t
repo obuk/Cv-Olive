@@ -18,16 +18,16 @@ $src->set([2], [rand 3]);
 
 if (1) {
 	my $dst = $src->exp;
-	is_deeply({ round => "%.4g" }, $dst->getReal([0]), exp($src->getReal([0])));
-	is_deeply({ round => "%.4g" }, $dst->getReal([1]), exp($src->getReal([1])));
-	is_deeply({ round => "%.4g" }, $dst->getReal([2]), exp($src->getReal([2])));
+	is_({ round => "%.4g" }, $dst->getReal([0]), exp($src->getReal([0])));
+	is_({ round => "%.4g" }, $dst->getReal([1]), exp($src->getReal([1])));
+	is_({ round => "%.4g" }, $dst->getReal([2]), exp($src->getReal([2])));
 }
 
 if (2) {
 	$src->exp(my $dst = $src->new);
-	is_deeply({ round => "%.4g" }, $dst->getReal([0]), exp($src->getReal([0])));
-	is_deeply({ round => "%.4g" }, $dst->getReal([1]), exp($src->getReal([1])));
-	is_deeply({ round => "%.4g" }, $dst->getReal([2]), exp($src->getReal([2])));
+	is_({ round => "%.4g" }, $dst->getReal([0]), exp($src->getReal([0])));
+	is_({ round => "%.4g" }, $dst->getReal([1]), exp($src->getReal([1])));
+	is_({ round => "%.4g" }, $dst->getReal([2]), exp($src->getReal([2])));
 }
 
 if (10) {

@@ -22,8 +22,8 @@ if (1) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_deeply({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_deeply({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
+	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
 }
 
 if (2) {
@@ -37,8 +37,8 @@ if (2) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_deeply({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_deeply({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
+	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
 }
 
 if (3) {
@@ -54,8 +54,8 @@ if (3) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_deeply({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_deeply({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
+	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
 }
 
 if (4) {
@@ -67,8 +67,8 @@ if (4) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_deeply({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_deeply({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
+	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
 }
 
 if (10) {

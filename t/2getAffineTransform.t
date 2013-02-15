@@ -36,12 +36,12 @@ if (1) {
 
 	Cv->GetAffineTransform(\@src, \@dst, my $map);
 
-	is_deeply({ round => '%.7f' }, $map->getReal([0, 0]), -1);
-	is_deeply({ round => '%.7f' }, $map->getReal([0, 1]), 0);
-	is_deeply({ round => '%.7f' }, $map->getReal([0, 2]), 320);
-	is_deeply({ round => '%.7f' }, $map->getReal([1, 0]), 0);
-	is_deeply({ round => '%.7f' }, $map->getReal([1, 1]), -1);
-	is_deeply({ round => '%.7f' }, $map->getReal([1, 2]), 240);
+	is_({ round => '%.7f' }, $map->getReal([0, 0]), -1);
+	is_({ round => '%.7f' }, $map->getReal([0, 1]), 0);
+	is_({ round => '%.7f' }, $map->getReal([0, 2]), 320);
+	is_({ round => '%.7f' }, $map->getReal([1, 0]), 0);
+	is_({ round => '%.7f' }, $map->getReal([1, 1]), -1);
+	is_({ round => '%.7f' }, $map->getReal([1, 2]), 240);
 
 	if ($verbose) {
 		my $img = Cv::Mat->new([2 * $cy, 2 * $cx], CV_8UC3);

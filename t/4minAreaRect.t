@@ -14,7 +14,7 @@ my @points = ([ 100, 100 ], [ 200, 100 ], [ 200, 200 ], [ 100, 200 ]);
 
 if (1) {
 	my @vtx = Cv->boxPoints(Cv->MinAreaRect(@points));
-	is_deeply({ round => '%.0f', rotate => 1 }, \@vtx, \@points);
+	is_({ round => '%.0f', rotate => 1 }, \@vtx, \@points);
 	if ($verbose) {
 		$img->zero;
 		$img->circle($_, 3, cvScalar(0, 0, 255), CV_FILLED, CV_AA) for @points;
@@ -26,5 +26,5 @@ if (1) {
 
 if (2) {
 	my @vtx = Cv->boxPoints(Cv->MinAreaRect(\@points));
-	is_deeply({ round => '%.0f', rotate => 1 }, \@vtx, \@points);
+	is_({ round => '%.0f', rotate => 1 }, \@vtx, \@points);
 }

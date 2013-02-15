@@ -38,12 +38,12 @@ if (1) {
 
 	Cv->GetPerspectiveTransform(\@src, \@dst, my $map);
 
-	is_deeply({ round => '%.7f' }, $map->getReal([0, 0]), 1);
-	is_deeply({ round => '%.7f' }, $map->getReal([0, 1]), 0);
-	is_deeply({ round => '%.7f' }, $map->getReal([0, 2]), 0);
-	is_deeply({ round => '%.7f' }, $map->getReal([1, 0]), 0);
-	is_deeply({ round => '%.7f' }, $map->getReal([1, 1]), 1);
-	is_deeply({ round => '%.7f' }, $map->getReal([1, 2]), 0);
+	is_({ round => '%.7f' }, $map->getReal([0, 0]), 1);
+	is_({ round => '%.7f' }, $map->getReal([0, 1]), 0);
+	is_({ round => '%.7f' }, $map->getReal([0, 2]), 0);
+	is_({ round => '%.7f' }, $map->getReal([1, 0]), 0);
+	is_({ round => '%.7f' }, $map->getReal([1, 1]), 1);
+	is_({ round => '%.7f' }, $map->getReal([1, 2]), 0);
 
 	if ($verbose) {
 		my $img = Cv::Mat->new([2 * $cy, 2 * $cx], CV_8UC3);

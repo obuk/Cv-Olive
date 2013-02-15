@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	is_deeply
+	is_
 	err_is
 	err_like
 	_e e
@@ -73,7 +73,7 @@ sub round_deeply {
 	$_[0];
 }
 
-sub is_deeply {
+sub is_ {
 	my $opt = ref $_[0] && ref $_[0] eq 'HASH' ? shift : { };
 	my ($got, $exp) = splice(@_, 0, 2);
 	if (my $round = $opt->{round}) {

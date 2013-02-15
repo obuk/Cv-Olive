@@ -24,10 +24,10 @@ if (1) {
 	$B->set([2], [$bz]);
 	my $X = $A->crossProduct($B);
 	my ($x, $y, $z) = ($X->getReal(0), $X->getReal(1), $X->getReal(2));
-	is_deeply({ round => "%.3g" }, cvScalar($x, $y, $z),
-			  cvScalar($ay * $bz - $az * $by,
-					   $az * $bx - $ax * $bz,
-					   $ax * $by - $ay * $bx),
+	is_({ round => "%.3g" }, cvScalar($x, $y, $z),
+		cvScalar($ay * $bz - $az * $by,
+				 $az * $bx - $ax * $bz,
+				 $ax * $by - $ay * $bx),
 		);
 }
 
@@ -39,10 +39,10 @@ if (2) {
 	$A->set([0], [$ax, $ay, $az]);
 	$B->set([0], [$bx, $by, $bz]);
 	$A->crossProduct($B, my $X = $A->new);
-	is_deeply({ round => "%.4g" }, $X->get([0]),
-			  cvScalar($ay * $bz - $az * $by,
-					   $az * $bx - $ax * $bz,
-					   $ax * $by - $ay * $bx),
+	is_({ round => "%.4g" }, $X->get([0]),
+		cvScalar($ay * $bz - $az * $by,
+				 $az * $bx - $ax * $bz,
+				 $ax * $by - $ay * $bx),
 		);
 }
 

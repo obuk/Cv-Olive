@@ -22,15 +22,15 @@ if (1) {
 	$src2->set([1], [1 + rand]);
 	$src2->set([2], [1 + rand]);
 	my $dst = $src1->div($src2);
-	is_deeply({ round => "%.4g" },
-			  [ $dst->getReal(0),
-				$dst->getReal(1),
-				$dst->getReal(2),
-			  ],
-			  [ Div($src1->getReal(0), $src2->getReal(0)),
-				Div($src1->getReal(1), $src2->getReal(1)),
-				Div($src1->getReal(2), $src2->getReal(2)),
-			  ],
+	is_({ round => "%.4g" },
+		[ $dst->getReal(0),
+		  $dst->getReal(1),
+		  $dst->getReal(2),
+		],
+		[ Div($src1->getReal(0), $src2->getReal(0)),
+		  Div($src1->getReal(1), $src2->getReal(1)),
+		  Div($src1->getReal(2), $src2->getReal(2)),
+		],
 		);
 }
 
@@ -43,15 +43,15 @@ if (2) {
 	$src2->set([1], [1 + rand]);
 	$src2->set([2], [1 + rand]);
 	$src1->div($src2, my $dst = $src1->new);
-	is_deeply({ round => "%.4g" },
-			  [ $dst->getReal(0),
-				$dst->getReal(1),
-				$dst->getReal(2),
-			  ],
-			  [ Div($src1->getReal(0), $src2->getReal(0)),
-				Div($src1->getReal(1), $src2->getReal(1)),
-				Div($src1->getReal(2), $src2->getReal(2)),
-			  ],
+	is_({ round => "%.4g" },
+		[ $dst->getReal(0),
+		  $dst->getReal(1),
+		  $dst->getReal(2),
+		],
+		[ Div($src1->getReal(0), $src2->getReal(0)),
+		  Div($src1->getReal(1), $src2->getReal(1)),
+		  Div($src1->getReal(2), $src2->getReal(2)),
+		],
 		);
 }
 

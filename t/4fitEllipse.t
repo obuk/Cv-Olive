@@ -22,8 +22,8 @@ for (map { [[ 160, 120 ], $_] } 0, 15, 30) {
 	$img->zero;
 	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
 	my $box = aa(Cv->fitEllipse(\@points));
-	is_deeply({ round => "%.0f" }, $box->[0], $center);
-	is_deeply({ round => "%.0f" }, $box->[2], $angle);
+	is_({ round => "%.0f" }, $box->[0], $center);
+	is_({ round => "%.0f" }, $box->[2], $angle);
 	my @box = Cv->BoxPoints($box);
 	$img->polyLine([\@box], -1, &color, 1, CV_AA);
 	# $img->EllipseBox($box, &color, 1, CV_AA);
@@ -49,8 +49,8 @@ for (map { [[ 160, 120 ], $_] } 45, 60, 75) {
 	$img->zero;
 	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
 	my $box = aa([Cv->fitEllipse(\@points)]);
-	is_deeply({ round => "%.0f" }, $box->[0], $center);
-	is_deeply({ round => "%.0f" }, $box->[2], $angle);
+	is_({ round => "%.0f" }, $box->[0], $center);
+	is_({ round => "%.0f" }, $box->[2], $angle);
 	my @box = Cv->BoxPoints($box);
 	$img->polyLine([\@box], -1, &color, 1, CV_AA);
 	$img->EllipseBox($box, &color, 1, CV_AA);
