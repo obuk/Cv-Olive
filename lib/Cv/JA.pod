@@ -578,9 +578,9 @@ CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
 
 =item L<Cv>
 
-=item http://opencv.willowgarage.com/
+=item L<http://opencv.willowgarage.com/>
 
-=item http://github.com/obuk/Cv-Olive
+=item L<http://github.com/obuk/Cv-Olive>
 
 =back
 
