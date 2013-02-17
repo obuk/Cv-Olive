@@ -7,6 +7,10 @@ use Test::More tests => 13;
 BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv', -nomore) }
 
+# ============================================================
+#  cvCvtSeqToArray(const CvSeq* seq, SV* elements, CvSlice slice=CV_WHOLE_SEQ)
+# ============================================================
+
 if (1) {
 	my $seq = Cv::Seq::Point->new(CV_32SC1);
 	ok($seq->isa('Cv::Seq::Point'));
@@ -21,7 +25,7 @@ if (1) {
 	}
 
 	if (1.2) {
-		my $slice = [1, 3];
+		my $slice = cvSlice(1, 3);
 		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = (1 .. 2);
@@ -30,7 +34,7 @@ if (1) {
 	}
 
 	if (1.3) {
-		my $slice = [-1, 3];
+		my $slice = cvSlice(-1, 3);
 		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = (9, 0 .. 2);
@@ -39,7 +43,7 @@ if (1) {
 	}
 
 	if (1.4) {
-		my $slice = [0, -1];
+		my $slice = cvSlice(0, -1);
 		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = (0 .. 8);
@@ -48,7 +52,7 @@ if (1) {
 	}
 
 	if (1.5) {
-		my $slice = [1, 1];
+		my $slice = cvSlice(0, 0);
 		Cv::Arr::cvCvtSeqToArray($seq, my $elements, $slice);
 		my @got = unpack("i*", $elements);
 		my @expect = ();

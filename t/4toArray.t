@@ -22,7 +22,7 @@ for my $class (qw(Cv::Mat Cv::MatND)) {
 		is(scalar @list, 3);
 		is_deeply([@list], [map {cvScalar(@$_)} @pts]);
 		
-		my @list2 = $arr->toArray([1, 1]);
+		my @list2 = $arr->toArray(cvSlice(1, 1));
 		is(scalar @list2, 1);
 		is_deeply([@list2], [map {cvScalar(@$_)} $pts[1]]);
 		
@@ -30,7 +30,7 @@ for my $class (qw(Cv::Mat Cv::MatND)) {
 		is(scalar @list3, 3);
 		is_deeply([@list3], [map {cvScalar(@$_)} @pts]);
 		
-		$arr->toArray(\my @list4, [0, 1]);
+		$arr->toArray(\my @list4, cvSlice(0, 1));
 		is(scalar @list4, 2);
 		is_deeply([@list4], [map {cvScalar(@$_)} @pts[0, 1]]);
 	}
@@ -46,7 +46,7 @@ for my $class (qw(Cv::Mat Cv::MatND)) {
 		is(scalar @list, 3);
 		is_deeply([@list], [map {cvScalar(@$_)} @pts]);
 		
-		my @list2 = $arr->toArray([1, 2]);
+		my @list2 = $arr->toArray(cvSlice(1, 2));
 		is(scalar @list2, 2);
 		is_deeply([@list2], [map {cvScalar(@$_)} @pts[1, 2]]);
 	}

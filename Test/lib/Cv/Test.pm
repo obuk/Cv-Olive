@@ -59,7 +59,7 @@ sub _e {
 
 sub e (&) {
 	_e(1);
-	local $Carp::CarpLevel = $Carp::CarpLevel + 2;
+	local $Carp::Internal{'Cv::Test'} = 1;
 	eval { &{$_[0]} };
 }
 

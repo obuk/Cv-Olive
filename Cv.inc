@@ -66,19 +66,12 @@ void Carp_croak(pTHX_ char const* format, ...)
 	const size_t size = 1000;
 	char* str = (char*) alloca(size);
 	char* argv[] = { str, 0 };
-	SV* sv_carplevel = get_sv("Carp::CarpLevel", 0);
 	va_start(ap, format);
 	vsnprintf(str, size, format, ap);
 	va_end(ap);
-	if (sv_carplevel) {
-		IV i = SvIV(sv_carplevel);
-		sv_setiv(sv_carplevel, i + 1);
-		call_argv("Carp::croak", G_VOID|G_DISCARD, argv);
-		/* NOTREACHED, but ... */
-		sv_setiv(sv_carplevel, i);
-	}
-	/* plan b */
-	Perl_croak(aTHX_ "%s", str);
+    call_argv("Carp::croak", G_VOID|G_DISCARD, argv);
+	/* NOTREACHED, but ... */
+	Perl_croak(aTHX_ "%s", str); /* for safety */
 }
 
 #define Perl_croak Carp_croak

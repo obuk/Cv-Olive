@@ -8,6 +8,5 @@ BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv', -nomore) }
 
 my $mat = Cv::Mat->new([240, 320], CV_8UC1);
-# my $img = $mat->Cv::Image::new;
 my $img = e { $mat->Cv::Image::new };
 err_is('');

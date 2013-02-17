@@ -110,6 +110,8 @@ cover:
 	cover
 	find cover_db -type d |xargs chmod +rx
 
+Cv.xs:	Cv.inc
+
 ";
 }
 
