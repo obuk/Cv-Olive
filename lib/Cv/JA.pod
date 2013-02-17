@@ -1,27 +1,26 @@
 # -*- mode: pod; coding: utf-8; tab-width: 4; -*-
+
 =encoding utf8
 
-=head1 名前
+=head1 Name
 
-Cv::More - L<Cv|Cv::Nihongo> をもう少し Perl で使いやすくしたいね。
+Cv::JA - 日本語ドキュメントと小さな断片
 
-=head1 概要
+=head1 DESCRIPTION
 
- use Cv::More qw(cs);
+Cv::JA は、日本語のドキュメント、あるいは、ドキュメントになる前のメモや
+アイディアのようなものです。
 
-=head1 説明
+=head1 Cv::More
 
-C<Cv::More> は、L<Cv|Cv::Nihongo> から実験的な機能を切り離して整理する
-ためのパッケージです。C<Cv> が拡張しやすくなると考えています。
-C<Cv::More> は、C<Cv> の一部を切り離したものなので、使わないことを明示
-しない限り取り込みます。
+C<Cv::More> は、L<Cv> から実験的な機能を切り離して整理するためのパッケー
+ジです。C<Cv> が拡張しやすくなると考えています。C<Cv::More> は、C<Cv>
+の一部を切り離したものなので、使わないことを明示しない限り取り込みます。
 
  use Cv;              # Cv::More を使う
  use Cv qw(:nomore);  # Cv::More を使わない
 
-=head2 追加または拡張したメソッド
-
-=head3 Perlの配列を使うメソッド
+=head2 Perlの配列を使うメソッド
 
 =over
 
@@ -276,7 +275,7 @@ cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。�
 =back
 
 
-=head3 その他のメソッド
+=head2 その他のメソッド
 
 =over
 
@@ -312,19 +311,282 @@ OpenCV がどのようなモジュールを有効にしてビルドされたか�
 
 =back
 
-=head1 バグ
+
+
+=head1 Cv::Seq
+
+OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。格納さ
+れたデータを型なしで扱うスーパクラス L<Cv::Seq|Cv::Seq-ja> と、データに
+合わせた変換を行う派生クラス L<Cv::Seq::Point|Cv::Seq::Point-ja>,
+L<Cv::Seq::Rect|Cv::Seq::Rect-ja>, ... に分け、データに合わせて bless
+して使います。C言語のキャストのようなものです。
+
+facedetect の一部を示します。HaarDetectObjects() は、検出した顔を複数の
+CvRect 型のデータのリストにして返します。次の例は、シーケンスを
+C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
+
+  my $faces = bless $image->HaarDetectObjects(
+    $cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+    cvSize(30, 30)), "Cv::Seq::Rect";
+  while (my @rect = $faces->shift) {
+    my ($x, $y, $w, $h) = @rect;
+    ...
+  }
+
+同じ部分の C言語のコードを並べておきます。比べやすくするために、余分な
+ものは省きました。
+
+  CvSeq* faces = cvHaarDetectObjects(
+    image, cascade, storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+    cvSize(30, 30));
+  for (;;) {
+    CvRect rect;
+    cvSeqPopFront(faces, &rect);
+    ...
+  }
+
+=head2 メソッド
+
+=over
+
+=item Cv->CreateSeq()
+
+=item CreateSeq($seqFlags, $headerSize, $elemSize, $stor)
+
+=item Cv::Seq->MakeSeqHeaderForArray($seqFlags, $headerSize, $elemSize, $stor)
+
+=item Cv::Seq->new($seqFlags, $headerSize, $elemSize, $stor)
+
+=item $seq->Push(@elem)
+
+=item $seq->Pop()
+
+=item $seq->Unshift(@elem)
+
+=item $seq->Shift()
+
+=item $seq->Splice()
+
+	# splice($array, $offset, $length, @list)
+	# splice($array, $offset, $length)
+	# splice($array, $offset)
+
+=back
+
+=head2 メモリの解放
+
+動的なメモリは、主にシーケンスを置く領域として使います。Cv の中はそれが
+必要な呼出しにおいて与えられないとき、内部で確保することがあります。確
+保した領域は $Cv::STORAGE に置きますが、動的なメモリは、使い方によって
+は、その成長を制限する必要があります。OpenCV は cvClearMemStorage() を
+呼んでリセットできるようにしていますが、Perl では、次のとおり local を
+使うと簡単です。
+
+ {
+   local $Cv::STORAGE = $Cv::STORAGE;
+   my $seq = Cv::Seq::Point->new();
+   ...
+ }
+
+
+=head1 Cv::Pango
+
+C<Cv::Pango> は、Pango を使用して、いろいろな文字を描きます。
+Cv::Arr::PutText() そのものを置き換えます。
+
+ use Cv;
+ use Cv::Pango;
+
+ my $img = Cv::Mat->new([240, 320], CV_8UC4);
+ $img->putText(
+	"\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
+	[20, 200], 'Sans Serif 42',
+	);
+ $img->showImage;
+ $img->waitKey;
+
+=head2 メソッド
+
+=over 4
+
+=item $img->putText($text, $org, $font, $color)
+
+$img は Cv::Arr のオブジェクトです。$font は Pango::FontDescription の
+オブジェクトかフォントを識別するための文字列を指定します。InitFont() で
+作成したフォントも使えます。PutText のその他のパラメータの詳細は
+OpenCV の cvPutText() を参照してください。
+
+フォントを識別するための文字列は次のとおり。
+
+ "[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]"
+
+具体的には、
+
+ "sans bold 12"
+ "serif,monospace bold italic condensed 16"
+ "normal 10"
+
+詳細は pango.FontDescription() を参照してください。
+
+=item $font->getTextSize($text, my $size, my $baseline)
+
+文字列のサイズとベースラインを求めます。サイズは幅と高さです。このサブ
+ルーチンは Pango::FontDescription に配置されます。行儀が悪いと思うので
+すが、どうすればいいのか分っていません。
+
+=back
+
+=head2 エクスポート
+
+ありません。
+
+=head2 バグ
 
 =over
 
 =item *
 
+いまのところ、CV_8UC1 と CV_8UC4 しか使えません。
+
+=item *
+
+このパッケージは、フォントが Pango::FontDescription のオブジェクトにな
+るので、この名前空間に cvGetTextSize() を置きます。もっと上手なパッチの
+あて方をご存知の方は教えてください。
+
 =back
 
-=head1 参考
 
-L<Cv::Nihongo|Cv::Nihongo>
 
-=head1 著作権
+
+
+=head1 Cv::Flipbook
+
+C<Cv::Flipbook> は、画像ファイルをひとつのディレクトリにまとめ、それを
+順番に読み込んでビデオ入力の代わりとして扱います。つまり、パラパラ漫画
+をビデオとして扱うということです。
+
+ use Cv;
+ use Cv::Flipbook;
+ 
+ my $capture = Cv->CaptureFromFlipbook("/path/to/flipbook");
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
+
+次の注意する必要があります。
+
+=over
+
+=item 
+
+すべての画像の大きさを揃える。
+
+=item
+
+ファイル名に順序付けのための番号を含める。
+
+=back
+
+=head2 メソッド
+
+=over
+
+=item Cv::Flipbook->new($dir, $flags, $pattern)
+
+パラパラ画像をビデオ入力にするオブジェクトを返します。new の代りに
+C<Cv-E<gt>CaptureFromFlipbook> と C<Cv::Capture-E<gt>FromFlipbook> も使
+えます。
+
+=over
+
+=item $dir
+
+パラパラ漫画の画像ファイルをまとめたディレクトリです。省略時は、
+カレントディレクトリを対象として扱います。
+
+=item $flags
+
+画像ファイルの読み込みで LoadImage のフラグとして使います。省略時は、
+CV_LOAD_IMAGE_COLOR を使いれます。
+
+=item $pattern
+
+$dir と合わせて画像ファイルの一覧を得るためのパターンとして使います。ス
+カラかリストを指定します。省略したときには、いくつかの画像ファイルの拡
+張子が指定されたものとみなします。
+
+ glob("$dir/$pattern")               # scalar
+ map { glob("$dir/$_") } @$pattern   # list
+
+=back
+
+=item GrabFrame()
+
+次フレームの画像ファイルを準備します。次のフレーム番号は、
+CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
+
+=item NextFrame()
+
+フレーム番号を 1つ進めます。
+
+=item RetrieveFrame()
+
+フレームを読み込んで返します。フレーム番号は 1つ進みます。次のプロパティ
+を更新します。
+
+ CV_CAP_PROP_FRAME_WIDTH
+ CV_CAP_PROP_FRAME_HEIGHT
+ CV_CAP_PROP_POS_MSEC      # CV_CAP_PROP_FPS が定義済なら
+
+3つ目の CV_CAP_PROP_POS_MSEC は、秒あたりのフレーム数 CV_CAP_PROP_FPS
+が C<SetCaptureProperty> で与えられていれば更新します。最後のフレームを
+越えると undef を返します。
+
+=item QueryFrame()
+
+次のフレームを読み込み、それを返します。
+
+=item GetCaptureProperty($property_id)
+
+パラパラビデオ入力のプロパティ $property_id を取得します。
+取り扱えるプロパティは次のとおり。
+
+ CV_CAP_PROP_FPS
+ CV_CAP_PROP_POS_MSEC
+ CV_CAP_PROP_POS_FRAMES
+ CV_CAP_PROP_FPS
+ CV_CAP_PROP_FRAME_WIDTH
+ CV_CAP_PROP_FRAME_HEIGHT
+
+詳細は OpenCV のリファレンスを参照してください。
+
+=item SetCaptureProperty($property_id, $value)
+
+パラパラビデオ入力のプロパティ $property_id に $value を与えます。
+
+=back
+
+=head2 エクスポート
+
+ありません。
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Cv>
+
+=item L<http://opencv.willowgarage.com/>
+
+=item L<http://github.com/obuk/Cv-Olive>
+
+=back
+
+=head1 LICENCE
 
 Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
 
