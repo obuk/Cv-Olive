@@ -24,7 +24,7 @@ my $dist = Cv::Mat->new([], CV_32FC1,
 
 my $PI = 3.1416;
 
-if (1) {
+if (0) {
 	my ($x, $y) = (-20, 30);
 	foreach my $z (map { $_ * 10 } 1 .. 50) {
 		my $img = Cv::Mat->new([$fy, $fx], CV_8UC3)->zero;
@@ -184,7 +184,7 @@ if (1.2) {
 	}
 }
 
-if (1.3) {
+if (0 * 1.3) {
 	foreach (-50 .. 50) {
 		my $img = Cv::Mat->new([$fy, $fx], CV_8UC3)->zero;
 		my $rvec = Cv::Mat->new([], CV_32FC1,
@@ -214,7 +214,7 @@ if (1.3) {
 	}
 }
 
-if (2.1) {
+if (0 * 2.1) {
 	foreach (-25 .. 25) {
 		my $img = Cv::Mat->new([$fy, $fx], CV_8UC3)->zero;
 		my $rvec = Cv::Mat->new([], CV_32FC1,
@@ -244,7 +244,7 @@ if (2.1) {
 	}
 }
 
-if (2.2) {
+if (0 * 2.2) {
 	foreach (-25 .. 25) {
 		my $img = Cv::Mat->new([$fy, $fx], CV_8UC3)->zero;
 		my $rvec = Cv::Mat->new([], CV_32FC1,
@@ -274,7 +274,7 @@ if (2.2) {
 	}
 }
 
-if (2.3) {
+if (0 * 2.3) {
 	foreach (-25 .. 25) {
 		my $img = Cv::Mat->new([$fy, $fx], CV_8UC3)->zero;
 		my $rvec = Cv::Mat->new([], CV_32FC1,
@@ -304,7 +304,7 @@ if (2.3) {
 	}
 }
 
-if (3) {
+if (0 * 3) {
 	foreach my $z (-25 .. 25) {
 		my $img = Cv::Mat->new([$fy, $fx], CV_8UC3)->zero;
 		my $rvec = Cv::Mat->new([], CV_32FC1,
