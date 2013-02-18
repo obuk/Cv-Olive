@@ -4,7 +4,6 @@
 =head1 名前
 
 Cv::Nihongo - 何かコンピュータビジョンでやってみるとき、あなたの助けになるように
-(只今、書き直し中)
 
 =head1 概要
 
@@ -26,9 +25,7 @@ Cv::Nihongo - 何かコンピュータビジョンでやってみるとき、あ
 C<Cv> は OpenCV コンピュータビジョンライブラリの Perl インタフェースで
 す。OpenCV の C言語のリファレンスを元にしたので、リファレンスとして
 http://opencv.willowgarage.com/ が使えます。とは言え、異なる部分もあり、
-少しずつ文書にまとめています。
-
-中途半端で申し訳ありません。
+少しずつ文書にまとめています。中途半端で申し訳ありません。
 
 コンピュータビジョンは少し難しいので、Perl のスローガンに則り「簡単なこ
 とは簡単に、難しいこともそれなりに」を心掛けています。
@@ -106,8 +103,7 @@ Cv のオブジェクトは、OpenCV の構造体をその型名に対応する�
 bless したものです。従って、Cv (Perl) から OpenCV の構造体は直接操作で
 きません。しかし、OpenCV に同梱されているサンプルでは、構造体の大きさや
 要素の型を直接使っています。たぶんそれが簡単なんでしょう。Cv でも同様の
-使い方をするために、構造体のメンバの名前でメソッドを作りました。詳細は
-L</Cvで追加されたメソッド> を参照してください。
+使い方をするために、構造体のメンバの名前でメソッドを作りました。
 
 =head2 メソッド
 
@@ -168,51 +164,63 @@ OpenCV の関数は、この Flip() に限らず、出力先は呼び出し元�
 
  my $bin = $src->cvtColor(CV_RGB2GRAY)->threshold(...);
 
+=head3 ビルド時の情報
 
-=head3 Cvで追加されたメソッド
+OpenCV は様々なライブラリを使います。またビルド時に指定できるオプション
+で利用できる機能が変ります。OpenCV 2.4.0 からその情報が取り出せるように
+なりました。
 
-(これはプログラムで生成したい。書くのは疲れる)
+=item GetBuildInformation()
 
+  my $info = Cv->GetBuildInformation()
+  my %info = Cv->GetBuildInformation()
+
+コンテクトがスカラなら cv::getBuildInformation() の戻り値を返し、リスト
+なら次の結果を返します。
+
+  'OpenCV modules' => {
+	'Disabled by dependency' => '-',
+	'Unavailable' => 'androidcamera java ocl',
+	'Disabled' => 'world',
+	'To be built' => 'core imgproc flann highgui features2d calib3d ml video objdetect contrib nonfree photo legacy gpu python stitching ts videostab'
+  },
+  'Version control' => 'commit:6484732',
+  'Linker flags (Debug)' => {
+	'Precompiled headers' => 'YES'
+  },
+  ...
+
+=item HasModule()
+
+ビルド時に組込みを指定できるモジュールなら次のとおり確かめることができ
+ます。
+
+ my $hasCore = Cv->HasModule('nonfree');
+ my $hasCore = Cv->HasModule('stitching');
+
+=back
 
 =head2 エラー処理
 
-eval { ... } で保護したブロックの中のエラーを検出できるようになりました。
-(Cv-0.13)
+eval { ... } で保護したブロックの中のエラーを検出できます。(Cv-0.13)
 
  my $img = eval { Cv->createImage([-1, -1], 8, 3) };
  if ($@) {
     print STDERR "*** got error ***";
  }
 
-ただし、C<Cv> をインストールするとき、c++ でコンパイルしておく必要があります。
-エラーを掴まえるだけでなく、自前で用意したエラー処理に向けることもできます。
-
- Cv->redirectError(
-   sub { my ($status, $funcName, $errMsg, $fileName, $line, $data) = @_;
-       ...
-   },
-   my $data = ...;
- );
-
 
 =head2 エクスポート
 
-Cv によってインポートされる名前は、use Cv の後に指定できます。(Cv-0.14)
-
-次の 2行は、C<CV> や C<IPL> ではじまる定数やマクロと cvScalarAll()
-のようないくつかの関数をインポートします。
-
- use Cv qw(:std);
- use Cv;			# 何も指定しないとき :std が補われる
-
-次の 2行は、Cv のすべての名前をインポートします。
+Cv の利用でインポートする名前は、use Cv の後に指定できます。(Cv-0.14)
 
  use Cv qw(:all);
  use Cv qw(/^(CV|IPL|cv)/);
+ use Cv;                      # use Cv qw(:all) と同じ
 
-何もインポートしないときは、空のリストを続けます。
+何もインポートしないときは、空のリストを置いてください。
 
- use Cv qw( );
+ use Cv ();
 
 =head1 ヒント
 
@@ -293,7 +301,9 @@ L<Cv::More|Cv::More-ja> に置くことにしました。
 
 =item *
 
-バージョン 0.17 で typemap の見直しを。一旦、xlib も止める。
+Cv::More を使わないとき use Cv qw(:nomore) と書きますが、これは、代りに use Cv -more と書けました (0.20 - 0.23)。
+しかし、このオプションは不明瞭なので、Cv::More を使わないとき use Cv -more でなく use Cv -nomore と書くことにしました。
+(0.24)
 
 =back
 
