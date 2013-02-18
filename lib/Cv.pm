@@ -244,26 +244,50 @@ C<cvCreateMat()> as:
 
 package Cv;
 
-foreach (classes('Cv')) {
-	next if /^Cv::.*::Ghost$/;
-	next if /^Cv::Constant$/;
+for (
+	"Cv",
+	"Cv::Arr",
+	"Cv::BGCodeBookModel",
+	"Cv::Capture",
+	"Cv::Chain",
+	"Cv::ChainPtReader",
+	"Cv::ConDensation",
+	"Cv::ContourScanner",
+	"Cv::ContourTree",
+	"Cv::ConvKernel",
+	"Cv::FileNode",
+	"Cv::FileStorage",
+	"Cv::Font",
+	"Cv::HaarClassifierCascade",
+	"Cv::Histogram",
+	"Cv::HuMoments",
+	"Cv::Image",
+	"Cv::Kalman",
+	"Cv::Mat",
+	"Cv::MatND",
+	"Cv::MemStorage",
+	"Cv::Moments",
+	"Cv::RNG",
+	"Cv::Seq",
+	"Cv::Seq::Circle",
+	"Cv::Seq::Point",
+	"Cv::Seq::Point2",
+	"Cv::Seq::Rect",
+	"Cv::Seq::SURFPoint",
+	"Cv::Seq::Seq",
+	"Cv::SeqReader",
+	"Cv::SeqWriter",
+	"Cv::SparseMat",
+	"Cv::StereoBMState",
+	"Cv::StereoGCState",
+	"Cv::StereoSGBM",
+	"Cv::String",
+	"Cv::StringHashNode",
+	"Cv::Subdiv2D",
+	"Cv::TypeInfo",
+	"Cv::VideoWriter",
+	) {
 	{ no strict 'refs'; *{$_ . '::AUTOLOAD'} = \&Cv::autoload }
-}
-
-
-sub classes {
-	my @list = ();
-	my $name = shift;
-	my $class = eval "\\%${name}::";
-	if (ref $class eq 'HASH') {
-		for (keys %$class) {
-			if (/^(\w+)::$/) {
-				push(@list, &classes("${name}::$1"));
-			}
-		}
-		push(@list, $name);
-	}
-	@list;
 }
 
 

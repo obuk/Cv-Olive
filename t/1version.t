@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 17;
+use Test::More tests => 11;
 BEGIN { use_ok('Cv', -nomore) }
 
 # test CV_*_VERSION defined OpenCV
@@ -23,7 +23,7 @@ is(scalar Cv->version, cvVersion());
 # test our VERSION
 use version;
 my $cv = version->parse($Cv::VERSION);
-foreach (sort &Cv::classes('Cv')) {
+foreach (sort classes('Cv')) {
 	next if /^Cv::.*::Ghost$/;
 	next if /^Cv::Constant$/;
 	my $pm = join('/', split(/::/, $_)) . ".pm";
@@ -33,4 +33,19 @@ foreach (sort &Cv::classes('Cv')) {
 		my $x = version->new(eval $pv);
 		is($x, $cv, "$pv in $pm");
 	}
+}
+
+sub classes {
+	my @list = ();
+	my $name = shift;
+	my $class = eval "\\%${name}::";
+	if (ref $class eq 'HASH') {
+		for (keys %$class) {
+			if (/^(\w+)::$/) {
+				push(@list, &classes("${name}::$1"));
+			}
+		}
+		push(@list, $name);
+	}
+	@list;
 }
