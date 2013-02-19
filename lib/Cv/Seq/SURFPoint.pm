@@ -11,7 +11,7 @@ use Cv::Seq::Point;
 our $VERSION = '0.24';
 our @ISA = qw(Cv::Seq::Point);
 
-{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
+# { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 sub template {
 	my $self = CORE::shift;

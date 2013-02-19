@@ -11,7 +11,7 @@ use Cv::Seq;
 our $VERSION = '0.24';
 our @ISA = qw(Cv::Seq);
 
-{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
+# { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
 sub new {
 	my $self = shift;
