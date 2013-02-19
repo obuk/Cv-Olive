@@ -9,11 +9,17 @@ BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
 
-my $img = Cv->createImage([320, 240], 8, 3)->zero;
-$img->circle([ 60 + rand(80), 80 + rand(80)], 30 + rand(30),
-			 cvScalarAll(200), 5, CV_AA);
-$img->circle([260 - rand(80), 80 + rand(80)], 30 + rand(30),
-			 cvScalarAll(200), 5, CV_AA);
+my $src = Cv::Mat->new([240, 320], CV_8UC1);
+$src->zero;
+my ($x0, $y0) = (100, 80);
+$src->circle([$x0, $y0], 30, cvScalarAll(255), 10);
+my ($x1, $y1) = ($x0 + 120, $y0);
+$src->rectangle([$x1 - 30, $y1 - 30], [$x1 + 30, $y1 + 30],
+				cvScalarAll(255), 10);
+my ($x2, $y2) = ($x1 - 50, $y0 + 80);
+$src->polyLine([ [ [$x2 - 30, $y2 + 30], [$x2 + 30, $y2 + 30],
+				   [$x2, $y2 - 30], ], ], -1, cvScalarAll(255), 10);
+my $img = $src->cvtColor(CV_GRAY2RGB);
 
 my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
 my $storage = Cv->createMemStorage;
@@ -22,7 +28,7 @@ my $circles = bless $gray->houghCircles(
 can_ok($circles, 'total');
 
 for ($circles->toArray) {
-	my $color = [ map { 64 + rand 192 } 1..3 ];
+	my $color = cvScalar(100, 100, 255);
 	$img->circle($_->[0], 3, $color, 3, CV_AA);
 	$img->circle($_->[0], $_->[1], $color, 3, CV_AA);
 }
@@ -34,7 +40,7 @@ if ($circles->total > 0) {
 	is($circle->[1], $radius);
 }
 
-is($circles->total, 2);
+is($circles->total, 1);
 
 $circles->push(my $x = [[10, 20], 30]);
 my $y = $circles->pop();
