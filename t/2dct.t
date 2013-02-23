@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 4;
+use Test::More tests => 3;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -38,11 +38,9 @@ if (2) {
 }
 
 if (10) {
-	e { $src->DCT() };
-	err_is("Usage: Cv::Arr::cvDCT(src, dst, flags)");
+	throws_ok { $src->DCT() } qr/Usage: Cv::Arr::cvDCT\(src, dst, flags\) at $0/;
 }
 
 if (11) {
-	e { $src->DCT(\0, CV_DXT_FORWARD) };
-	err_like("OpenCV Error:");
+	throws_ok { $src->DCT(\0, CV_DXT_FORWARD) } qr/OpenCV Error:/;
 }

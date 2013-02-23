@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 40;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 39;
+use Test::Number::Delta within => 1e-15;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -27,13 +27,12 @@ if (1) {
 		}
 	}
 	$map = Cv->GetAffineTransform(\@src, \@dst);
-	# print_map($map);
-	is_({ round => "%.7f" }, $map->getReal([0, 0]), -1);
-	is_({ round => "%.7f" }, $map->getReal([0, 1]), 0);
-	is_({ round => "%.7f" }, $map->getReal([0, 2]), 320);
-	is_({ round => "%.7f" }, $map->getReal([1, 0]), 0);
-	is_({ round => "%.7f" }, $map->getReal([1, 1]), -1);
-	is_({ round => "%.7f" }, $map->getReal([1, 2]), 240);
+	delta_ok($map->getReal([0, 0]), -1);
+	delta_ok($map->getReal([0, 1]), 0);
+	delta_ok($map->getReal([0, 2]), 320);
+	delta_ok($map->getReal([1, 0]), 0);
+	delta_ok($map->getReal([1, 1]), -1);
+	delta_ok($map->getReal([1, 2]), 240);
 }
 
 
@@ -95,16 +94,3 @@ if (6) {
 	is($dst[2]->[0], $dst6[2]->[0]);
 	is($dst[2]->[1], $dst6[2]->[1]);
 }
-
-
-sub print_map {
-	my $map = shift;
-	for my $row (0 .. $map->rows - 1) {
-		print STDERR "[ ";
-		for my $col (0 .. $map->cols - 1) {
-			print STDERR $map->getReal([$row, $col]), ", ";
-		}
-		print STDERR "]\n";
-	}
-}
-

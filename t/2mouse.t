@@ -5,7 +5,7 @@ use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 3;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
+use Test::Exception;
 
 my $verbose = Cv->hasGUI;
 
@@ -57,8 +57,7 @@ SKIP: {
 	}
 	$img->showImage($win);
 	if (10) {
-		e { Cv->setMouseCallback };
-		err_is('Usage: Cv::cvSetMouseCallback(windowName, onMouse= NO_INIT, userdata= NO_INIT)');
+		throws_ok { Cv->setMouseCallback } qr/Usage: Cv::cvSetMouseCallback\(windowName, onMouse= NO_INIT, userdata= NO_INIT\) at $0/;
 	}
 	Cv->setMouseCallback($win, \&onMouse);
 	while ($remaining >= 0) {

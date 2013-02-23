@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More tests => 12;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $arr = Cv::Mat->new([240, 320], CV_64FC1);
 
@@ -42,6 +42,5 @@ if (3) {
 }
 
 if (10) {
-	e { $arr->MinMaxLoc; };
-	err_is('Usage: Cv::Arr::cvMinMaxLoc(arr, min_val, max_val, min_loc, max_loc, mask=NULL)');
+	throws_ok { $arr->MinMaxLoc; } qr/Usage: Cv::Arr::cvMinMaxLoc\(arr, min_val, max_val, min_loc, max_loc, mask=NULL\) at $0/;
 }

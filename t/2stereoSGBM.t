@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More tests => 6;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 SKIP: {
 	skip "no Cv->CreateStereoSGBM", 5 unless Cv->can('CreateStereoSGBM');
@@ -20,8 +20,7 @@ SKIP: {
 		is($av[3], 3);
 	}
 	if (10) {
-		e { Cv->CreateStereoSGBM(0) };
-		err_is('Usage: Cv::StereoSGBM::new(CLASS)');
+		throws_ok { Cv->CreateStereoSGBM(0) } qr/Usage: Cv::StereoSGBM::new\(CLASS\) at $0/;
 	}
 }
 

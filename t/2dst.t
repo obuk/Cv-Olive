@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 576;
+use Test::More tests => 575;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 
 #  (1) $src1->XXX($src2);
@@ -84,8 +84,7 @@ AbsDiff Add And Or Sub Xor
 	if (10) {
 		no strict 'refs';
 		my $cv = "Cv::Arr::cv${xs}";
-		e { &$cv() };
-		err_like("Usage: $cv");
+		throws_ok { &$cv() } qr/Usage: $cv/;
 	}
 
 	if (11) {
@@ -94,8 +93,7 @@ AbsDiff Add And Or Sub Xor
 		my $dst  = Cv::Mat->new([ 12, 12 ], CV_32FC1);
 		no strict 'refs';
 		my $cv = "Cv::Arr::cv${xs}";
-		e { &$cv($src1, $src2, $dst) };
-		err_like("OpenCV Error:");
+		throws_ok { &$cv($src1, $src2, $dst) } qr/OpenCV Error:/;
 	}
 }
 
@@ -169,8 +167,7 @@ PyrMeanShiftFiltering PyrSegmentation Threshold Canny
 		if (10) {
 			no strict 'refs';
 			my $cv = "Cv::Arr::cv${xs}";
-			e { &$cv() };
-			err_like("Usage: $cv");
+			throws_ok { &$cv() } qr/Usage: $cv/;
 		}
 	}
 }
@@ -238,8 +235,7 @@ foreach my $xs (
 	if (10) {
 		no strict 'refs';
 		my $cv = "Cv::Arr::cv${xs}";
-		e { &$cv() };
-		err_like("Usage: $cv");
+		throws_ok { &$cv() } qr/Usage: $cv/;
 	}
 
 }
@@ -329,8 +325,7 @@ InRange
 	if (10) {
 		no strict 'refs';
 		my $cv = "Cv::Arr::cv${xs}";
-		e { &$cv() };
-		err_like("Usage: $cv");
+		throws_ok { &$cv() } qr/Usage: $cv/;
 	}
 
 }

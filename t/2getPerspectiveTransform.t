@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
+use Test::More tests => 10;
+use Test::Number::Delta within => 1e-7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -36,12 +37,12 @@ if (1) {
 
 	Cv->GetPerspectiveTransform(\@src, \@dst, my $map);
 
-	is_({ round => '%.7f' }, $map->getReal([0, 0]), 1);
-	is_({ round => '%.7f' }, $map->getReal([0, 1]), 0);
-	is_({ round => '%.7f' }, $map->getReal([0, 2]), 0);
-	is_({ round => '%.7f' }, $map->getReal([1, 0]), 0);
-	is_({ round => '%.7f' }, $map->getReal([1, 1]), 1);
-	is_({ round => '%.7f' }, $map->getReal([1, 2]), 0);
+	delta_ok($map->getReal([0, 0]), 1);
+	delta_ok($map->getReal([0, 1]), 0);
+	delta_ok($map->getReal([0, 2]), 0);
+	delta_ok($map->getReal([1, 0]), 0);
+	delta_ok($map->getReal([1, 1]), 1);
+	delta_ok($map->getReal([1, 2]), 0);
 
 	if ($verbose) {
 		my $img = Cv::Mat->new([2 * $cy, 2 * $cx], CV_8UC3);
@@ -75,11 +76,9 @@ if (1) {
 }
 
 if (10) {
-	e { Cv->GetPerspectiveTransform };
-	err_is('Usage: Cv::cvGetPerspectiveTransform(src, dst, mapMatrix)');
+	throws_ok { Cv->GetPerspectiveTransform } qr/Usage: Cv::cvGetPerspectiveTransform\(src, dst, mapMatrix\) at $0/;
 }
 
 if (11) {
-	e { Cv->GetPerspectiveTransform(1, 2) };
-	err_is('src is not of type CvPoint2D32f * in Cv::cvGetPerspectiveTransform');
+	throws_ok { Cv->GetPerspectiveTransform(1, 2) } qr/src is not of type CvPoint2D32f \* in Cv::cvGetPerspectiveTransform at $0/;
 }

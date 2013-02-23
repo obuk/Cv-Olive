@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 21;
+use Test::More tests => 20;
+use Test::Number::Delta within => 1e-7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 #  Cv->getRotationMatrix2D($center, $angle, $scale, $map);
 
@@ -20,8 +21,8 @@ if (1) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	delta_ok($a, $scale * cos($angle * $rad));
+	delta_ok($b, $scale * sin($angle * $rad));
 }
 
 if (2) {
@@ -35,8 +36,8 @@ if (2) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	delta_ok($a, $scale * cos($angle * $rad));
+	delta_ok($b, $scale * sin($angle * $rad));
 }
 
 if (3) {
@@ -52,8 +53,8 @@ if (3) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	delta_ok($a, $scale * cos($angle * $rad));
+	delta_ok($b, $scale * sin($angle * $rad));
 }
 
 if (4) {
@@ -65,16 +66,14 @@ if (4) {
 	my $a = $map->getReal([0, 0]);
 	my $b = $map->getReal([0, 1]);
 	my $rad = CV_PI / 180;
-	is_({ round => '%g' }, $a, $scale * cos($angle * $rad));
-	is_({ round => '%g' }, $b, $scale * sin($angle * $rad));
+	delta_ok($a, $scale * cos($angle * $rad));
+	delta_ok($b, $scale * sin($angle * $rad));
 }
 
 if (10) {
-	e { Cv->GetRotationMatrix2D };
-	err_is('Usage: Cv::cvGetRotationMatrix2D(center, angle, scale, mapMatrix)');
+	throws_ok { Cv->GetRotationMatrix2D } qr/Usage: Cv::cvGetRotationMatrix2D\(center, angle, scale, mapMatrix\) at $0/;
 }
 
 if (11) {
-	e { Cv->cvGetRotationMatrix2D(1, 2, 3) };
-	err_is('center is not of type CvPoint2D32f in Cv::cv2DRotationMatrix');
+	throws_ok { Cv->cvGetRotationMatrix2D(1, 2, 3) } qr/center is not of type CvPoint2D32f in Cv::cv2DRotationMatrix at $0/;
 }

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 33;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 32;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 my $stor = Cv::MemStorage->new;

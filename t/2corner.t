@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More tests => 12;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -136,12 +136,9 @@ if ($verbose) {
 
 
 if (10) {
-	e { $arr->CornerEigenValsAndVecs };
-	err_is('Usage: Cv::Arr::cvCornerEigenValsAndVecs(image, eigenvv, blockSize, aperture_size=3)');
+	throws_ok { $arr->CornerEigenValsAndVecs } qr/Usage: Cv::Arr::cvCornerEigenValsAndVecs\(image, eigenvv, blockSize, aperture_size=3\) at $0/;
 
-	e { $arr->CornerHarris };
-	err_is('Usage: Cv::Arr::cvCornerHarris(image, harris_dst, blockSize, aperture_size=3, k=0.04)');
+	throws_ok { $arr->CornerHarris } qr/Usage: Cv::Arr::cvCornerHarris\(image, harris_dst, blockSize, aperture_size=3, k=0\.04\) at $0/;
 
-	e { $arr->CornerMinEigenVal };
-	err_is('Usage: Cv::Arr::cvCornerMinEigenVal(image, eigenval, blockSize, aperture_size=3)');
+	throws_ok { $arr->CornerMinEigenVal } qr/Usage: Cv::Arr::cvCornerMinEigenVal\(image, eigenval, blockSize, aperture_size=3\) at $0/;
 }

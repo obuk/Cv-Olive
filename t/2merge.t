@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 173;
+use Test::More tests => 172;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $b = Cv::Image->new([3, 3], CV_8UC1);
@@ -79,18 +79,14 @@ if (1) {
 }
 
 if (10) {
-	e { Cv->Merge; };
-	err_is("Usage: Cv::Arr::Merge([src0, src1, ...], dst)");
+	throws_ok { Cv->Merge; } qr/Usage: Cv::Arr::Merge\(\[src0, src1, \.\.\.\], dst\) at $0/;
 	my $cv = bless [], 'Cv';
-	e { $cv->Merge; };
-	err_is("Usage: Cv::Arr::Merge([src0, src1, ...], dst)");
+	throws_ok { $cv->Merge; } qr/Usage: Cv::Arr::Merge\(\[src0, src1, \.\.\.\], dst\) at $0/;
 }
 
 if (11) {
 	my $x = Cv::Mat->new([320, 240], CV_8UC1);
 	my ($b, $g, $r, $a) = ($x->new, $x->new, $x->new, $x->new);
-	e { Cv->Merge($b, $g, $r, $a, $x->new) };
-	err_like('OpenCV Error:');
-	e { Cv->Merge([$b, $g, $r, $a], $x->new) };
-	err_like('OpenCV Error:');
+	throws_ok { Cv->Merge($b, $g, $r, $a, $x->new) } qr/OpenCV Error:/;
+	throws_ok { Cv->Merge([$b, $g, $r, $a], $x->new) } qr/OpenCV Error:/;
 }

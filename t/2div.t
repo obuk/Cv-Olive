@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 5;
+use Test::Number::Delta within => 1e-7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  void cvDiv(CvArr* src1, CvArr* src2, CvArr* dst, double scale=1)
@@ -22,7 +23,7 @@ if (1) {
 	$src2->set([1], [1 + rand]);
 	$src2->set([2], [1 + rand]);
 	my $dst = $src1->div($src2);
-	is_({ round => "%.4g" },
+	delta_ok(
 		[ $dst->getReal(0),
 		  $dst->getReal(1),
 		  $dst->getReal(2),
@@ -43,7 +44,7 @@ if (2) {
 	$src2->set([1], [1 + rand]);
 	$src2->set([2], [1 + rand]);
 	$src1->div($src2, my $dst = $src1->new);
-	is_({ round => "%.4g" },
+	delta_ok(
 		[ $dst->getReal(0),
 		  $dst->getReal(1),
 		  $dst->getReal(2),
@@ -56,13 +57,11 @@ if (2) {
 }
 
 if (10) {
-	e { $src1->Div(0, 0, 0, 0) };
-	err_is("Usage: Cv::Arr::cvDiv(src1, src2, dst, scale=1)");
+	throws_ok { $src1->Div(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvDiv\(src1, src2, dst, scale=1\) at $0/;
 }
 
 if (12) {
-	e { $src1->Div(\0) }; 
-	err_like("OpenCV Error:");
+	throws_ok { $src1->Div(\0) } qr/OpenCV Error:/;
 }
 
 sub Div {

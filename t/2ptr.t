@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More tests => 12;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $mat = Cv::Mat->new([3, 1], CV_8UC1);
@@ -49,6 +49,5 @@ if (5) {
 
 if (11) {
 	my $mat = Cv::Mat->new([3, 1], CV_8UC1);
-	e { $mat->Ptr({}) };
-	err_like('OpenCV Error:');
+	throws_ok { $mat->Ptr({}) } qr/OpenCV Error:/;
 }

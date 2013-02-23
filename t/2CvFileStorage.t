@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 26;
+use Test::More tests => 25;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -68,20 +68,17 @@ if (8) {
 
 if (10) {
 	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
-	e { $fs->Read($fs->getFileNodeByName(\0, "lena")) };
-	err_is('type_name unknown in Cv::FileStorage::Read');
+	throws_ok { $fs->Read($fs->getFileNodeByName(\0, "lena")) } qr/type_name unknown in Cv::FileStorage::Read at $0/;
 }
 
 if (11) {
 	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
-	e { $fs->ReadByName(\0, "lena") };
-	err_is('type_name unknown in Cv::FileStorage::Read');
+	throws_ok { $fs->ReadByName(\0, "lena") } qr/type_name unknown in Cv::FileStorage::Read at $0/;
 }
 
 unlink($yml);
 
 SKIP: {
 	skip "opencv-2.x", 1 unless cvVersion() >= 2.004;
-	e { Cv->OpenFileStorage('', 0) };
-	err_like('OpenCV Error:');
+	throws_ok { Cv->OpenFileStorage('', 0) } qr/OpenCV Error:/;
 }

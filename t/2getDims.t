@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 18;
+use Test::More tests => 17;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 # int cvGetDims(const CvArr* arr, int* sizes=NULL)
@@ -65,6 +65,5 @@ if (7) {
 }
 
 if (10) {
-	e { Cv::Arr::GetDims(1) };
-	err_is('arr is not of type CvArr * in Cv::Arr::cvGetDims');
+	throws_ok { Cv::Arr::GetDims(1) } qr/arr is not of type CvArr \* in Cv::Arr::cvGetDims at $0/;
 }

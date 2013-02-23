@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
+use Test::More tests => 10;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $a = Cv->createMat(2, 2, CV_64FC1)
@@ -55,13 +55,11 @@ if (1) {
 
 
 if (10) {
-	e { Cv::Arr::cvGEMM };
-	err_is('Usage: Cv::Arr::cvGEMM(src1, src2, alpha, src3, beta, dst, tABC=0)');
+	throws_ok { Cv::Arr::cvGEMM } qr/Usage: Cv::Arr::cvGEMM\(src1, src2, alpha, src3, beta, dst, tABC=0\) at $0/;
 }
 
 if (11) {
 	my $a = Cv->createMat(2, 2, CV_64FC1);
 	my $b = Cv->createMat(2, 3, CV_64FC1);
-	e { $a->matMul($b) };
-	err_like('OpenCV Error:');
+	throws_ok { $a->matMul($b) } qr/OpenCV Error:/;
 }

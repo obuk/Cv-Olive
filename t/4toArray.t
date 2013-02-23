@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 46;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 45;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 for my $class (qw(Cv::Mat Cv::MatND)) {
@@ -61,7 +61,6 @@ for my $class (qw(Cv::Mat Cv::MatND)) {
 		ok($arr);
 		is($arr->rows, 3);
 		is($arr->cols, 3);
-		e { my @list = @$arr };
-		err_is("can't convert 3x3 in Cv::Arr::ToArray");
+		throws_ok { my @list = @$arr } qr/can't convert 3x3 in Cv::Arr::ToArray at $0/;
 	}
 }

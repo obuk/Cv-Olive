@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 734;
+use Test::More tests => 733;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my %TYPENAME = (
 	'Cv::Mat'       => CV_TYPE_NAME_MAT,
@@ -39,8 +39,7 @@ for my $class (keys %TYPENAME) {
 		is($arr->depth, CV2IPL_DEPTH($type), "${class}->depth");
 		is($arr->channels, CV_MAT_CN($type), "${class}->channels");
 		is($arr->nChannels, CV_MAT_CN($type), "${class}->nChannels");
-		e { $arr->unknown };
-		err_is("can't call ${class}::unknown", "${class}->unknwon");
+		throws_ok { $arr->unknown } qr/can't call ${class}::unknown/, "${class}->unknwon at $0";
 	}
 
 	# type: Cv::Mat->new([ $rows, $cols ], $type);
@@ -58,10 +57,8 @@ for my $class (keys %TYPENAME) {
 			   "scalar ${class}->getDims");
 			is_deeply(\@sizes, $_->{sizes}, "${class}->getDims(\@sizes)");
 		}
-		e { $class->new };
-		err_is("size not specified in ${class}::new");
-		e { $class->new([320, 240]) };
-		err_is("type not specified in ${class}::new");
+		throws_ok { $class->new } qr/size not specified in ${class}::new at $0/;
+		throws_ok { $class->new([320, 240]) } qr/type not specified in ${class}::new at $0/;
 	}
 
 	# inherit parameters if omit

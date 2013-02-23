@@ -3,48 +3,37 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 60;
+use Test::More tests => 59;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
-	e { Cv->NotDefined() };
-	err_is("can't call Cv::NotDefined");
+	throws_ok { Cv->NotDefined() } qr/can't call Cv::NotDefined at $0/;
 }
 
 if (2) {
 	{ package Cv; sub Foo { } }
-	e { Cv->FOO() };
-	err_is("can't call Cv::FOO");
-	e { Cv->Foo() };
-	err_is('');
-	e { Cv->foo() };
-	err_is('');
-	e { Cv->fOO() };
-	err_is("can't call Cv::fOO");
+	throws_ok { Cv->FOO() } qr/can't call Cv::FOO at $0/;
+	lives_ok  { Cv->Foo() };
+	lives_ok  { Cv->foo() };
+	throws_ok { Cv->fOO() } qr/can't call Cv::fOO at $0/;
 }
 
 if (3) {
 	{ package Cv; sub BAR { } }
-	e { Cv->BAR() };
-	err_is('');
-	e { Cv->Bar() };
-	err_is("can't call Cv::Bar");
-	e { Cv->bar() };
-	err_is('');
-	e { Cv->bAR() };
-	err_is('');
+	lives_ok  { Cv->BAR() };
+	throws_ok { Cv->Bar() } qr/can't call Cv::Bar at $0/;
+	lives_ok  { Cv->bar() };
+	lives_ok  { Cv->bAR() };
 }
 
 if (4) {
-	e { Cv->cvmGet() };
-	err_is("can't call Cv::cvmGet");
+	throws_ok { Cv->cvmGet() } qr/can't call Cv::cvmGet at $0/;
 }
 
 if (5) {
 	my $cv = bless [], 'Cv';
-	e { $cv->alloc() };
-	err_is("class name needed");
+	throws_ok { $cv->alloc() } qr/class name needed at $0/;
 }
 
 ok(!defined $Cv::Constant::{AUTOLOAD});

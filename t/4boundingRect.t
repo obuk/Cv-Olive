@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 3;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 2;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -74,6 +74,5 @@ Cv::More->import(qw(cs-warn));
 if (11) {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak; # capturing carp as croak
-	e { my @retval = Cv->boundingRect([10, 20], [10, 30]) };
-	err_is("called in list context, but returning scaler");
+	throws_ok { my @retval = Cv->boundingRect([10, 20], [10, 30]) } qr/called in list context, but returning scaler at $0/;
 }

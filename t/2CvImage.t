@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 90;
+use Test::More tests => 89;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $class = 'Cv::Image';
 
@@ -21,18 +21,12 @@ if (1) {
 	$arr->origin(0);
 	is($arr->origin, 0);
 
-	e { ${class}->new([240, 320], 7) };
-	err_like("OpenCV Error:");
+	throws_ok { ${class}->new([240, 320], 7) } qr/OpenCV Error:/;
 }
 
 # type: $class->new([ $rows, $cols ], $type);
 if (2) {
-	e { $class->new([-1, -1], CV_8UC3) };
-	err_like("OpenCV Error:");
-	# e { $class->new };
-	# err_is("${class}::new: ?sizes");
-	# e { $class->new([320, 240]) };
-	# err_is("${class}::new: ?type");
+	throws_ok { $class->new([-1, -1], CV_8UC3) } qr/OpenCV Error:/;
 }
 
 

@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 24;
+use Test::More tests => 23;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # my $dst = $src->resize([rows, cols]);
 
@@ -61,12 +61,10 @@ if (4) {
 
 if (10) {
 	my $src = Cv::Mat->new([100, 10], CV_8UC3);
-	e { $src->resize(1, 2, 3) };
-	err_is('Usage: Cv::Arr::cvResize(src, dst, interpolation=CV_INTER_LINEAR)');
+	throws_ok { $src->resize(1, 2, 3) } qr/Usage: Cv::Arr::cvResize\(src, dst, interpolation=CV_INTER_LINEAR\) at $0/;
 }
 
 if (11) {
 	my $src = Cv::Mat->new([100, 10], CV_8UC3);
-	e { $src->resize(\0) };
-	err_like('OpenCV Error:');
+	throws_ok { $src->resize(\0) } qr/OpenCV Error:/;
 }

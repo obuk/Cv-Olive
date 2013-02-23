@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 16;
+use Test::More tests => 15;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 # void cvAbsDiff(const CvArr* src1, const CvArr* src2, CvArr* dst)
@@ -60,8 +60,7 @@ if (10) {
 	$src2->fill([ 11, 12, 13, 14 ]);
 	no warnings 'redefine';
 	local *Cv::Mat::new = sub { undef };
-	e { $src->absDiff($src2) };
-	err_is('dst is not of type CvArr * in Cv::Arr::cvAbsDiff');
+	throws_ok { $src->absDiff($src2) } qr/dst is not of type CvArr \* in Cv::Arr::cvAbsDiff at $0/;
 }
 
 # OpenCV Error:
@@ -69,6 +68,5 @@ if (11) {
 	my $src2 = $src->new;
 	$src->fill([ 21, 22, 23, 24 ]);
 	$src2->fill([ 11, 12, 13, 14 ]);
-	e { $src->absDiff($src2, \0) };
-	err_like('OpenCV Error:');
+	throws_ok { $src->absDiff($src2, \0) } qr/OpenCV Error:/;
 }

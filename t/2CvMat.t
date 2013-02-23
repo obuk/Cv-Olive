@@ -3,20 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 439;
+use Test::More tests => 438;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $class = 'Cv::Mat';
 
 # type: ${class}->new([ $rows, $cols ], $type);
 if (2) {
-	e { ${class}->new([-1, -1], CV_8UC3) };
-	err_like("OpenCV Error:");
-	# e { ${class}->new };
-	# err_is("${class}::new: ?sizes");
-	# e { ${class}->new([320, 240]) };
-	# err_is("${class}::new: ?type");
+	throws_ok { ${class}->new([-1, -1], CV_8UC3) } qr/OpenCV Error:/;
 }
 
 # has data (using Cv::More)

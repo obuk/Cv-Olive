@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
@@ -33,6 +33,5 @@ if ($verbose) {
 }
 
 if (10) {
-	e { $image->Threshold };
-	err_is('Usage: Cv::Arr::cvThreshold(src, dst, threshold, maxValue, thresholdType)');
+	throws_ok { $image->Threshold } qr/Usage: Cv::Arr::cvThreshold\(src, dst, threshold, maxValue, thresholdType\) at $0/;
 }

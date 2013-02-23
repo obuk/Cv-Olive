@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 32;
+use Test::More tests => 31;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 use File::Basename;
 use List::Util qw(max min);
 
@@ -23,8 +23,7 @@ ok($hist, 'Cv->CreateHist');
 if (1) {
 	ok(Cv->CreateHist([256], CV_HIST_ARRAY),
 	   'CreateHist(Cv->CreateHist)');
-	e { Cv->CreateHist };
-	err_is('Usage: Cv::cvCreateHist(sizes, type, ranges=NULL, uniform=1)', 'CvCreateHist(usage)');
+	throws_ok { Cv->CreateHist } qr/Usage: Cv::cvCreateHist\(sizes, type, ranges=NULL, uniform=1\) at $0/, 'CvCreateHist(usage)';
 }
 
 # ------------------------------------------------------------
@@ -33,8 +32,7 @@ if (1) {
 if (1) {
 	$hist->CalcHist([$gray]);
 	ok($hist, 'CalcHist');
-	e { $hist->CalcHist };
-	err_is('Usage: Cv::Histogram::cvCalcHist(hist, image, accumulate=0, mask=NULL)', 'CalcHist(usage)');
+	throws_ok { $hist->CalcHist } qr/Usage: Cv::Histogram::cvCalcHist\(hist, image, accumulate=0, mask=NULL\) at $0/, 'CalcHist(usage)';
 }
 
 # ------------------------------------------------------------

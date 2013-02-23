@@ -4,8 +4,9 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More;
+use Test::Exception;
 use Cv;
-use Cv::Test;
+
 eval "use Cv::Qt qw(:all)";
 plan skip_all => "Qt required" unless !$@ && cvHasQt();
 plan tests => 8;
@@ -17,18 +18,16 @@ plan tests => 8;
 #     int spacing = 0)
 # ============================================================
 
-e { cvFontQt() };
-err_is('Usage: Cv::Qt::cvFontQt(nameFont, pointSize= -1, color= cvScalarAll(0), weight= CV_FONT_NORMAL, style= CV_STYLE_NORMAL, spacing= 0)');
+throws_ok { cvFontQt() }
+qr/Usage: Cv::Qt::cvFontQt\(nameFont, pointSize= -1, color= cvScalarAll\(0\), weight= CV_FONT_NORMAL, style= CV_STYLE_NORMAL, spacing= 0\)/;
 
-my $huge = e { cvFontQt('Helvetica', 20) };
+my $huge = cvFontQt('Helvetica', 20);
 isa_ok($huge, 'Cv::Font');
 
-my $bold = e { cvFontQt('Times', 10, cvScalarAll(0),
-						eval "&CV_FONT_BOLD") };
+my $bold = cvFontQt('Times', 10, cvScalarAll(0), eval "&CV_FONT_BOLD");
 isa_ok($bold, 'Cv::Font');
 
-my $normal = e { Cv->FontQt('Times', 10, cvScalarAll(0),
-							eval "&CV_FONT_NORMAL") };
+my $normal = Cv->FontQt('Times', 10, cvScalarAll(0), eval "&CV_FONT_NORMAL");
 isa_ok($normal, 'Cv::Font');
 
 # ============================================================
@@ -43,18 +42,16 @@ SKIP: {
 	my $img = Cv->createImage([480, 240], 8, 3);
 	$img->fill(cvScalarAll(255));
 
-	e { cvAddText() };
-	err_is('Usage: Cv::Qt::cvAddText(img, text, location, font)');
+	throw_ok { cvAddText() }
+	qr/Usage: Cv::Qt::cvAddText\(img, text, location, font\)/;
 
-	e { cvAddText($img, "Hello, Qt", [ 10, 80 ], $huge) }; err_is('');
+	lives_ok { cvAddText($img, "Hello, Qt", [ 10, 80 ], $huge) };
 	my $text = "The quick brown fox jumps over the lazy dog. 01234567890";
 	if ($normal) {
-		e { cvAddText($img, $text, [ 10, 100 ], $normal) };
-		err_is('');
+		lives_ok { cvAddText($img, $text, [ 10, 100 ], $normal) };
 	}
 	if ($bold) {
-		e { $img->AddText($text, [ 10, 120 ], $bold) };
-		err_is('');
+		lives_ok { $img->AddText($text, [ 10, 120 ], $bold) };
 	}
 
 	$img->show('Cv');

@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 14;
+use Test::More tests => 13;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
@@ -67,23 +67,21 @@ my $verbose = Cv->hasGUI;
 }
 
 {
-	e { Cv->loadImage };
-	err_is('Usage: Cv::cvLoadImage(filename, iscolor=CV_LOAD_IMAGE_COLOR)');
+	throws_ok { Cv->loadImage } qr/Usage: Cv::cvLoadImage\(filename, iscolor=CV_LOAD_IMAGE_COLOR\) at $0/;
 }
 
 {
-	e { Cv->loadImageM };
-	err_is('Usage: Cv::cvLoadImageM(filename, iscolor=CV_LOAD_IMAGE_COLOR)');
+	throws_ok { Cv->loadImageM } qr/Usage: Cv::cvLoadImageM\(filename, iscolor=CV_LOAD_IMAGE_COLOR\) at $0/;
 }
 
 {
-	my $image = e { Cv->loadImage("path-to-not-exist") };
-	err_is('');
-	ok(!$image);
+	my $x;
+	lives_ok { $x = Cv->loadImage("path-to-not-exist") };
+	is($x, undef);
 }
 
 {
-	my $image = e { Cv->loadImageM("path-to-not-exist") };
-	err_is('');
-	ok(!$image);
+	my $x;
+	lives_ok { $x = Cv->loadImageM("path-to-not-exist") };
+	is($x, undef);
 }

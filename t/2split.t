@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 81;
+use Test::More tests => 80;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $arr = Cv::Image->new([3, 4], CV_8UC3);
@@ -41,13 +41,11 @@ if (2) {
 
 if (10) {
 	my $mats = Cv::SparseMat->new([320, 240], CV_8UC4);
-	e { $mats->split };
-	err_like('OpenCV Error:');
+	throws_ok { $mats->split } qr/OpenCV Error:/;
 }
 
 SKIP: {
 	skip "opencv-2.x", 1 unless cvVersion() >= 2.004;
 	my $matn = Cv::MatND->new([320, 240], CV_8UC4);
-	e { $matn->split };
-	err_is('');
+	lives_ok { $matn->split };
 }

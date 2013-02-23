@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $rgba = Cv::Mat->new([100, 100], CV_8UC4);
@@ -21,8 +21,7 @@ if (1) {
 }
 
 if (10) {
-	e { Cv->mixChannels; };
-	err_is('Usage: Cv::cvMixChannels(src, dst, fromTo)');
+	throws_ok { Cv->mixChannels; } qr/Usage: Cv::cvMixChannels\(src, dst, fromTo\) at $0/;
 }
 
 if (11) {
@@ -30,6 +29,5 @@ if (11) {
 	my $bgr = $rgba->new(CV_8UC1);
 	my $alpha = $rgba->new(CV_8UC1);
 	my $fromTo = [ (0, 2), (1, 1), (2, 0), (3, 3) ];
-	e { Cv->MixChannels([ $rgba ], [ $bgr, $alpha ], $fromTo) };
-	err_like('OpenCV Error:');
+	throws_ok { Cv->MixChannels([ $rgba ], [ $bgr, $alpha ], $fromTo) } qr/OpenCV Error:/;
 }

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 12;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 sub xy {
@@ -61,8 +61,7 @@ if (21) {
 	Cv::More->import(qw(cs-warn));
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
-	e { my @line = Cv->minEnclosingCircle(\@points); };
-	err_is("called in list context, but returning scaler");
+	throws_ok { my @line = Cv->minEnclosingCircle(\@points); } qr/called in list context, but returning scaler at $0/;
 }
 
 if (22) {
@@ -70,6 +69,5 @@ if (22) {
 	Cv::More->import(qw(cs));
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
-	e { my @line = Cv->minEnclosingCircle(\@points); is(@line, 2); };
-	err_is("");
+	lives_ok { my @line = Cv->minEnclosingCircle(\@points); is(@line, 2); };
 }

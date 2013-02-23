@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 9;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 if (1) {
@@ -30,12 +30,10 @@ if (3) {
 
 if (11) {
 	my @pts = map { [ map { rand } qw(x y) ] } 1 .. 10;
-	e { Cv::Seq::Point->new(CV_64FC3, @pts) };
-	err_is("can't init in Cv::Seq::Point::s_new");
+	throws_ok { Cv::Seq::Point->new(CV_64FC3, @pts) } qr/can't init in Cv::Seq::Point::s_new at $0/;
 }
 
 if (12) {
 	my @pts = map { [ map { rand } qw(x y) ] } 1 .. 10;
-	e { Cv::Seq::Point->new(CV_64FC1, @pts) };
-	err_is("can't init in Cv::Seq::Point::s_new");
+	throws_ok { Cv::Seq::Point->new(CV_64FC1, @pts) } qr/can't init in Cv::Seq::Point::s_new at $0/;
 }

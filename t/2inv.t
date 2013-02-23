@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 5;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  double cvInv(const CvArr* src, CvArr* dst, int method=CV_LU)
@@ -34,12 +34,10 @@ if (2) {
 
 if (10) {
 	my $src = Cv::Mat->new([2], CV_32FC1);
-	e { $src->inv(1, 2) };
-	err_is("Usage: Cv::Arr::cvInv(src, dst, method=CV_LU)");
+	throws_ok { $src->inv(1, 2) } qr/Usage: Cv::Arr::cvInv\(src, dst, method=CV_LU\) at $0/;
 }
 
 if (11) {
 	my $src = Cv::Mat->new([2], CV_32FC1);
-	e { $src->inv };
-	err_like("OpenCV Error");
+	throws_ok { $src->inv } qr/OpenCV Error:/;
 }

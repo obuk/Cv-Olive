@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 26;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 25;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 if (1) {
@@ -89,20 +89,16 @@ if (14) {
 
 
 # Cv-0.19
-e { my @line = Cv->FitLine };
-err_is('Usage: Cv::Arr::FitLine(points, distType=CV_DIST_L2, param=0, reps=0.01, aeps=0.01)');
+throws_ok { my @line = Cv->FitLine } qr/Usage: Cv::Arr::FitLine\(points, distType=CV_DIST_L2, param=0, reps=0\.01, aeps=0\.01\) at $0/;
 
-e { my @line = Cv->FitLine([]) };
-err_is('points is not [ pt1, pt2, ... ] in Cv::Arr::FitLine');
+throws_ok { my @line = Cv->FitLine([]) } qr/points is not \[ pt1, pt2, \.\.\. \] in Cv::Arr::FitLine at $0/;
 
-e { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) };
-err_like("OpenCV Error:");
+throws_ok { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]], -1) } qr/OpenCV Error:/;
 
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
 {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
-	e { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]) };
-	err_is("called in list context, but returning scaler");
+	throws_ok { my @line = Cv->FitLine([[1, 2], [2, 3], [3, 4]]) } qr/called in list context, but returning scaler at $0/;
 }

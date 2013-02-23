@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
@@ -36,11 +36,9 @@ SKIP: {
 }
 
 if (10) {
-	e { $arr->saveImage };
-	err_is('Usage: Cv::Arr::SaveImage(image, filename, params=0)');
+	throws_ok { $arr->saveImage } qr/Usage: Cv::Arr::SaveImage\(image, filename, params=0\) at $0/;
 }
 
 if (11) {
-	e { $arr->saveImage('xxx') };
-	err_like('OpenCV Error:');
+	throws_ok { $arr->saveImage('xxx') } qr/OpenCV Error:/;
 }

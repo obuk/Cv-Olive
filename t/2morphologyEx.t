@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 18;
+use Test::More tests => 17;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 #  void cvMorphologyEx(src, dst, temp, element, operation, iterations=1)
 #  (1) $src->MorphologyEx($element, CV_MOP_OPEN);
@@ -61,6 +61,5 @@ if (3) {
 
 if (10) {
 	my $src = Cv::Mat->new([ 240, 320 ], CV_8UC3);
-	e { $src->MorphologyEx };
-	err_is('Usage: Cv::Arr::cvMorphologyEx(src, dst, temp, element, operation, iterations=1)');
+	throws_ok { $src->MorphologyEx } qr/Usage: Cv::Arr::cvMorphologyEx\(src, dst, temp, element, operation, iterations=1\) at $0/;
 }

@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More tests => 8;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC1);
@@ -37,12 +37,10 @@ sub CvtScale {
 
 if (10) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
-	e { $arr->cvtScale(1, 0, 1) };
-	err_is('Usage: Cv::Arr::cvConvertScale(src, dst, scale=1, shift=0)');
+	throws_ok { $arr->cvtScale(1, 0, 1) } qr/Usage: Cv::Arr::cvConvertScale\(src, dst, scale=1, shift=0\) at $0/;
 }
 
 if (11) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
-	e { $arr->cvtScale($arr->new([120, 160])) };
-	err_like('OpenCV Error:');
+	throws_ok { $arr->cvtScale($arr->new([120, 160])) } qr/OpenCV Error:/;
 }

@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 34;
+use Test::More tests => 33;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 # double cvGetReal1D(const CvArr* arr, int idx0)
@@ -13,7 +13,6 @@ BEGIN { use_ok('Cv::Test') }
 # double cvGetReal3D(const CvArr* arr, int idx0, int idx1, int idx2)
 # double cvGetRealND(const CvArr* arr, int* idx)
 # ------------------------------------------------------------
-
 
 if (1) {
 	my $Xs = 'GetRealND';
@@ -66,7 +65,6 @@ for my $n (1..4) {
 	if ($n == 1) {
 		is($m->getReal($i), $v->[0]);
 	} else {
-		e { $m->getReal($i) };
-		err_like('OpenCV Error:');
+		throws_ok { $m->getReal($i) } qr/OpenCV Error:/;
 	}
 }

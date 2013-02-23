@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 11;
+use Test::Number::Delta within => 1e-1;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -38,8 +39,8 @@ if (2) {
 	$arr->avgSdv(my $mean, my $stdDev);
 	my @mean = map { $_ / $p1 } @{$mean}[0 .. $ch - 1];
 	my @stdDev = map { $_ / $p2 } @{$stdDev}[0 .. $ch - 1];
-	is_({ round => "%.1f" }, \@mean, [ (1.0) x $ch ]);
-	is_({ round => "%.1f" }, \@stdDev, [ (1.0) x $ch ]);
+	delta_ok(\@mean, [ (1.0) x $ch ]);
+	delta_ok(\@stdDev, [ (1.0) x $ch ]);
 }
 
 if (2) {
@@ -60,18 +61,16 @@ if (2) {
 	$arr->avgSdv(my $mean, my $stdDev);
 	my @mean = map { $_ / $p1 } @{$mean}[0 .. $ch - 1];
 	my @stdDev = map { $_ / $p2 } @{$stdDev}[0 .. $ch - 1];
-	is_({ round => "%.1f" }, \@mean, [ (1.0) x $ch ]);
-	is_({ round => "%.1f" }, \@stdDev, [ (1.0) x $ch ]);
+	delta_ok(\@mean, [ (1.0) x $ch ]);
+	delta_ok(\@stdDev, [ (1.0) x $ch ]);
 }
 
 if (10) {
 	my $rng = Cv->RNG;
-	e { $rng->arr };
-	err_is('Usage: Cv::RNG::cvArr(rng, arr, distType, param1, param2)');
+	throws_ok { $rng->arr } qr/Usage: Cv::RNG::cvArr\(rng, arr, distType, param1, param2\) at $0/;
 }
 
 if (11) {
 	my $rng = Cv->RNG;
-	e { $rng->arr(1,2,3,4) };
-	err_is('arr is not of type CvArr * in Cv::RNG::cvRandArr');
+	throws_ok { $rng->arr(1,2,3,4) } qr/arr is not of type CvArr \* in Cv::RNG::cvRandArr at $0/;
 }

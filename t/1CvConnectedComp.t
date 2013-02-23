@@ -4,6 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 17;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
 
@@ -27,31 +28,25 @@ if (1) {
 		# is($out->[3], $cc->[3]);
 	}
 
-	e { Cv::CvConnectedComp([]) };
-	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
+	throws_ok { Cv::CvConnectedComp([]) } qr/cc is not of type CvConnectedComp in Cv::CvConnectedComp at $0/;
 
-	e { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) };
-	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
+	throws_ok { Cv::CvConnectedComp([$area, 'x', $rect, $contour]) } qr/cc is not of type CvConnectedComp in Cv::CvConnectedComp at $0/;
 
-	e { Cv::CvConnectedComp([$area, $value, 'x', $contour]) };
-	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
+	throws_ok { Cv::CvConnectedComp([$area, $value, 'x', $contour]) } qr/cc is not of type CvConnectedComp in Cv::CvConnectedComp at $0/;
 
-	e { Cv::CvConnectedComp([$area, $value, $rect, 'x']) };
-	err_is("cc is not of type CvConnectedComp in Cv::CvConnectedComp");
+	throws_ok { Cv::CvConnectedComp([$area, $value, $rect, 'x']) } qr/cc is not of type CvConnectedComp in Cv::CvConnectedComp at $0/;
 
 	{
 		use warnings FATAL => qw(all);
-		my $cc = e { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
-		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+		throws_ok { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) } qr/Argument \"1x\" isn't numeric in subroutine entry at $0/;
 	}
 
 	{
 		no warnings 'numeric';
-		my $cc = e { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
-		err_is("");
-		is($cc->[0], 1);
-		is_deeply($cc->[1], $value);
-		is_deeply($cc->[2], $rect);
-		# is($cc->[3], $contour);
+		my $x; lives_ok { $x = Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
+		is($x->[0], 1);
+		is_deeply($x->[1], $value);
+		is_deeply($x->[2], $rect);
+		# is($x->[3], $contour);
 	}
 }

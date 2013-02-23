@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 19;
+use Test::More tests => 18;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 use List::Util qw(min);
 
 # ------------------------------------------------------------
@@ -66,23 +66,18 @@ if (4) {
 }
 
 if (10) {
-	e { $src->min(0, 0, 0) };
-	err_is("Usage: Cv::Arr::cvMinS(src, value, dst)");
-	e { $src->min($src, 0, 0) };
-	err_is("Usage: Cv::Arr::cvMin(src1, src2, dst)");
+	throws_ok { $src->min(0, 0, 0) } qr/Usage: Cv::Arr::cvMinS\(src, value, dst\) at $0/;
+	throws_ok { $src->min($src, 0, 0) } qr/Usage: Cv::Arr::cvMin\(src1, src2, dst\) at $0/;
 }
 
 if (11) {
-	e { $src->min([1]) };
-	err_is("src2 is not of type CvArr * in Cv::Arr::cvMin");
+	throws_ok { $src->min([1]) } qr/src2 is not of type CvArr \* in Cv::Arr::cvMin at $0/;
 }
 
 if (12) {
-	e { $src->min(0, $src->new(CV_32FC1)) };
-	err_like("OpenCV Error:");
+	throws_ok { $src->min(0, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
 }
 
 if (13) {
-	e { $src->min($src->new, $src->new(CV_32FC1)) };
-	err_like("OpenCV Error:");
+	throws_ok { $src->min($src->new, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
 }

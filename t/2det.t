@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 5;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  double cvDet(const CvArr* mat)
@@ -33,12 +33,10 @@ if (2) {
 
 if (10) {
 	my $src = Cv::Mat->new([2], CV_32FC1);
-	e { $src->det(1) };
-	err_is("Usage: Cv::Arr::cvDet(mat)");
+	throws_ok { $src->det(1) } qr/Usage: Cv::Arr::cvDet\(mat\) at $0/;
 }
 
 if (11) {
 	my $src = Cv::Mat->new([2], CV_32FC1);
-	e { $src->det };
-	err_like("OpenCV Error");
+	throws_ok { $src->det } qr/OpenCV Error:/;
 }

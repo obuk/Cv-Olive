@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More tests => 12;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
@@ -58,6 +58,5 @@ if (1) {
 
 if (10) {
 	my $arr = Cv->createMat(240, 320, CV_8UC3);
-	e { $arr->setZero({}) };
-	err_is('Usage: Cv::Arr::cvSetZero(arr)');
+	throws_ok { $arr->setZero({}) } qr/Usage: Cv::Arr::cvSetZero\(arr\) at $0/;
 }

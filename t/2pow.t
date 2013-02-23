@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More tests => 8;
+use Test::Number::Delta within => 1e-5;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  void cvPow(const CvArr* src, CvArr* dst, double power)
@@ -18,21 +19,20 @@ $src->set([2], [rand 3]);
 
 if (1) {
 	my $dst = $src->pow(2);
-	is_({ round => "%.4g" }, $dst->getReal(0), pow2($src->getReal(0)));
-	is_({ round => "%.4g" }, $dst->getReal(1), pow2($src->getReal(1)));
-	is_({ round => "%.4g" }, $dst->getReal(2), pow2($src->getReal(2)));
+	delta_ok($dst->getReal(0), pow2($src->getReal(0)));
+	delta_ok($dst->getReal(1), pow2($src->getReal(1)));
+	delta_ok($dst->getReal(2), pow2($src->getReal(2)));
 }
 
 if (2) {
 	$src->pow(my $dst = $src->new, 2);
-	is_({ round => "%.4g" }, $dst->getReal(0), pow2($src->getReal(0)));
-	is_({ round => "%.4g" }, $dst->getReal(1), pow2($src->getReal(1)));
-	is_({ round => "%.4g" }, $dst->getReal(2), pow2($src->getReal(2)));
+	delta_ok($dst->getReal(0), pow2($src->getReal(0)));
+	delta_ok($dst->getReal(1), pow2($src->getReal(1)));
+	delta_ok($dst->getReal(2), pow2($src->getReal(2)));
 }
 
 if (10) {
-	e { $src->pow() };
-	err_is("Usage: Cv::Arr::cvPow(src, dst, power)");
+	throws_ok { $src->pow() } qr/Usage: Cv::Arr::cvPow\(src, dst, power\) at $0/;
 }
 
 sub pow2 {

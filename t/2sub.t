@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 16;
+use Test::More tests => 15;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 # void cvSub(CvArr* src1, CvArr* src2, CvArr* dst, CvArr* mask=NULL)
@@ -65,13 +65,11 @@ if (4) {
 }
 
 if (10) {
-	e { $src->sub(0, 0, 0, 0) };
-	err_is("Usage: Cv::Arr::cvSub(src1, src2, dst, mask=NULL)");
+	throws_ok { $src->sub(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvSub\(src1, src2, dst, mask=NULL\) at $0/;
 }
 
 if (12) {
-	e { $src->sub(\0) }; 
-	err_like("OpenCV Error:");
+	throws_ok { $src->sub(\0) } qr/OpenCV Error:/;
 }
 
 
