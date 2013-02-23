@@ -8,7 +8,7 @@ use warnings;
 
 use Cv::Seq::Point;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 our @ISA = qw(Cv::Seq::Point);
 
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }

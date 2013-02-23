@@ -77,6 +77,7 @@ WriteMakefile(
 	LIBS => $cf->libs,
 	CC => $cf->cc,
 	LD => $cf->cc,
+	INC => '-I.',
 	XSOPT => '-C++ -hiertype',
 	TYPEMAPS => $cf->typemaps,
 	CCFLAGS => $cf->ccflags,
@@ -112,7 +113,7 @@ cover:
 	cover
 	find cover_db -type d |xargs chmod +rx
 
-Cv.xs:	Cv.inc
+Cv.xs:	lib/Cv/Cv.inc
 
 ";
 }
