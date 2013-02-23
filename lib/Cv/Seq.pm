@@ -22,7 +22,20 @@ package Cv::Seq::Seq;
 
 package Cv::Seq;
 
-{ no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
+for (
+	"Cv::Seq",
+	"Cv::Seq::Circle",
+	"Cv::Seq::Point",
+	"Cv::Seq::Point2",
+	"Cv::Seq::Rect",
+	"Cv::Seq::SURFPoint",
+	"Cv::Seq::Seq",
+	"Cv::SeqReader",
+	"Cv::SeqWriter",
+	) {
+	{ no strict 'refs'; *{$_ . '::AUTOLOAD'} = \&Cv::autoload }
+}
+
 
 our %TEMPLATE;
 

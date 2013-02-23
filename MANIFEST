@@ -14,14 +14,11 @@ fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 lib/Cv.pm
 lib/Cv/Config.pm
-lib/Cv/Flipbook-ja.pod
 lib/Cv/Flipbook.pm
-lib/Cv/More-ja.pod
+lib/Cv/JA.pod
 lib/Cv/More.pm
 lib/Cv/Nihongo.pod
-lib/Cv/Pango-ja.pod
 lib/Cv/Pango.pm
-lib/Cv/Seq-ja.pod
 lib/Cv/Seq.pm
 lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm
@@ -280,9 +277,6 @@ t/4s_new.t
 t/4toArray-seq.t
 t/4toArray.t
 t/4transform.t
-t/8issue10.t
-t/8issue8.t
-t/8issue9.t
 t/9flipbook.t
 t/9inlineC.t
 t/9pango.t

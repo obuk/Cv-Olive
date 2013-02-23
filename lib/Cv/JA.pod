@@ -19,6 +19,8 @@ C<Cv::More> は、L<Cv> から実験的な機能を切り離して整理する�
 
  use Cv;              # Cv::More を使う
  use Cv qw(:nomore);  # Cv::More を使わない
+ use Cv -more;        # Cv::More を使う
+ use Cv -nomore;      # Cv::More を使わない
 
 =head2 Perlの配列を使うメソッド
 
@@ -260,58 +262,7 @@ $index は配列のリファレンスで、より具体的に次のとおり書�
 列のリファレンス [$start, $end] で表わすことができます。省略したときは
 $arr のすべての要素を変換します。
 
-cvCvtSeqToArray() を元にしたので同じ呼出し形式も使えます。つまり、次の
-使い方もできます。でも使わないかもしれませんね。
-
- $arr->ToArray(\my @array);
- $arr->ToArray(\my @attay, $slice);
-
-(注意) Perl の配列のようにインデクスに負数が使えると便利なことがありま
-すが、これはできません。そのうち考えてみようと思っています。
-
- my @array = $arr->ToArray([ -1, 1 ]);
- my @array = $arr->ToArray([ 1, -1 ]);
-
 =back
-
-
-=head2 その他のメソッド
-
-=over
-
-=item GetBuildInformation()
-
-  my $info = Cv->GetBuildInformation()
-  my %info = Cv->GetBuildInformation()
-
-OpenCV 2.4.0 からビルド時の情報が取り出せるます。コンテクトがスカラなら
-cv::getBuildInformation() の戻り値を返し、リストなら次のような結果を返
-します。
-
-  'OpenCV modules' => {
-	'Disabled by dependency' => '-',
-	'Unavailable' => 'androidcamera java ocl',
-	'Disabled' => 'world',
-	'To be built' => 'core imgproc flann highgui features2d calib3d ml video objdetect contrib nonfree photo legacy gpu python stitching ts videostab'
-  },
-  'Version control' => 'commit:6484732',
-  'Linker flags (Debug)' => {
-	'Precompiled headers' => 'YES'
-  },
-  ...
-
-これは、C<HasModule()> でOpenCV で利用可能なモジュールを確認するために
-使用しています。
-
-=item HasModule()
-
- my $hasCore = Cv->HasModule('core');
-
-OpenCV がどのようなモジュールを有効にしてビルドされたかを返します。
-
-=back
-
-
 
 =head1 Cv::Seq
 
