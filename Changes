@@ -1,5 +1,17 @@
 Revision history for Cv.pm
 
+0.24 - 2012-02-24
+     * replaced to Carp::croak to Perl_croak of xs.
+     * use Getopt::Long
+     * moved GetBuildInformation(), HasQt(), HasModule() to Cv from Cv::More.
+     * redefined $Cv::STORAGE from $Cv::Seq::STORAGE.
+     * moved code for Qt to Cv::Qt.
+     * moved test code to Cv::Test.
+     * add test for typemap.
+     * fixed AUTOLOAD of defined.
+     * added Cv::JA, summarized Japanese documents.
+     * fixed some bugs.
+
 0.23 - 2012-01-31
      * fixed endRow of cvGetRows
      * fixed cvSolve, cvSolveCubic, cvMinS, Cv::Arr::Min, Cv::Arr::Max
