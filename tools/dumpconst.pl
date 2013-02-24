@@ -4,18 +4,13 @@
 use strict;
 use warnings;
 
-=encoding utf8
-
-=head1 NAME
-
-dumpconst - convert opencv header files to Perl constants
-
-
-=head1 SYNOPSIS
-
-B<dumpconst.pl> [-verbose] [-unlink] dirs
-
-=cut
+# dumpconst - convert opencv header files to Perl constants
+# 
+# dumpconst.pl [-verbose] [-unlink] dirs
+# 
+# dumpconst.pl は、opencv の定数を Perl モジュールに変換する。はじめに、
+# 指定されたディレクトリ下の opencv のヘッダファイルを find コマンド検索
+# し、h2ph で変換する。
 
 our @incdir = ();
 our $verbose = 0;
@@ -39,14 +34,6 @@ if ($output) {
 
 print STDERR "include: ", join(', ', @ARGV), "\n" if $verbose > 1;
 
-=head1 DESCRIPTION
-
-dumpconst.pl は、opencv の定数を Perl モジュールに変換する。はじめに、
-指定されたディレクトリ下の opencv のヘッダファイルを find コマンド検索
-し、h2ph で変換する。
-
-=cut
-
 use File::Basename;
 for my $dir (@ARGV) {
 	open FIND, "(cd $dir && find opencv* -name '*.h' -o -name '*.hpp')|"
@@ -54,26 +41,19 @@ for my $dir (@ARGV) {
 	while (<FIND>) {  chop; h2ph($dir, $_); }
 }
 
-=pod
+# 変換された .ph のうち、opencv/ の下の cv.h highgui.h cvaux.h と
+# opencv2/ の下の opencv.hpp を require で動的に取り込む。そのとき、
+# opencv.hpp は OpenCV-1* にはないので、 eval { } でエラーを無視した。
 
-変換された .ph のうち、opencv/ の下の cv.h highgui.h cvaux.h と
-opencv2/ の下の opencv.hpp を require で動的に取り込む。そのとき、
-opencv.hpp は OpenCV-1* にはないので、 eval { } でエラーを無視した。
-
-=cut
 
 require "opencv/cv.ph";
 require "opencv/highgui.ph";
 require "opencv/cvaux.ph";
 eval { require "opencv2/opencv.hpp" };
 
-=pod
-
-そして、変換結果を B::Deparse し、定数らしく見えるものを出力することに
-した。手作業で変換したものや定数でないものものもあるので、無視して欲し
-いものは %ignore に置いた。
-
-=cut
+# そして、変換結果を B::Deparse し、定数らしく見えるものを出力することに
+# した。手作業で変換したものや定数でないものものもあるので、無視して欲し
+# いものは %ignore に置いた。
 
 use B::Deparse;
 
@@ -94,16 +74,11 @@ CV_STEREO_GC_OCCLUDED
 
 	);
 
-=pod
-
-定数として出力するものは、名前が /^(CV|IPL)_/ に一致し、B::Deparse して
-eval が含まれていないものを選ぶことにした。変換結果には、C言語では定数
-になる sizeof() もあった。しかし、Cv の定数として扱いを決められなかった
-ので、不都合が生じるまで出力しないことにした。この他 h2ph が 3.14f のよ
-うな浮動小数点の定数を 3.14 & 'f' という形で出力するところも補正した。
-
-=cut
-
+# 定数として出力するものは、名前が /^(CV|IPL)_/ に一致し、B::Deparse して
+# eval が含まれていないものを選ぶことにした。変換結果には、C言語では定数
+# になる sizeof() もあった。しかし、Cv の定数として扱いを決められなかった
+# ので、不都合が生じるまで出力しないことにした。この他 h2ph が 3.14f のよ
+# うな浮動小数点の定数を 3.14 & 'f' という形で出力するところも補正した。
 
 our @subs;
 sub dumpsub {
@@ -137,15 +112,11 @@ print &postamble;
 exit 0;
 
 
-=pod
-
-h2ph() は h2ph を呼び、opencv のヘッダファイルを .ph に変換する。ここで
-は単に定数を取り出せれば十分なので、変換された .ph 中の include に相当
-する require を eval { } で括り、エラーの発生を無視することにした。
-これは、opencv のヘッダファイル以外のヘッダファイルが .ph に変換されて
-いないときに発生するエラーを抑止する。
-
-=cut
+# h2ph() は h2ph を呼び、opencv のヘッダファイルを .ph に変換する。ここで
+# は単に定数を取り出せれば十分なので、変換された .ph 中の include に相当
+# する require を eval { } で括り、エラーの発生を無視することにした。
+# これは、opencv のヘッダファイル以外のヘッダファイルが .ph に変換されて
+# いないときに発生するエラーを抑止する。
 
 
 sub h2ph {
