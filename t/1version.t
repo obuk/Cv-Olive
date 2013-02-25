@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 use Test::More qw(no_plan);
-# use Test::More tests => 11;
+# use Test::More tests => 19;
 BEGIN { use_ok('Cv', -nomore) }
+BEGIN { use_ok('Cv::Test') }
 
 # test CV_*_VERSION defined OpenCV
 my @v = Cv::CV_VERSION;
@@ -32,9 +33,8 @@ foreach (sort &classes('Cv')) {
 		my $pv = "\$${_}::VERSION";
 		my $x = version->new(eval $pv);
 		is($x, $cv, "$pv in $pm");
-	}		
+	}
 }
-
 
 sub classes {
 	my @list = ();
