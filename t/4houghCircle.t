@@ -24,7 +24,7 @@ my $img = $src->cvtColor(CV_GRAY2RGB);
 my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
 my $storage = Cv->createMemStorage;
 my $circles = bless $gray->houghCircles(
-	$storage, CV_HOUGH_GRADIENT, 1, 30, 100, 50, 25, 65), "Cv::Seq::Circle";
+	$storage, CV_HOUGH_GRADIENT, 1, 30, 100, 50), "Cv::Seq::Circle";
 can_ok($circles, 'total');
 
 for ($circles->toArray) {
