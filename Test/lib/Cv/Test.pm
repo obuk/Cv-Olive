@@ -17,7 +17,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = @EXPORT_OK;
 
-our $VERSION = '0.03';
+our $VERSION = '0.25';
 
 require XSLoader;
 XSLoader::load('Cv::Test', $VERSION);
