@@ -28,3 +28,10 @@ WriteMakefile(
 	INST_MAN1DIR => '../.lib/man1',
 	INST_MAN3DIR => '../.lib/man3',
 );
+
+sub MY::postamble {
+	"
+Test.xs:	../lib/Cv/Cv.inc
+
+";
+}
