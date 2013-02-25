@@ -60,6 +60,14 @@ typedef char tiny;
 
 #define length(x) length_ ## x
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void Carp_croak(pTHX_ char const* format, ...);
+#ifdef __cplusplus
+}
+#endif
+
 void Carp_croak(pTHX_ char const* format, ...)
 {
 	va_list ap;
