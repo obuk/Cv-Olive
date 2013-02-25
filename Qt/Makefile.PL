@@ -16,6 +16,7 @@ if ($^O eq 'cygwin') {
 		%$PREREQ_PM,
 		ExtUtils::MM_Cygwin => 6.62,
 		Test::Number::Delta => 1.03,
+		Test::Exception => 0.31,
 	};
 }
 
