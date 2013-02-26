@@ -23,7 +23,7 @@ for my $x (-1.5, -1, -0.5, 0, 0.5, 1, 1.5) {
 	if ($x >= 0) {
 		delta_ok(cvSqrt($x), sqrt($x), "cvSqrt($x)");
 	} else {
-		is(cvSqrt($x), 'nan', "cvSqrt($x)");
+		like(cvSqrt($x), qr/-?nan/i, "cvSqrt($x)");
 	}
 }
 

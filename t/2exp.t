@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 9;
-use Test::Number::Delta within => 1e-6;
+use Test::Number::Delta within => 1e-4;
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
