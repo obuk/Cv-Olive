@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 64;
+use Test::More tests => 63;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $stor = Cv::MemStorage->new;
 
@@ -26,12 +26,10 @@ if (1) {
 	is($destroy, 4);
 
 	my $Cv = bless [], 'Cv';
-	e { $Cv->CreateSeq() };
-	err_is('class name needed');
+	throws_ok { $Cv->CreateSeq() } qr/class name needed at $0/;
 
 	my $Cv_Seq = bless [], 'Cv::Seq';
-	e { $Cv_Seq->CreateSeq() };
-	err_is('class name needed');
+	throws_ok { $Cv_Seq->CreateSeq() } qr/class name needed at $0/;
 }
 
 if (2) {

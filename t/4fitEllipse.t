@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 17;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 16;
+use Test::Number::Delta within => 1e-1;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 use List::Util qw(sum min max);
 
@@ -22,8 +23,8 @@ for (map { [[ 160, 120 ], $_] } 0, 15, 30) {
 	$img->zero;
 	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
 	my $box = aa(Cv->fitEllipse(\@points));
-	is_({ round => "%.0f" }, $box->[0], $center);
-	is_({ round => "%.0f" }, $box->[2], $angle);
+	delta_ok($box->[0], $center);
+	delta_ok($box->[2], $angle);
 	my @box = Cv->BoxPoints($box);
 	$img->polyLine([\@box], -1, &color, 1, CV_AA);
 	# $img->EllipseBox($box, &color, 1, CV_AA);
@@ -49,8 +50,8 @@ for (map { [[ 160, 120 ], $_] } 45, 60, 75) {
 	$img->zero;
 	$img->circle($_, 3, &color, 1, CV_AA) for @points; 
 	my $box = aa([Cv->fitEllipse(\@points)]);
-	is_({ round => "%.0f" }, $box->[0], $center);
-	is_({ round => "%.0f" }, $box->[2], $angle);
+	delta_ok($box->[0], $center);
+	delta_ok($box->[2], $angle);
 	my @box = Cv->BoxPoints($box);
 	$img->polyLine([\@box], -1, &color, 1, CV_AA);
 	$img->EllipseBox($box, &color, 1, CV_AA);
@@ -79,14 +80,12 @@ sub aa {
 
 
 # Cv-0.19
-e { my @list = Cv->FitEllipse };
-err_is('Usage: Cv::Arr::FitEllipse2(points)');
+throws_ok { my @list = Cv->FitEllipse } qr/Usage: Cv::Arr::FitEllipse2\(points\) at $0/;
 
 my $pts3 = [[1, 2], [2, 3], [3, 4]];
 my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
-e { my @list = Cv->FitEllipse($pts3) };
-err_like("OpenCV Error:");
+throws_ok { my @list = Cv->FitEllipse($pts3) } qr/OpenCV Error:/;
 
 Cv::More->unimport(qw(cs cs-warn));
 Cv::More->import(qw(cs-warn));
@@ -94,6 +93,5 @@ Cv::More->import(qw(cs-warn));
 {
 	no warnings 'redefine';
 	local *Carp::carp = \&Carp::croak;
-	e { my @line = Cv->FitEllipse($pts5); };
-	err_is("called in list context, but returning scaler");
+	throws_ok { my @line = Cv->FitEllipse($pts5); } qr/called in list context, but returning scaler at $0/;
 }

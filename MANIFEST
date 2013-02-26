@@ -1,5 +1,4 @@
 Changes
-Cv.inc
 Cv.xs
 fallback/Constant.pm-1.0.0
 fallback/Constant.pm-1.1.0
@@ -13,6 +12,7 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 lib/Cv.pm
+lib/Cv/Cv.inc
 lib/Cv/Config.pm
 lib/Cv/Flipbook.pm
 lib/Cv/JA.pod

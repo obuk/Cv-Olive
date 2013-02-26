@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 4;
+use Test::More tests => 3;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 use File::Basename;
 my $verbose = Cv->hasGUI;
@@ -15,16 +15,15 @@ my $verbose = Cv->hasGUI;
 # ------------------------------------------------------------
 
 if (10) {
-	e { Cv::Arr::cvAddWeighted() };
-	err_is('Usage: Cv::Arr::cvAddWeighted(src1, alpha, src2, beta, gamma, dst)');
+	throws_ok { Cv::Arr::cvAddWeighted() } qr/Usage: Cv::Arr::cvAddWeighted\(src1, alpha, src2, beta, gamma, dst\) at $0/;
 }
 
 my $src1 = Cv->loadImage(dirname($0) . "/baboon.jpg");
 my $src2 = Cv->loadImage(dirname($0) . "/lena.jpg");
 
 if (11) {
-	e { $src1->addWeighted(0, $src2->cvtColor(CV_BGR2GRAY), 0, 0) };
-	err_like('OpenCV Error:');
+	throws_ok { $src1->addWeighted(0, $src2->cvtColor(CV_BGR2GRAY), 0, 0) }
+	qr/OpenCV Error:/;
 }
 
 my $win = "addWeighted";

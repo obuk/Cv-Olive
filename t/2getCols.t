@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 23;
+use Test::More tests => 22;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 # CvMat* cvGetCols(const CvArr* arr, CvMat* submat, int startCol, int endCol)
@@ -73,20 +73,17 @@ if (6) {
 
 if (10) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	e { $src->GetCols(10, 10) };
-	err_is('');
+	lives_ok { $src->GetCols(10, 10) };
 }
 
 if (12) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	e { $src->GetCols(10, 0) };
-	err_like('OpenCV Error:');
+	throws_ok { $src->GetCols(10, 0) } qr/OpenCV Error:/;
 }
 
 if (13) {
 	my $src = Cv::Mat->new([240, 320], CV_8UC3);
 	no warnings 'redefine';
 	local *Cv::Mat::new = sub { undef };
-	e { $src->GetCols(100, 200) };
-	err_is('submat is not of type CvMat * in Cv::Arr::cvGetCols');
+	throws_ok { $src->GetCols(100, 200) } qr/submat is not of type CvMat \* in Cv::Arr::cvGetCols at $0/;
 }

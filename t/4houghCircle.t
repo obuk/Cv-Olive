@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 9;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -24,7 +24,7 @@ my $img = $src->cvtColor(CV_GRAY2RGB);
 my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
 my $storage = Cv->createMemStorage;
 my $circles = bless $gray->houghCircles(
-	$storage, CV_HOUGH_GRADIENT, 1, 30, 100, 50, 25, 65), "Cv::Seq::Circle";
+	$storage, CV_HOUGH_GRADIENT, 1, 30, 100, 50), "Cv::Seq::Circle";
 can_ok($circles, 'total');
 
 for ($circles->toArray) {
@@ -53,4 +53,3 @@ if ($verbose) {
 	$img->showImage("Circles");
 	Cv->WaitKey(1000);
 }
-

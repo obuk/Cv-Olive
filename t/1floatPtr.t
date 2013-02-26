@@ -4,6 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
 
@@ -15,19 +16,16 @@ if (1) {
 		is_deeply($floatPtr, \@floatPtr);
 	}
 
-	e { Cv::floatPtr({}) };
-	err_is("values is not of type float * in Cv::floatPtr");
+	throws_ok { Cv::floatPtr({}) } qr/values is not of type float \* in Cv::floatPtr at $0/;
 
 	{
 		use warnings FATAL => qw(all);
-		e { Cv::floatPtr(['1x']) };
-		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+		throws_ok { Cv::floatPtr(['1x']) } qr/Argument \"1x\" isn't numeric in subroutine entry at $0/;
 	}
 
 	{
 		no warnings 'numeric';
-		my $floatPtr2 = e { Cv::floatPtr([1, '2x', 3]) };
-		err_is("");
-		is_deeply($floatPtr2, [1, 2, 3]);
+		my $x; lives_ok { $x = Cv::floatPtr([1, '2x', 3]) };
+		is_deeply($x, [1, 2, 3]);
 	}
 }

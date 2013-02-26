@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
+use Test::More tests => 9;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $src = Cv->createImage([ 320, 240 ], 8, 3);
 my $rng = Cv->RNG;
@@ -33,11 +33,9 @@ if (3) {
 }
 
 if (10) {
-	e { $src->copy };
-	err_is('Usage: Cv::Arr::cvCopy(src, dst, mask=NULL)');
+	throws_ok { $src->copy } qr/Usage: Cv::Arr::cvCopy\(src, dst, mask=NULL\) at $0/;
 }
 
 if (11) {
-	e { $src->copy($src->new(CV_8UC1)) };
-	err_like('OpenCV Error:');
+	throws_ok { $src->copy($src->new(CV_8UC1)) } qr/OpenCV Error:/;
 }

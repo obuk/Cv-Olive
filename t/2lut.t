@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More tests => 6;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -58,27 +58,23 @@ if (1) {
 if (10) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC1);
 	my $lut = Cv::Mat->new([256], CV_8UC1);
-	e { $arr->LUT($lut) };
-	err_is('');
+	lives_ok { $arr->LUT($lut) };
 }
 
 if (11) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC1);
 	my $lut = Cv::Mat->new([256], CV_8UC3);
-	e { $arr->LUT($lut) };
-	err_is('');
+	lives_ok { $arr->LUT($lut) };
 }
 
 if (12) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
 	my $lut = Cv::Mat->new([256], CV_8UC1);
-	e { $arr->LUT($lut) };
-	err_like('OpenCV Error:');
+	throws_ok { $arr->LUT($lut) } qr/OpenCV Error:/;
 }
 
 if (13) {
 	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
 	my $lut = Cv::Mat->new([256], CV_8UC3);
-	e { $arr->LUT($lut) };
-	err_like('OpenCV Error:');
+	throws_ok { $arr->LUT($lut) } qr/OpenCV Error:/;
 }

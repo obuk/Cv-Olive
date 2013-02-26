@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More tests => 8;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my $a = Cv->createMat(2, 2, CV_64FC1)
@@ -29,20 +29,17 @@ if (1) {
 
 if (10) {
 	my $a = Cv->createMat(2, 2, CV_64FC1);
-	e { $a->scaleAdd(1, 2, 3) };
-	err_is('Usage: Cv::Arr::cvScaleAdd(src1, scale, src2, dst)');
+	throws_ok { $a->scaleAdd(1, 2, 3) } qr/Usage: Cv::Arr::cvScaleAdd\(src1, scale, src2, dst\) at $0/;
 }
 
 if (11) {
 	my $a = Cv->createMat(2, 2, CV_64FC1);
-	e { $a->scaleAdd(1) };
-	err_is('scale is not of type CvScalar in Cv::Arr::cvScaleAdd');
+	throws_ok { $a->scaleAdd(1) } qr/scale is not of type CvScalar in Cv::Arr::cvScaleAdd at $0/;
 }
 
 if (12) {
 	my $a = Cv->createMat(2, 2, CV_64FC1);
 	my $b = Cv->createMat(2, 2, CV_64FC2);
 	my $c = Cv->createMat(2, 2, CV_64FC3);
-	e { $a->scaleAdd([2], $b, $c) };
-	err_like('OpenCV Error:');
+	throws_ok { $a->scaleAdd([2], $b, $c) } qr/OpenCV Error:/;
 }

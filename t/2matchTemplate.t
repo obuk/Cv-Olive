@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More tests => 8;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 #  cvMatchTemplate(image, templ, [result], method)
 #  (1) $image->MatchTemplate($templ, CV_TM_SQDIFF);
@@ -37,20 +37,17 @@ if (2) {
 
 if (10) {
 	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
-	e { $image->matchTemplate; };
-	err_is('Usage: Cv::Arr::cvMatchTemplate(image, templ, result, method)');
+	throws_ok { $image->matchTemplate; } qr/Usage: Cv::Arr::cvMatchTemplate\(image, templ, result, method\) at $0/;
 }
 
 if (11) {
 	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
 	my $templ = Cv::Mat->new([480, 640], CV_8UC1)->zero;
-	e { $image->matchTemplate($templ); };
-	err_like('OpenCV Error:');
+	throws_ok { $image->matchTemplate($templ); } qr/OpenCV Error:/;
 }
 
 if (12) {
 	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
 	my $templ = Cv::Mat->new([24 + 1, 32 + 1], CV_8UC1)->zero;
-	e { $image->matchTemplate($templ, -1); };
-	err_like('OpenCV Error:');
+	throws_ok { $image->matchTemplate($templ, -1); } qr/OpenCV Error:/;
 }

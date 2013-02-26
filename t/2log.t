@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
+use Test::More tests => 9;
+use Test::Number::Delta within => 1e-4;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  void cvLog(const CvArr* src, CvArr* dst)
@@ -18,24 +19,22 @@ $src->set([2], [rand 3]);
 
 if (1) {
 	my $dst = $src->log;
-	is_({ round => "%.4g" }, $dst->getReal(0), log($src->getReal(0)));
-	is_({ round => "%.4g" }, $dst->getReal(1), log($src->getReal(1)));
-	is_({ round => "%.4g" }, $dst->getReal(2), log($src->getReal(2)));
+	delta_ok($dst->getReal(0), log($src->getReal(0)));
+	delta_ok($dst->getReal(1), log($src->getReal(1)));
+	delta_ok($dst->getReal(2), log($src->getReal(2)));
 }
 
 if (2) {
 	$src->log(my $dst = $src->new);
-	is_({ round => "%.4g" }, $dst->getReal(0), log($src->getReal(0)));
-	is_({ round => "%.4g" }, $dst->getReal(1), log($src->getReal(1)));
-	is_({ round => "%.4g" }, $dst->getReal(2), log($src->getReal(2)));
+	delta_ok($dst->getReal(0), log($src->getReal(0)));
+	delta_ok($dst->getReal(1), log($src->getReal(1)));
+	delta_ok($dst->getReal(2), log($src->getReal(2)));
 }
 
 if (10) {
-	e { $src->log(0, 0) };
-	err_is("Usage: Cv::Arr::cvLog(src, dst)");
+	throws_ok { $src->log(0, 0) } qr/Usage: Cv::Arr::cvLog\(src, dst\) at $0/;
 }
 
 if (11) {
-	e { $src->log($src->new(CV_8UC1)) };
-	err_like("OpenCV Error");
+	throws_ok { $src->log($src->new(CV_8UC1)) } qr/OpenCV Error:/;
 }

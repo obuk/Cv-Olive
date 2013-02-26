@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 4;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 SKIP: {
@@ -15,7 +15,5 @@ SKIP: {
 	is(scalar Cv->hasModule('core'), 1);
 	is(scalar Cv->hasModule('Core'), 0);
 	diag("OpenCV modules: ", join(", ", Cv->hasModule));
-	e { Cv->fontQt };
-	# err_is("no Qt");
-	err_is("can't call Cv::fontQt");
+	throws_ok { Cv->fontQt } qr/can't call Cv::fontQt/;
 }

@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -102,11 +102,9 @@ if (1) {
 }
 
 if (10) {
-	e { Cv::Arr::cvGetSubRect };
-	err_is('Usage: Cv::Arr::cvGetSubRect(arr, submat, rect)');
+	throws_ok { Cv::Arr::cvGetSubRect } qr/Usage: Cv::Arr::cvGetSubRect\(arr, submat, rect\) at $0/;
 }
 
 if (11) {
-	e { Cv::Arr::cvGetSubRect(1, 2, 3) };
-	err_is('arr is not of type CvArr * in Cv::Arr::cvGetSubRect');
+	throws_ok { Cv::Arr::cvGetSubRect(1, 2, 3) } qr/arr is not of type CvArr \* in Cv::Arr::cvGetSubRect at $0/;
 }

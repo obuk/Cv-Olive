@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 19;
+use Test::More tests => 18;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 use List::Util qw(max);
 
 # ------------------------------------------------------------
@@ -66,23 +66,18 @@ if (4) {
 }
 
 if (10) {
-	e { $src->max(0, 0, 0) };
-	err_is("Usage: Cv::Arr::cvMaxS(src, value, dst)");
-	e { $src->max($src, 0, 0) };
-	err_is("Usage: Cv::Arr::cvMax(src1, src2, dst)");
+	throws_ok { $src->max(0, 0, 0) } qr/Usage: Cv::Arr::cvMaxS\(src, value, dst\) at $0/;
+	throws_ok { $src->max($src, 0, 0) } qr/Usage: Cv::Arr::cvMax\(src1, src2, dst\) at $0/;
 }
 
 if (11) {
-	e { $src->max([1]) };
-	err_is("src2 is not of type CvArr * in Cv::Arr::cvMax");
+	throws_ok { $src->max([1]) } qr/src2 is not of type CvArr \* in Cv::Arr::cvMax at $0/;
 }
 
 if (12) {
-	e { $src->max(0, $src->new(CV_32FC1)) };
-	err_like("OpenCV Error:");
+	throws_ok { $src->max(0, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
 }
 
 if (13) {
-	e { $src->max($src->new, $src->new(CV_32FC1)) };
-	err_like("OpenCV Error:");
+	throws_ok { $src->max($src->new, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
 }

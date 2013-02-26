@@ -4,6 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
 
@@ -20,22 +21,18 @@ if (1) {
 		is_deeply($arr2, $arr);
 	}
 
-	e { Cv::CvPoint3D32fPtr([]) };
-	err_is("pt is not of type CvPoint3D32f in Cv::CvPoint3D32fPtr");
+	throws_ok { Cv::CvPoint3D32fPtr([]) } qr/pt is not of type CvPoint3D32f in Cv::CvPoint3D32fPtr at $0/;
 
-	e { Cv::CvPoint3D32fPtr([1]) };
-	err_is("pt is not of type CvPoint3D32f in Cv::CvPoint3D32fPtr");
+	throws_ok { Cv::CvPoint3D32fPtr([1]) } qr/pt is not of type CvPoint3D32f in Cv::CvPoint3D32fPtr at $0/;
 
 	{
 		use warnings FATAL => qw(all);
-		e { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
-		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+		throws_ok { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) } qr/Argument \"1x\" isn't numeric in subroutine entry at $0/;
 	}
 
 	{
 		no warnings 'numeric';
-		my $arr2 = e { Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
-		err_is("");
-		is_deeply($arr2, [ [1, 2, 3] ]);
+		my $x; lives_ok { $x = Cv::CvPoint3D32fPtr(['1x', '2y', '3z']) };
+		is_deeply($x, [ [1, 2, 3] ]);
 	}
 }

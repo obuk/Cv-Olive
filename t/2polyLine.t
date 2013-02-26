@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 3;
+use Test::More tests => 2;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $verbose = Cv->hasGUI;
 
@@ -24,6 +24,5 @@ if (1) {
 
 if (10) {
 	my $img = Cv::Image->new([240, 320], CV_8UC3);
-	e { $img->polyLine };
-	err_is('Usage: Cv::Arr::cvPolyLine(img, pts, is_closed, color, thickness= 1, line_type= 8, shift= 0)');
+	throws_ok { $img->polyLine } qr/Usage: Cv::Arr::cvPolyLine\(img, pts, is_closed, color, thickness= 1, line_type= 8, shift= 0\) at $0/;
 }

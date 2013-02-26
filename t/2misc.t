@@ -3,10 +3,11 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 43;
-BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
+use Test::More tests => 42;
+use Test::Number::Delta within => 1e-7;
+use Test::Exception;
 use POSIX;
+BEGIN { use_ok('Cv', -nomore) }
 
 sub cbrt {
     my ($x) = @_; my $sign = 1;
@@ -15,42 +16,35 @@ sub cbrt {
 }
 
 for my $x (-1.5, -1, -0.5, 0, 0.5, 1, 1.5) {
-    my $prec = 7;
-    my $a = sprintf("%.${prec}g", cvCbrt($x));
-    my $b = sprintf("%.${prec}g", cbrt($x));
-    is($a, $b, "cvCbrt($x)");
+    delta_ok(cvCbrt($x), cbrt($x), "cvCbrt($x)");
 }
 
 for my $x (-1.5, -1, -0.5, 0, 0.5, 1, 1.5) {
-    my $prec = 7;
-    my $a = sprintf("%.${prec}g", cvSqrt($x));
-    my $b = $x >= 0? sprintf("%.${prec}g", sqrt($x)) : 'nan';
-    is($a, $b, "cvSqrt($x)");
+	if ($x >= 0) {
+		delta_ok(cvSqrt($x), sqrt($x), "cvSqrt($x)");
+	} else {
+		is(cvSqrt($x), 'nan', "cvSqrt($x)");
+	}
 }
 
 for my $x (-1, -0.5, 0, 0.5, 1) {
-    my $y = POSIX::floor($x) + 0;
-    is(cvFloor($x), $y, "cvFloor($x)");
+    is(cvFloor($x), POSIX::floor($x) + 0, "cvFloor($x)");
 }
 
 for my $x (-1, -0.5, 0, 0.5, 1) {
-    my $y = POSIX::ceil($x) + 0;
-    is(cvCeil($x), $y, "cvCeil($x)");
+    is(cvCeil($x), POSIX::ceil($x) + 0, "cvCeil($x)");
 }
 
 for (1 .. 10) {
     my ($y, $x) = (rand(), rand());
-    my $a = cvFastArctan($y, $x);
-    redo unless my $b = 180 / CV_PI * atan2($y, $x);
-    $b = $a if (abs($a / $b) - 1) <= 0.1; # ignoring error < 10%
-    is($a, $b, "cvFastArctan($y, $x)");
-}
-
-sub round {
-    my ($x) = (@_);
-    ($x >= 0)? POSIX::floor($x + 0.5) : POSIX::ceil($x - 0.5);
+    delta_within(cvFastArctan($y, $x), 180/CV_PI*atan2($y, $x),
+				 1e-2, "cvFastArctan($y, $x)");
 }
 
 for my $x (-1.4, -1, -0.6, 0, 0.6, 1, 1.4) {
-    is(cvRound($x), round($x), "round($x)");
+	if ($x >= 0) {
+		is(cvRound($x), POSIX::floor($x + 0.5), "round($x)");
+	} else {
+		is(cvRound($x), POSIX::ceil($x - 0.5), "round($x)");
+	}
 }

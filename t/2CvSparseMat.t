@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 46;
+use Test::More tests => 45;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $class = 'Cv::SparseMat';
 
@@ -14,11 +14,9 @@ if (1) {
 	my $arr = $class->new(my $sizes = [240, 320], my $type = CV_8UC3);
 	isa_ok($arr, $class);
 
-	e { $arr->size };
-	err_like("OpenCV Error:");
+	throws_ok { $arr->size } qr/OpenCV Error:/;
 
-	e { $arr->origin };
-	err_is("can't call ${class}::origin");
+	throws_ok { $arr->origin } qr/can't call ${class}::origin at $0/;
 }
 
 # type: Cv::Mat->new([ $rows, $cols ], $type);
@@ -43,10 +41,5 @@ if (2) {
 		is_deeply(\@sizes, $_->{sizes}, "${class}->getDims(\@sizes)");
 	}
 	
-	e { $class->new([-1, -1], CV_8UC3) };
-	err_like("OpenCV Error:");
-	# e { $class->new };
-	# err_is("${class}::new: ?sizes");
-	# e { $class->new([320, 240]) };
-	# err_is("${class}::new: ?type");
+	throws_ok { $class->new([-1, -1], CV_8UC3) } qr/OpenCV Error:/;
 }

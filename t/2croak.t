@@ -3,34 +3,27 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More tests => 8;
+use Test::Exception;
 BEGIN { use_ok('Cv', qw(-nomore)) }
-BEGIN { use_ok('Cv::Test') }
 
-e { cvCreateImage() };
-err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+throws_ok { cvCreateImage() } qr/Usage: Cv::cvCreateImage\(size, depth, channels\) at $0/;
 
 # calling via autoload
-e { Cv->createImage() };
-err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+throws_ok { Cv->createImage() } qr/Usage: Cv::cvCreateImage\(size, depth, channels\) at $0/;
 
 # not calling via autoload
-e { Cv->createImage() };
-err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+throws_ok { Cv->createImage() } qr/Usage: Cv::cvCreateImage\(size, depth, channels\) at $0/;
 
 # calling via autoload
-e { Cv->CreateImage() };
-err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+throws_ok { Cv->CreateImage() } qr/Usage: Cv::cvCreateImage\(size, depth, channels\) at $0/;
 
 # not calling via autoload
-e { Cv->CreateImage() };
-err_is("Usage: Cv::cvCreateImage(size, depth, channels)");
+throws_ok { Cv->CreateImage() } qr/Usage: Cv::cvCreateImage\(size, depth, channels\) at $0/;
 
-e { my $scalar = Cv->createMat() };
-err_is("Usage: Cv::cvCreateMat(rows, cols, type)");
+throws_ok { my $scalar = Cv->createMat() } qr/Usage: Cv::cvCreateMat\(rows, cols, type\) at $0/;
 
 TODO: {
 	local $TODO = "fix error location in list context";
-	e { my @list = Cv->createMatND() };
-	err_is("Usage: Cv::cvCreateMatND(sizes, type)");
+	throws_ok { my @list = Cv->createMatND() } qr/Usage: Cv::cvCreateMatND\(sizes, type\) at $0/;
 }

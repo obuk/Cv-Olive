@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
+use Test::More tests => 12;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $src = Cv->createImage([320, 240], 8, 3);
 
@@ -33,13 +33,10 @@ if (4) {
 }
 
 if (10) {
-	e { Cv::Arr::cvSize };
-	err_is('Usage: Cv::Arr::cvSize(arr)');
-	e { Cv::Arr::cvGetSize };
-	err_is('Usage: Cv::Arr::cvGetSize(arr)');
+	throws_ok { Cv::Arr::cvSize } qr/Usage: Cv::Arr::cvSize\(arr\) at $0/;
+	throws_ok { Cv::Arr::cvGetSize } qr/Usage: Cv::Arr::cvGetSize\(arr\) at $0/;
 }
 
 if (11) {
-	e { Cv::Arr::cvGetSize(1) };
-	err_is('arr is not of type CvArr * in Cv::Arr::cvGetSize');
+	throws_ok { Cv::Arr::cvGetSize(1) } qr/arr is not of type CvArr \* in Cv::Arr::cvGetSize at $0/;
 }

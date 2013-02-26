@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	# http://keisan.casio.jp/has10/SpecExec.cgi
@@ -25,13 +25,11 @@ if (1) {
 
 if (10) {
 	my $coeffs = Cv::Mat->new([4], CV_64FC1);
-	e { $coeffs->solveCubic };
-	err_is("Usage: Cv::Arr::cvSolveCubic(coeffs, roots)");
+	throws_ok { $coeffs->solveCubic } qr/Usage: Cv::Arr::cvSolveCubic\(coeffs, roots\) at $0/;
 }
 
 if (11) {
 	my $coeffs = Cv::Mat->new([4], CV_64FC1);
 	my $roots = Cv::Mat->new([1], CV_64FC1);
-	e { $coeffs->solveCubic($roots) };
-	err_like("OpenCV Error:");
+	throws_ok { $coeffs->solveCubic($roots) } qr/OpenCV Error:/;
 }

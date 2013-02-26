@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
+use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 if (1) {
 	my ($x, $y) = (map { int rand 1000 } 1..2);
@@ -37,14 +37,12 @@ if (2) {
 
 if (10) {
 	my $A = Cv::Mat->new([2, 2], CV_32FC1);
-	e { $A->solve };
-	err_is("Usage: Cv::Arr::cvSolve(src1, src2, dst, method=CV_LU)");
+	throws_ok { $A->solve } qr/Usage: Cv::Arr::cvSolve\(src1, src2, dst, method=CV_LU\) at $0/;
 }
 
 if (11) {
 	my $A = Cv::Mat->new([2, 2], CV_32FC1);
 	my $B = Cv::Mat->new([2], CV_32FC1);
 	my $X = Cv::Mat->new([2], CV_16SC1);
-	e { $A->solve($B, $X) };
-	err_like("OpenCV Error:");
+	throws_ok { $A->solve($B, $X) } qr/OpenCV Error:/;
 }

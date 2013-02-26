@@ -4,6 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
 
@@ -15,19 +16,16 @@ if (1) {
 		is_deeply($doublePtr, \@doublePtr);
 	}
 
-	e { Cv::doublePtr({}) };
-	err_is("values is not of type double * in Cv::doublePtr");
+	throws_ok { Cv::doublePtr({}) } qr/values is not of type double \* in Cv::doublePtr at $0/;
 
 	{
 		use warnings FATAL => qw(all);
-		e { Cv::doublePtr(['1x']) };
-		err_is("Argument \"1x\" isn't numeric in subroutine entry");
+		throws_ok { Cv::doublePtr(['1x']) } qr/Argument \"1x\" isn't numeric in subroutine entry at $0/;
 	}
 
 	{
 		no warnings 'numeric';
-		my $doublePtr2 = e { Cv::doublePtr([1, '2x', 3]) };
-		err_is("");
-		is_deeply($doublePtr2, [1, 2, 3]);
+		my $x; lives_ok { $x = Cv::doublePtr([1, '2x', 3]) };
+		is_deeply($x, [1, 2, 3]);
 	}
 }

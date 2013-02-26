@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 5;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
+use Test::Number::Delta within => 1e-4;
+use Test::Exception;
 
 # ------------------------------------------------------------
 # void cvCrossProduct(const CvArr* src1, const CvArr* src2, CvArr* dst)
@@ -24,10 +25,10 @@ if (1) {
 	$B->set([2], [$bz]);
 	my $X = $A->crossProduct($B);
 	my ($x, $y, $z) = ($X->getReal(0), $X->getReal(1), $X->getReal(2));
-	is_({ round => "%.3g" }, cvScalar($x, $y, $z),
-		cvScalar($ay * $bz - $az * $by,
-				 $az * $bx - $ax * $bz,
-				 $ax * $by - $ay * $bx),
+	delta_ok(cvScalar($x, $y, $z),
+			 cvScalar($ay * $bz - $az * $by,
+					  $az * $bx - $ax * $bz,
+					  $ax * $by - $ay * $bx),
 		);
 }
 
@@ -39,21 +40,19 @@ if (2) {
 	$A->set([0], [$ax, $ay, $az]);
 	$B->set([0], [$bx, $by, $bz]);
 	$A->crossProduct($B, my $X = $A->new);
-	is_({ round => "%.4g" }, $X->get([0]),
-		cvScalar($ay * $bz - $az * $by,
-				 $az * $bx - $ax * $bz,
-				 $ax * $by - $ay * $bx),
+	delta_ok($X->get([0]),
+			 cvScalar($ay * $bz - $az * $by,
+					  $az * $bx - $ax * $bz,
+					  $ax * $by - $ay * $bx),
 		);
 }
 
 if (10) {
 	my $A = Cv::Mat->new([1], CV_32FC3);
-	e { $A->crossProduct(0, 0, 0) };
-	err_is("Usage: Cv::Arr::cvCrossProduct(src1, src2, dst)");
+	throws_ok { $A->crossProduct(0, 0, 0) } qr/Usage: Cv::Arr::cvCrossProduct\(src1, src2, dst\) at $0/;
 }
 
 if (11) {
 	my $A = Cv::Mat->new([1], CV_32FC3);
-	e { $A->crossProduct() };
-	err_is("src2 is not of type CvArr * in Cv::Arr::cvCrossProduct");
+	throws_ok { $A->crossProduct() } qr/src2 is not of type CvArr \* in Cv::Arr::cvCrossProduct at $0/;
 }

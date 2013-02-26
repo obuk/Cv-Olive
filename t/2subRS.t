@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 6;
+use Test::More tests => 5;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  void cvSubRS(CvArr* src, CvScalar value, CvArr* dst, CvArr* mask=NULL)
@@ -33,6 +33,5 @@ if (2) {
 
 if (10) {
 	my $src = Cv::Mat->new([1, 2], &CV_32FC4);
-	e { $src->subRS };
-	err_is('value is not of type CvScalar in Cv::Arr::cvSubRS');
+	throws_ok { $src->subRS } qr/value is not of type CvScalar in Cv::Arr::cvSubRS at $0/;
 }

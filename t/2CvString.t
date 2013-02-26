@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 14;
+use Test::More tests => 13;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $stor = Cv::MemStorage->new();
 ok($stor->isa('Cv::MemStorage'));
@@ -31,6 +31,5 @@ if (2) {
 }
 
 if (10) {
-	e { $stor->allocString() };
-	err_is("Usage: Cv::MemStorage::cvAllocString(storage, ptr, len=-1)");
+	throws_ok { $stor->allocString() } qr/Usage: Cv::MemStorage::cvAllocString\(storage, ptr, len=-1\) at $0/;
 }

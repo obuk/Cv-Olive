@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 32;
+use Test::More tests => 31;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
+
 use File::Basename;
 
 my $lena = dirname($0) . "/lena.jpg";
@@ -73,13 +74,11 @@ if (3) {
 if (10) {
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
-	e { $image->cvtColor };
-	err_is('Usage: Cv::Arr::CvtColor(src, dst, code)');
+	throws_ok { $image->cvtColor } qr/Usage: Cv::Arr::CvtColor\(src, dst, code\) at $0/;
 }
 
 if (11) {
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
-	e { $image->cvtColor(-1) };
-	err_is('dst is not of type CvArr * in Cv::Arr::cvCvtColor');
+	throws_ok { $image->cvtColor(-1) } qr/dst is not of type CvArr \* in Cv::Arr::cvCvtColor at $0/;
 }

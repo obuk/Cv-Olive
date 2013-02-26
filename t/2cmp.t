@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More tests => 6;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  void cvCmp(const CvArr* src1, const CvArr* src2, CvArr* dst, int cmpOp)
@@ -35,18 +35,15 @@ if (2) {
 
 if (10) {
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
-	e { $src->cmp };
-	err_is('Usage: Cv::Arr::cvCmpS(src, value, dst, cmpOp)');
+	throws_ok { $src->cmp } qr/Usage: Cv::Arr::cvCmpS\(src, value, dst, cmpOp\) at $0/;
 }
 
 if (11) {
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
-	e { $src->cmp(0, -1) };
-	err_like('OpenCV Error:');
+	throws_ok { $src->cmp(0, -1) } qr/OpenCV Error:/;
 }
 
 if (12) {
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
-	e { $src->cmp(Cv::Image->new([10, 10], CV_8UC1), CV_CMP_EQ) };
-	err_like('OpenCV Error:');
+	throws_ok { $src->cmp(Cv::Image->new([10, 10], CV_8UC1), CV_CMP_EQ) } qr/OpenCV Error:/;
 }

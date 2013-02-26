@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 11;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 # ------------------------------------------------------------
 #  void cvFlip(const CvArr* src, CvArr* dst=NULL, int flipMode=0)
@@ -43,11 +43,9 @@ if (3) {
 }
 
 if (10) {
-	e { $src->flip(0, 0) };
-	err_is("Usage: Cv::Arr::cvFlip(src, dst=NULL, flipMode=0)");
+	throws_ok { $src->flip(0, 0) } qr/Usage: Cv::Arr::cvFlip\(src, dst=NULL, flipMode=0\) at $0/;
 }
 
 if (11) {
-	e { $src->flip($src->new(CV_16SC1)) };
-	err_like("OpenCV Error:");
+	throws_ok { $src->flip($src->new(CV_16SC1)) } qr/OpenCV Error:/;
 }

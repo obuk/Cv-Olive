@@ -4,6 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
+use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::Test') }
 
@@ -18,26 +19,20 @@ if (1) {
 		is_deeply($term2, $term);
 	}
 
-	e { Cv::CvTermCriteria({}) };
-	err_is("term is not of type CvTermCriteria in Cv::CvTermCriteria");
+	throws_ok { Cv::CvTermCriteria({}) } qr/term is not of type CvTermCriteria in Cv::CvTermCriteria at $0/;
 
-	e { Cv::CvTermCriteria([]) };
-	err_is("term is not of type CvTermCriteria in Cv::CvTermCriteria");
+	throws_ok { Cv::CvTermCriteria([]) } qr/term is not of type CvTermCriteria in Cv::CvTermCriteria at $0/;
 
 	{
 		use warnings FATAL => qw(all);
-		e { Cv::CvTermCriteria(['1x', 2, 3]) };
-		err_is("Argument \"1x\" isn't numeric in subroutine entry");
-		e { Cv::CvTermCriteria([1, '2x', 3]) };
-		err_is("Argument \"2x\" isn't numeric in subroutine entry");
-		e { Cv::CvTermCriteria([1, 2, '3x']) };
-		err_is("Argument \"3x\" isn't numeric in subroutine entry");
+		throws_ok { Cv::CvTermCriteria(['1x', 2, 3]) } qr/Argument \"1x\" isn't numeric in subroutine entry at $0/;
+		throws_ok { Cv::CvTermCriteria([1, '2x', 3]) } qr/Argument \"2x\" isn't numeric in subroutine entry at $0/;
+		throws_ok { Cv::CvTermCriteria([1, 2, '3x']) } qr/Argument \"3x\" isn't numeric in subroutine entry at $0/;
 	}
 
 	{
 		no warnings 'numeric';
-		my $term2 = e { Cv::CvTermCriteria(['1x', '2x', '3x']) };
-		err_is("");
-		is_deeply($term2, [ 1, 2, 3 ]);
+		my $x; lives_ok { $x = Cv::CvTermCriteria(['1x', '2x', '3x']) };
+		is_deeply($x, [ 1, 2, 3 ]);
 	}
 }
