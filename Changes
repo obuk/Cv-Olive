@@ -1,5 +1,21 @@
 Revision history for Cv.pm
 
+0.25rc - 2012-02-28
+     * rewrote t/2matchTemplate.t; perhaps changed 2.4.4 or later
+     * fixed compile error around cvEncodeImage (same as above)
+     * fixed test cvSqrt returns -nan (t/2misc.t)
+ 
+0.24 - 2012-02-24
+     * replaced Perl_croak with Carp::croak to get better error info
+     * rewrote Cv::import using Getopt for use Cv -option
+     * split parts of Cv module into Cv::Test and Cv::Qt
+     * rewrote startup defining AUTOLOAD statically
+     * moved $STORAGE from Cv::Seq to Cv as $CV::STORAGE
+     * put scattered docs into Cv::JA
+     * fixed cvCvtSeqToArray() negative index
+     * $arr->new() supported calling with class as $arr->Cv::Image::new()
+     * suppoted init value for Cv::Seq::Point::new()
+
 0.23 - 2012-01-31
      * fixed endRow of cvGetRows
      * fixed cvSolve, cvSolveCubic, cvMinS, Cv::Arr::Min, Cv::Arr::Max
