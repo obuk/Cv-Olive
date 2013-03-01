@@ -42,7 +42,7 @@ SKIP: {
 	my $img = Cv->createImage([480, 240], 8, 3);
 	$img->fill(cvScalarAll(255));
 
-	throw_ok { cvAddText() }
+	throws_ok { cvAddText() }
 	qr/Usage: Cv::Qt::cvAddText\(img, text, location, font\)/;
 
 	lives_ok { cvAddText($img, "Hello, Qt", [ 10, 80 ], $huge) };

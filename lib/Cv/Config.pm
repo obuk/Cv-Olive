@@ -10,7 +10,7 @@ use File::Basename;
 use version;
 BEGIN { eval "use Cv::Constant" };
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 our %opencv;
 our %C;
@@ -125,6 +125,7 @@ sub hasqt {
 			print C <<"----";
 #include <stdio.h>
 #include <opencv/cv.h>
+#include <opencv/highgui.h>
 main()
 {
 	CvFont font = cvFontQt("Times");
