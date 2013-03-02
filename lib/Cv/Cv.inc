@@ -3,6 +3,8 @@
 #ifndef _cv_inc_
 #define _cv_inc_
 
+#ifndef __Inline_C
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +17,8 @@ extern "C" {
 
 /* #define NEED_sv_2pv_nolen */
 #include "ppport.h"
+
+#endif  /* __Inlin_C */
 
 /* remove confincting macros */
 #undef do_open
