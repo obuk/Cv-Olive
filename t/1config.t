@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 10;
+use Test::Exception;
 use version;
 
 BEGIN {
@@ -66,4 +67,13 @@ if (3) {
 	my $cf = eval { new Cv::Config };
 	like($cf->ccflags, qr{-I$include});
 	like($cf->ccflags, qr{-D$define});
+}
+
+# Cv-0.25
+if (4) {
+	no warnings;
+	# local $Data::Dumper::Terse = 1;
+	undef *{Cv::Config::cf};
+	my $cf = eval { new Cv::Config };
+	lives_ok { $cf->hasqt };
 }

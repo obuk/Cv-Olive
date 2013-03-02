@@ -3408,6 +3408,10 @@ CvMat*
 cvEncodeImage(const CvArr* arr, const char* ext, int* params)
 CODE:
     int i = length(params) & ~1;
+#if _CV_VERSION() >= _VERSION(2,4,4)
+	if (params) params[i] = 0;
+	RETVAL = cvEncodeImage(ext, arr, params);
+#else
 #ifdef __cplusplus
     cv::Mat img = cv::cvarrToMat(arr);
     if (CV_IS_IMAGE(arr) && ((const IplImage*)arr)->origin == IPL_ORIGIN_BL) {
@@ -3424,6 +3428,7 @@ CODE:
 #else
 	if (params) params[i] = 0;
 	RETVAL = cvEncodeImage(ext, arr, params);
+#endif
 #endif
 OUTPUT:
 	RETVAL

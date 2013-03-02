@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 733;
+use Test::More tests => 721;
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
@@ -100,8 +100,10 @@ for my $class (keys %TYPENAME) {
 		is($destroy_ghost, 1, "${class}::Ghost->DESTROY");
 	}
 
-	# test memory leak
-	if (5) {
+	# XXXXX - This test case attempted to test that there is no memory
+	# leak, but it was not enough.
+	# see cpan/report/bf57696e-7ed6-11e2-9fc8-389cbe3604bd
+	if (0) {
 		my $arr = $class->new(my $sizes = [240, 320], my $type = CV_8UC3);
 		isa_ok($arr, $class);
 		my $arr_phys = $arr->phys;

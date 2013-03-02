@@ -67,12 +67,9 @@ sub new {
 	my $sizes = @_ && ref $_[0] eq 'ARRAY' ? CORE::shift : undef;
 	my ($hSize, $eSize) = $sizes ? @$sizes : @SIZES;
 	my $flags = @_ ? CORE::shift : ref $self ? $self->type : undef;
-	$flags = $FLAGS unless defined $flags;
-	$hSize ||= &Cv::CV_SIZEOF('CvSeq'),
-	$eSize ||= &Cv::CV_ELEM_SIZE($flags);
 	my $class = $self->isa('Cv::Seq') && $self || __PACKAGE__;
 	$class = ref $class if ref $class;
-	bless Cv::cvCreateSeq($flags, $hSize, $eSize, $stor), $class;
+	$class->CreateSeq($flags, $hSize, $eSize, $stor);
 }
 
 

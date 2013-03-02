@@ -23,7 +23,7 @@ for my $x (-1.5, -1, -0.5, 0, 0.5, 1, 1.5) {
 	if ($x >= 0) {
 		delta_ok(cvSqrt($x), sqrt($x), "cvSqrt($x)");
 	} else {
-		is(cvSqrt($x), 'nan', "cvSqrt($x)");
+		like(cvSqrt($x), qr/-?nan/i, "cvSqrt($x)");
 	}
 }
 
@@ -38,7 +38,7 @@ for my $x (-1, -0.5, 0, 0.5, 1) {
 for (1 .. 10) {
     my ($y, $x) = (rand(), rand());
     delta_within(cvFastArctan($y, $x), 180/CV_PI*atan2($y, $x),
-				 1e-2, "cvFastArctan($y, $x)");
+				 0.5, "cvFastArctan($y, $x)");
 }
 
 for my $x (-1.4, -1, -0.6, 0, 0.6, 1, 1.4) {
