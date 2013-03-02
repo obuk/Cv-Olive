@@ -1,7 +1,8 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use 5.008008;
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker;
+use ExtUtils::PkgConfig;
 
 use lib qw(./lib);
 eval "use Cv::Config";
@@ -60,7 +61,7 @@ my @perl_h = qw(perl.h sv.h pp.h);
 my %PREREQ_PM = (
 	PREREQ_PM => {
 		ExtUtils::ParseXS => 2.22,
-		ExtUtils::PkgConfig => 1.14,
+		ExtUtils::PkgConfig => 1.13,
 		Test::Number::Delta => 1.03,
 		Test::Exception => 0.31,
 		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),
