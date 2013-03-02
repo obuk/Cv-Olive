@@ -9,3 +9,5 @@ rm -f /usr/local/lib/libcxcore*
 rm -f /usr/local/lib/libcv*
 rm -f /usr/local/lib/libml*
 rm -f /usr/local/lib/libhighgui*
+rm -f /usr/local/libdata/pkgconfig/opencv.pc
+rm -f /usr/local/lib/pkgconfig/opencv.pc
