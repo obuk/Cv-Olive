@@ -2,10 +2,11 @@
 
 use strict;
 use Test::More;
+use Test::Exception;
 BEGIN {
 	plan skip_all => "Inline::C required"
 		unless eval "use Inline; 1";
-	plan tests => 5;
+	plan tests => 6;
 }
 
 BEGIN {
@@ -24,6 +25,8 @@ if ($verbose) {
 	$img1->show('Inline C');
 	Cv->waitKey(1000);
 }
+
+throws_ok { myload() } qr/Usage: main::myload\(name\)/;
 
 BEGIN {
 	use_ok('Cv::Config');
