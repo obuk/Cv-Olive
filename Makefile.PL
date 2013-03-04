@@ -71,6 +71,9 @@ my %PREREQ_PM = (
 my @dir = qw(Test);
 push(@dir, qw(Qt)) if $cf->hasqt;
 
+eval "use Pango";
+push(@dir, qw(Pango)) unless $@;
+
 WriteMakefile(
 	NAME => 'Cv',
 	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
