@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
-use Test::Number::Delta within => 1.1;
+use Test::More tests => 7;
 use Test::Exception;
 use version;
 BEGIN { use_ok('Cv', -nomore) }
@@ -26,11 +25,11 @@ if (1) {
 	is_deeply($result->size, [ map { $_ + 1 } @sz ]);
 	is($result->type, CV_32FC1);
 	$result->minMaxLoc(my $minVal, my $maxVal, my $minLoc, my $maxLoc);
-	my $v = version->parse(cvVersion());
-	if ($v >= qv(2.4.4)) {
-		delta_ok($maxLoc, \@pt);
-	} else {
-		delta_ok($minLoc, \@pt);
+	my @minLocErr = map { $minLoc->[$_] - $pt[$_] } 0..1;
+	my @maxLocErr = map { $maxLoc->[$_] - $pt[$_] } 0..1;
+	unless (abs($minLocErr[0]) <= 1.1 && abs($minLocErr[1]) <= 1.1 ||
+			abs($maxLocErr[0]) <= 1.1 && abs($maxLocErr[1]) <= 1.1) {
+		diag(sprintf("minLoc: %dx%d, maxLoc", @minLocErr, @maxLocErr));
 	}
 }
 
