@@ -12,8 +12,8 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 lib/Cv.pm
-lib/Cv/Cv.inc
 lib/Cv/Config.pm
+lib/Cv/Cv.inc
 lib/Cv/Flipbook.pm
 lib/Cv/JA.pod
 lib/Cv/More.pm
@@ -37,6 +37,8 @@ Qt/MANIFEST
 Qt/Qt.xs
 Qt/README
 Qt/t/Cv-Qt.t
+Qt/t/pod-coverage.t
+Qt/t/pod.t
 README
 sample/aloeL.jpg
 sample/aloeR.jpg

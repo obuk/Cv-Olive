@@ -2,6 +2,7 @@
 
 use 5.008008;
 use ExtUtils::MakeMaker;
+use ExtUtils::PkgConfig;
 
 use lib qw(../lib);
 eval "use Cv::Config";
@@ -17,7 +18,7 @@ my $cf = new Cv::Config;
 my %PREREQ_PM = (
 	PREREQ_PM => {
 		ExtUtils::ParseXS => 2.22,
-		ExtUtils::PkgConfig => 1.13,
+		ExtUtils::PkgConfig => 1.12,
 		Test::Number::Delta => 1.03,
 		Test::Exception => 0.31,
 		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),

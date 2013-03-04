@@ -55,7 +55,16 @@ sub cc {
 sub libs {
 	my $self = shift;
 	unless (defined $self->{LIBS}) {
-		$self->{LIBS} = [ $opencv{libs} ];
+		my @libs = split(/\s+/, $opencv{libs});
+		if ($libs[0] =~ m{(/.*)/libopencv}) {
+			my $dir = $1;
+			s{$dir/lib}{-l} for @libs;
+			s{\.(so|dll)$}{} for @libs;
+			unshift(@libs, "-L$dir");
+		}
+		s{(-(\d+\.)+)(so|dll)$}{} for @libs;
+		# $self->{LIBS} = [ $opencv{libs} ];
+		$self->{LIBS} = [ join(' ', @libs) ];
 	}
 	$self->{LIBS};
 }
