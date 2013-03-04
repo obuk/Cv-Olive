@@ -62,6 +62,7 @@ sub libs {
 			s{\.(so|dll)$}{} for @libs;
 			unshift(@libs, "-L$dir");
 		}
+		s{(-(\d+\.)+)(so|dll)$}{} for @libs;
 		# $self->{LIBS} = [ $opencv{libs} ];
 		$self->{LIBS} = [ join(' ', @libs) ];
 	}
