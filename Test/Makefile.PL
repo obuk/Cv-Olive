@@ -2,6 +2,7 @@
 
 use 5.008008;
 use ExtUtils::MakeMaker;
+use ExtUtils::PkgConfig;
 
 use lib qw(../lib);
 eval "use Cv::Config";
