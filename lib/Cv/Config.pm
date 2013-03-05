@@ -59,11 +59,9 @@ sub libs {
 		if ($libs[0] =~ m{(/.*)/libopencv}) {
 			my $dir = $1;
 			s{$dir/lib}{-l} for @libs;
-			s{\.(so|dll)$}{} for @libs;
 			unshift(@libs, "-L$dir");
 		}
 		s{(-(\d+\.)+)(so|dll)$}{} for @libs;
-		# $self->{LIBS} = [ $opencv{libs} ];
 		$self->{LIBS} = [ join(' ', @libs) ];
 	}
 	$self->{LIBS};
@@ -142,7 +140,7 @@ main()
 	;
 			close C;
 			warn "$CC $CCFLAGS -o a.exe $c $LIBS\n" if $verbose;
-			chop(my $v = `$CC $CCFLAGS -o a.exe $c $LIBS && ./a.exe`);
+			chop(my $v = `$CC $CCFLAGS -o a.exe $c $LIBS 2>/dev/null && ./a.exe`);
 			$self->{hasqt} = $? == 0;
 			unlink($c, 'a.exe');
 		} else {
