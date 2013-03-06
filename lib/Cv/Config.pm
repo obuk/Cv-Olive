@@ -61,11 +61,7 @@ sub libs {
 			s{$dir/lib}{-l} for @libs;
 			unshift(@libs, "-L$dir");
 		}
-<<<<<<< HEAD
-		s{(-(\d+\.)+)(so|dll)$}{} for @libs;
-=======
 		s{(-\d+\.\d+)?(\.(so|dll))?$}{} for @libs;
->>>>>>> 74a6068637cdeaf15085242808aabd40596f6d8b
 		$self->{LIBS} = [ join(' ', @libs) ];
 	}
 	$self->{LIBS};
