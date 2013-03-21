@@ -23,7 +23,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.14';
+our $VERSION = '0.25';
 
 {
 	package Cv::Arr;
