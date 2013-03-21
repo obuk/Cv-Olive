@@ -3,10 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 17;
+use Test::More;
+BEGIN {
+	eval { use Cv -nomore };
+	eval { require XSLoader; XSLoader::load('Cv::Test', $Cv::VERSION) };
+	plan skip_all => "no Cv/Test.so" if $@;
+	plan tests => 16;
+}
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my $area = int rand 16384;
 my $value = [ map { (int rand 16384) + 0.5 } 0..3 ];
