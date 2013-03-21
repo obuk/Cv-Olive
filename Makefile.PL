@@ -94,6 +94,17 @@ WriteMakefile(
 			] },
 	);
 
+sub MY::dynamic {
+    my($self) = shift;
+    '
+dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
+	$(NOECHO) $(NOOP)
+	test -d t/auto -a -f Test.xs || \
+		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic
+
+';
+}
+
 sub MY::postamble {
 	"
 ref:
