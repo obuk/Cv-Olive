@@ -34,6 +34,11 @@ our $VERSION = '0.25';
 	sub PutText {
 		my ($img, $text, $org, $font, $color) = @_;
 		goto \&cvPutText if ref $font && $font->isa('Cv::Font');
+		my $oimg = $img;
+		if ($oimg->type == Cv::CV_8UC3) {
+			my ($b, $g, $r) = $oimg->split;
+			$img = Cv->merge([$b, $g, $r, $b->new->zero]);
+		}
 		my $type = $img->type;
 		my $cairo_format; # argb32, rgb24, a8, a1, rgb16-565 
 		$cairo_format = 'a8'     if ($type == Cv::CV_8UC1);
@@ -58,6 +63,11 @@ our $VERSION = '0.25';
 		$cr->set_source_rgba($r, $g, $b, 1);
 		$cr->fill_preserve;
 		# $cr->stroke;
+		if ($oimg->type == Cv::CV_8UC3) {
+			my ($b, $g, $r, $a) = $img->split;
+			Cv->merge([$b, $g, $r])->copy($oimg);
+		}
+		$oimg;
 	}
 
 	sub boxText {

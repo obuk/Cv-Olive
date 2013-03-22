@@ -18,37 +18,55 @@ BEGIN {
 
 my $verbose = Cv->hasGUI;
 
-my $img = Cv::Mat->new([240, 320], CV_8UC4);
-if (1) {
+my $bgra = Cv::Mat->new([240, 320], CV_8UC4);
+if (41) {
 	my ($text, $org, $font) = (
 		"hello, world", [20, 50],
 		Cv->InitFont(CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 2, CV_AA),
 		);
-	$img->boxText($text, $org, $font, cvScalarAll(127));
-	$img->putText($text, $org, $font, CV_RGB(255, 255, 100));
+	$bgra->boxText($text, $org, $font, cvScalarAll(127));
+	$bgra->putText($text, $org, $font, CV_RGB(255, 255, 100));
 }
 
-if (2) {
+if (42) {
 	my ($text, $org, $font) = (
 		"hello, world", [20, 100],
 		Pango::FontDescription->from_string('Sans Serif 22.5'),
 		);
-	$img->boxText($text, $org, $font, cvScalarAll(127));
-	$img->putText($text, $org, $font, CV_RGB(255, 255, 100));
+	$bgra->boxText($text, $org, $font, cvScalarAll(127));
+	$bgra->putText($text, $org, $font, CV_RGB(255, 255, 100));
 }
 
-if (3) {
+if (43) {
 	my ($text, $org, $font) = (
 		"\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
 		# 'こんにちは',
 		[20, 200],
 		'Sans Serif 42',
 		);
-	$img->boxText($text, $org, $font, cvScalarAll(127));
-	$img->putText($text, $org, $font, cvScalarAll(255));
+	$bgra->boxText($text, $org, $font, cvScalarAll(127));
+	$bgra->putText($text, $org, $font, cvScalarAll(255));
 }
 
 if ($verbose) {
-	$img->show("Font");
+	$bgra->show("Font");
+	Cv->waitKey(1000);
+}
+
+
+my $bgr = Cv::Mat->new([240, 320], CV_8UC3);
+if (33) {
+	my ($text, $org, $font) = (
+		"\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
+		# 'こんにちは',
+		[20, 200],
+		'Sans Serif 42',
+		);
+	$bgr->boxText($text, $org, $font, cvScalarAll(127));
+	$bgr->putText($text, $org, $font, CV_RGB(255, 200, 200));
+}
+
+if ($verbose) {
+	$bgr->show("Font");
 	Cv->waitKey(1000);
 }
