@@ -39,7 +39,7 @@ use Carp;
 use Scalar::Util;
 use warnings::register;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Cv::Constant qw(:all);
 

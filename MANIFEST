@@ -29,13 +29,6 @@ lib/Cv/typemap
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-Pango/Changes
-Pango/lib/Cv/Pango.pm
-Pango/Makefile.PL
-Pango/MANIFEST
-Pango/README
-Pango/t/Cv-Pango.t
-Pango/t/pod-coverage.t
 ppport.h
 Qt/Changes
 Qt/lib/Cv/Qt.pm

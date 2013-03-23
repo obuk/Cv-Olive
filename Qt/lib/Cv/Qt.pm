@@ -30,7 +30,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = ();
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 require XSLoader;
 XSLoader::load('Cv::Qt', $VERSION);

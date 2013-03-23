@@ -71,8 +71,8 @@ my %PREREQ_PM = (
 my @dir = qw();
 push(@dir, qw(Qt)) if $cf->hasqt;
 
-eval "use Pango";
-push(@dir, qw(Pango)) unless $@;
+# eval "use Pango";
+# push(@dir, qw(Pango)) unless $@;
 
 WriteMakefile(
 	NAME => 'Cv',
@@ -99,8 +99,9 @@ sub MY::dynamic {
     '
 dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 	$(NOECHO) $(NOOP)
-	test -d t/auto -a -f Test.xs || \
-		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic
+	if [ $(FULLEXT) = Cv -a -f Test.xs ]; then \
+		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic; \
+	fi
 
 ';
 }

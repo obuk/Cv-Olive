@@ -18,7 +18,7 @@ opencv.pc is found by pkg-config:
 
 To install this module type the following:
 
-  $ CC=g++; export CC		# if you use g++ instead of c++
+  $ CC=c++; export CC		# if you use c++ instead of cc
   $ perl Makefile.PL
   $ make
   $ make test
