@@ -58,7 +58,14 @@ my @perl_h = qw(perl.h sv.h pp.h);
 	&rm('-f', $tmp);
 }
 
-my %PREREQ_PM = (
+my @dir = qw();
+push(@dir, qw(Qt)) if $cf->hasqt;
+
+WriteMakefile(
+	NAME => 'Cv',
+	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
+	ABSTRACT_FROM => "lib/Cv.pm",
+	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	PREREQ_PM => {
 		ExtUtils::ParseXS => 2.22,
 		ExtUtils::PkgConfig => 1.12,
@@ -66,20 +73,6 @@ my %PREREQ_PM = (
 		Test::Exception => 0.31,
 		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),
 	},
-);
-
-my @dir = qw();
-push(@dir, qw(Qt)) if $cf->hasqt;
-
-# eval "use Pango";
-# push(@dir, qw(Pango)) unless $@;
-
-WriteMakefile(
-	NAME => 'Cv',
-	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
-	ABSTRACT_FROM => "lib/Cv.pm",
-	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
-	%PREREQ_PM,
 	%Cv::Config::MM,
 	INC => '-I.',
 	XSOPT => '-C++ -hiertype',
