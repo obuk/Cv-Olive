@@ -3,10 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 9;
+use Test::More;
+BEGIN {
+	eval { use Cv -nomore };
+	eval { require XSLoader; XSLoader::load('Cv::Test', $Cv::VERSION) };
+	plan skip_all => "no Cv/Test.so" if $@;
+	plan tests => 8;
+}
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my ($x, $y, $z) = unpack("f*", pack("f*", map { rand 1 } 0..2));
 my $pt = cvPoint3D32f($x, $y, $z);

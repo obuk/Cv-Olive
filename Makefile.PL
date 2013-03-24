@@ -68,8 +68,11 @@ my %PREREQ_PM = (
 	},
 );
 
-my @dir = qw(Test);
+my @dir = qw();
 push(@dir, qw(Qt)) if $cf->hasqt;
+
+eval "use Pango";
+push(@dir, qw(Pango)) unless $@;
 
 WriteMakefile(
 	NAME => 'Cv',
@@ -86,15 +89,20 @@ WriteMakefile(
 	clean => {
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
-			't/ref-*.pm', 'camera.xml', 'contours.xml', 'sample.avi',
-			'_Inline', 'cover_db', '.lib',
+			't/ref-*.pm', 't/auto', 'camera.xml', 'contours.xml', 'sample.avi',
+			'_Inline', 'cover_db',
 			] },
 	);
 
-sub MY::test_via_harness {
-    my($self, $perl, $tests) = @_;
-    return qq{\t$perl "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)', '.lib/lib', '.lib/arch')" $tests\n};
+sub MY::dynamic {
+    my($self) = shift;
+    '
+dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
+	$(NOECHO) $(NOOP)
+	test -d t/auto -a -f Test.xs || \
+		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic
+
+';
 }
 
 sub MY::postamble {

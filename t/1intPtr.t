@@ -3,10 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More;
+BEGIN {
+	eval { use Cv -nomore };
+	eval { require XSLoader; XSLoader::load('Cv::Test', $Cv::VERSION) };
+	plan skip_all => "no Cv/Test.so" if $@;
+	plan tests => 6;
+}
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my @intPtr = map { int rand 65536 } 1 .. 100;
 

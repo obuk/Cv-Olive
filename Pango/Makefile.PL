@@ -19,33 +19,17 @@ my %PREREQ_PM = (
 	PREREQ_PM => {
 		ExtUtils::ParseXS => 2.22,
 		ExtUtils::PkgConfig => 1.12,
-		Test::Number::Delta => 1.03,
-		Test::Exception => 0.31,
-		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),
+		Pango => 1.223,
 	},
 );
 
 WriteMakefile(
-	NAME => 'Cv::Test',
-	VERSION_FROM => 'lib/Cv/Test.pm',
-	ABSTRACT_FROM => 'lib/Cv/Test.pm',
+	NAME => 'Cv::Pango',
+	VERSION_FROM => 'lib/Cv/Pango.pm',
+	ABSTRACT_FROM => 'lib/Cv/Pango.pm',
 	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	%PREREQ_PM,
 	%Cv::Config::MM,
 	INC => '-I. -I..',
 	XSOPT => '-C++ -hiertype',
-
-	INST_ARCHLIB => '../.lib/arch',
-	INST_SCRIPT => '../.lib/script',
-	INST_BIN => '../.lib/bin',
-	INST_LIB => '../.lib/lib',
-	INST_MAN1DIR => '../.lib/man1',
-	INST_MAN3DIR => '../.lib/man3',
 );
-
-sub MY::postamble {
-	"
-Test.xs:	../lib/Cv/Cv.inc
-
-";
-}

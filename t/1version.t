@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 BEGIN { use_ok('Cv') }
-BEGIN { use_ok('Cv::Test') }
 BEGIN { use_ok('Cv::Config') }
 BEGIN { use_ok('Cv::Qt') if Cv->hasQt }
+BEGIN { use_ok('Cv::Pango') if eval "use Pango; 1" };
 
 # test CV_*_VERSION defined OpenCV
 my @v = Cv::CV_VERSION;

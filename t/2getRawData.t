@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 35;
+use Test::More qw(no_plan);
+# use Test::More tests => 35;
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
@@ -32,6 +32,20 @@ for my $class (qw(Cv::Mat Cv::MatND Cv::Image)) {
 	$mat->getRawData(my $rawData3);
 	is(length($rawData3), $step * $rows);
 	is(ord(substr($rawData3, 0, 1)), 123);
+
+	if ($mat->isa('Cv::Image')) {
+		my ($y0, $x0) = ($rows/4, $cols/4);
+		my ($rows2, $cols2) = ($rows/2, $cols/2);
+		my $step2 = $cols * $cn;
+		$mat->setImageROI([ $x0, $y0, $cols2, $rows2 ]);
+		$mat->fill(cvScalarAll(45));
+		$mat->getRawData(my $rawData2, my $rawStep2, my $rawSize2);
+		is($rawStep2, $step2);
+		is_deeply($rawSize2, [$cols2, $rows2]);
+		is(length($rawData2), $step2 * $rows2);
+		is(ord(substr($rawData2, 0, 1)), 45);
+		$mat->resetImageROI();
+	}
 
 	# SvREADONLY_on
 	throws_ok { substr($rawData, 0, 1) = 'x'; } qr/Modification of a read-only value attempted at $0/;

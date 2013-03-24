@@ -52,5 +52,3 @@ if ($verbose) {
 	$img->show("Font");
 	Cv->waitKey(1000);
 }
-ok(1);
-=cut

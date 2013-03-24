@@ -1,4 +1,4 @@
-Cv-T version 0.01
+Cv-Pango version 0.01
 =======================
 
 INSTALLATION
@@ -7,7 +7,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Cv
+  Cv, Pango
 
 COPYRIGHT AND LICENCE
 

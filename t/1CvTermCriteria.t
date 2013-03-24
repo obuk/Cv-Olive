@@ -3,10 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 11;
+use Test::More;
+BEGIN {
+	eval { use Cv -nomore };
+	eval { require XSLoader; XSLoader::load('Cv::Test', $Cv::VERSION) };
+	plan skip_all => "no Cv/Test.so" if $@;
+	plan tests => 10;
+}
 use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
-BEGIN { use_ok('Cv::Test') }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
 my ($epsilon) = map { int rand 10 } 3;

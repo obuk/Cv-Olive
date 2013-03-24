@@ -11,6 +11,7 @@ fallback/Constant.pm-2.4.0
 fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
+fallback/Constant.pm-2.4.4
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Cv.inc
@@ -18,7 +19,6 @@ lib/Cv/Flipbook.pm
 lib/Cv/JA.pod
 lib/Cv/More.pm
 lib/Cv/Nihongo.pod
-lib/Cv/Pango.pm
 lib/Cv/Seq.pm
 lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm
@@ -29,6 +29,13 @@ lib/Cv/typemap
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+Pango/Changes
+Pango/lib/Cv/Pango.pm
+Pango/Makefile.PL
+Pango/MANIFEST
+Pango/README
+Pango/t/Cv-Pango.t
+Pango/t/pod-coverage.t
 ppport.h
 Qt/Changes
 Qt/lib/Cv/Qt.pm
@@ -38,7 +45,6 @@ Qt/Qt.xs
 Qt/README
 Qt/t/Cv-Qt.t
 Qt/t/pod-coverage.t
-Qt/t/pod.t
 README
 sample/aloeL.jpg
 sample/aloeR.jpg
@@ -164,6 +170,7 @@ t/1CvTermCriteria.t
 t/1doublePtr.t
 t/1floatPtr.t
 t/1intPtr.t
+t/1more-test.t
 t/1sizeof.t
 t/1version.t
 t/1xs.t
@@ -281,20 +288,13 @@ t/4toArray.t
 t/4transform.t
 t/9flipbook.t
 t/9inlineC.t
-t/9pango.t
 t/9pod.t
 t/9ref.t
 t/9threads.t
 t/baboon.jpg
 t/hackcv.pm
 t/lena.jpg
-Test/Changes
-Test/lib/Cv/Test.pm
-Test/Makefile.PL
-Test/MANIFEST
-Test/README
-Test/t/Cv-Test.t
-Test/Test.xs
+Test.xs
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh
