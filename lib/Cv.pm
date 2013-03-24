@@ -1148,10 +1148,30 @@ package Cv;
 
 sub CV_RGB { my ($r, $g, $b, $a) = @_; cvScalar($b, $g, $r, $a || 0) }
 
+sub GetTextSize {
+	shift if $_[0] eq __PACKAGE__ && @_ == 5;
+	Usage("textString, font, textSize, baseline") unless @_ == 4;
+	if (ref $_[1] eq 'Cv::Font') {
+		goto \&cvGetTextSize;
+	} else {
+		Carp::croak "unknown font @{[ ref $_[1] ]} in Cv::GetTextSize";
+	}
+}
+
 package Cv::Font;
 { *new = \&Cv::InitFont }
 
+sub GetTextSize {
+	my ($font, $text) = splice(@_, 0, 2);
+	unshift(@_, 'Cv', $text, $font);
+	goto \&Cv::GetTextSize;
+}
+
 package Cv::Arr;
+
+sub PutText {
+	goto \&cvPutText;
+}
 
 sub Ellipse {
 	# cvEllipse(img, center, axes, angle, start_angle, end_angle,

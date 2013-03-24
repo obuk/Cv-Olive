@@ -5,12 +5,10 @@ pm_to_blib
 \.skip/
 ^\.|/\.
 ^\#|/\#
-\.(a|o|bak|new|old|tmp|orig)$
+\.(a|bs|c|o|so|bak|new|old|tmp|orig)$
 \~$
 lib/Cv/(perl|pp|sv)\.h$
 lib/Cv/Constant\.pm$
-\.in$
-\.(bs|c|o)$
 Makefile$
 MYMETA\.yml$
 ^camera\.xml$

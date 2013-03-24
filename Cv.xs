@@ -1648,13 +1648,10 @@ C_ARGS: img, pts, length(inner_pts), length(pts), color, lineType, shift
 POSTCALL:
 	XSRETURN(1);
 
-MODULE = Cv	PACKAGE = Cv::Font
-void
-cvGetTextSize(const CvFont* font, const char* textString, OUT CvSize textSize, OUT int baseline)
-C_ARGS:
-	textString, font, &textSize, &baseline
-
 MODULE = Cv	PACKAGE = Cv
+void
+cvGetTextSize(const char* textString, const CvFont* font, OUT CvSize textSize, OUT int baseline)
+
 CvFont*
 cvInitFont(int fontFace, double hscale, double vscale, double shear=0, int thickness=1, int lineType=8)
 INIT:

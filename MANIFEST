@@ -215,6 +215,7 @@ t/2getRotationMatrix2D.t
 t/2getRows.t
 t/2getSize.t
 t/2getSubRect.t
+t/2getTextSize.t
 t/2histogram.t
 t/2initSystem.t
 t/2inRange.t
