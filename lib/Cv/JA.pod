@@ -2,14 +2,316 @@
 
 =encoding utf8
 
-=head1 Name
+=head1 NAME
 
 Cv::JA - 日本語ドキュメントと小さな断片
+
+=head1 SYNOPSIS
+
+ use Cv;
+ 
+ my $image = Cv->LoadImage("/path/to/image", CV_LOAD_IMAGE_COLOR);
+ $image->ShowImage("image");
+ Cv->WaitKey;
+ 
+ my $capture = Cv->CaptureFromCAM(0);
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
 
 =head1 DESCRIPTION
 
 Cv::JA は、日本語のドキュメント、あるいは、ドキュメントになる前のメモや
 アイディアのようなものです。
+
+
+=head1 Cv
+
+C<Cv> は OpenCV コンピュータビジョンライブラリの Perl インタフェースで
+す。OpenCV の C言語のリファレンスを元にしたので、リファレンスとして
+http://opencv.willowgarage.com/ が使えます。とは言え、異なる部分もあり、
+少しずつ文書にまとめています。中途半端で申し訳ありません。
+
+コンピュータビジョンは少し難しいので、Perl のスローガンに則り「簡単なこ
+とは簡単に、難しいこともそれなりに」を心掛けています。
+
+=head2 オブジェクトの作成と解放
+
+OpenCV の画像やマトリクスのオブジェクトは、C言語と同様に
+C<Createなんとか()> で作ります。
+
+ my $img = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
+ my $mat = Cv->CreateMat(240, 320, CV_8UC4);
+
+オブジェクトは C<new> で作ることもできます。画像を作る CreateImage() と
+マトリクスを作る CreateMat() は、上の例のとおり呼び出し形式が違いますが。
+C<new> なら同じように作ることができます。
+
+ my $arr = Cv::Image->new($size, $type);
+ my $arr = Cv::Mat->new($size, $type);
+ my $arr = Cv::MatND->new($size, $type);
+ my $arr = Cv::SparseMat->new($size, $type);
+
+またオブジェクトを作るとき、元のオブジェクトがあれば引数を省略すること
+もできます。
+
+ my $sameone = $img->new;
+ my $gray = $color->new(CV_8UC1);
+
+オブジェクトが不要になったら、C言語では C<Createなんとか()> と対の
+C<Releaseなんとか()> で利用者がオブジェクトを解放します。Perl は同じ場
+面で C<DESTROY> を呼ぶので、C<Cv> はこの仕組みを使ってオブジェクトを解
+放します。従って解放について利用者が注意を払う必要はありません。解放で
+きないオブジェクトは C<Cv::なんとか::Ghost> というクラスで bless し、
+C<Cv> の中で識別できるようにしています。
+
+=head2 OpenCVのデータ型とCvのクラス名
+
+OpenCV には画像やマトリクスのデータ型として C<CvImage>, C<CvMat>,
+C<CvMatND>, C<CvSparseMat> など、いろいろな型があります。C<Cv> は、この
+データ型とクラス名が対応しています。クラス名は、C<Cv> の後に :: を置い
+た名前で、たとえば、C<CvImage> は C<Cv::Image> に、C<CvMat> は
+C<Cv::Mat> に対応しています。そして、オブジェクトは、OpenCV のデータの
+ポインタをそのデータ型に対応するクラス名で bless したものになります。
+
+OpenCV の画像やマトリクスのデータ型 C<CvMat>、C<CvImage> は、C<CvArr>
+から導出されたデータ型です。従って、画像やマトリクスは C<CvArr> を介し
+て受け渡されます。C<Cv> でも同様に、スーパクラスとして C<Cv::Arr> を用
+意し、メソッドはできるだけここに置くことにしました。
+
+OpenCV には更にシーケンスと呼ばれる動的なデータ型もありますが、これにつ
+いては、L<Cv::Seq|Cv::Seq-ja> を参照してください。
+
+=head2 データ領域の共有
+
+OpenCV の画像やマトリクスは、ヘッダ部とデータ部が分れており、データ部の
+ないヘッダだけのオブジェクトが作れます。データのないことを伝えるために、
+次のとおり undef を渡します。
+
+ my $arr = Cv::Mat->new([$rows, $cols], $type, undef);
+
+このようにして作成したヘッダだけのオブジェクトは、GetRows(), GetCols()
+のようにデータ部を共有するメソッドで使っています。
+
+(注意) コードを見ると、undef の代りに文字列でデータ部を与えることが可能
+だと気付くかもしれません。別のシステムで作成した画像やマトリクスを扱う
+とき、データ変換の手間を減らすことができると考える人もいると思います。
+しかし、オブジェクトが開放されるとき Cv::Image ではエラーが起きます。
+Cv::Mat はなんとなく動いているように見えますが、安定していません。文字
+列でデータ部を渡さないようにしてください。(これは bugs へ)
+
+=head2 OpenCVの構造体
+
+Cv のオブジェクトは、OpenCV の構造体をその型名に対応するクラス名で
+bless したものです。従って、Cv (Perl) から OpenCV の構造体は直接操作で
+きません。しかし、OpenCV に同梱されているサンプルでは、構造体の大きさや
+要素の型を直接使っています。たぶんそれが簡単なんでしょう。Cv でも同様の
+使い方をするために、構造体のメンバの名前でメソッドを作りました。
+
+=head2 メソッドの名前とその統合
+
+メソッドの名前は、OpenCV の関数名の頭の C<cv> を省いた名前と、名前のは
+じめの大文字を小文字に直したものが使えます。次の 2つの例はどちらも
+C<cvCreateMat()> を呼び出します。
+
+ my $mat = Cv->CreateMat(240, 320, CV_8UC3);
+ my $mat = Cv->createMat(240, 320, CV_8UC3);
+
+それから C<cvAdd()> と C<cvAddS()> のような類似した関数はより簡潔な名前、
+つまりこの例では C<Add()> にまとめました。おそらく C言語では異なる型の
+引数を受けとることができないので、分けるしかなかったのでしょう。C<Cv>
+ではこれらを統合し、引数で呼び出す関数を決めています。
+
+ my $ar2 = Cv->CreateImage();      # ref Cv::Image
+ my $sc2 = cvScalar();             # ref ARRAY
+ my $d = $ar->Add($ar2);           # cvAdd($ar, $ar2)
+ my $d = $ar->Add($sc2);           # cvAddS($ar, $sc2)
+
+統合した関数は次のとおり。あまり多くありません。リファレンスを参照して、
+C<cvなんとか()> と C<cvなんとかS()> の両方あるものがそうだと考えてください。
+
+ AbsDiff(), Add(), And(), Cmp(), InRange(), Max(), Min(), Or(), Sub(), Xor()
+
+=head2 引数の省略、インプレース、戻り値
+
+出力先の画像やマトリクス (C<dst> として表わされることが多い) が省略され
+たとき、それが補える場合は補うようにしています。補える例とそうでない例の
+両方を示します。
+
+ my $dst = $src->Add($src2);
+ my $dst = $src->Add($src2, $mask);  # can't omit dst
+
+後者は、マスクとして与えた C<$mask> と出力先を区別することができません。
+このような場合には C<$dst> を呼び出し元で用意してください。C<$dst> が
+C<$src> と同じなら次のとおり。
+
+ my $dst = $src->Add($src2, $src->new, $mask); 
+
+OpenCV は、インプレース処理が可能な関数では出力先の画像やマトリクス
+C<dst> に C<NULL> を指定し、入力画像を出力先としても使います。C<Cv> で
+はこの C<NULL> を表わすために C<\0> を使います。次の例は左右反転した画
+像を返します。
+
+ my $dst = $src->Flip(\0);
+
+OpenCV の関数は、この Flip() に限らず、出力先は呼び出し元が用意します。
+そうした使い方では特に戻り値を使う必要はありません。しかし、上述のとお
+り C<Cv> では出力先を省略できるので、その場合にはメソッドの中で必要に応
+じて作られた出力先を戻り値として受けとることになります。
+
+この出力を戻り値として受けとる方法は、次の例のとおり、メソッドをつない
+で書けるようにしてくれますが、メソッドが呼ばれる度にオブジェクトの確保
+と開放があるので、その分だけオーバヘッドがあります。
+
+ my $bin = $src->cvtColor(CV_RGB2GRAY)->threshold(...);
+
+=head2 ビルド時の情報
+
+OpenCV は様々なライブラリを使います。またビルド時に指定できるオプション
+で利用できる機能が変ります。OpenCV 2.4.0 からその情報が取り出せるように
+なりました。
+
+=over
+
+=item GetBuildInformation()
+
+  my $info = Cv->GetBuildInformation()
+  my %info = Cv->GetBuildInformation()
+
+コンテクトがスカラなら cv::getBuildInformation() の戻り値を返し、リスト
+なら次の結果を返します。
+
+  'OpenCV modules' => {
+	'Disabled by dependency' => '-',
+	'Unavailable' => 'androidcamera java ocl',
+	'Disabled' => 'world',
+	'To be built' => 'core imgproc flann highgui features2d calib3d ml video objdetect contrib nonfree photo legacy gpu python stitching ts videostab'
+  },
+  'Version control' => 'commit:6484732',
+  'Linker flags (Debug)' => {
+	'Precompiled headers' => 'YES'
+  },
+  ...
+
+=item HasModule()
+
+ビルド時に組込みを指定できるモジュールなら次のとおり確かめることができ
+ます。
+
+ my $hasCore = Cv->HasModule('nonfree');
+ my $hasCore = Cv->HasModule('stitching');
+
+=back
+
+=head2 エラー処理
+
+eval { ... } で保護したブロックの中のエラーを検出できます。(Cv-0.13)
+
+ my $img = eval { Cv->createImage([-1, -1], 8, 3) };
+ if ($@) {
+    print STDERR "*** got error ***";
+ }
+
+
+=head2 エクスポート
+
+Cv の利用でインポートする名前は、use Cv の後に指定できます。(Cv-0.14)
+
+ use Cv qw(:all);
+ use Cv qw(/^(CV|IPL|cv)/);
+ use Cv;                      # use Cv qw(:all) と同じ
+
+何もインポートしないときは、空のリストを置いてください。
+
+ use Cv ();
+
+
+=head2 ヒント
+
+Cv を使っている方から、ちょっといい使い方を教えて戴きました。
+
+=over 4
+
+=item *
+
+Cv で作成した画像を CGI で直接出力するとき、
+EncodeImage() と Ptr() を使うことができます。
+画像をファイルに保存する必要がありません。
+
+ use Cv;
+ my $img = Cv::Image->new([240, 320], CV_8UC3);
+ $img->zero->circle([ 100, 100 ], 100, CV_RGB(255, 100, 100));
+ print "Content-type: image/jpg\n\n";
+ print $img->encodeImage(".jpg")->ptr;
+
+これは Imager 向けの変換にも使えます。
+
+ use Imager;
+ my $imager = Imager->new(data => $img->encodeImage(".ppm")->ptr);
+
+=item *
+
+C<Inline C> を使うためのコンフィギュレーションを用意しました。
+これは、いろいろな実験や拡張を容易にしてくれます。
+使い方は次のとおり簡単です。
+
+ use Cv::Config;
+ use Inline C => Config => %Cv::Config::C;
+
+=back
+
+=head2 サンプル
+
+OpenCV に付属しているサンプルを、いくつか C<Cv> で書き直しました。
+C<sample/> にあります。
+
+=over 4
+
+=item
+
+ bgfg_codebook.pl calibration.pl camshiftdemo.pl capture.pl chamfer.pl
+ contours.pl convexhull.pl delaunay.pl demhist.pl dft.pl distrans.pl
+ drawing.pl edge.pl facedetect.pl fback_c.pl ffilldemo.pl find_obj.pl
+ fitellipse.pl houghlines.pl image.pl imager.pl inpaint.pl kalman.pl
+ kmeans.pl laplace.pl lkdemo.pl minarea.pl morphology.pl motempl.pl
+ mser_sample.pl polar_transforms.pl pyramid_segmentation.pl squares.pl
+ stereo_calib.pl stereo_match.pl tiehash.pl video-thread.pl
+ watershed.pl
+
+=back
+
+=head2 バグ
+
+=over 4
+
+=item *
+
+バージョン 0.07 で名前付きの引数を諦めました。
+名前付きの引数を処理するためのオーバヘッドが大きかったからです。
+この版では C<Cv::TieHash> と C<Cv::TieArr> も削除しました。
+C<Cv::TieHash> は C<sample/tiehash.pl> を参照してください。
+
+=item *
+
+バージョン 0.14 で別名を整理しました。
+CV_MAKETYPE() のようなマクロのいくつかには Cv::MAKETYPE()
+のような別名もありましたが、もとの名前の方が短いので、
+別名を止めることにしました。
+
+=item *
+
+バージョン 0.16 で C<Cv> を分け、拡張したコードを分離して
+L<Cv::More|Cv::More-ja> に置くことにしました。
+
+=item *
+
+Cv::More を使わないとき use Cv qw(:nomore) と書きますが、これは、代りに use Cv -more と書けました (0.20 - 0.23)。
+しかし、このオプションは不明瞭なので、Cv::More を使わないとき use Cv -more でなく use Cv -nomore と書くことにしました。
+(0.24)
+
+=back
 
 =head1 Cv::More
 
