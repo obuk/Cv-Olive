@@ -1,9 +1,13 @@
 Revision history for Cv.pm
 
-0.25rc - 2012-02-28
-     * rewrote t/2matchTemplate.t; perhaps changed 2.4.4 or later
-     * fixed compile error around cvEncodeImage (same as above)
-     * fixed test cvSqrt returns -nan (t/2misc.t)
+0.25 - 2012-03-31
+     * accept pkg-config results even if it returns shared libs
+       (libopencv_core.so) or cc parameter (e.g. -lopencv_core)
+       for building Cv
+     * stopped alternative code for cvEncodeImage() since 2.4.4
+     * removed Cv::Test for testing
+     * rewrote t/2matchTemplate.t, t/2misc.t
+     * removed Cv::Nihongo.pod for Japanease document
  
 0.24 - 2012-02-24
      * replaced Perl_croak with Carp::croak to get better error info
