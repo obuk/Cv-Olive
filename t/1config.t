@@ -18,14 +18,15 @@ if (1) {
 	local $ENV{CC} = undef;
 	local $ENV{CXX} = undef;
 	my $cf = eval { new Cv::Config };
-	like($cf->cvdir, qr{/blib/lib/Cv});
-	like(${$cf->typemaps}[0], qr{/blib/lib/Cv/typemap});
+	# like($cf->cvdir, qr{/(blib/)?lib/Cv});
+	ok(-d $cf->cvdir);
+	# like(${$cf->typemaps}[0], qr{/(blib/)?lib/Cv/typemap});
+	ok(-f ${$cf->typemaps}[0]);
 	is($cf->cc, 'c++');
 	my $min = version->parse('1.001000');
 	# local $Cv::Config::verbose = 1;
 	cmp_ok($cf->_version, '>=', $min);
 	cmp_ok(version->parse($cf->version), '>=', $min);
-	# like($cf->myextlib, qr{/blib/arch/auto/Cv/Cv.(dll|so)});
 }
 
 if (2) {
