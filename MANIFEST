@@ -297,5 +297,4 @@ tools/dumpconst-all.pl
 tools/dumpconst.pl
 tools/ref2pl-all.pl
 tools/ref2pl.pl
-tools/test.sh
 tools/testdist.pl
