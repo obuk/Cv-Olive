@@ -1152,7 +1152,7 @@ sub GetTextSize {
 	shift if $_[0] eq __PACKAGE__ && @_ == 5;
 	Usage("textString, font, textSize, baseline") unless @_ == 4;
 	if (ref $_[1] eq 'Cv::Font') {
-		goto \&cvGetTextSize;
+		goto &cvGetTextSize;
 	} else {
 		Carp::croak "unknown font @{[ ref $_[1] ]} in Cv::GetTextSize";
 	}
@@ -1164,13 +1164,13 @@ package Cv::Font;
 sub GetTextSize {
 	my ($font, $text) = splice(@_, 0, 2);
 	unshift(@_, 'Cv', $text, $font);
-	goto \&Cv::GetTextSize;
+	goto &Cv::GetTextSize;
 }
 
 package Cv::Arr;
 
 sub PutText {
-	goto \&cvPutText;
+	goto &cvPutText;
 }
 
 sub Ellipse {
