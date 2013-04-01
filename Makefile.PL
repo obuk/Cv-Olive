@@ -4,6 +4,11 @@ use 5.008008;
 use ExtUtils::MakeMaker;
 use ExtUtils::PkgConfig;
 
+use Devel::CheckLib;
+my $cv1 = check_lib(lib => 'cv');			# OpenCV-1.x
+my $cv2 = check_lib(lib => 'opencv_core');	# OpenCV-2.x
+check_lib_or_exit(lib => 'opencv_core') unless $cv1 + $cv2;
+
 use lib qw(./lib);
 eval "use Cv::Config";
 if ($@) {
@@ -81,7 +86,7 @@ WriteMakefile(
 	LICENSE => 'perl',
 	clean => {
 		FILES => [
-			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
+			@perl_h_patched, 'lib/Cv/Constant.pm*', 'Test.bs', 'a.pm', '*.tmp',
 			't/ref-*.pm', 't/auto', 'camera.xml', 'contours.xml', 'sample.avi',
 			'_Inline', 'cover_db',
 			] },
@@ -101,6 +106,7 @@ dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 
 sub MY::postamble {
 	"
+
 ref:
 	./tools/ref2pl-all.pl |sh -x
 
