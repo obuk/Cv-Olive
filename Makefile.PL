@@ -10,13 +10,13 @@ my $cv1 = check_lib(lib => 'cv');			# OpenCV-1.x
 my $cv2 = check_lib(lib => 'opencv_core');	# OpenCV-2.x
 check_lib_or_exit(lib => 'opencv_core') unless $cv1 + $cv2;
 
-use lib qw(./lib);
+use lib qw(lib);
 eval "use Cv::Config";
 if ($@) {
 	warn "=" x 60, "\n";
 	warn "See README to install this module\n";
 	warn "=" x 60, "\n";
-	exit 1;
+	exit 0;
 }
 
 my $cf = new Cv::Config;
@@ -98,7 +98,7 @@ sub MY::dynamic {
     '
 dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 	$(NOECHO) $(NOOP)
-	if [ $(FULLEXT) = Cv -a -f Test.xs ]; then \
+	@if [ $(FULLEXT) = Cv -a -f Test.xs ]; then \
 		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic; \
 	fi
 
