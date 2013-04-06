@@ -12,6 +12,7 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 fallback/Constant.pm-2.4.4
+inc/lib/Devel/CheckLib.pm
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Cv.inc

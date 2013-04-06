@@ -10,7 +10,7 @@ if ($@) {
 	warn "=" x 60, "\n";
 	warn "See README to install this module\n";
 	warn "=" x 60, "\n";
-	exit 1;
+	exit 0;
 }
 
 my $cf = new Cv::Config;
