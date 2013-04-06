@@ -1349,6 +1349,16 @@ sub cvSetErrMode {
 }
 
 
+our %SIZEOF;
+
+sub CV_SIZEOF {
+	my ($name) = @_;
+	my $size = $SIZEOF{$name};
+	Carp::croak "unknwon type $name in CV_SIZEOF" unless defined $size;
+	$size;
+}
+
+
 # ============================================================
 #  imgproc. Image Processing: Histograms
 # ============================================================

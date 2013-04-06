@@ -4173,24 +4173,6 @@ CV_NODE_TYPE(int type)
 #  CV_[O-U]
 # ====================
 
-int
-CV_SIZEOF(const char *t)
-CODE:
-	if (strcmp(t, "CvContour") == 0 || strcmp(t, "Cv::Contour") == 0)
-		RETVAL = sizeof(CvContour);
-	else if (strcmp(t, "CvPoint") == 0 || strcmp(t, "Cv::Point") == 0)
-		RETVAL = sizeof(CvPoint);
-	else if (strcmp(t, "CvPoint3D32f") == 0 || strcmp(t, "Cv::Point3D32f") == 0)
-		RETVAL = sizeof(CvPoint3D32f);
-	else if (strcmp(t, "CvSeq") == 0 || strcmp(t, "Cv::Seq") == 0)
-		RETVAL = sizeof(CvSeq);
-	else if (strcmp(t, "CvSet") == 0 || strcmp(t, "Cv::Set") == 0)
-		RETVAL = sizeof(CvSet);
-	else
-		Perl_croak(aTHX_ "CV_SIZEOF: %s unknwon", t);
-OUTPUT:
-	RETVAL
-
 # ====================
 #  CV_[V-Z]
 # ====================
@@ -4222,3 +4204,27 @@ BOOT:
 	cvRedirectError(&cb_error, (VOID*)NULL, NULL);
     cvSetErrMode(1);
     cvSetErrStatus(0);
+{
+	HV* Cv_SIZEOF;
+	const char *pre[] = { "Cv", "Cv::" };
+	struct {
+		const char *name; int size;
+	} sz[] = {
+		{ "Contour",    sizeof(CvContour) },
+		{ "Point",      sizeof(CvPoint) },
+		{ "Point3D32f", sizeof(CvPoint3D32f) },
+		{ "Seq",        sizeof(CvSeq) },
+		{ "Set",        sizeof(CvSet) },
+	};
+	char name[100];
+	int i, j;
+	if (!(Cv_SIZEOF = get_hv("Cv::SIZEOF", 0))) {
+		Perl_croak(aTHX_ "can't get %Cv::SIZEOF");
+	}
+	for (i = 0; i < DIM(sz); i++) {
+		for (j = 0; j < DIM(pre); j++) {
+			strcpy(name, pre[j]); strcat(name, sz[i].name);
+			hv_store(Cv_SIZEOF, name, strlen(name), newSViv(sz[i].size), 0);
+		}
+	}
+}
