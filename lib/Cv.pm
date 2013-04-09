@@ -1366,11 +1366,28 @@ sub CV_SIZEOF {
 package Cv::Histogram;
 
 sub new {
-	my $self   = shift;
-	my $sizes  = shift || $self->sizes;
-	my $type   = shift || &Cv::CV_HIST_ARRAY;
-	my $ranges = shift || $self->thresh;
-	unshift(@_, $sizes, $type, $ranges);
+	my ($self, $sizes, $type, $ranges, $uniform) = @_;
+	if (ref $self) {
+		unless (defined $sizes) {
+			$sizes = $self->sizes;
+		}
+		unless (defined $type) {
+			if (ref $self->bins) {
+				$type = $self->bins->isa('Cv::SparseMat')?
+					&Cv::CV_HIST_SPARSE : &Cv::CV_HIST_ARRAY;
+			}
+		}
+		unless (defined $ranges) {
+			$ranges = $self->type & &Cv::CV_HIST_RANGES_FLAG?
+				$self->thresh : \0;
+		}
+		unless (defined $uniform) {
+			$uniform = $self->type & &Cv::CV_HIST_UNIFORM_FLAG? 1 : 0
+		}
+	}
+	@_ = ($sizes, $type);
+	push(@_, $ranges) if defined $ranges;
+	push(@_, $uniform) if defined $uniform;
 	goto &Cv::cvCreateHist;
 }
 

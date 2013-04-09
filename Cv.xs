@@ -1997,12 +1997,21 @@ CODE:
 OUTPUT:
 	RETVAL
 
-CvArr*
+SV*
 bins(CvHistogram* hist)
 CODE:
-	RETVAL = hist->bins;
-OUTPUT:
-	RETVAL
+	ST(0) = sv_newmortal();
+	if (CV_IS_MAT(hist->bins)) {
+		sv_setref_pv(ST(0), "Cv::Mat::Ghost", hist->bins);
+	} else if (CV_IS_MATND(hist->bins)) {
+		sv_setref_pv(ST(0), "Cv::MatND::Ghost", hist->bins);
+	} else if (CV_IS_SPARSE_MAT(hist->bins)) {
+		sv_setref_pv(ST(0), "Cv::SparseMat::Ghost", hist->bins);
+	} else if (CV_IS_IMAGE(hist->bins)) {
+		sv_setref_pv(ST(0), "Cv::Image::Ghost", hist->bins);
+	} else {
+		Perl_croak(aTHX_ "bins: unknown array type"); // XXXXX
+	}
 
 AV*
 thresh(CvHistogram* hist)
@@ -2076,7 +2085,7 @@ POSTCALL:
 MODULE = Cv	PACKAGE = Cv
 CvHistogram*
 cvCreateHist(int* sizes, int type, float** ranges=NULL, int uniform=1)
-C_ARGS: length(sizes), sizes, type, ranges=NULL, uniform
+C_ARGS: length(sizes), sizes, type, ranges, uniform
 
 #legacy# double cvGetHistValue_1D(CvHistogram* hist, int idx0)
 #legacy# double cvGetHistValue_2D(CvHistogram* hist, int idx0, int idx1)
