@@ -1984,6 +1984,8 @@ cvUseOptimized(int onoff)
 
 #TBD# void cvSetIPLAllocators(Cv_iplCreateImageHeader create_header, Cv_iplAllocateImageData allocate_data, Cv_iplDeallocate deallocate, Cv_iplCreateROI create_roi, Cv_iplCloneImage clone_image)
 
+#if 0
+
 # ============================================================
 #  imgproc. Image Processing: Histograms
 # ============================================================
@@ -2128,6 +2130,7 @@ cvThreshHist(CvHistogram* hist, double threshold)
 POSTCALL:
 	XSRETURN(1);
 
+#endif
 
 # ============================================================
 #  imgproc. Image Processing: Image Filtering
@@ -3768,6 +3771,8 @@ cvDecomposeProjectionMatrix(const CvMat *projMatrix, CvMat *cameraMatrix, CvMat 
 void
 cvDrawChessboardCorners(CvArr* image, CvSize patternSize, CvPoint2D32f* corners, int patternWasFound)
 C_ARGS: image, patternSize, corners, length(corners), patternWasFound
+POSTCALL:
+	XSRETURN(1);
 
 int
 cvFindChessboardCorners(const CvArr* image, CvSize patternSize, corners, int flags=CV_CALIB_CB_ADAPTIVE_THRESH)

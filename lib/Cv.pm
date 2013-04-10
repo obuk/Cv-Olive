@@ -63,7 +63,7 @@ our %O;
 our %M;
 
 BEGIN {
-	$IMPORT{$_} = 1 for qw(seq more);
+	$IMPORT{$_} = 1 for qw(seq more histogram);
 	$IMPORT{$_} = 0 for qw(qt);
 	$O{$_} = 1 for qw(boxhappy);
 }
@@ -76,12 +76,13 @@ sub import {
 	my $opt_ok = GetOptions(
 		"more!"     => \$IMPORT{more},
 		"seq!"      => \$IMPORT{seq},
+		"histogram!" => \$IMPORT{histogram},
 		"qt!"       => \$IMPORT{qt},
 		"boxhappy!" => \$O{boxhappy},
 		);
 	unless ($opt_ok) {
 		die << "----";
-Usage: use Cv qw(-nomore -noseq -qt)
+Usage: use Cv qw(-nomore -noseq -nohistogram -qt)
 ----
 ;
 	}
@@ -259,7 +260,7 @@ for (
 	"Cv::FileStorage",
 	"Cv::Font",
 	"Cv::HaarClassifierCascade",
-	"Cv::Histogram",
+	# "Cv::Histogram",
 	"Cv::HuMoments",
 	"Cv::Image",
 	"Cv::Kalman",
@@ -1357,70 +1358,6 @@ sub CV_SIZEOF {
 	Carp::croak "unknwon type $name in CV_SIZEOF" unless defined $size;
 	$size;
 }
-
-
-# ============================================================
-#  imgproc. Image Processing: Histograms
-# ============================================================
-
-package Cv::Histogram;
-
-sub new {
-	my ($self, $sizes, $type, $ranges, $uniform) = @_;
-	if (ref $self) {
-		unless (defined $sizes) {
-			$sizes = $self->sizes;
-		}
-		unless (defined $type) {
-			if (ref $self->bins) {
-				$type = $self->bins->isa('Cv::SparseMat')?
-					&Cv::CV_HIST_SPARSE : &Cv::CV_HIST_ARRAY;
-			}
-		}
-		unless (defined $ranges) {
-			$ranges = $self->type & &Cv::CV_HIST_RANGES_FLAG?
-				$self->thresh : \0;
-		}
-		unless (defined $uniform) {
-			$uniform = $self->type & &Cv::CV_HIST_UNIFORM_FLAG? 1 : 0
-		}
-	}
-	@_ = ($sizes, $type);
-	push(@_, $ranges) if defined $ranges;
-	push(@_, $uniform) if defined $uniform;
-	goto &Cv::cvCreateHist;
-}
-
-
-{ *Copy = \&CopyHist }
-sub CopyHist {
-	# CopyHist(src. dst)
-	my $src = shift;
-	my $dst = shift || $src->new;
-	unshift(@_, $src, $dst);
-	goto &cvCopyHist;
-}
-
-
-sub GetHistValue {
-	my $self = shift;
-	my $arr = $self->bins->Ptr(@_);
-	my @floats = unpack("f*", $arr);
-	wantarray? @floats : \@floats;
-}
-
-
-sub QueryHistValue {
-	my $self = shift;
-	$self->bins->GetReal(@_);
-}
-
-{ *Calc = \&CalcHist }
-{ *Clear = \&ClearHist }
-{ *Compare = \&CompareHist }
-{ *Normalize = \&NormalizeHist }
-{ *SetBinRanges = \&SetHistBinRanges }
-{ *Thresh = \&ThreshHist }
 
 
 # ============================================================

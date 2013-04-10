@@ -23,7 +23,7 @@ ok($hist, 'Cv->CreateHist');
 if (1) {
 	ok(Cv->CreateHist([256], CV_HIST_ARRAY),
 	   'CreateHist(Cv->CreateHist)');
-	throws_ok { Cv->CreateHist } qr/Usage: Cv::cvCreateHist\(sizes, type, ranges=NULL, uniform=1\) at $0/, 'CvCreateHist(usage)';
+	throws_ok { Cv->CreateHist } qr/Usage: [^\(]*\(sizes, type, ranges=NULL, uniform=1\) at $0/, 'CvCreateHist(usage)';
 }
 
 # ------------------------------------------------------------
@@ -32,7 +32,7 @@ if (1) {
 if (1) {
 	$hist->CalcHist([$gray]);
 	ok($hist, 'CalcHist');
-	throws_ok { $hist->CalcHist } qr/Usage: Cv::Histogram::cvCalcHist\(hist, image, accumulate=0, mask=NULL\) at $0/, 'CalcHist(usage)';
+	throws_ok { $hist->CalcHist } qr/Usage: Cv::Histogram::CalcHist\(hist, image, accumulate=0, mask=NULL\) at $0/, 'CalcHist(usage)';
 }
 
 # ------------------------------------------------------------

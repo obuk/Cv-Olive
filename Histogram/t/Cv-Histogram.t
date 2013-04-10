@@ -2,14 +2,11 @@
 
 use strict;
 use warnings;
+use Test::More qw(no_plan);
 use Test::More;
 use Test::Exception;
-BEGIN {
-	eval { use Cv -nomore };
-	eval { require XSLoader; XSLoader::load('Cv::Test', $Cv::VERSION) };
-	plan skip_all => "no Cv/Test.so" if $@;
-	plan tests => 80;
-}
+use Cv;
+BEGIN { use_ok('Cv::Histogram') }
 
 # ranges=no, uniform=yes
 if (1) {
