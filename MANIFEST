@@ -12,7 +12,15 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 fallback/Constant.pm-2.4.4
-inc/lib/Devel/CheckLib.pm
+Histogram/Changes
+Histogram/Histogram.xs
+Histogram/lib/Cv/Histogram.pm
+Histogram/Makefile.PL
+Histogram/MANIFEST
+Histogram/README
+Histogram/t/Cv-Histogram.t
+Histogram/t/pod-coverage.t
+inc/Devel/CheckLib.pm
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Cv.inc
