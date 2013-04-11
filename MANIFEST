@@ -19,7 +19,6 @@ Histogram/Makefile.PL
 Histogram/MANIFEST
 Histogram/README
 Histogram/t/Cv-Histogram.t
-Histogram/t/pod-coverage.t
 inc/Devel/CheckLib.pm
 lib/Cv.pm
 lib/Cv/Config.pm
@@ -46,7 +45,6 @@ Qt/MANIFEST
 Qt/Qt.xs
 Qt/README
 Qt/t/Cv-Qt.t
-Qt/t/pod-coverage.t
 README
 sample/aloeL.jpg
 sample/aloeR.jpg

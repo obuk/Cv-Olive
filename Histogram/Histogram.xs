@@ -19,14 +19,10 @@ SV*
 bins(CvHistogram* hist)
 CODE:
 	ST(0) = sv_newmortal();
-	if (CV_IS_MAT(hist->bins)) {
-		sv_setref_pv(ST(0), "Cv::Mat::Ghost", hist->bins);
-	} else if (CV_IS_MATND(hist->bins)) {
+	if (CV_IS_MATND(hist->bins)) {
 		sv_setref_pv(ST(0), "Cv::MatND::Ghost", hist->bins);
 	} else if (CV_IS_SPARSE_MAT(hist->bins)) {
 		sv_setref_pv(ST(0), "Cv::SparseMat::Ghost", hist->bins);
-	} else if (CV_IS_IMAGE(hist->bins)) {
-		sv_setref_pv(ST(0), "Cv::Image::Ghost", hist->bins);
 	} else {
 		Perl_croak(aTHX_ "Cv::Histogram::bins: unknown array type"); // XXXXX
 	}

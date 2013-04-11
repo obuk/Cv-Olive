@@ -8,9 +8,7 @@ Cv::Histogram - Perl extension for OpenCV Histogram
 
 =head1 SYNOPSIS
 
-  use Cv::Histogram;
-
-=head1 DESCRIPTION
+ use Cv::Histogram;
 
 =cut
 
@@ -43,21 +41,24 @@ XSLoader::load('Cv::Histogram', $VERSION);
 #  imgproc. Image Processing: Histograms
 # ============================================================
 
+=head1 DESCRIPTION
+
 =head2 METHOD
 
 =over
 
-=item new($self, $sizes, $type, $ranges, $uniform)
+=item new (cvCreateHist)
 
-=item cvCreateHist()
+ $hist = Cv::Histogram->new($sizes, $type, $ranges, $uniform);
+ $hist = Cv::Histogram->new($sizes, $type);
+ $hist2 = $hist1->new;
 
-=item bins()
+=item bins, ranges, sizes, type (members of CvHistogram)
 
-=item ranges() - alias of thresh
-
-=item sizes()
-
-=item type()
+ $hist->bins
+ $hist->type
+ $hist->ranges
+ $hist->uniform
 
 =cut
 
@@ -91,17 +92,23 @@ sub new {
 }
 
 
-=item cvReleaseHist()
+=item DESTROY (cvReleaseHist)
 
 =cut
 
 sub DESTROY { goto &cvReleaseHist }
 
 
-=item GetHistValue()
+=item GetHistValue, Get
+
+ $value = $hist->get($idx0);
+ $value = $hist->get($idx0, $idx1);
+ $value = $hist->get($idx0, $idx1, $idx2);
+ $value = $hist->get(\@idx);
 
 =cut
 
+sub Get { goto &GetHistValue }
 sub GetHistValue {
 	my $self = shift;
 	my $arr = $self->bins->Ptr(@_);
@@ -109,18 +116,25 @@ sub GetHistValue {
 	wantarray? @floats : \@floats;
 }
 
-=item QueryHistValue()
+
+=item QueryHistValue, Query
+
+ $value = $hist->query($idx0);
+ $value = $hist->query($idx0, $idx1);
+ $value = $hist->query($idx0, $idx1, $idx2);
+ $value = $hist->query(\@idx);
 
 =cut
 
+sub Query { goto &QueryHistValue }
 sub QueryHistValue {
 	my $self = shift;
 	$self->bins->GetReal(@_);
 }
 
-=item CalcBackProject()
+=item CalcBackProject
 
-=item cvCalcBackProject()
+ $hist->CalcBackProject(\@image, $back_project);
 
 =cut
 
@@ -131,9 +145,9 @@ sub CalcBackProject {
 	goto &cvCalcBackProject;
 }
 
-=item CalcBackProjectPatch()
+=item CalcBackProjectPatch
 
-=item cvCalcBackProjectPatch()
+ $hist->CalcBackProjectPatch(\@image, $dst, $patch_size, $method, $factor);
 
 =cut
 
@@ -145,11 +159,10 @@ sub CalcBackProjectPatch {
 }
 
 
-=item CalcHist()
+=item CalcHist, Calc
 
-=item cvCalcHist()
-
-=item Calc()
+ $hist->calc(\@image, $accumulate, $mask);
+ $hist->calc(\@image);
 
 =cut
 
@@ -162,30 +175,27 @@ sub CalcHist {
 }
 
 
-=item CalcProbDensity()
+=item CalcProbDensity
 
-=item cvCalcProbDensity()
+ $hist1->CalcProbDensity($hist2, $dst_hist, $scale);
+ $hist1->CalcProbDensity($hist2, $dst_hist);
 
 =cut
 
 sub CalcProbDensity { goto &cvCalcProbDensity }
 
-=item ClearHist()
+=item ClearHist, Clear
 
-=item cvClearHist()
-
-=item Clear()
+ $hist->clear;
 
 =cut
 
 sub Clear { goto &ClearHist }
 sub ClearHist { goto &cvClearHist }
 
-=item CompareHist()
+=item CompareHist, Compare
 
-=item cvCompareHist()
-
-=item Compare()
+ $hist1->compare($hist2, $method);
 
 =cut
 
@@ -193,11 +203,10 @@ sub Compare { goto &CompareHist }
 sub CompareHist { goto &cvCompareHist }
 
 
-=item CopyHist()
+=item CopyHist, Copy
 
-=item cvCopyHist()
-
-=item Copy()
+ $src->copy($dst);
+ $dst = $src->copy;
 
 =cut
 
@@ -208,45 +217,42 @@ sub CopyHist {
 }
 
 
-=item GetMinMaxHistValue()
+=item GetMinMaxHistValue, MinMaxLoc
 
-=item cvGetMinMaxHistValue()
+ $hist->minMaxLoc(my $min_value, my $max_value, my $min_idx, my $max_idx);
+ $hist->minMaxLoc(my $min_value, my $max_value);
 
 =cut
 
+sub MinMaxLoc { goto &GetMinMaxHistValue }
 sub GetMinMaxHistValue {
 	$_[3] = my $min_idx unless defined $_[3];
 	$_[4] = my $max_idx unless defined $_[4];
 	goto &cvGetMinMaxHistValue;
 }
 
-=item NormalizeHist()
+=item NormalizeHist, Normalize
 
-=item cvNormalizeHist()
-
-=item Normalize()
+ $hist->normalize($factor);
 
 =cut
 
 sub Normalize { goto &NormalizeHist }
 sub NormalizeHist { goto &cvNormalizeHist }
 
-=item SetHistBinRanges()
+=item SetHistBinRanges, SetRanges
 
-=item cvSetHistBinRanges()
-
-=item SetBinRanges()
+ $hist->setRanges(\@ranges, $uniform);
+ $hist->setRanges(\@ranges);
 
 =cut
 
-sub SetBinRanges { goto &SetHistBinRanges }
+sub SetRanges { goto &SetHistBinRanges }
 sub SetHistBinRanges { goto &cvSetHistBinRanges }
 
-=item ThreshHist()
+=item ThreshHist, Thresh
 
-=item cvThreshHist()
-
-=item Thresh()
+ $hist->thresh($threshold);
 
 =cut
 
@@ -254,13 +260,20 @@ sub Thresh { goto &ThreshHist }
 sub ThreshHist { goto &cvThreshHist }
 
 
-=item CalcPGH()
+=item CalcPGH
 
-=item cvCalcPGH()
+ $hist->calcPGH($contour);
 
 =cut
 
 sub Cv::Arr::CalcPGH { goto &cvCalcPGH }
+
+sub CalcPGH {
+	Cv::Usage("hist, contour") unless @_ == 2;
+	my ($hist, $contour) = splice(@_, 0, 2);
+	unshift(@_, $contour, $hist);
+	goto &cvCalcPGH;
+}
 
 =back
 
