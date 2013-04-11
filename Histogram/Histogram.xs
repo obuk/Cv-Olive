@@ -41,18 +41,6 @@ CODE:
 OUTPUT:
 	RETVAL
 
-AV*
-sizes(CvHistogram* hist)
-CODE:
-	int sizes[CV_MAX_DIM];
-	int dims = cvGetDims(&hist->mat, sizes); int i;
-	RETVAL = newAV();
-	for (i = 0; i < dims; i++) {
-		av_push(RETVAL, newSViv(sizes[i]));
-	}
-OUTPUT:
-	RETVAL
-
 void
 cvCalcBackProject(IplImage** images, CvArr* back_project, const CvHistogram* hist)
 POSTCALL:

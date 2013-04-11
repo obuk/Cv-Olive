@@ -53,12 +53,12 @@ XSLoader::load('Cv::Histogram', $VERSION);
  $hist = Cv::Histogram->new($sizes, $type);
  $hist2 = $hist1->new;
 
-=item bins, ranges, sizes, type (members of CvHistogram)
+=item type, bins, ranges, sizes (members of CvHistogram)
 
- $hist->bins
  $hist->type
- $hist->ranges
- $hist->uniform
+ $hist->bins
+ $hist->ranges					# alias of CvHistogram.thresh
+ $hist->sizes					# $hist->bins->dims
 
 =cut
 
@@ -91,6 +91,7 @@ sub new {
 	goto &cvCreateHist;
 }
 
+sub sizes { $_[0]->bins->sizes }
 
 =item DESTROY (cvReleaseHist)
 
@@ -248,6 +249,7 @@ sub NormalizeHist { goto &cvNormalizeHist }
 =cut
 
 sub SetRanges { goto &SetHistBinRanges }
+sub SetBinRanges { goto &SetHistBinRanges }
 sub SetHistBinRanges { goto &cvSetHistBinRanges }
 
 =item ThreshHist, Thresh
