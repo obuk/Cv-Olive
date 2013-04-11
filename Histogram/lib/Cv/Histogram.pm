@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Cv::Histogram - Cv extension for Histogram
+Cv::Histogram - Perl extension for OpenCV Histogram
 
 =head1 SYNOPSIS
 
@@ -252,6 +252,15 @@ sub SetHistBinRanges { goto &cvSetHistBinRanges }
 
 sub Thresh { goto &ThreshHist }
 sub ThreshHist { goto &cvThreshHist }
+
+
+=item CalcPGH()
+
+=item cvCalcPGH()
+
+=cut
+
+sub Cv::Arr::CalcPGH { goto &cvCalcPGH }
 
 =back
 

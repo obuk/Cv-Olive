@@ -130,3 +130,9 @@ void
 cvThreshHist(CvHistogram* hist, double threshold)
 POSTCALL:
 	XSRETURN(1);
+
+void
+cvCalcPGH(const CvSeq* contour, CvHistogram* hist)
+POSTCALL:
+	ST(0) = ST(1);
+	XSRETURN(1);

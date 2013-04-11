@@ -2421,9 +2421,13 @@ INIT:
 OUTPUT:
 	pts
 
+#if 0
+
 MODULE = Cv	PACKAGE = Cv::Arr
 void
 cvCalcPGH(const CvSeq* contour, CvHistogram* hist)
+
+#endif
 
 #TBD# float cvCalcEMD2(const CvArr* signature1, const CvArr* signature2, int distance_type, CvDistanceFunction distance_func=NULL, const CvArr* cost_matrix=NULL, CvArr* flow=NULL, float* lower_bound=NULL, VOID* userdata=NULL)
 
