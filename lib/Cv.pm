@@ -63,8 +63,8 @@ our %O;
 our %M;
 
 BEGIN {
-	$IMPORT{$_} = 1 for qw(seq more histogram);
-	$IMPORT{$_} = 0 for qw(qt);
+	$IMPORT{$_} = 1 for qw(Seq More Histogram);
+	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel);
 	$O{$_} = 1 for qw(boxhappy);
 }
 
@@ -73,16 +73,13 @@ use Getopt::Long;
 sub import {
 	my $self = shift;
 	local @ARGV = @_;
-	my $opt_ok = GetOptions(
-		"more!"     => \$IMPORT{more},
-		"seq!"      => \$IMPORT{seq},
-		"histogram!" => \$IMPORT{histogram},
-		"qt!"       => \$IMPORT{qt},
-		"boxhappy!" => \$O{boxhappy},
+	my %opt = (
+		(map { lc($_).'!' => \$IMPORT{$_} } keys %IMPORT),
+		(map { lc($_).'!' => \$O{$_} } keys %O),
 		);
-	unless ($opt_ok) {
+	unless (GetOptions(%opt)) {
 		die << "----";
-Usage: use Cv qw(-nomore -noseq -nohistogram -qt)
+Usage: use Cv @{[ map { "-".($IMPORT{$_}?"no":"").lc($_) } sort keys %IMPORT ]}
 ----
 ;
 	}
@@ -98,7 +95,6 @@ Usage: use Cv qw(-nomore -noseq -nohistogram -qt)
 		@ARGV = @argv;
 	}
 	for (grep { $IMPORT{$_} } keys %IMPORT) {
-		s/./\U$&/;
 		eval "use Cv::$_";
 		die "can't use Cv::$_; $@" if $@;
 	}
@@ -248,7 +244,7 @@ package Cv;
 for (
 	"Cv",
 	"Cv::Arr",
-	"Cv::BGCodeBookModel",
+	# "Cv::BGCodeBookModel",
 	"Cv::Capture",
 	"Cv::Chain",
 	"Cv::ChainPtReader",

@@ -3,51 +3,14 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 103;
-BEGIN { use_ok('Cv', -nomore, '/do not import/') }
+use Test::More tests => 97;
+BEGIN { use_ok('Cv', -nomore, -bg, '/do not import/') }
 
 if (1) {
 	for (qw(cvScalar cvVersion)) {
 		ok(!__PACKAGE__->can($_));
 	}
 }
-
-if (98) {
-	# A-G
-	ok(Cv->assoc('CreateBGCodeBookModel'));
-	ok(Cv::BGCodeBookModel->Cv::assoc('new'));
-
-	ok(Cv->assoc('CreateKalman'));
-	ok(Cv::Kalman->Cv::assoc('new'));
-
-	ok(Cv->assoc('CreateMemStorage'));
-	ok(Cv::MemStorage->Cv::assoc('new'));
-
-	ok(Cv->assoc('CreateStereoBMState'));
-	ok(Cv::StereoBMState->Cv::assoc('new'));
-
-  SKIP: {
-	  skip "cvCreateStereoGCState", 2 unless Cv->can('cvCreateStereoGCState');
-	  ok(Cv->assoc('CreateStereoGCState'));
-	  ok(Cv::StereoGCState->Cv::assoc('new'));
-	}
-
-	ok(Cv->assoc('CreateStructuringElementEx'));
-	ok(Cv::ConvKernel->Cv::assoc('new'));
-
-	ok(Cv->assoc('CreateVideoWriter'));
-	ok(Cv::VideoWriter->Cv::assoc('new'));
-
-	ok(Cv->assoc('OpenFileStorage'));
-	ok(Cv::FileStorage->Cv::assoc('new'));
-
-	ok(Cv->assoc('InitFont'));
-	ok(Cv::Font->Cv::assoc('new'));
-
-	ok(Cv->assoc('LoadHaarClassifierCascade'));
-	ok(Cv::HaarClassifierCascade->Cv::assoc('new'));
-}
-
 
 if (99) {
 	# A-G
@@ -57,12 +20,25 @@ if (99) {
 	ok(Cv::BGCodeBookModel->Cv::assoc('Diff'));
 	ok(Cv::BGCodeBookModel->Cv::assoc('ClearStale'));
 
+	ok(Cv->assoc('CreateStructuringElementEx'));
+	ok(Cv::ConvKernel->Cv::assoc('new'));
+
+	ok(Cv->assoc('OpenFileStorage'));
+	ok(Cv::FileStorage->Cv::assoc('new'));
+
+	ok(Cv->assoc('InitFont'));
+	ok(Cv::Font->Cv::assoc('new'));
+
 	# H-N
+	ok(Cv->assoc('LoadHaarClassifierCascade'));
+	ok(Cv::HaarClassifierCascade->Cv::assoc('new'));
+
 	ok(Cv::Histogram->Cv::assoc('Calc'));
 	ok(Cv::Histogram->Cv::assoc('Clear'));
 	ok(Cv::Histogram->Cv::assoc('Compare'));
 	ok(Cv::Histogram->Cv::assoc('Normalize'));
-	ok(Cv::Histogram->Cv::assoc('SetBinRanges'));
+	# ok(Cv::Histogram->Cv::assoc('SetBinRanges'));
+	ok(Cv::Histogram->Cv::assoc('SetRanges'));
 	ok(Cv::Histogram->Cv::assoc('Thresh'));
 
 	ok(Cv::Image->Cv::assoc('Clear'));
@@ -143,5 +119,16 @@ if (99) {
 	ok(Cv::SparseMat->Cv::assoc('Clone'));
 	ok(Cv::SparseMat->Cv::assoc('CloneMat'));
 
+	ok(Cv->assoc('CreateStereoBMState'));
+	ok(Cv::StereoBMState->Cv::assoc('new'));
+
+  SKIP: {
+	  skip "cvCreateStereoGCState", 2 unless Cv->can('cvCreateStereoGCState');
+	  ok(Cv->assoc('CreateStereoGCState'));
+	  ok(Cv::StereoGCState->Cv::assoc('new'));
+	}
+
 	# V-Z
+	ok(Cv->assoc('CreateVideoWriter'));
+	ok(Cv::VideoWriter->Cv::assoc('new'));
 }

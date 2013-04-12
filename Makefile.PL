@@ -65,8 +65,9 @@ my @perl_h = qw(perl.h sv.h pp.h);
 }
 
 my @dir = qw();
-push(@dir, qw(Qt)) if $cf->hasqt;
+push(@dir, qw(BGCodeBookModel));
 push(@dir, qw(Histogram));
+push(@dir, qw(Qt)) if $cf->hasqt;
 
 WriteMakefile(
 	NAME => 'Cv',

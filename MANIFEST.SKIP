@@ -5,7 +5,7 @@ pm_to_blib
 \.skip/
 ^\.|/\.
 ^\#|/\#
-\.(a|bs|c|o|so|bak|new|old|tmp|orig)$
+\.(a|bs|c|o|so|bak|new|old|tmp|[xX]|orig)$
 \~$
 lib/Cv/(perl|pp|sv)\.h$
 lib/Cv/Constant\.pm$
