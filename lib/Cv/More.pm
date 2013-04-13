@@ -474,7 +474,7 @@ C<Cv>. C<Cv::More> is what separated the part of the C<Cv>. So, it is
 enabled by default. Please make a explicit if you do not use.
 
  use Cv;              # enabled Cv::More
- use Cv qw(:nomore);  # disabled Cv::More
+ use Cv -nomore;	  # disabled Cv::More
 
 =head2 Added or Extended Method
 
@@ -778,9 +778,9 @@ L<Cv>
 
 =head1 LICENCE
 
-Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+MASUDA Yuta E<lt>yuta.cpan@gmail.comE<gt>
 
-Copyright (c) 2012 by Yuta MASUDA.
+Copyright (c) 2012, 2013 by MASUDA Yuta.
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

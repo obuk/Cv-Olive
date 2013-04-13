@@ -75,7 +75,7 @@ MASUDA Yuta E<lt>yuta.cpan@gmail.comE<gt>
 
 =head1 LICENCE
 
-Copyright (c) 2010, 2011, 2012 by Masuda Yuta.
+Copyright (c) 2013 by MASUDA Yuta.
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

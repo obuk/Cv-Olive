@@ -467,9 +467,9 @@ CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
 
 =head1 LICENCE
 
-Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+MASUDA Yuta E<lt>yuta.cpan@gmail.comE<gt>
 
-Copyright (c) 2012 by Yuta MASUDA.
+Copyright (c) 2012, 2013 by MASUDA Yuta.
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.
