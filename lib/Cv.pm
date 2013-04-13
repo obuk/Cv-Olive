@@ -64,7 +64,7 @@ our %M;
 
 BEGIN {
 	$IMPORT{$_} = 1 for qw(Seq More Histogram);
-	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel);
+	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel Subdiv2D);
 	$O{$_} = 1 for qw(boxhappy);
 }
 
@@ -271,7 +271,7 @@ for (
 	"Cv::StereoSGBM",
 	"Cv::String",
 	"Cv::StringHashNode",
-	"Cv::Subdiv2D",
+	# "Cv::Subdiv2D",
 	"Cv::TypeInfo",
 	"Cv::VideoWriter",
 	) {
@@ -1688,6 +1688,8 @@ sub BoxPoints {
 }
 
 
+=pod
+
 # ============================================================
 #  imgproc. Image Processing: Planar Subdivisions
 # ============================================================
@@ -1699,6 +1701,8 @@ sub DESTROY { }
 { *CreateDelaunay = \&Cv::CreateSubdivDelaunay2D }
 { *Locate = \&Subdiv2DLocate }
 { *DelaunayInsert = \&SubdivDelaunay2DInsert }
+
+=cut
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking

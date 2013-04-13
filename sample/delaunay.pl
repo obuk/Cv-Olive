@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use lib qw(blib/lib blib/arch);
-use Cv;
+use Cv -subdiv;
 
 {
 	package Cv::SeqReader::Edge;

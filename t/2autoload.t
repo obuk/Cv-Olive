@@ -5,7 +5,7 @@ use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 59;
 use Test::Exception;
-BEGIN { use_ok('Cv', -nomore, -bg) }
+BEGIN { use_ok('Cv', -nomore, -bg, -subdiv) }
 
 if (1) {
 	throws_ok { Cv->NotDefined() } qr/can't call Cv::NotDefined at $0/;

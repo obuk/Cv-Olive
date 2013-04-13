@@ -2599,6 +2599,8 @@ MODULE = Cv	PACKAGE = Cv::ContourScanner
 void
 cvSubstituteContour(CvContourScanner scanner, CvSeq* new_contour)
 
+#if 0
+
 # ============================================================
 #  imgproc. Image Processing: Planar Subdivisions
 # ============================================================
@@ -2683,6 +2685,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
+#endif
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking
