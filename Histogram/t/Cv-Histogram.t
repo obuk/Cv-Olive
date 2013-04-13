@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::More qw(no_plan);
-use Test::More;
 use Test::Exception;
 use Cv;
 BEGIN { use_ok('Cv::Histogram') }

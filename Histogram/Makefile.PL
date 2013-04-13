@@ -15,7 +15,11 @@ if ($@) {
 
 my $cf = new Cv::Config;
 
-my %PREREQ_PM = (
+WriteMakefile(
+	NAME => 'Cv::Histogram',
+	VERSION_FROM => 'lib/Cv/Histogram.pm',
+	ABSTRACT_FROM => 'lib/Cv/Histogram.pm',
+	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	PREREQ_PM => {
 		ExtUtils::ParseXS => 2.22,
 		ExtUtils::PkgConfig => 1.12,
@@ -23,14 +27,6 @@ my %PREREQ_PM = (
 		Test::Exception => 0.31,
 		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),
 	},
-);
-
-WriteMakefile(
-	NAME => 'Cv::Histogram',
-	VERSION_FROM => 'lib/Cv/Histogram.pm',
-	ABSTRACT_FROM => 'lib/Cv/Histogram.pm',
-	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
-	%PREREQ_PM,
 	%Cv::Config::MM,
 	INC => '-I. -I..',
 	XSOPT => '-C++ -hiertype',

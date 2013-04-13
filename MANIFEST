@@ -155,6 +155,14 @@ sample/trains.png
 sample/video-thread.pl
 sample/video.pl
 sample/watershed.pl
+Subdiv2D/Changes
+Subdiv2D/lib/Cv/Subdiv2D.pm
+Subdiv2D/Makefile.PL
+Subdiv2D/MANIFEST
+Subdiv2D/README
+Subdiv2D/Subdiv2D.xs
+Subdiv2D/t/Cv-Subdiv2D.t
+Subdiv2D/t/pod-coverage.t
 t/1config.t
 t/1const-old.t
 t/1const.t
@@ -266,6 +274,12 @@ t/2subRS.t
 t/2sum.t
 t/2threshold.t
 t/2trackbar.t
+t/2useCv-bgcode.t
+t/2useCv-default.t
+t/2useCv-nocv.t
+t/2useCv-nohist.t
+t/2useCv-qt.t
+t/2useCv-subdiv.t
 t/2xor.t
 t/4boundingRect.t
 t/4contour.t

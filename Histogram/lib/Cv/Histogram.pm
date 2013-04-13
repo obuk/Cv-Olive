@@ -18,22 +18,25 @@ use 5.008008;
 use strict;
 use warnings;
 use Cv ();
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-our %EXPORT_TAGS = (
-	'all' => [ grep { /^cv/ } keys %Cv::Histogram:: ],
-	);
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = ( );
 
 our $VERSION = '0.26';
 
 require XSLoader;
 XSLoader::load('Cv::Histogram', $VERSION);
+
+require Exporter;
+
+our @ISA = qw(Exporter);
+
+our @EXPORT_OK = grep /^(IPL|CV|cv)/, (keys %Cv::Histogram::);
+
+our %EXPORT_TAGS = (
+	'all' => \@EXPORT_OK,
+	);
+
+our @EXPORT = ( );
+
+push(@Cv::EXPORT_OK, @EXPORT_OK);
 
 *AUTOLOAD = \&Cv::autoload;
 
@@ -47,91 +50,51 @@ XSLoader::load('Cv::Histogram', $VERSION);
 
 =over
 
-=item new (cvCreateHist)
+=item new, CreateHist
 
  $hist = Cv::Histogram->new($sizes, $type, $ranges, $uniform);
  $hist = Cv::Histogram->new($sizes, $type);
  $hist2 = $hist1->new;
 
-=item type, bins, ranges, sizes (members of CvHistogram)
+=item type, bins, ranges (members of CvHistogram)
 
  $hist->type
  $hist->bins
  $hist->ranges					# alias of CvHistogram.thresh
- $hist->sizes					# $hist->bins->dims
 
 =cut
 
-sub Cv::CreateHist { goto &new }
-
-sub new {
+sub new { goto &CreateHist }
+sub Cv::CreateHist { goto &CreateHist }
+sub CreateHist {
 	my $self = shift;
-	my ($sizes, $type, $ranges, $uniform) = @_;
-	if (ref $self) {
-		unless (defined $sizes) {
-			$sizes = $self->sizes;
+	if (ref $self && $self->isa('Cv::Histogram')) {
+		unless (defined $_[0]) {
+			$_[0] = $self->bins->sizes;
 		}
-		unless (defined $type) {
-			$type = ref $self->bins && $self->bins->isa('Cv::SparseMat')?
+		unless (defined $_[1]) {
+			$_[1] = ref $self->bins && $self->bins->isa('Cv::SparseMat')?
 				&Cv::CV_HIST_SPARSE : &Cv::CV_HIST_ARRAY;
 		}
-		unless (defined $ranges) {
-			$ranges = $self->type & &Cv::CV_HIST_RANGES_FLAG?
+		unless (defined $_[2]) {
+			$_[2] = $self->type & &Cv::CV_HIST_RANGES_FLAG?
 				$self->ranges : \0;
 		}
-		unless (defined $uniform) {
-			$uniform = $self->type & &Cv::CV_HIST_UNIFORM_FLAG? 1 : 0
+		unless (defined $_[3]) {
+			$_[3] = $self->type & &Cv::CV_HIST_UNIFORM_FLAG? 1 : 0
 		}
+	} elsif (ref $self) {
+		unshift(@_, $self);	# sizes
 	}
 	Cv::Usage("sizes, type, ranges=NULL, uniform=1")
-		unless defined $sizes && defined $type;
-	@_ = ($sizes, $type);
-	push(@_, $ranges) if defined $ranges;
-	push(@_, $uniform) if defined $uniform;
+		unless 2 <= @_ && @_ <= 4;
 	goto &cvCreateHist;
 }
 
-sub sizes { $_[0]->bins->sizes }
-
-=item DESTROY (cvReleaseHist)
-
-=cut
+# sub sizes { $_[0]->bins->sizes }
 
 sub DESTROY { goto &cvReleaseHist }
 
-
-=item GetHistValue, Get
-
- $value = $hist->get($idx0);
- $value = $hist->get($idx0, $idx1);
- $value = $hist->get($idx0, $idx1, $idx2);
- $value = $hist->get(\@idx);
-
-=cut
-
-sub Get { goto &GetHistValue }
-sub GetHistValue {
-	my $self = shift;
-	my $arr = $self->bins->Ptr(@_);
-	my @floats = unpack("f*", $arr); # XXXXX
-	wantarray? @floats : \@floats;
-}
-
-
-=item QueryHistValue, Query
-
- $value = $hist->query($idx0);
- $value = $hist->query($idx0, $idx1);
- $value = $hist->query($idx0, $idx1, $idx2);
- $value = $hist->query(\@idx);
-
-=cut
-
-sub Query { goto &QueryHistValue }
-sub QueryHistValue {
-	my $self = shift;
-	$self->bins->GetReal(@_);
-}
 
 =item CalcBackProject
 
@@ -249,7 +212,6 @@ sub NormalizeHist { goto &cvNormalizeHist }
 =cut
 
 sub SetRanges { goto &SetHistBinRanges }
-sub SetBinRanges { goto &SetHistBinRanges }
 sub SetHistBinRanges { goto &cvSetHistBinRanges }
 
 =item ThreshHist, Thresh
@@ -261,8 +223,7 @@ sub SetHistBinRanges { goto &cvSetHistBinRanges }
 sub Thresh { goto &ThreshHist }
 sub ThreshHist { goto &cvThreshHist }
 
-
-=item CalcPGH
+=item CalcPGH (legacy)
 
  $hist->calcPGH($contour);
 
@@ -276,6 +237,67 @@ sub CalcPGH {
 	unshift(@_, $contour, $hist);
 	goto &cvCalcPGH;
 }
+
+=item QueryHistValue, Query (legacy)
+
+ $value = $hist->query($idx0);
+ $value = $hist->query($idx0, $idx1);
+ $value = $hist->query($idx0, $idx1, $idx2);
+ $value = $hist->query(\@idx);
+
+=cut
+
+sub Query { goto &QueryHistValue }
+sub QueryHistValue {
+	my $self = shift;
+	$self->bins->GetReal(@_);
+}
+
+=item GetHistValue, Get (legacy)
+
+ $value = $hist->get($idx0);
+ $value = $hist->get($idx0, $idx1);
+ $value = $hist->get($idx0, $idx1, $idx2);
+ $value = $hist->get(\@idx);
+
+=cut
+
+sub Get { goto &GetHistValue }
+sub GetHistValue {
+	my $self = shift;
+	my $arr = $self->bins->Ptr(@_);
+	my @floats = unpack("f*", $arr); # XXXXX
+	wantarray? @floats : \@floats;
+}
+
+
+=item cvCalcBackProject
+
+=item cvCalcBackProjectPatch
+
+=item cvCalcHist
+
+=item cvCalcPGH
+
+=item cvCalcProbDensity
+
+=item cvClearHist
+
+=item cvCompareHist
+
+=item cvCopyHist
+
+=item cvCreateHist
+
+=item cvGetMinMaxHistValue
+
+=item cvNormalizeHist
+
+=item cvReleaseHist
+
+=item cvSetHistBinRanges
+
+=item cvThreshHist
 
 =back
 

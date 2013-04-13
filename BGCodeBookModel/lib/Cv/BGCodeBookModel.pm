@@ -18,23 +18,23 @@ use 5.008008;
 use strict;
 use warnings;
 use Cv ();
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-our %EXPORT_TAGS = (
-	# 'all' => [ grep { /^cv/ } keys %Cv::BGCodeBookModel:: ],
-	'all' => [ grep { /^cv/ } keys %Cv:: ],
-	);
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = ( );
 
 our $VERSION = '0.26';
 
 require XSLoader;
 XSLoader::load('Cv::BGCodeBookModel', $VERSION);
+
+require Exporter;
+
+our @EXPORT_OK = grep /^(IPL|CV|cv)/, (keys %Cv::BGCodeBookModel::);
+
+our %EXPORT_TAGS = (
+	'all' => \@EXPORT_OK,
+	);
+
+our @EXPORT = ( );
+
+push(@Cv::EXPORT_OK, @EXPORT_OK);
 
 *AUTOLOAD = \&Cv::autoload;
 
