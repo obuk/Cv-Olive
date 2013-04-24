@@ -80,7 +80,14 @@ POSTCALL:
 
 CvHistogram*
 cvCreateHist(int* sizes, int type, float** ranges=NULL, int uniform=1)
-C_ARGS: length(sizes), sizes, type, ranges, uniform
+CODE:
+	RETVAL = cvCreateHist(length(sizes), sizes, type, ranges, uniform);
+#if CV_MAJOR_VERSION < 2
+	if (uniform) RETVAL->type |= CV_HIST_UNIFORM_FLAG;
+	if (ranges)  RETVAL->type |= CV_HIST_RANGES_FLAG;
+#endif
+OUTPUT:
+	RETVAL
 
 #legacy# double cvGetHistValue_1D(CvHistogram* hist, int idx0)
 #legacy# double cvGetHistValue_2D(CvHistogram* hist, int idx0, int idx1)
