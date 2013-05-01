@@ -36,7 +36,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT = ( );
 
-push(@Cv::EXPORT_OK, @EXPORT_OK);
+# push(@Cv::EXPORT_OK, @EXPORT_OK);
 
 *AUTOLOAD = \&Cv::autoload;
 
@@ -63,6 +63,9 @@ push(@Cv::EXPORT_OK, @EXPORT_OK);
  $hist->ranges					# alias of CvHistogram.thresh
 
 =cut
+
+*Cv::cvCreateHist = \&cvCreateHist;
+push(@Cv::EXPORT_OK, 'cvCreateHist');
 
 sub new { goto &CreateHist }
 sub Cv::CreateHist { goto &CreateHist }
