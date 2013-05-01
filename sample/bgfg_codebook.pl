@@ -179,7 +179,6 @@ while (1) {
 		$pause = 0;
 	}
 	elsif ($c eq ' ') {
-		$model->BGCodeBookClearStale(0);
 		$model->clearStale(0);
 		$nframes = 0;
 	}
