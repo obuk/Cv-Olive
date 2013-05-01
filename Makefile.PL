@@ -88,6 +88,7 @@ WriteMakefile(
 	dynamic_lib => $cf->dynamic_lib,
 	DIR => [ @dir ],
 	LICENSE => 'perl',
+	depend => { 'Cv.xs' => 'lib/Cv/Cv.inc' },
 	clean => {
 		FILES => [
 			@perl_h_patched, 'lib/Cv/Constant.pm*', 'Test.bs', 'a.pm', '*.tmp',
@@ -122,8 +123,6 @@ cover:
 	-HARNESS_PERL_SWITCHES=-MDevel::Cover make test
 	cover
 	find cover_db -type d |xargs chmod +rx
-
-Cv.xs:	lib/Cv/Cv.inc
 
 ";
 }

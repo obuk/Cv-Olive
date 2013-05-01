@@ -32,6 +32,7 @@ package Cv::More;
 sub import {
 	my $self = shift;
 	for (@_) {
+		next if /^:/;			# ignore
 		if (defined $Cv::O{$_}) {
 			$O{$_} = 1;
 		} else {
@@ -43,6 +44,7 @@ sub import {
 sub unimport {
 	my $self = shift;
 	for (@_) {
+		next if /^:/;			# ignore
 		if (defined $Cv::O{$_}) {
 			$O{$_} = 0;
 		} else {

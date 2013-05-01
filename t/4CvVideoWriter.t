@@ -14,8 +14,8 @@ SKIP: {
 	skip "can't query #0", 3 unless $frame;
 	my $fourcc;
 	for (qw(DIVX HFYU DRAC XVID X264 MP1V)) {
-		eval { Cv->createVideoWriter("a.avi", $_, 30, $frame->size) };
-		$fourcc = $_, last unless $@;
+		my $v = eval { Cv->createVideoWriter("a.avi", $_, 30, $frame->size) };
+		$fourcc = $_, last if $v && !$@;
 	}
 	skip "can't query #0", 3 unless $fourcc;
 	my $v1 = Cv->createVideoWriter("a.avi", $fourcc, 30, $frame->size);
