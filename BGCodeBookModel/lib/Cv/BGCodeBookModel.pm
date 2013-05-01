@@ -59,11 +59,11 @@ our @EXPORT = ( );
 
 =cut
 
-*Cv::cvCreateBGCodeBookModel = \&cvCreateBGCodeBookModel;
+sub Cv::cvCreateBGCodeBookModel { goto &cvCreateBGCodeBookModel }
 push(@Cv::EXPORT_OK, 'cvCreateBGCodeBookModel');
-# *Cv::CreateBGCodeBookModel = sub { shift; goto &cvCreateBGCodeBookModel };
-*new = \&Cv::CreateBGCodeBookModel;
-*DESTROY = \&cvReleaseBGCodeBookModel;
+sub Cv::CreateBGCodeBookModel { shift; goto &cvCreateBGCodeBookModel }
+sub new { goto &Cv::CreateBGCodeBookModel }
+sub DESTROY { goto &cvReleaseBGCodeBookModel }
 
 =item BGCodeBookClearStale(), ClearStale(), cvBGCodeBookClearStale()
 
@@ -71,7 +71,8 @@ push(@Cv::EXPORT_OK, 'cvCreateBGCodeBookModel');
 
 =cut
 
-*ClearStale = \&BGCodeBookClearStale;
+sub ClearStale { goto &BGCodeBookClearStale }
+sub BGCodeBookClearStale { goto &cvBGCodeBookClearStale }
 
 =item BGCodeBookDiff(), Diff(), cvBGCodeBookDiff()
 
@@ -79,7 +80,8 @@ push(@Cv::EXPORT_OK, 'cvCreateBGCodeBookModel');
 
 =cut
 
-*Diff = \&BGCodeBookDiff;
+sub Diff { goto &BGCodeBookDiff }
+sub BGCodeBookDiff { goto &cvBGCodeBookDiff }
 
 =item BGCodeBookUpdate(), Update(), cvBGCodeBookUpdate()
 
@@ -87,7 +89,8 @@ push(@Cv::EXPORT_OK, 'cvCreateBGCodeBookModel');
 
 =cut
 
-*Update = \&BGCodeBookUpdate;
+sub Update { goto &BGCodeBookUpdate }
+sub BGCodeBookUpdate { goto &cvBGCodeBookUpdate }
 
 =item SegmentFGMask(), cvSegmentFGMask()
 

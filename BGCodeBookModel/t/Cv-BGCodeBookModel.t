@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 19;
+use Test::More tests => 22;
 use Test::Exception;
 BEGIN { use_ok('Cv', -bg) }
 
@@ -41,59 +41,26 @@ can_ok(__PACKAGE__, 'cvCreateBGCodeBookModel');
 
 
 # ============================================================
-#  cvBGCodeBookClearStale
-# ============================================================
-
-if (1) {
-	my $model = 'Cv::BGCodeBookModel';
-	my $pass = 0;
-	no warnings 'redefine';
-	local *Cv::BGCodeBookModel::cvBGCodeBookClearStale = sub { $pass++ };
-	$model->BGCodeBookClearStale();
-	$model->ClearStale();
-	is($pass, 2, 'alias of cvBGCodeBookClearStale');
-}
-
-
-# ============================================================
-#  cvBGCodeBookDiff
-# ============================================================
-
-if (1) {
-	my $model = 'Cv::BGCodeBookModel';
-	my $pass = 0;
-	no warnings 'redefine';
-	local *Cv::BGCodeBookModel::cvBGCodeBookDiff = sub { $pass++ };
-	$model->BGCodeBookDiff();
-	$model->Diff();
-	is($pass, 2, 'alias of cvBGCodeBookDiff');
-}
-
-# ============================================================
-#  cvBGCodeBookUpdate
-# ============================================================
-
-if (1) {
-	my $model = 'Cv::BGCodeBookModel';
-	my $pass = 0;
-	no warnings 'redefine';
-	local *Cv::BGCodeBookModel::cvBGCodeBookUpdate = sub { $pass++ };
-	$model->BGCodeBookUpdate();
-	$model->Update();
-	is($pass, 2, 'alias of cvBGCodeBookUpdate');
-}
-
-# ============================================================
+#  cvBGCodeBookClearStale cvBGCodeBookDiff cvBGCodeBookUpdate
 #  cvSegmentFGMask
 # ============================================================
 
 if (1) {
-	my $model = 'Cv::BGCodeBookModel';
-	my $pass = 0;
-	no warnings 'redefine';
-	local *Cv::BGCodeBookModel::cvSegmentFGMask = sub { $pass++ };
-	$model->SegmentFGMask();
-	is($pass, 1, 'alias of cvSegmentFGMask');
+	for (qw( cvBGCodeBookClearStale cvBGCodeBookDiff cvBGCodeBookUpdate cvSegmentFGMask)) {
+		package Cv::BGCodeBookModel;
+		no strict 'refs';
+		no warnings 'redefine';
+		my $pass = 0;
+		local *$_ = sub { $pass++ };
+		(my $short1 = $_) =~ s/^cv//;
+		(my $short2 = $_) =~ s/^cv|BGCodeBook//g;
+		&$short1;
+		main::is($pass, 1, "$short1: alias of $_");
+		if ($short1 ne $short2) {
+			&$short2;
+			main::is($pass, 2, "$short2: alias of $_");
+		}
+	}
 }
 
 # ============================================================

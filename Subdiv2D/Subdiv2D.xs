@@ -17,15 +17,15 @@ OUTPUT:
 
 void
 cvCalcSubdivVoronoi2D(CvSubdiv2D* subdiv)
-ALIAS:	Cv::cvCalcSubdivVoronoi2D = 1
+# ALIAS:	Cv::cvCalcSubdivVoronoi2D = 1
 
 void
 cvClearSubdivVoronoi2D(CvSubdiv2D* subdiv)
-ALIAS:	Cv::cvClearSubdivVoronoi2D = 1
+# ALIAS:	Cv::cvClearSubdivVoronoi2D = 1
 
 CvSubdiv2D*
 cvCreateSubdivDelaunay2D(CvRect rect, CvMemStorage* storage)
-ALIAS:	Cv::cvCreateSubdivDelaunay2D = 1
+# ALIAS:	Cv::cvCreateSubdivDelaunay2D = 1
 
 CvSubdiv2DPoint
 cvFindNearestPoint2D(CvSubdiv2D* subdiv, CvPoint2D32f pt)
@@ -37,7 +37,7 @@ OUTPUT:
 
 CvSubdiv2DPoint
 cvSubdiv2DEdgeOrg(CvSubdiv2DEdge edge)
-ALIAS:	Cv::cvSubdiv2DEdgeOrg = 1
+# ALIAS:	Cv::cvSubdiv2DEdgeOrg = 1
 CODE:
 	CvSubdiv2DPoint* p = cvSubdiv2DEdgeOrg(edge);
 	if (p) RETVAL = *p; else XSRETURN_UNDEF;
@@ -46,7 +46,7 @@ OUTPUT:
 
 CvSubdiv2DPoint
 cvSubdiv2DEdgeDst(CvSubdiv2DEdge edge)
-ALIAS:	Cv::cvSubdiv2DEdgeDst = 1
+# ALIAS:	Cv::cvSubdiv2DEdgeDst = 1
 CODE:
 	CvSubdiv2DPoint* p = cvSubdiv2DEdgeDst(edge);
 	if (p) RETVAL = *p; else XSRETURN_UNDEF;
@@ -55,11 +55,11 @@ OUTPUT:
 
 CvSubdiv2DEdge
 cvSubdiv2DGetEdge(CvSubdiv2DEdge edge, CvNextEdgeType type)
-ALIAS:	Cv::cvSubdiv2DGetEdge = 1
+# ALIAS:	Cv::cvSubdiv2DGetEdge = 1
 
 CvSubdiv2DEdge
 cvSubdiv2DNextEdge(CvSubdiv2DEdge edge)
-ALIAS:	Cv::cvSubdiv2DNextEdge = 1
+# ALIAS:	Cv::cvSubdiv2DNextEdge = 1
 
 CvSubdiv2DPointLocation
 cvSubdiv2DLocate(CvSubdiv2D* subdiv, CvPoint2D32f pt, OUT CvSubdiv2DEdge edge, vertex = NO_INIT)
@@ -72,7 +72,7 @@ OUTPUT:
 
 CvSubdiv2DEdge
 cvSubdiv2DRotateEdge(CvSubdiv2DEdge edge, int rotate)
-ALIAS:	Cv::cvSubdiv2DRotateEdge = 1
+# ALIAS:	Cv::cvSubdiv2DRotateEdge = 1
 
 CvSubdiv2DPoint
 cvSubdivDelaunay2DInsert(CvSubdiv2D* subdiv, CvPoint2D32f pt)

@@ -5,6 +5,7 @@ BGCodeBookModel/Makefile.PL
 BGCodeBookModel/MANIFEST
 BGCodeBookModel/README
 BGCodeBookModel/t/Cv-BGCodeBookModel.t
+BGCodeBookModel/t/pod-coverage.t
 Changes
 Cv.xs
 fallback/Constant.pm-1.0.0
@@ -19,6 +20,7 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 fallback/Constant.pm-2.4.4
+fallback/Constant.pm-2.4.5
 Histogram/Changes
 Histogram/Histogram.xs
 Histogram/lib/Cv/Histogram.pm
@@ -26,6 +28,7 @@ Histogram/Makefile.PL
 Histogram/MANIFEST
 Histogram/README
 Histogram/t/Cv-Histogram.t
+Histogram/t/pod-coverage.t
 inc/Devel/CheckLib.pm
 lib/Cv.pm
 lib/Cv/Config.pm

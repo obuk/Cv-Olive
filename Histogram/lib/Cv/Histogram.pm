@@ -64,7 +64,7 @@ our @EXPORT = ( );
 
 =cut
 
-*Cv::cvCreateHist = \&cvCreateHist;
+sub Cv::cvCreateHist { goto &cvCreateHist }
 push(@Cv::EXPORT_OK, 'cvCreateHist');
 
 sub new { goto &CreateHist }

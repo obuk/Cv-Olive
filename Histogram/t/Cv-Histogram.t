@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 124;
+use Test::More tests => 141;
 use Test::Exception;
 use Cv;
 BEGIN { use_ok('Cv::Histogram') }
@@ -162,5 +162,45 @@ if (4) {
 			is($_[3], 0, 'uniform');
 		};
 		$hist->new();
+	}
+}
+
+
+
+# ============================================================
+#  cvCalcHist cvCalcProbDensity cvClearHist cvCompareHist cvCopyHist
+#  cvGetMinMaxHistValue cvNormalizeHist SetHistBinRanges cvThreshHist
+# ============================================================
+
+if (1) {
+	my %args = (
+		cvCalcHist => [ 1, 2 ],
+		cvCopyHist => [ Cv->CreateHist([256], CV_HIST_ARRAY) ],
+		);
+	my %short = (
+		cvGetMinMaxHistValue => [qw(MinMaxLoc)],
+		SetHistBinRanges => [qw(SetRanges)],
+		);
+	for (qw(cvCalcHist cvCalcProbDensity cvClearHist cvCompareHist cvCopyHist cvGetMinMaxHistValue cvNormalizeHist SetHistBinRanges cvThreshHist)) {
+		package Cv::Histogram;
+		no strict 'refs';
+		no warnings 'redefine';
+		my $pass = 0;
+		local *$_ = sub { $pass++ };
+		(my $short1 = $_) =~ s/^cv//;
+		my @args = @{$args{$_} || []};
+		&$short1(@args);
+		main::is($pass, 1, "$short1: alias of $_");
+		(my $short2 = $_) =~ s/^cv|Hist//g;
+		if ($short1 ne $short2 && Cv::Histogram->can($short2)) {
+			$pass = 0;
+			&$short2(@args);
+			main::is($pass, 1, "$short2: alias of $_");
+		}
+		for my $short3 (@{$short{$_} || []}) {
+			$pass = 0;
+			&$short3(@args);
+			main::is($pass, 1, "$short3: alias of $_");
+		}
 	}
 }
