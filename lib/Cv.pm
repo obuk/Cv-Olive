@@ -300,7 +300,12 @@ sub assoc {
 	my $family = shift;
 	my $short = shift;
 	my @names;
-	if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
+	if ($short =~ /^cv[A-Zm]/) {
+		# return $family->can($short);
+		return undef;
+	}
+	# if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
+	if ($short =~ /^[a-z]/) {
 		(my $caps = $short) =~ s/^[a-z]/\U$&/;
 		push(@names, $caps);
 		(my $upper = $short) =~ s/^[a-z]+/\U$&/;
@@ -1948,18 +1953,6 @@ if (__PACKAGE__->can('new')) {
 # ============================================================
 #  ml. Machine Learning
 # ============================================================
-
-
-# ============================================================
-#  xxx. Background/foreground segmentation
-# ============================================================
-
-package Cv::BGCodeBookModel;
-
-{ *new = \&Cv::CreateBGCodeBookModel }
-{ *Update = \&BGCodeBookUpdate }
-{ *Diff = \&BGCodeBookDiff }
-{ *ClearStale = \&BGCodeBookClearStale }
 
 
 # ============================================================

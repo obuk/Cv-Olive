@@ -26,6 +26,8 @@ XSLoader::load('Cv::BGCodeBookModel', $VERSION);
 
 require Exporter;
 
+our @ISA = qw(Exporter);
+
 our @EXPORT_OK = grep /^(IPL|CV|cv)/, (keys %Cv::BGCodeBookModel::);
 
 our %EXPORT_TAGS = (
@@ -34,7 +36,8 @@ our %EXPORT_TAGS = (
 
 our @EXPORT = ( );
 
-push(@Cv::EXPORT_OK, @EXPORT_OK);
+# { package Cv; Cv::BGCodeBookModel->import(qw(:all)); }
+# push(@Cv::EXPORT_OK, @EXPORT_OK);
 
 *AUTOLOAD = \&Cv::autoload;
 
@@ -48,9 +51,64 @@ push(@Cv::EXPORT_OK, @EXPORT_OK);
 
 =over
 
+=item new(), cvCreateBGCodeBookModel()
+
+ my $model = Cv::BGCodeBookModel->new();
+
+=item cvReleaseBGCodeBookModel();
+
 =cut
 
+*Cv::cvCreateBGCodeBookModel = \&cvCreateBGCodeBookModel;
+push(@Cv::EXPORT_OK, 'cvCreateBGCodeBookModel');
+# *Cv::CreateBGCodeBookModel = sub { shift; goto &cvCreateBGCodeBookModel };
+*new = \&Cv::CreateBGCodeBookModel;
+*DESTROY = \&cvReleaseBGCodeBookModel;
 
+=item BGCodeBookClearStale(), ClearStale(), cvBGCodeBookClearStale()
+
+ $model->ClearStale($staleThresh, $roi, $mask);
+
+=cut
+
+*ClearStale = \&BGCodeBookClearStale;
+
+=item BGCodeBookDiff(), Diff(), cvBGCodeBookDiff()
+
+ $model->Diff($image, $mask, $roi);
+
+=cut
+
+*Diff = \&BGCodeBookDiff;
+
+=item BGCodeBookUpdate(), Update(), cvBGCodeBookUpdate()
+
+ $model->Update($image, $roi, $mask);
+
+=cut
+
+*Update = \&BGCodeBookUpdate;
+
+=item SegmentFGMask(), cvSegmentFGMask()
+
+=item cbBounds($value);
+
+ my $value = $model->cbBounds;
+ my $oldvalue = $model->cbBounds($value);
+
+=item modMax
+
+ my $value = $model->modMax;
+ my $oldvalue = $model->modMax($value);
+
+=item modMin
+
+ my $value = $model->modMin;
+ my $oldvalue = $model->modMin($value);
+
+=item t
+
+ my $t = $model->t;
 
 =back
 

@@ -10,11 +10,11 @@ MODULE = Cv::BGCodeBookModel		PACKAGE = Cv::BGCodeBookModel
 
 CvBGCodeBookModel*
 cvCreateBGCodeBookModel()
-ALIAS: Cv::cvCreateBGCodeBookModel = 1
+# ALIAS: Cv::cvCreateBGCodeBookModel = 1
 
 void
 cvReleaseBGCodeBookModel(CvBGCodeBookModel* &model)
-ALIAS: DESTROY = 1
+# ALIAS: DESTROY = 1
 
 # INIT:
 #	unbless(ST(0));
