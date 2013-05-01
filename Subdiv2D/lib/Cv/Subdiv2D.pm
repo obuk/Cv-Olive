@@ -26,6 +26,8 @@ XSLoader::load('Cv::Subdiv2D', $VERSION);
 
 require Exporter;
 
+our @ISA = qw(Exporter);
+
 our @EXPORT_OK = grep /^(IPL|CV|cv)/, (keys %Cv::Subdiv2D::);
 
 our %EXPORT_TAGS = (
