@@ -140,6 +140,9 @@ if (4) {
 	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
 		my $hist = Cv->CreateHist(my $sizes = [1], $type, [[0, 256]], 0);
 		isa_ok($hist, 'Cv::Histogram');
+		my $cant_test_ranges_flag =
+			cvVersion() <= 2.002 && $type == CV_HIST_SPARSE?
+			"- can't pass testing CV_HIST_RANGES_FLAG" : undef;
 		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
 		if ($type == CV_HIST_ARRAY) {
 			isa_ok($hist->bins, 'Cv::Mat');
@@ -147,13 +150,19 @@ if (4) {
 			isa_ok($hist->bins, 'Cv::SparseMat');
 		}
 		ok(!($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok( ($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+	  TODO: {
+		  local $TODO = $cant_test_ranges_flag;
+		  ok( ($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		}
 		my $hist2 = $hist->new();
 		isa_ok($hist2, 'Cv::Histogram');
 		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
 		isa_ok($hist2->bins, 'Cv::Mat');
 		ok(!($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok( ($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+	  TODO: {
+		  local $TODO = $cant_test_ranges_flag;
+		  ok( ($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		}
 		no warnings 'redefine';
 		local *Cv::Histogram::cvCreateHist = sub {
 			is_deeply($_[0], $sizes, 'sizes');
