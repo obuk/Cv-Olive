@@ -30,7 +30,7 @@ my @cvarr = qw(
 cvAddText
 );
 
-our @EXPORT_OK = ( @cv );
+our @EXPORT_OK = ( @cv, @cvarr );
 
 our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
