@@ -1,5 +1,12 @@
 Revision history for Cv.pm
 
+0.26rc - 2012-05-02
+     * separates packages: Cv::BGCodeBookModel, Cv::Histogram,
+       Cv::Subdiv2D (classified as a legacy in OpenCV)
+       - Cv::Pango (experimental)
+     * bundle Devel/CheckLib.pm
+     * test with OpenCV-2.4.5
+
 0.25 - 2012-03-31
      * accept pkg-config results even if it returns shared libs
        (libopencv_core.so) or cc parameter (e.g. -lopencv_core)
@@ -8,7 +15,7 @@ Revision history for Cv.pm
      * removed Cv::Test for testing
      * rewrote t/2matchTemplate.t, t/2misc.t
      * removed Cv::Nihongo.pod for Japanease document
- 
+
 0.24 - 2012-02-24
      * replaced Perl_croak with Carp::croak to get better error info
      * rewrote Cv::import using Getopt for use Cv -option

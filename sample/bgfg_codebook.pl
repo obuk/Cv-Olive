@@ -4,7 +4,7 @@
 use strict;
 # use warnings;
 use lib qw(blib/lib blib/arch);
-use Cv;
+use Cv -bg;
 use List::Util qw(max min);
 
 # Background average sample code done with averages and done with codebooks
@@ -179,7 +179,6 @@ while (1) {
 		$pause = 0;
 	}
 	elsif ($c eq ' ') {
-		$model->BGCodeBookClearStale(0);
 		$model->clearStale(0);
 		$nframes = 0;
 	}

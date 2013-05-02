@@ -6,7 +6,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Cv::Seq::Point;
 use Cv::Seq::Point2;

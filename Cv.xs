@@ -1648,13 +1648,10 @@ C_ARGS: img, pts, length(inner_pts), length(pts), color, lineType, shift
 POSTCALL:
 	XSRETURN(1);
 
-MODULE = Cv	PACKAGE = Cv::Font
-void
-cvGetTextSize(const CvFont* font, const char* textString, OUT CvSize textSize, OUT int baseline)
-C_ARGS:
-	textString, font, &textSize, &baseline
-
 MODULE = Cv	PACKAGE = Cv
+void
+cvGetTextSize(const char* textString, const CvFont* font, OUT CvSize textSize, OUT int baseline)
+
 CvFont*
 cvInitFont(int fontFace, double hscale, double vscale, double shear=0, int thickness=1, int lineType=8)
 INIT:
@@ -1987,141 +1984,6 @@ cvUseOptimized(int onoff)
 
 #TBD# void cvSetIPLAllocators(Cv_iplCreateImageHeader create_header, Cv_iplAllocateImageData allocate_data, Cv_iplDeallocate deallocate, Cv_iplCreateROI create_roi, Cv_iplCloneImage clone_image)
 
-# ============================================================
-#  imgproc. Image Processing: Histograms
-# ============================================================
-
-MODULE = Cv	PACKAGE = Cv::Histogram
-# ====================
-int
-type(CvHistogram* hist)
-CODE:
-	RETVAL = hist->type;
-OUTPUT:
-	RETVAL
-
-CvArr*
-bins(CvHistogram* hist)
-CODE:
-	RETVAL = hist->bins;
-OUTPUT:
-	RETVAL
-
-AV*
-thresh(CvHistogram* hist)
-CODE:
-	RETVAL = newAV();
-	int dims = cvGetDims(&hist->mat, NULL); int i;
-	for (i = 0; i < dims; i++) {
-		AV* av = newAV();
-		av_push(av, newSViv(hist->thresh[i][0]));
-		av_push(av, newSViv(hist->thresh[i][1]));
-		av_push(RETVAL, newRV_inc(sv_2mortal((SV*)av)));
-	}
-OUTPUT:
-	RETVAL
-
-AV*
-sizes(CvHistogram* hist)
-CODE:
-	int sizes[CV_MAX_DIM];
-	int dims = cvGetDims(&hist->mat, sizes); int i;
-	RETVAL = newAV();
-	for (i = 0; i < dims; i++) {
-		av_push(RETVAL, newSViv(sizes[i]));
-	}
-OUTPUT:
-	RETVAL
-
-MODULE = Cv	PACKAGE = Cv::Histogram
-# ====================
-void
-cvCalcBackProject(const CvHistogram* hist, IplImage** images, CvArr* back_project)
-C_ARGS: images, back_project, hist
-POSTCALL:
-	ST(0) = ST(2);
-	XSRETURN(1);
-
-void
-cvCalcBackProjectPatch(CvHistogram* hist, IplImage** images, CvArr* dst, CvSize patch_size, int method, double factor)
-C_ARGS: images, dst, patch_size, hist, method, factor
-POSTCALL:
-	ST(0) = ST(2);
-	XSRETURN(1);
-
-void
-cvCalcHist(CvHistogram* hist, IplImage** image, int accumulate=0, const CvArr* mask=NULL)
-C_ARGS: image, hist, accumulate, mask
-POSTCALL:
-	XSRETURN(1);
-
-void
-cvCalcProbDensity(const CvHistogram* hist1, const CvHistogram* hist2, CvHistogram* dst_hist, double scale=255)
-POSTCALL:
-	XSRETURN(1);
-
-void
-cvClearHist(CvHistogram* hist)
-POSTCALL:
-	XSRETURN(1);
-
-double
-cvCompareHist(const CvHistogram* hist1, const CvHistogram* hist2, int method)
-
-void
-cvCopyHist(const CvHistogram* src, CvHistogram* dst)
-C_ARGS: src, &dst
-POSTCALL:
-	ST(0) = ST(1);
-	XSRETURN(1);
-
-
-MODULE = Cv	PACKAGE = Cv
-CvHistogram*
-cvCreateHist(int* sizes, int type, float** ranges=NULL, int uniform=1)
-C_ARGS: length(sizes), sizes, type, ranges=NULL, uniform
-
-#legacy# double cvGetHistValue_1D(CvHistogram* hist, int idx0)
-#legacy# double cvGetHistValue_2D(CvHistogram* hist, int idx0, int idx1)
-#legacy# double cvGetHistValue_3D(CvHistogram* hist, int idx0, int idx1, int idx2)
-#legacy# double cvGetHistValue_nD(CvHistogram* hist, int* idx)
-
-MODULE = Cv	PACKAGE = Cv::Histogram
-void
-cvGetMinMaxHistValue(const CvHistogram* hist, OUT float min_value, OUT float max_value, min_idx = NO_INIT, max_idx = NO_INIT)
-INPUT:
-	int &min_idx = NO_INIT
-	int &max_idx = NO_INIT
-POSTCALL:
-	if (items >= 4) sv_setiv(ST(3), min_idx);
-	if (items >= 5) sv_setiv(ST(4), max_idx);
-
-
-#TBD# CvHistogram* cvMakeHistHeaderForArray(int dims, int* sizes, CvHistogram* hist, float* data, float** ranges=NULL, int uniform=1)
-
-
-void
-cvNormalizeHist(CvHistogram* hist, double factor)
-POSTCALL:
-	XSRETURN(1);
-
-#legacy# float cvQueryHistValue_1D(CvHistogram* hist, int idx0)
-#legacy# float cvQueryHistValue_2D(CvHistogram* hist, int idx0, int idx1)
-#legacy# float cvQueryHistValue_3D(CvHistogram* hist, int idx0, int idx1, int idx2)
-#legacy# float cvQueryHistValue_nD(CvHistogram* hist, int* idx)
-
-void
-cvReleaseHist(CvHistogram* &hist)
-ALIAS: DESTROY = 1
-
-void
-cvSetHistBinRanges(CvHistogram* hist, float** ranges, int uniform=1)
-
-void
-cvThreshHist(CvHistogram* hist, double threshold)
-POSTCALL:
-	XSRETURN(1);
-
 
 # ============================================================
 #  imgproc. Image Processing: Image Filtering
@@ -2412,9 +2274,6 @@ INIT:
 OUTPUT:
 	pts
 
-MODULE = Cv	PACKAGE = Cv::Arr
-void
-cvCalcPGH(const CvSeq* contour, CvHistogram* hist)
 
 #TBD# float cvCalcEMD2(const CvArr* signature1, const CvArr* signature2, int distance_type, CvDistanceFunction distance_func=NULL, const CvArr* cost_matrix=NULL, CvArr* flow=NULL, float* lower_bound=NULL, VOID* userdata=NULL)
 
@@ -2740,6 +2599,8 @@ MODULE = Cv	PACKAGE = Cv::ContourScanner
 void
 cvSubstituteContour(CvContourScanner scanner, CvSeq* new_contour)
 
+#if 0
+
 # ============================================================
 #  imgproc. Image Processing: Planar Subdivisions
 # ============================================================
@@ -2824,6 +2685,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
+#endif
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking
@@ -3271,16 +3133,14 @@ OUTPUT:
 
 void
 cvDestroyAllWindows()
-CODE:
-	cvDestroyAllWindows();
+INIT:
 	delete_all_callback("Cv::TRACKBAR");
 	delete_all_callback("Cv::MOUSE");
 
 
 void
 cvDestroyWindow(const char* name)
-CODE:
-	cvDestroyWindow(name);
+INIT:
 	delete_win_callback(name, "Cv::TRACKBAR");
 	delete_win_callback(name, "Cv::MOUSE");
 
@@ -3762,6 +3622,8 @@ cvDecomposeProjectionMatrix(const CvMat *projMatrix, CvMat *cameraMatrix, CvMat 
 void
 cvDrawChessboardCorners(CvArr* image, CvSize patternSize, CvPoint2D32f* corners, int patternWasFound)
 C_ARGS: image, patternSize, corners, length(corners), patternWasFound
+POSTCALL:
+	XSRETURN(1);
 
 int
 cvFindChessboardCorners(const CvArr* image, CvSize patternSize, corners, int flags=CV_CALIB_CB_ADAPTIVE_THRESH)
@@ -4049,88 +3911,6 @@ OUTPUT:
 #  ml. Machine Learning
 # ============================================================
 
-# ============================================================
-#  Background/foreground segmentation
-# ============================================================
-
-MODULE = Cv		PACKAGE = Cv
-# ====================
-
-CvBGCodeBookModel*
-cvCreateBGCodeBookModel()
-
-MODULE = Cv	PACKAGE = Cv::BGCodeBookModel
-void
-cvReleaseBGCodeBookModel(CvBGCodeBookModel* &model)
-ALIAS: DESTROY = 1
-INIT:
-	unbless(ST(0));
-
-void
-cvBGCodeBookUpdate(CvBGCodeBookModel* model, const CvArr* image, CvRect roi = cvRect(0, 0, 0, 0), const CvArr* mask = 0)
-
-int
-cvBGCodeBookDiff(const CvBGCodeBookModel* model, const CvArr* image, CvArr* fgmask, CvRect roi = cvRect(0, 0, 0, 0))
-
-void
-cvBGCodeBookClearStale(CvBGCodeBookModel* model, int staleThresh, CvRect roi = cvRect(0, 0, 0, 0), const CvArr* mask = 0)
-
-MODULE = Cv	PACKAGE = Cv::Arr
-CvSeq*
-cvSegmentFGMask(CvArr *fgmask, int poly1Hull0 = 1, float perimScale = 4.0, CvMemStorage* storage = 0, CvPoint offset = cvPoint(0, 0))
-
-
-MODULE = Cv		PACKAGE = Cv::BGCodeBookModel
-# ====================
-AV*
-modMin(CvBGCodeBookModel* model, AV* value = NO_INIT)
-INIT:
-	RETVAL = newAV();
-	int i;
-CODE:
-	for (i = 0; i < DIM(model->modMin); i++) {
-		av_push(RETVAL, newSViv(model->modMin[i]));
-		if (items == 2 && i <= av_len(value))
-			model->modMin[i] = SvIV((SV*)(*av_fetch(value, i, 0)));
-	}
-OUTPUT:
-	RETVAL
-
-AV*
-modMax(CvBGCodeBookModel* model, AV* value = NO_INIT)
-INIT:
-	RETVAL = newAV();
-	int i;
-CODE:
-	for (i = 0; i < DIM(model->modMax); i++) {
-		av_push(RETVAL, newSViv(model->modMax[i]));
-		if (items == 2 && i <= av_len(value))
-			model->modMax[i] = SvIV((SV*)(*av_fetch(value, i, 0)));
-	}
-OUTPUT:
-	RETVAL
-
-AV*
-cbBounds(CvBGCodeBookModel* model, AV* value = NO_INIT)
-INIT:
-	RETVAL = newAV();
-	int i;
-CODE:
-	for (i = 0; i < DIM(model->cbBounds); i++) {
-		av_push(RETVAL, newSViv(model->cbBounds[i]));
-		if (items == 2 && i <= av_len(value))
-			model->cbBounds[i] = SvIV((SV*)(*av_fetch(value, i, 0)));
-	}
-OUTPUT:
-	RETVAL
-
-int
-t(CvBGCodeBookModel* model)
-CODE:
-	RETVAL = model->t;
-OUTPUT:
-	RETVAL
-
 
 # ============================================================
 #  misc.
@@ -4176,24 +3956,6 @@ CV_NODE_TYPE(int type)
 #  CV_[O-U]
 # ====================
 
-int
-CV_SIZEOF(const char *t)
-CODE:
-	if (strcmp(t, "CvContour") == 0 || strcmp(t, "Cv::Contour") == 0)
-		RETVAL = sizeof(CvContour);
-	else if (strcmp(t, "CvPoint") == 0 || strcmp(t, "Cv::Point") == 0)
-		RETVAL = sizeof(CvPoint);
-	else if (strcmp(t, "CvPoint3D32f") == 0 || strcmp(t, "Cv::Point3D32f") == 0)
-		RETVAL = sizeof(CvPoint3D32f);
-	else if (strcmp(t, "CvSeq") == 0 || strcmp(t, "Cv::Seq") == 0)
-		RETVAL = sizeof(CvSeq);
-	else if (strcmp(t, "CvSet") == 0 || strcmp(t, "Cv::Set") == 0)
-		RETVAL = sizeof(CvSet);
-	else
-		Perl_croak(aTHX_ "CV_SIZEOF: %s unknwon", t);
-OUTPUT:
-	RETVAL
-
 # ====================
 #  CV_[V-Z]
 # ====================
@@ -4225,3 +3987,27 @@ BOOT:
 	cvRedirectError(&cb_error, (VOID*)NULL, NULL);
     cvSetErrMode(1);
     cvSetErrStatus(0);
+{
+	HV* Cv_SIZEOF;
+	const char *pre[] = { "Cv", "Cv::" };
+	struct {
+		const char *name; int size;
+	} sz[] = {
+		{ "Contour",    sizeof(CvContour) },
+		{ "Point",      sizeof(CvPoint) },
+		{ "Point3D32f", sizeof(CvPoint3D32f) },
+		{ "Seq",        sizeof(CvSeq) },
+		{ "Set",        sizeof(CvSet) },
+	};
+	char name[100];
+	int i, j;
+	if (!(Cv_SIZEOF = get_hv("Cv::SIZEOF", 0))) {
+		Perl_croak(aTHX_ "can't get %Cv::SIZEOF");
+	}
+	for (i = 0; i < DIM(sz); i++) {
+		for (j = 0; j < DIM(pre); j++) {
+			strcpy(name, pre[j]); strcat(name, sz[i].name);
+			hv_store(Cv_SIZEOF, name, strlen(name), newSViv(sz[i].size), 0);
+		}
+	}
+}

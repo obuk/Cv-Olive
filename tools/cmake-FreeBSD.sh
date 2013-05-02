@@ -7,7 +7,6 @@
 # cmake.sh   (this script)
 
 src=../opencv
-modules=`pwd`/$src/modules
 cmake \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DCMAKE_VERBOSE:BOOL=No \
@@ -21,12 +20,12 @@ cmake \
     -DWITH_GTK:BOOL=Yes \
     -DWITH_JASPER:BOOL=Yes \
     -DWITH_JPEG:BOOL=Yes \
-    -DWITH_OPENEXR:BOOL=No \
     -DWITH_PNG:BOOL=Yes \
     -DWITH_QT:BOOL=No \
+    -DWITH_OPENEXR:BOOL=No \
+    -DWITH_OPENGL:BOOL=No \
     -DWITH_TBB:BOOL=Yes \
-    -DWITH_EIGEN:BOOL=No \
-    -DWITH_EIGEN2:BOOL=No \
+    -DWITH_EIGEN:BOOL=Yes \
     -DWITH_V4L:BOOL=Yes \
     -DWITH_TIFF:BOOL=Yes \
     -DWITH_XINE:BOOL=No \
@@ -54,7 +53,33 @@ s<Libs:  ><Libs: -L\${libdir} >;
 s<\${exec_prefix}/lib/libopencv><-lopencv>g;
 s<(opencv_\w+)\.so><$1>g;
 EOF
+    # perl -i.bak -lp $patch $target
+  fi
+
+  patch=patch-cmake_install.pl
+  target=cmake_install.cmake
+  if [ -f $target ]; then
+    cat >$patch <<'EOF'
+s<lib/pkgconfig><libdata/pkgconfig>;
+EOF
     perl -i.bak -lp $patch $target
+  fi
+
+  patch=patch-cmake_install_modules.pl
+  if [ -d modules ]; then
+    cat >$patch <<EOF
+use Cwd qw(abs_path);
+use File::Basename;
+my \$SRC = abs_path('$src');
+while (<>) {
+  if (m|FILE\\(INSTALL DESTINATION "\\\${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "\${SRC}/modules/(\\w+)/include/([^"]+)"\\)|) {
+    my (\$m, \$d) = (\$1, dirname(\$2));
+    s|"(\\\${CMAKE_INSTALL_PREFIX}/include)"|"\$1/\$d"|;
+  }
+  print;
+}
+EOF
+    find modules -name $target |xargs perl -i.bak $patch
   fi
 fi
 

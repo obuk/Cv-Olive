@@ -6,6 +6,12 @@ use 5.008008;
 use strict;
 use warnings;
 use Cv ();
+
+our $VERSION = '0.26';
+
+require XSLoader;
+XSLoader::load('Cv::Qt', $VERSION);
+
 require Exporter;
 
 our @ISA = qw(Exporter);
@@ -24,16 +30,15 @@ my @cvarr = qw(
 cvAddText
 );
 
-our %EXPORT_TAGS = ( 'all' => [ @cv, @cvarr ] );
+our @EXPORT_OK = ( @cv );
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+our %EXPORT_TAGS = (
+	'all' => \@EXPORT_OK,
+	);
 
-our @EXPORT = ();
+our @EXPORT = ( );
 
-our $VERSION = '0.25';
-
-require XSLoader;
-XSLoader::load('Cv::Qt', $VERSION);
+push(@Cv::EXPORT_OK, @EXPORT_OK);
 
 for (@cvarr) {
 	(my $short = $_) =~ s/^cv//;
@@ -158,7 +163,7 @@ MASUDA Yuta E<lt>yuta.cpan@gmail.comE<gt>
 
 =head1 LICENCE
 
-Copyright (c) 2010, 2011, 2012 by Masuda Yuta.
+Copyright (c) 2013 by MASUDA Yuta.
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

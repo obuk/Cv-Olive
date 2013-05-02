@@ -4,13 +4,19 @@ use 5.008008;
 use ExtUtils::MakeMaker;
 use ExtUtils::PkgConfig;
 
-use lib qw(./lib);
+use lib qw(inc);
+use Devel::CheckLib;
+my $cv1 = check_lib(lib => 'cv');			# OpenCV-1.x
+my $cv2 = check_lib(lib => 'opencv_core');	# OpenCV-2.x
+check_lib_or_exit(lib => 'opencv_core') unless $cv1 + $cv2;
+
+use lib qw(lib);
 eval "use Cv::Config";
 if ($@) {
 	warn "=" x 60, "\n";
 	warn "See README to install this module\n";
 	warn "=" x 60, "\n";
-	exit 1;
+	exit 0;
 }
 
 my $cf = new Cv::Config;
@@ -58,7 +64,17 @@ my @perl_h = qw(perl.h sv.h pp.h);
 	&rm('-f', $tmp);
 }
 
-my %PREREQ_PM = (
+my @dir = qw();
+push(@dir, qw(BGCodeBookModel));
+push(@dir, qw(Histogram));
+push(@dir, qw(Subdiv2D));
+push(@dir, qw(Qt)) if $cf->hasqt;
+
+WriteMakefile(
+	NAME => 'Cv',
+	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
+	ABSTRACT_FROM => "lib/Cv.pm",
+	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	PREREQ_PM => {
 		ExtUtils::ParseXS => 2.22,
 		ExtUtils::PkgConfig => 1.12,
@@ -66,29 +82,16 @@ my %PREREQ_PM = (
 		Test::Exception => 0.31,
 		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),
 	},
-);
-
-my @dir = qw();
-push(@dir, qw(Qt)) if $cf->hasqt;
-
-eval "use Pango";
-push(@dir, qw(Pango)) unless $@;
-
-WriteMakefile(
-	NAME => 'Cv',
-	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
-	ABSTRACT_FROM => "lib/Cv.pm",
-	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
-	%PREREQ_PM,
 	%Cv::Config::MM,
 	INC => '-I.',
 	XSOPT => '-C++ -hiertype',
 	dynamic_lib => $cf->dynamic_lib,
 	DIR => [ @dir ],
 	LICENSE => 'perl',
+	depend => { 'Cv.xs' => 'lib/Cv/Cv.inc' },
 	clean => {
 		FILES => [
-			@perl_h_patched, 'lib/Cv/Constant.pm*', 'a.pm', '*.tmp',
+			@perl_h_patched, 'lib/Cv/Constant.pm*', 'Test.bs', 'a.pm', '*.tmp',
 			't/ref-*.pm', 't/auto', 'camera.xml', 'contours.xml', 'sample.avi',
 			'_Inline', 'cover_db',
 			] },
@@ -99,14 +102,16 @@ sub MY::dynamic {
     '
 dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 	$(NOECHO) $(NOOP)
-	test -d t/auto -a -f Test.xs || \
-		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic
+	@if [ $(FULLEXT) = Cv -a -f Test.xs ]; then \
+		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic; \
+	fi
 
 ';
 }
 
 sub MY::postamble {
 	"
+
 ref:
 	./tools/ref2pl-all.pl |sh -x
 
@@ -118,8 +123,6 @@ cover:
 	-HARNESS_PERL_SWITCHES=-MDevel::Cover make test
 	cover
 	find cover_db -type d |xargs chmod +rx
-
-Cv.xs:	lib/Cv/Cv.inc
 
 ";
 }

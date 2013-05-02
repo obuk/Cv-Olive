@@ -1,3 +1,11 @@
+BGCodeBookModel/BGCodeBookModel.xs
+BGCodeBookModel/Changes
+BGCodeBookModel/lib/Cv/BGCodeBookModel.pm
+BGCodeBookModel/Makefile.PL
+BGCodeBookModel/MANIFEST
+BGCodeBookModel/README
+BGCodeBookModel/t/Cv-BGCodeBookModel.t
+BGCodeBookModel/t/pod-coverage.t
 Changes
 Cv.xs
 fallback/Constant.pm-1.0.0
@@ -12,6 +20,16 @@ fallback/Constant.pm-2.4.1
 fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 fallback/Constant.pm-2.4.4
+fallback/Constant.pm-2.4.5
+Histogram/Changes
+Histogram/Histogram.xs
+Histogram/lib/Cv/Histogram.pm
+Histogram/Makefile.PL
+Histogram/MANIFEST
+Histogram/README
+Histogram/t/Cv-Histogram.t
+Histogram/t/pod-coverage.t
+inc/Devel/CheckLib.pm
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Cv.inc
@@ -28,13 +46,6 @@ lib/Cv/typemap
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-Pango/Changes
-Pango/lib/Cv/Pango.pm
-Pango/Makefile.PL
-Pango/MANIFEST
-Pango/README
-Pango/t/Cv-Pango.t
-Pango/t/pod-coverage.t
 ppport.h
 Qt/Changes
 Qt/lib/Cv/Qt.pm
@@ -146,6 +157,14 @@ sample/trains.png
 sample/video-thread.pl
 sample/video.pl
 sample/watershed.pl
+Subdiv2D/Changes
+Subdiv2D/lib/Cv/Subdiv2D.pm
+Subdiv2D/Makefile.PL
+Subdiv2D/MANIFEST
+Subdiv2D/README
+Subdiv2D/Subdiv2D.xs
+Subdiv2D/t/Cv-Subdiv2D.t
+Subdiv2D/t/pod-coverage.t
 t/1config.t
 t/1const-old.t
 t/1const.t
@@ -221,6 +240,7 @@ t/2getRotationMatrix2D.t
 t/2getRows.t
 t/2getSize.t
 t/2getSubRect.t
+t/2getTextSize.t
 t/2histogram.t
 t/2initSystem.t
 t/2inRange.t
@@ -256,6 +276,12 @@ t/2subRS.t
 t/2sum.t
 t/2threshold.t
 t/2trackbar.t
+t/2useCv-bgcode.t
+t/2useCv-default.t
+t/2useCv-nocv.t
+t/2useCv-nohist.t
+t/2useCv-qt.t
+t/2useCv-subdiv.t
 t/2xor.t
 t/4boundingRect.t
 t/4contour.t
@@ -302,5 +328,4 @@ tools/dumpconst-all.pl
 tools/dumpconst.pl
 tools/ref2pl-all.pl
 tools/ref2pl.pl
-tools/test.sh
 tools/testdist.pl

@@ -84,5 +84,6 @@ SKIP: {
 	ok($quit || !$capture->grabFrame);
 	ok($quit || !$capture->retrieveFrame);
 }
-Cv->waitKey(3000);
-
+if ($verbose) {
+	Cv->waitKey(3000);
+}

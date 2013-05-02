@@ -1,4 +1,6 @@
 Makefile
+_Inline/
+auto/
 blib/
 cover_db/
 evidences/
@@ -9,15 +11,14 @@ lib/Cv/sv.h
 pm_to_blib
 t/flipbook
 t/ref*.pm
-_Inline/
-auto/
-*.o
 *.a
+*.bak
 *.bs
 *.c
+*.o
 *.old
-*.tmp
-*.bak
 *.orig
 *.rej
+*.skip
+*.tmp
 *~

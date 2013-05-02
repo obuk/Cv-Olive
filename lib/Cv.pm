@@ -39,7 +39,7 @@ use Carp;
 use Scalar::Util;
 use warnings::register;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Cv::Constant qw(:all);
 
@@ -63,8 +63,8 @@ our %O;
 our %M;
 
 BEGIN {
-	$IMPORT{$_} = 1 for qw(seq more);
-	$IMPORT{$_} = 0 for qw(qt);
+	$IMPORT{$_} = 1 for qw(Seq More Histogram);
+	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel Subdiv2D);
 	$O{$_} = 1 for qw(boxhappy);
 }
 
@@ -73,15 +73,13 @@ use Getopt::Long;
 sub import {
 	my $self = shift;
 	local @ARGV = @_;
-	my $opt_ok = GetOptions(
-		"more!"     => \$IMPORT{more},
-		"seq!"      => \$IMPORT{seq},
-		"qt!"       => \$IMPORT{qt},
-		"boxhappy!" => \$O{boxhappy},
+	my %opt = (
+		(map { lc($_).'!' => \$IMPORT{$_} } keys %IMPORT),
+		(map { lc($_).'!' => \$O{$_} } keys %O),
 		);
-	unless ($opt_ok) {
+	unless (GetOptions(%opt)) {
 		die << "----";
-Usage: use Cv qw(-nomore -noseq -qt)
+Usage: use Cv @{[ map { "-".($IMPORT{$_}?"no":"").lc($_) } sort keys %IMPORT ]}
 ----
 ;
 	}
@@ -97,7 +95,6 @@ Usage: use Cv qw(-nomore -noseq -qt)
 		@ARGV = @argv;
 	}
 	for (grep { $IMPORT{$_} } keys %IMPORT) {
-		s/./\U$&/;
 		eval "use Cv::$_";
 		die "can't use Cv::$_; $@" if $@;
 	}
@@ -247,7 +244,7 @@ package Cv;
 for (
 	"Cv",
 	"Cv::Arr",
-	"Cv::BGCodeBookModel",
+	# "Cv::BGCodeBookModel",
 	"Cv::Capture",
 	"Cv::Chain",
 	"Cv::ChainPtReader",
@@ -259,7 +256,7 @@ for (
 	"Cv::FileStorage",
 	"Cv::Font",
 	"Cv::HaarClassifierCascade",
-	"Cv::Histogram",
+	# "Cv::Histogram",
 	"Cv::HuMoments",
 	"Cv::Image",
 	"Cv::Kalman",
@@ -274,7 +271,7 @@ for (
 	"Cv::StereoSGBM",
 	"Cv::String",
 	"Cv::StringHashNode",
-	"Cv::Subdiv2D",
+	# "Cv::Subdiv2D",
 	"Cv::TypeInfo",
 	"Cv::VideoWriter",
 	) {
@@ -303,7 +300,12 @@ sub assoc {
 	my $family = shift;
 	my $short = shift;
 	my @names;
-	if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
+	if ($short =~ /^cv[A-Zm]/) {
+		# return $family->can($short);
+		return undef;
+	}
+	# if ($short =~ /^[a-z]/ && $short !~ /^cv[A-Zm]/) {
+	if ($short =~ /^[a-z]/) {
 		(my $caps = $short) =~ s/^[a-z]/\U$&/;
 		push(@names, $caps);
 		(my $upper = $short) =~ s/^[a-z]+/\U$&/;
@@ -1148,10 +1150,30 @@ package Cv;
 
 sub CV_RGB { my ($r, $g, $b, $a) = @_; cvScalar($b, $g, $r, $a || 0) }
 
+sub GetTextSize {
+	shift if $_[0] eq __PACKAGE__ && @_ == 5;
+	Usage("textString, font, textSize, baseline") unless @_ == 4;
+	if (ref $_[1] eq 'Cv::Font') {
+		goto &cvGetTextSize;
+	} else {
+		Carp::croak "unknown font @{[ ref $_[1] ]} in Cv::GetTextSize";
+	}
+}
+
 package Cv::Font;
 { *new = \&Cv::InitFont }
 
+sub GetTextSize {
+	my ($font, $text) = splice(@_, 0, 2);
+	unshift(@_, 'Cv', $text, $font);
+	goto &Cv::GetTextSize;
+}
+
 package Cv::Arr;
+
+sub PutText {
+	goto &cvPutText;
+}
 
 sub Ellipse {
 	# cvEllipse(img, center, axes, angle, start_angle, end_angle,
@@ -1329,51 +1351,14 @@ sub cvSetErrMode {
 }
 
 
-# ============================================================
-#  imgproc. Image Processing: Histograms
-# ============================================================
+our %SIZEOF;
 
-package Cv::Histogram;
-
-sub new {
-	my $self   = shift;
-	my $sizes  = shift || $self->sizes;
-	my $type   = shift || &Cv::CV_HIST_ARRAY;
-	my $ranges = shift || $self->thresh;
-	unshift(@_, $sizes, $type, $ranges);
-	goto &Cv::cvCreateHist;
+sub CV_SIZEOF {
+	my ($name) = @_;
+	my $size = $SIZEOF{$name};
+	Carp::croak "unknwon type $name in CV_SIZEOF" unless defined $size;
+	$size;
 }
-
-
-{ *Copy = \&CopyHist }
-sub CopyHist {
-	# CopyHist(src. dst)
-	my $src = shift;
-	my $dst = shift || $src->new;
-	unshift(@_, $src, $dst);
-	goto &cvCopyHist;
-}
-
-
-sub GetHistValue {
-	my $self = shift;
-	my $arr = $self->bins->Ptr(@_);
-	my @floats = unpack("f*", $arr);
-	wantarray? @floats : \@floats;
-}
-
-
-sub QueryHistValue {
-	my $self = shift;
-	$self->bins->GetReal(@_);
-}
-
-{ *Calc = \&CalcHist }
-{ *Clear = \&ClearHist }
-{ *Compare = \&CompareHist }
-{ *Normalize = \&NormalizeHist }
-{ *SetBinRanges = \&SetHistBinRanges }
-{ *Thresh = \&ThreshHist }
 
 
 # ============================================================
@@ -1708,6 +1693,8 @@ sub BoxPoints {
 }
 
 
+=pod
+
 # ============================================================
 #  imgproc. Image Processing: Planar Subdivisions
 # ============================================================
@@ -1719,6 +1706,8 @@ sub DESTROY { }
 { *CreateDelaunay = \&Cv::CreateSubdivDelaunay2D }
 { *Locate = \&Subdiv2DLocate }
 { *DelaunayInsert = \&SubdivDelaunay2DInsert }
+
+=cut
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking
@@ -1967,18 +1956,6 @@ if (__PACKAGE__->can('new')) {
 
 
 # ============================================================
-#  xxx. Background/foreground segmentation
-# ============================================================
-
-package Cv::BGCodeBookModel;
-
-{ *new = \&Cv::CreateBGCodeBookModel }
-{ *Update = \&BGCodeBookUpdate }
-{ *Diff = \&BGCodeBookDiff }
-{ *ClearStale = \&BGCodeBookClearStale }
-
-
-# ============================================================
 #  misc.
 # ============================================================
 
@@ -2088,7 +2065,7 @@ functions of Cv.
 
 If you do not want to import anything, put an empty list.
 
- use Cv qw( );
+ use Cv ( );
 
 =back
 
@@ -2208,7 +2185,7 @@ MASUDA Yuta E<lt>yuta.cpan@gmail.comE<gt>
 
 =head1 LICENCE
 
-Copyright (c) 2010, 2011, 2012 by Masuda Yuta.
+Copyright (c) 2010, 2011, 2012, 2013 by MASUDA Yuta.
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.
