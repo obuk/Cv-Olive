@@ -1892,10 +1892,6 @@ sub CreateVideoWriter {
 
 
 # ============================================================
-#  highgui. High-level GUI and Media I/O: Qt new functions
-# ============================================================
-
-# ============================================================
 #  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera
 #   Calibration and 3d Reconstruction
 # ============================================================
