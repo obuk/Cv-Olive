@@ -13,7 +13,7 @@ MODULE = Cv::Qt		PACKAGE = Cv::Qt
 void
 cvSetWindowProperty(const char* name, int prop_id, double prop_value)
 
-void
+double
 cvGetWindowProperty(const char* name, int prop_id)
 
 #endif
