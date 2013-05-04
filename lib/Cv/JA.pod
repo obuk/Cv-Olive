@@ -634,6 +634,37 @@ C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
    ...
  }
 
+=head1 Cv::Histogram
+
+L<Cv::Histogram> はヒストグラムを扱います。Cv::Histogram は、Cv の一部
+を切り離したものなので、L<Cv::More>, L<Cv::Seq> と同様に使わないことを
+明示しない限り取り込みます。
+
+ use Cv;          # Cv::Histogram を使う
+ use Cv -nohist;  # Cv::Histogram を使わない  
+
+オブジェクトの作成は cvCreateHist を使います。いくつもの呼び方がありますが、
+Cv->CreateHist または Cv::Histogram->new が分り易いと思います。
+
+ my $hist = Cv->CreateHist([256], CV_HIST_ARRAY);
+
+ # or
+
+ my $hist = Cv::Histogram->new([256], CV_HIST_ARRAY);
+
+ # or
+
+ my $hist = Cv::Histogram::cvCreateHist([256], CV_HIST_ARRAY);
+
+ # or
+
+ my $hist = Cv::cvCreateHist([256], CV_HIST_ARRAY);
+
+
+=head2 メソッド
+
+メソッドの詳細は L<Cv::Histogram> を参照してください。
+
 =head1 Cv::Flipbook
 
 C<Cv::Flipbook> は、画像ファイルをひとつのディレクトリにまとめ、それを
