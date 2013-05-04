@@ -471,7 +471,7 @@ Cv::More - A little more easy to using L<Cv> in Perl.
 =head1 DESCRIPTION
 
 C<Cv::More> is a package to organize some of the experimental features
-from L<Cv|Cv::Nihongo>. I believe it will be easier to extend the
+from L<Cv>. I believe it will be easier to extend the
 C<Cv>. C<Cv::More> is what separated the part of the C<Cv>. So, it is
 enabled by default. Please make a explicit if you do not use.
 
