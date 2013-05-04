@@ -780,13 +780,11 @@ CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
 =head1 Cv::Qt
 
 Opencv のフロントエンドに Qt を使用する場合、L<Cv::Qt> を利用することができます。
-デフォルトではインポートされないため、明示してください。
+デフォルトではインポートされないため、次のようにして明示をしてください。
 
  use Cv -qt;  # Cv::Qt を使う。
 
 =head2 メソッド
-
-=over
 
 L<Cv::Qt> または
 http://docs.opencv.org/modules/highgui/doc/qt_new_functions.html を参照
@@ -806,7 +804,7 @@ http://docs.opencv.org/modules/highgui/doc/qt_new_functions.html を参照
 
 これらは実験的な部分もあるため、将来実装方法は変更になることがあるかも
 しれません。提供されるメソッドは L<Cv::BGCodeBookModel>,
-l<Cv::Subdiv2D> を参照してください。
+L<Cv::Subdiv2D> を参照してください。
 
 =head1 SEE ALSO
 
