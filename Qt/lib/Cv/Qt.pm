@@ -159,6 +159,13 @@ TBD
 
 TBD
 
+=cut
+
+{ package Cv; our @BUTTON; }
+
+sub Cv::cvCreateButton { goto &cvCreateButton }
+push(@Cv::EXPORT_OK, 'cvCreateButton');
+
 =back
 
 =cut

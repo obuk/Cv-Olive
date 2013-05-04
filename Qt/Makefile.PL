@@ -28,6 +28,7 @@ WriteMakefile(
 		$^O eq 'cygwin' ? (ExtUtils::MM_Cygwin => 6.62) : (),
 	},
 	%Cv::Config::MM,
+	depend => { 'Qt.xs' => '../lib/Cv/Cv.inc' },
 	INC => '-I. -I..',
 	XSOPT => '-C++ -hiertype',
 );

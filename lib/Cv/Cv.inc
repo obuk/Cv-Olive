@@ -88,4 +88,28 @@ void Carp_croak(pTHX_ char const* format, ...)
 
 #define Perl_croak Carp_croak
 
+typedef struct {
+	SV* callback;
+	union {
+		struct trackbar {
+			SV* value;
+			int pos;
+			int lastpos;
+		} t;
+		struct mouse {
+			SV* userdata;
+			int pos;
+			int lastpos;
+		} m;
+		struct button {
+			SV* userdata;
+			int state;
+			int laststate;
+		} b;
+	} u;
+} callback_t;
+
+#define SvREF0(arg) \
+	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
+
 #endif

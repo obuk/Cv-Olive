@@ -10,7 +10,7 @@ use Cv;
 eval "use Cv::Qt qw(:all)";
 plan skip_all => "Qt required" unless !$@ && cvHasQt();
 # plan qw(no_pln);
-plan tests => 42;
+plan tests => 46;
 
 my $hasGUI = Cv->hasGUI;
 
@@ -51,7 +51,7 @@ $img->fill(cvScalarAll(255));
 SKIP: {
 	skip "cvAddText() unless DISPLAY", 4 unless $hasGUI;
 
-	Cv->namedWindow('Cv', CV_WINDOW_AUTOSIZE);
+	Cv->namedWindow('Cv', CV_WINDOW_AUTOSIZE | CV_WINDOW_NORMAL);
 
 	throws_ok { cvAddText() }
 	qr/Usage: Cv::Qt::cvAddText\(img, text, location, font\)/;
@@ -191,6 +191,20 @@ SKIP: {
 #    int initial_button_state = 0)
 # ============================================================
 
+can_ok('Cv', 'cvCreateButton');
+can_ok(__PACKAGE__, 'cvCreateButton');
+
+SKIP: {
+	skip "cvCreateButton() unless DISPLAY", 2 unless $hasGUI;
+
+	my $state;
+	lives_ok { Cv->createButton(\0, sub { $state = shift }) };
+	lives_ok { Cv->createButton("button", sub { $state = shift }) };
+
+	$img->show;
+	Cv->waitKey(1000);
+
+}
 
 # ============================================================
 #  void cvCreateOpenGLCallback(

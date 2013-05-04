@@ -5,25 +5,6 @@
 #define bless(st0, class, retval) \
     sv_setref_pv(st0 = sv_newmortal(), class, (void*)retval);
 
-#define SvREF0(arg) \
-	(SvROK(arg) && SvIOK(SvRV(arg)) && SvIV(SvRV(arg)) == 0)
-
-typedef struct {
-	SV* callback;
-	union {
-		struct trackbar {
-			SV* value;
-			int pos;
-			int lastpos;
-		} t;
-		struct mouse {
-			SV* userdata;
-			int pos;
-			int lastpos;
-		} m;
-	} u;
-} callback_t;
-
 static void delete_callback(AV* av)
 {
 	SV* sv;
@@ -85,7 +66,8 @@ static void cb_trackbar(int pos)
 						PUSHMARK(SP);
 						XPUSHs(sv_2mortal(newSViv(p->u.t.pos)));
 						PUTBACK;
-						call_sv(p->callback, G_EVAL|G_DISCARD);
+						// call_sv(p->callback, G_EVAL|G_DISCARD);
+						call_sv(p->callback, G_DISCARD);
 						FREETMPS;
 						LEAVE;
 					}
@@ -111,7 +93,8 @@ static void cb_mouse(int event, int x, int y, int flags, VOID* userdata)
 		PUSHs(sv_2mortal(newSViv(flags)));
 		PUSHs(p->u.m.userdata? p->u.m.userdata : &PL_sv_undef);
 		PUTBACK;
-		call_sv(p->callback, G_EVAL|G_DISCARD);
+		// call_sv(p->callback, G_EVAL|G_DISCARD);
+		call_sv(p->callback, G_DISCARD);
 		FREETMPS;
 		LEAVE;
 	}
@@ -3099,7 +3082,7 @@ PREINIT:
 	SV** q; AV* av; SV* sv;
 INIT:
 	if (!(Cv_TRACKBAR = get_hv("Cv::TRACKBAR", 0))) {
-		Perl_croak(aTHX_ "Cv::cvCreateTrackbar: can't get %Cv::TRACKBAR");
+		Perl_croak(aTHX_ "Cv::cvCreateTrackbar: can't get \%Cv::TRACKBAR");
 	}
 	RETVAL = -1;
 CODE:
@@ -3119,7 +3102,6 @@ CODE:
 	q = hv_fetch(Cv_TRACKBAR, windowName, strlen(windowName), 0);
 	if (q && SvROK(*q) && SvTYPE(SvRV(*q)) == SVt_PVAV) { SV* sv;
 		av = (AV*)SvRV(*q);
-		// delete_trackbar(av);
 	} else if (!q) {
 		av = newAV();
 		hv_store(Cv_TRACKBAR, windowName, strlen(windowName),
@@ -3196,7 +3178,7 @@ INIT:
 	if (items <= 1) onMouse = (SV*)0;
 	if (items <= 2) userdata = (SV*)0;
 	if (!(Cv_MOUSE = get_hv("Cv::MOUSE", 0))) {
-		Perl_croak(aTHX_ "Cv::cvSetMouseCallback: can't get %Cv::MOUSE");
+		Perl_croak(aTHX_ "Cv::cvSetMouseCallback: can't get \%Cv::MOUSE");
 	}
 CODE:
 	Newx(callback, 1, callback_t);
@@ -4002,7 +3984,7 @@ BOOT:
 	char name[100];
 	int i, j;
 	if (!(Cv_SIZEOF = get_hv("Cv::SIZEOF", 0))) {
-		Perl_croak(aTHX_ "can't get %Cv::SIZEOF");
+		Perl_croak(aTHX_ "can't get \%Cv::SIZEOF");
 	}
 	for (i = 0; i < DIM(sz); i++) {
 		for (j = 0; j < DIM(pre); j++) {
