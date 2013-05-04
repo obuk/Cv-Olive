@@ -267,10 +267,6 @@ C<Inline C> を使うためのコンフィギュレーションを用意しま�
 OpenCV に付属しているサンプルを、いくつか C<Cv> で書き直しました。
 C<sample/> にあります。
 
-=over 4
-
-=item
-
  bgfg_codebook.pl calibration.pl camshiftdemo.pl capture.pl chamfer.pl
  contours.pl convexhull.pl delaunay.pl demhist.pl dft.pl distrans.pl
  drawing.pl edge.pl facedetect.pl fback_c.pl ffilldemo.pl find_obj.pl
@@ -279,8 +275,6 @@ C<sample/> にあります。
  mser_sample.pl polar_transforms.pl pyramid_segmentation.pl squares.pl
  stereo_calib.pl stereo_match.pl tiehash.pl video-thread.pl
  watershed.pl
-
-=back
 
 =head2 バグ
 
