@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 #use Test::More qw(no_plan);
-use Test::More tests => 141;
+use Test::More tests => 137;
 use Test::Exception;
 use Cv;
 BEGIN { use_ok('Cv::Histogram') }
@@ -139,13 +139,9 @@ if (3) {
 # ranges=yes, uniform=no
 if (4) {
 	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
-		my $cant_test_ranges_flag =
-			cvVersion() <= 2.002 && $type == CV_HIST_SPARSE?
-			"- can't pass testing CV_HIST_RANGES_FLAG" : undef;
-	  TODO: {
-		  local $TODO = $cant_test_ranges_flag;
-
-		  eval {
+	  SKIP: {
+		  skip "OpenCV 2.2 && CV_HIST_SPARSE", 12
+			  if cvVersion() <= 2.002 && $type == CV_HIST_SPARSE;
 		  my $hist = Cv->CreateHist(my $sizes = [1], $type, [[0, 256]], 0);
 		  isa_ok($hist, 'Cv::Histogram');
 		  is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
@@ -168,8 +164,7 @@ if (4) {
 			  is($_[3], 0, 'uniform');
 		  };
 		  $hist->new();
-		}
-		};
+		}; # SKIP
 	}
 }
 
