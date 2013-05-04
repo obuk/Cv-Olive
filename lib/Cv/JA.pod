@@ -82,7 +82,7 @@ OpenCV の画像やマトリクスのデータ型 C<CvMat>、C<CvImage> は、C<
 意し、メソッドはできるだけここに置くことにしました。
 
 OpenCV には更にシーケンスと呼ばれる動的なデータ型もありますが、これにつ
-いては、L<Cv::Seq|Cv::Seq-ja> を参照してください。
+いては、L<Cv::Seq> を参照してください。
 
 =head2 データ領域の共有
 
@@ -297,7 +297,7 @@ CV_MAKETYPE() のようなマクロのいくつかには Cv::MAKETYPE()
 =item *
 
 バージョン 0.16 で C<Cv> を分け、拡張したコードを分離して
-L<Cv::More|Cv::More-ja> に置くことにしました。
+L<Cv::More> に置くことにしました。
 
 =item *
 
@@ -563,10 +563,9 @@ $arr のすべての要素を変換します。
 =head1 Cv::Seq
 
 OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。格納さ
-れたデータを型なしで扱うスーパクラス L<Cv::Seq|Cv::Seq-ja> と、データに
-合わせた変換を行う派生クラス L<Cv::Seq::Point|Cv::Seq::Point-ja>,
-L<Cv::Seq::Rect|Cv::Seq::Rect-ja>, ... に分け、データに合わせて bless
-して使います。C言語のキャストのようなものです。
+れたデータを型なしで扱うスーパクラス L<Cv::Seq> と、データに合わせた変
+換を行う派生クラス C<Cv::Seq::Point>, C<Cv::Seq::Rect>, ... に分け、デー
+タに合わせて blessして使います。C言語のキャストのようなものです。
 
 facedetect の一部を示します。HaarDetectObjects() は、検出した顔を複数の
 CvRect 型のデータのリストにして返します。次の例は、シーケンスを
