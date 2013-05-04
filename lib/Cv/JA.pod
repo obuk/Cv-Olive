@@ -82,7 +82,7 @@ OpenCV の画像やマトリクスのデータ型 C<CvMat>、C<CvImage> は、C<
 意し、メソッドはできるだけここに置くことにしました。
 
 OpenCV には更にシーケンスと呼ばれる動的なデータ型もありますが、これにつ
-いては、L<Cv::Seq> を参照してください。
+いては、L</Cv::Seq> を参照してください。
 
 =head2 データ領域の共有
 
@@ -637,7 +637,7 @@ C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
 =head1 Cv::Histogram
 
 L<Cv::Histogram> はヒストグラムを扱います。Cv::Histogram は、Cv の一部
-を切り離したものなので、L<Cv::More>, L<Cv::Seq> と同様に使わないことを
+を切り離したものなので、L</Cv::More>, L</Cv::Seq> と同様に使わないことを
 明示しない限り取り込みます。
 
  use Cv;          # Cv::Histogram を使う
@@ -659,7 +659,6 @@ Cv->CreateHist または Cv::Histogram->new が分り易いと思います。
  # or
 
  my $hist = Cv::cvCreateHist([256], CV_HIST_ARRAY);
-
 
 =head2 メソッド
 
