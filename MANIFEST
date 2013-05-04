@@ -30,7 +30,6 @@ lib/Cv/Cv.inc
 lib/Cv/Flipbook.pm
 lib/Cv/JA.pod
 lib/Cv/More.pm
-lib/Cv/Nihongo.pod
 lib/Cv/Seq.pm
 lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm

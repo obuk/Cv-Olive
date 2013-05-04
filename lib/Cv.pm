@@ -2102,10 +2102,6 @@ test and extend a variety. How easy is as follows.
 
 We rewrote some OpenCV samples in C<Cv>, and put them in sample/.
 
-=over 4
-
-=item
-
  bgfg_codebook.pl calibration.pl camshiftdemo.pl capture.pl
  contours.pl convexhull.pl delaunay.pl demhist.pl dft.pl distrans.pl
  drawing.pl edge.pl facedetect.pl fback_c.pl ffilldemo.pl find_obj.pl
@@ -2113,8 +2109,6 @@ We rewrote some OpenCV samples in C<Cv>, and put them in sample/.
  laplace.pl lkdemo.pl minarea.pl morphology.pl motempl.pl
  mser_sample.pl polar_transforms.pl pyramid_segmentation.pl squares.pl
  stereo_calib.pl stereo_match.pl tiehash.pl video.pl watershed.pl
-
-=back
 
 =head1 BUGS
 
