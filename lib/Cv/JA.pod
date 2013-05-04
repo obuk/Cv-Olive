@@ -777,6 +777,36 @@ CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
 
 ありません。
 
+=head1 Cv::Qt
+
+Opencv のフロントエンドに Qt を使用する場合、L<Cv::Qt> を利用することができます。
+デフォルトではインポートされないため、明示してください。
+
+ use Cv -qt;  # Cv::Qt を使う。
+
+=head2 メソッド
+
+=over
+
+L<Cv::Qt> または
+http://docs.opencv.org/modules/highgui/doc/qt_new_functions.html を参照
+してください。
+
+=head1 Cv::BGCodeBookModel, Cv::Subdiv2D
+
+これらは Opencv で legacy に分類されているものや、リファレンスに無いも
+ので L<Cv> から切り離しをしました。L</Cv::Histogram> とは異なり、使用す
+ることを明示しない限りインポートされることはありません。
+
+ use Cv;          # Cv::BGCodeBookModel, Cv::Subdiv2D を使用しない
+ use Cv -bgcode;  # Cv::BGCodeBookModel を使用する
+ use Cv -subdiv;  # Cv::Subdiv2D を使用する
+
+=head2 メソッド
+
+これらは実験的な部分もあるため、将来実装方法は変更になることがあるかも
+しれません。提供されるメソッドは L<Cv::BGCodeBookModel>,
+l<Cv::Subdiv2D> を参照してください。
 
 =head1 SEE ALSO
 
