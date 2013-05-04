@@ -1,9 +1,6 @@
 BGCodeBookModel/BGCodeBookModel.xs
-BGCodeBookModel/Changes
 BGCodeBookModel/lib/Cv/BGCodeBookModel.pm
 BGCodeBookModel/Makefile.PL
-BGCodeBookModel/MANIFEST
-BGCodeBookModel/README
 BGCodeBookModel/t/Cv-BGCodeBookModel.t
 BGCodeBookModel/t/pod-coverage.t
 Changes
@@ -21,12 +18,9 @@ fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 fallback/Constant.pm-2.4.4
 fallback/Constant.pm-2.4.5
-Histogram/Changes
 Histogram/Histogram.xs
 Histogram/lib/Cv/Histogram.pm
 Histogram/Makefile.PL
-Histogram/MANIFEST
-Histogram/README
 Histogram/t/Cv-Histogram.t
 Histogram/t/pod-coverage.t
 inc/Devel/CheckLib.pm
@@ -48,12 +42,9 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
-Qt/Changes
 Qt/lib/Cv/Qt.pm
 Qt/Makefile.PL
-Qt/MANIFEST
 Qt/Qt.xs
-Qt/README
 Qt/t/Cv-Qt.t
 Qt/t/pod-coverage.t
 README
@@ -158,11 +149,8 @@ sample/trains.png
 sample/video-thread.pl
 sample/video.pl
 sample/watershed.pl
-Subdiv2D/Changes
 Subdiv2D/lib/Cv/Subdiv2D.pm
 Subdiv2D/Makefile.PL
-Subdiv2D/MANIFEST
-Subdiv2D/README
 Subdiv2D/Subdiv2D.xs
 Subdiv2D/t/Cv-Subdiv2D.t
 Subdiv2D/t/pod-coverage.t
