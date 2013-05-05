@@ -141,7 +141,7 @@ if (4) {
 	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
 	  SKIP: {
 		  skip "OpenCV 2.2 && CV_HIST_SPARSE", 12
-			  if cvVersion() <= 2.002 && $type == CV_HIST_SPARSE;
+			  if cvVersion() <= 2.002;# && $type == CV_HIST_SPARSE;
 		  my $hist = Cv->CreateHist(my $sizes = [1], $type, [[0, 256]], 0);
 		  isa_ok($hist, 'Cv::Histogram');
 		  is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
