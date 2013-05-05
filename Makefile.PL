@@ -102,8 +102,8 @@ sub MY::dynamic {
     '
 dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 	$(NOECHO) $(NOOP)
-	@if [ $(FULLEXT) = Cv -a -f Test.xs ]; then \
-		make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic; \
+	@if [ $(FULLEXT) = Cv -a -f TestTypemap.xs ]; then \
+	  make INST_ARCHLIB=t BASEEXT=TestTypemap FULLEXT=Cv/TestTypemap dynamic; \
 	fi
 
 ';

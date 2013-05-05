@@ -9,7 +9,7 @@ use Carp;
 use File::Basename;
 use Cv;
 
-our $VERSION = '0.19';
+our $VERSION = '0.27';
 
 require Exporter;
 

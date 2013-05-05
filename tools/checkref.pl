@@ -7,6 +7,8 @@ use File::Basename;
 use Data::Dumper;
 use lib qw(blib/lib blib/arch);
 use Cv;
+use Cv::Subdiv2D;
+eval "use Cv::Qt" if Cv->hasModule('qt');
 
 our %cv;
 our %file;
@@ -102,7 +104,7 @@ foreach my $file (sort keys %file) {
 }
 
 if ($mediawiki) {
-	my $percent = sprintf("%5.1f%%", $sum_defined / $sum_total * 100);
+	# my $percent = sprintf("%5.1f%%", $sum_defined / $sum_total * 100);
 	print (
 		"|- valign=top\n",
 		"| &nbsp;\n",
