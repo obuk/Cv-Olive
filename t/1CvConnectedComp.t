@@ -6,8 +6,8 @@ use warnings;
 use Test::More;
 BEGIN {
 	eval { use Cv -nomore };
-	eval { require XSLoader; XSLoader::load('Cv::TestTypemap', $Cv::VERSION) };
-	plan skip_all => "no Cv/TestTypemap.so" if $@;
+	eval { require XSLoader; XSLoader::load('Cv::t', $Cv::VERSION) };
+	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 16;
 }
 use Test::Exception;
