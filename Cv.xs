@@ -637,7 +637,7 @@ PPCODE:
 	if (items == 2) {
 		AV* av_sizes = (AV*)SvRV(ST(1)); av_clear(av_sizes);
 		for (i = 0; i < dims; i++) {
-			av_push(av_sizes, newSVnv(sizes[i]));
+			av_push(av_sizes, newSViv(sizes[i]));
 		}
 	}
 	I32 gimme = GIMME_V; /* wantarray */
@@ -3957,9 +3957,9 @@ CODE:
 		XSRETURN(1);
 	} else if (gimme == G_ARRAY) {
 		if (verbose) fprintf(stderr, "Context is Array\n");
-		XPUSHs(sv_2mortal(newSVnv(CV_MAJOR_VERSION)));
-		XPUSHs(sv_2mortal(newSVnv(CV_MINOR_VERSION)));
-		XPUSHs(sv_2mortal(newSVnv(CV_SUBMINOR_VERSION)));
+		XPUSHs(sv_2mortal(newSViv(CV_MAJOR_VERSION)));
+		XPUSHs(sv_2mortal(newSViv(CV_MINOR_VERSION)));
+		XPUSHs(sv_2mortal(newSViv(CV_SUBMINOR_VERSION)));
 		XSRETURN(3);
 	}
 
