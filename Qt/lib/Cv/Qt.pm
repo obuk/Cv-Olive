@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 require XSLoader;
 XSLoader::load('Cv::Qt', $VERSION);

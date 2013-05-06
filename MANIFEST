@@ -311,7 +311,7 @@ t/9threads.t
 t/baboon.jpg
 t/hackcv.pm
 t/lena.jpg
-Test.xs
+t.xs
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh

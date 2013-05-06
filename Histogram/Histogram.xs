@@ -34,8 +34,8 @@ CODE:
 	int dims = cvGetDims(&hist->mat, NULL); int i;
 	for (i = 0; i < dims; i++) {
 		AV* av = newAV();
-		av_push(av, newSViv(hist->thresh[i][0]));
-		av_push(av, newSViv(hist->thresh[i][1]));
+		av_push(av, newSVnv(hist->thresh[i][0]));
+		av_push(av, newSVnv(hist->thresh[i][1]));
 		av_push(RETVAL, newRV_inc(sv_2mortal((SV*)av)));
 	}
 OUTPUT:

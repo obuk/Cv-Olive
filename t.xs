@@ -2,7 +2,7 @@
 
 #include "Cv.inc"
 
-MODULE = Cv::Test		PACKAGE = Cv
+MODULE = Cv::t		PACKAGE = Cv
 
 # ============================================================
 #  T_CvBox2D
