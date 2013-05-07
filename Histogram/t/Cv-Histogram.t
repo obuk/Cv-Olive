@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-#use Test::More qw(no_plan);
-use Test::More tests => 137;
+# use Test::More qw(no_plan);
+use Test::More tests => 347;
 use Test::Exception;
 use Cv;
 BEGIN { use_ok('Cv::Histogram') }
@@ -46,85 +46,97 @@ can_ok(__PACKAGE__, 'cvCreateHist');
 #  CvHistogram* cvCreateHist(sizes, type, ranges, uniform)
 # ============================================================
 
+my @test;
+for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
+	for my $size (1 .. 3) {
+		my @size = map { 1 + int rand 10 } 1 .. $size;
+		my @thresh = map { [ 0 .. $size[$_] ] } 0 .. $#size;
+		push(@test, { type => $type, sizes => \@size, thresh => \@thresh });
+	}
+}
+
+
 # ranges=no, uniform=yes
 if (1) {
-	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
-		my $hist = Cv->CreateHist(my $sizes = [256], $type);
+	for (@test) {
+		my ($type, $sizes, $thresh) = ($_->{type}, $_->{sizes}, $_->{thresh});
+		my $hist = Cv->CreateHist($sizes, $type);
 		isa_ok($hist, 'Cv::Histogram');
-		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
+		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
 		if ($type == CV_HIST_ARRAY) {
 			isa_ok($hist->bins, 'Cv::Mat');
 		} else {
 			isa_ok($hist->bins, 'Cv::SparseMat');
 		}
-		ok( ($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok(!($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		ok( ($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok(!($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
 		my $hist2 = $hist->new();
 		isa_ok($hist2, 'Cv::Histogram');
-		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
+		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
 		isa_ok($hist2->bins, 'Cv::Mat');
-		ok( ($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok(!($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		ok( ($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok(!($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
 		no warnings 'redefine';
 		local *Cv::Histogram::cvCreateHist = sub {
 			is_deeply($_[0], $sizes, 'sizes');
 			is($_[1], $type, 'type');
-			ok(Cv::is_null($_[2]), 'ranges');
-			is($_[3], 1, 'uniform');
 		};
 		$hist->new();
 	}
 }
 
+
 # ranges=yes, uniform=yes
 if (2) {
-	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
-		my $hist = Cv->CreateHist(my $sizes = [256], $type, [[0, 256]]);
+	for (@test) {
+		my ($type, $sizes, $thresh) = ($_->{type}, $_->{sizes}, $_->{thresh});
+		my $hist = Cv->CreateHist($sizes, $type, $thresh);
 		isa_ok($hist, 'Cv::Histogram');
-		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
+		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
 		if ($type == CV_HIST_ARRAY) {
 			isa_ok($hist->bins, 'Cv::Mat');
 		} else {
 			isa_ok($hist->bins, 'Cv::SparseMat');
 		}
-		ok(($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok(($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		ok( ($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok( ($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
 		my $hist2 = $hist->new();
 		isa_ok($hist2, 'Cv::Histogram');
-		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
+		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
 		isa_ok($hist2->bins, 'Cv::Mat');
-		ok(($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok(($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		ok( ($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok( ($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
 		no warnings 'redefine';
 		local *Cv::Histogram::cvCreateHist = sub {
 			is_deeply($_[0], $sizes, 'sizes');
 			is($_[1], $type, 'type');
 			is_deeply($_[2], $hist->ranges, 'ranges');
-			is($_[3], 1, 'uniform');
 		};
 		$hist->new();
 	}
 }
 
+
 # ranges=no, uniform=no
 if (3) {
-	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
-		my $hist = Cv->CreateHist(my $sizes = [1], $type, \0, 0);
+	for (@test) {
+		my ($type, $sizes, $thresh) = ($_->{type}, $_->{sizes}, $_->{thresh});
+		my $hist = Cv->CreateHist($sizes, $type, \0, 0);
 		isa_ok($hist, 'Cv::Histogram');
-		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
+		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
 		if ($type == CV_HIST_ARRAY) {
 			isa_ok($hist->bins, 'Cv::Mat');
 		} else {
 			isa_ok($hist->bins, 'Cv::SparseMat');
 		}
-		ok(!($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok(!($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		ok(!($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok(!($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
 		my $hist2 = $hist->new();
 		isa_ok($hist2, 'Cv::Histogram');
-		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
+		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
 		isa_ok($hist2->bins, 'Cv::Mat');
-		ok(!($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		ok(!($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG'  );
+		ok(!($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok(!($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
 		no warnings 'redefine';
 		local *Cv::Histogram::cvCreateHist = sub {
 			is_deeply($_[0], $sizes, 'sizes');
@@ -136,35 +148,35 @@ if (3) {
 	}
 }
 
+
 # ranges=yes, uniform=no
 if (4) {
-	for my $type (CV_HIST_ARRAY, CV_HIST_SPARSE) {
-	  SKIP: {
-		  skip "OpenCV 2.2 && CV_HIST_SPARSE", 12
-			  if cvVersion() <= 2.002;# && $type == CV_HIST_SPARSE;
-		  my $hist = Cv->CreateHist(my $sizes = [1], $type, [[0, 256]], 0);
-		  isa_ok($hist, 'Cv::Histogram');
-		  is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
-		  if ($type == CV_HIST_ARRAY) {
-			  isa_ok($hist->bins, 'Cv::Mat');
-		  } else {
-			  isa_ok($hist->bins, 'Cv::SparseMat');
-		  }
-		  ok(!($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		  my $hist2 = $hist->new();
-		  isa_ok($hist2, 'Cv::Histogram');
-		  is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC' );
-		  isa_ok($hist2->bins, 'Cv::Mat');
-		  ok(!($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG' );
-		  no warnings 'redefine';
-		  local *Cv::Histogram::cvCreateHist = sub {
-			  is_deeply($_[0], $sizes, 'sizes');
-			  is($_[1], $type, 'type');
-			  is_deeply($_[2], $hist->ranges, 'ranges');
-			  is($_[3], 0, 'uniform');
-		  };
-		  $hist->new();
-		}; # SKIP
+	for (@test) {
+		my ($type, $sizes, $thresh) = ($_->{type}, $_->{sizes}, $_->{thresh});
+		my $hist = Cv->CreateHist($sizes, $type, $thresh, 0);
+		isa_ok($hist, 'Cv::Histogram');
+		is(($hist->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
+		if ($type == CV_HIST_ARRAY) {
+			isa_ok($hist->bins, 'Cv::Mat');
+		} else {
+			isa_ok($hist->bins, 'Cv::SparseMat');
+		}
+		ok(!($hist->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok( ($hist->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
+		my $hist2 = $hist->new();
+		isa_ok($hist2, 'Cv::Histogram');
+		is(($hist2->type & CV_MAGIC_MASK), CV_HIST_MAGIC_VAL, 'HIST_MAGIC');
+		isa_ok($hist2->bins, 'Cv::Mat');
+		ok(!($hist2->type & CV_HIST_UNIFORM_FLAG), 'UNIFORM_FLAG');
+		ok( ($hist2->type & CV_HIST_RANGES_FLAG ), 'RANGES_FLAG' );
+		no warnings 'redefine';
+		local *Cv::Histogram::cvCreateHist = sub {
+			is_deeply($_[0], $sizes, 'sizes');
+			is($_[1], $type, 'type');
+			is_deeply($_[2], $hist->ranges, 'ranges');
+			is($_[3], 0, 'uniform');
+		};
+		$hist->new();
 	}
 }
 
