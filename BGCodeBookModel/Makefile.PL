@@ -3,13 +3,22 @@
 use 5.008008;
 use ExtUtils::MakeMaker;
 
-our %PREREQ_PM = (
-	'ExtUtils::ParseXS' => 2.22,
-	'ExtUtils::PkgConfig' => 1.12,
-	'Test::Number::Delta' => 1.03,
-	'Test::Exception' => 0.31,
-	$^O eq 'cygwin' ? ('ExtUtils::MM_Cygwin' => 6.62) : (),
+our %build_reqs = (
+	'perl-ExtUtils-ParseXS'   => '2.220',
+	'perl-ExtUtils-PkgConfig' => '1.120',
 );
+
+our %PREREQ_PM = (
+	'ExtUtils::ParseXS'   => $build_reqs{'perl-ExtUtils-ParseXS'},
+	'ExtUtils::PkgConfig' => $build_reqs{'perl-ExtUtils-PkgConfig'},
+	'Test::Number::Delta' => '1.030',
+	'Test::Exception'     => '0.310',
+);
+
+if ($^O eq 'cygwin') {
+	$PREREQ_PM{'ExtUtils::MM_Cygwin'} =
+		$build_reqs{'perl-ExtUtils-MM_Cygwin'} = '6.620';
+}
 
 unless (eval join('; ', (map "use $_ $PREREQ_PM{'$_'}", keys %PREREQ_PM), 1)) {
     warn "$@\n";
