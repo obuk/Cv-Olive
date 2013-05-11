@@ -159,6 +159,9 @@ static SV *unbless(SV * rv)
     return rv;
 }
 
+
+#if 0 /* Cv-0.28 */
+
 #if _CV_VERSION() >= _VERSION(2,4,0)
 #ifdef __cplusplus
 void
@@ -197,6 +200,7 @@ cvExtractMSER(CvArr* img, CvArr* mask, CvSeq** contours, CvMemStorage* storage, 
 #endif
 #endif
 
+#endif
 
 const char*
 cvGetBuildInformation()
@@ -1369,6 +1373,9 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV *
 cvGetSeqElem(const CvSeq* seq, int index)
 CODE:
+	if (!CV_IS_SEQ(seq)) {
+		Perl_croak(aTHX_ "Cv::cvGetSeqElem: seq is not of type CvSeq");
+	}
 	RETVAL = newSVpvn_ro((char*)cvGetSeqElem(seq, index), seq->elem_size);
 OUTPUT:
 	RETVAL
@@ -1383,14 +1390,18 @@ CODE:
 		memcpy(dst, SvPV_nolen(elements), seq->elem_size);
 
 
-MODULE = Cv	PACKAGE = Cv::Arr
+MODULE = Cv	PACKAGE = Cv::Seq::Seq
+
 CvSeq*
-cvGetSeqSeq(const CvSeq* seq, int index)
-ALIAS: Cv::Seq::Seq::cvGetSeqElem = 1
+cvGetSeqElem(const CvSeq* seq, int index)
 CODE:
 	RETVAL = *(CvSeq**)cvGetSeqElem(seq, index);
 OUTPUT:
 	RETVAL
+
+void
+cvSeqPush(CvSeq* seq, CvSeq* element)
+C_ARGS:	seq, &element
 
 MODULE = Cv	PACKAGE = Cv::SeqReader
 int
@@ -2257,10 +2268,23 @@ INIT:
 OUTPUT:
 	pts
 
-
-#TBD# float cvCalcEMD2(const CvArr* signature1, const CvArr* signature2, int distance_type, CvDistanceFunction distance_func=NULL, const CvArr* cost_matrix=NULL, CvArr* flow=NULL, float* lower_bound=NULL, VOID* userdata=NULL)
-
 MODULE = Cv	PACKAGE = Cv::Arr
+
+#C# float cvCalcEMD2(const CvArr* signature1, const CvArr* signature2, int distance_type, CvDistanceFunction distance_func=NULL, const CvArr* cost_matrix=NULL, CvArr* flow=NULL, float* lower_bound=NULL, VOID* userdata=NULL)
+
+float
+cvCalcEMD2(const CvArr* signature1, const CvArr* signature2, int distance_type, SV* distance_func=NULL, const CvArr* cost_matrix=NULL, CvArr* flow=NULL, float* lower_bound=NULL, SV* userdata=NULL)
+INIT:
+	if (distance_func) {
+		Perl_croak(aTHX_ "Cv::cvCalcEMD2: can't support distance_func");
+	}
+	if (userdata) {
+		if (!SvREF0(userdata))
+			Perl_croak(aTHX_ "Cv::cvCalcEMD2: can't support userdata");
+		userdata = NULL;
+	}
+C_ARGS:	signature1, signature2, distance_type, (CvDistanceFunction) distance_func, cost_matrix, flow, lower_bound, (VOID*) userdata
+
 int
 cvCheckContourConvexity(const CvArr* contour)
 
@@ -2785,6 +2809,8 @@ OUTPUT:
 	descriptors
 
 
+=xxx /* Cv-0.28 */
+
 MODULE = Cv		PACKAGE = Cv
 
 #if _CV_VERSION() >= _VERSION(2,0,0)
@@ -2810,6 +2836,7 @@ cvExtractMSER(CvArr* img, CvArr* mask, OUT CvSeq* contours, CvMemStorage* storag
 
 #endif /* 2.0.0 */
 
+=cut
 
 #TBD# CvSeq* cvGetStarKeypoints(const CvArr* image, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams())
 
@@ -3429,9 +3456,8 @@ ALIAS: Cv::cvCorrectMatches = 1
 #endif
 
 MODULE = Cv	PACKAGE = Cv
-#xs# CvPOSITObject*
-#xs# cvCreatePOSITObject(CvPoint3D32f* points)
-#xs# C_ARGS: points, length(points)
+
+#TBD# CvPOSITObject* cvCreatePOSITObject(CvPoint3D32f* points, int point_count)
 
 CvStereoBMState*
 cvCreateStereoBMState(int preset=CV_STEREO_BM_BASIC, int numberOfDisparities=0)
@@ -3675,11 +3701,7 @@ void
 cvInitUndistortRectifyMap(const CvMat* cameraMatrix, const CvMat* distCoeffs, const CvMat* R, const CvMat* newCameraMatrix, CvArr* map1, CvArr* map2)
 ALIAS: Cv::cvInitUndistortRectifyMap = 1
 
-#xs# MODULE = Cv	PACKAGE = Cv::POSITObject
-#C# void cvPOSIT(CvPOSITObject* posit_object, CvPoint2D32f* imagePoints, double focal_length, CvTermCriteria criteria, CvMatr32f rotationMatrix, CvVect32f translation_vector)
-#xs# void
-#xs# cvPOSIT(CvPOSITObject* posit_object, OUT imagePoints, double focal_length, CvTermCriteria criteria, float* rotationMatrix, float* translation_vector)
-#xs# INPUT: CvPoint2D32f imagePoints = NO_INIT
+#TBD# void cvPOSIT(CvPOSITObject* posit_object, CvPoint2D32f* imagePoints, double focal_length, CvTermCriteria criteria, CvMatr32f rotationMatrix, CvVect32f translation_vector)
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
@@ -3700,11 +3722,7 @@ CODE:
 void
 cvRQDecomp3x3(const CvMat *M, CvMat *R, CvMat *Q, CvMat *Qx=NULL, CvMat *Qy=NULL, CvMat *Qz=NULL, CvPoint3D64f *eulerAngles=NULL)
 
-
-#xs# MODULE = Cv	PACKAGE = Cv::POSITObject
-#xs# void
-#xs# cvReleasePOSITObject(CvPOSITObject* &posit_object)
-#xs# ALIAS: DESTROY = 1
+#TBD# void cvReleasePOSITObject(CvPOSITObject** posit_object)
 
 
 MODULE = Cv	PACKAGE = Cv::StereoBMState
@@ -3971,25 +3989,22 @@ BOOT:
     cvSetErrStatus(0);
 {
 	HV* Cv_SIZEOF;
-	const char *pre[] = { "Cv", "Cv::" };
-	struct {
+	struct sz {
 		const char *name; int size;
 	} sz[] = {
-		{ "Contour",    sizeof(CvContour) },
-		{ "Point",      sizeof(CvPoint) },
-		{ "Point3D32f", sizeof(CvPoint3D32f) },
-		{ "Seq",        sizeof(CvSeq) },
-		{ "Set",        sizeof(CvSet) },
+		{ "CvContour",    sizeof(CvContour) },
+		{ "CvPoint",      sizeof(CvPoint) },
+		{ "CvPoint3D32f", sizeof(CvPoint3D32f) },
+		{ "CvSeq",        sizeof(CvSeq) },
+		{ "CvSeq*",       sizeof(CvSeq*) },
+		{ "CvSet",        sizeof(CvSet) },
 	};
-	char name[100];
-	int i, j;
+	int i;
 	if (!(Cv_SIZEOF = get_hv("Cv::SIZEOF", 0))) {
 		Perl_croak(aTHX_ "can't get \%Cv::SIZEOF");
 	}
 	for (i = 0; i < DIM(sz); i++) {
-		for (j = 0; j < DIM(pre); j++) {
-			strcpy(name, pre[j]); strcat(name, sz[i].name);
-			hv_store(Cv_SIZEOF, name, strlen(name), newSViv(sz[i].size), 0);
-		}
+		struct sz *p = &sz[i];
+		hv_store(Cv_SIZEOF, p->name, strlen(p->name), newSViv(p->size), 0);
 	}
 }
