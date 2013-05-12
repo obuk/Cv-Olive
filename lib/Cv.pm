@@ -39,7 +39,7 @@ use Carp;
 use Scalar::Util;
 use warnings::register;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Cv::Constant qw(:all);
 
@@ -1691,23 +1691,6 @@ sub BoxPoints {
 	@{ $_[1] } = @$pts if @_ >= 2;
 	wantarray? @$pts : $pts;
 }
-
-
-=pod
-
-# ============================================================
-#  imgproc. Image Processing: Planar Subdivisions
-# ============================================================
-
-package Cv::Subdiv2D;
-sub DESTROY { }
-{ *CalcVoronoi = \&CalcSubdivVoronoi2D }
-{ *ClearVoronoi = \&ClearSubdivVoronoi2D }
-{ *CreateDelaunay = \&Cv::CreateSubdivDelaunay2D }
-{ *Locate = \&Subdiv2DLocate }
-{ *DelaunayInsert = \&SubdivDelaunay2DInsert }
-
-=cut
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking

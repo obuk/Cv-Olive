@@ -11,7 +11,7 @@ use File::Basename;
 use ExtUtils::PkgConfig;
 use version;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 our %opencv;
 our %MM;

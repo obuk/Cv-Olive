@@ -29,14 +29,25 @@ CODE:
 
 AV*
 ranges(CvHistogram* hist)
+INIT:
+	int size[CV_MAX_DIM];
+	int dims = cvGetDims(hist->bins, size);
 CODE:
 	RETVAL = newAV();
-	int dims = cvGetDims(&hist->mat, NULL); int i;
-	for (i = 0; i < dims; i++) {
-		AV* av = newAV();
-		av_push(av, newSViv(hist->thresh[i][0]));
-		av_push(av, newSViv(hist->thresh[i][1]));
-		av_push(RETVAL, newRV_inc(sv_2mortal((SV*)av)));
+	if (hist->type & CV_HIST_RANGES_FLAG) { int i, j;
+		for (i = 0; i < dims; i++) {
+			AV* av = newAV();
+			if (hist->thresh2) {
+				for (j = 0; j <= size[i]; j++) {
+					av_push(av, newSVnv(hist->thresh2[i][j]));
+				}
+			} else {
+				for (j = 0; j <= size[i]; j++) {
+					av_push(av, newSVnv(hist->thresh[i][j]));
+				}
+			}
+			av_push(RETVAL, newRV_inc(sv_2mortal((SV*)av)));
+		}
 	}
 OUTPUT:
 	RETVAL

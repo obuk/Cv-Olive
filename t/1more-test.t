@@ -6,7 +6,7 @@ use Test::More;
 
 BEGIN {
 	eval { use Cv -nomore };
-	eval { require XSLoader; XSLoader::load('Cv::TestTypemap', $Cv::VERSION) };
+	eval { require XSLoader; XSLoader::load('Cv::t', $Cv::VERSION) };
 	if ($@) {
 		plan skip_all => "make INST_ARCHLIB=t BASEEXT=Test FULLEXT=Cv/Test dynamic";
 	}
