@@ -39,7 +39,7 @@ use Carp;
 use Scalar::Util;
 use warnings::register;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Cv::Constant qw(:all);
 
@@ -63,7 +63,7 @@ our %O;
 our %M;
 
 BEGIN {
-	$IMPORT{$_} = 1 for qw(Histogram MSER More Seq);
+	$IMPORT{$_} = 1 for qw(Histogram More Seq);
 	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel Subdiv2D);
 	$O{$_} = 1 for qw(boxhappy);
 }

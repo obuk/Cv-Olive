@@ -45,7 +45,7 @@ ok(!defined $Cv::SparseMat::Ghost::{AUTOLOAD});
 
 for (&classes('Cv')) {
 	next if /^Cv::.*::Ghost$/;
-	next if /^Cv::(Constant|More|Test)$/;
+	next if /^Cv::(Constant|More)$/;
 	# next if /^Cv::Seq/;
 	my $AUTOLOAD = "${_}::AUTOLOAD";
 	is(\&{$AUTOLOAD}, \&Cv::autoload, $_);

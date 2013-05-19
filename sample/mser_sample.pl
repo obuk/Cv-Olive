@@ -51,7 +51,7 @@ my $mask = $img->new(CV_8UC1)->fill(cvScalarAll(255))->rectangle(
 my $storage= Cv->createMemStorage;
 my $t = Cv->getTickCount();
 $hsv->extractMSER($mask, my $contours, $storage, $params);
-bless $contours, 'Cv::Seq::Seq';
+# bless $contours, 'Cv::Seq::Seq';
 $t = Cv->getTickCount() - $t;
 printf "MSER extracted %d contours in %g ms.\n",
 	$contours->total, $t/(Cv->getTickFrequency()*1000);

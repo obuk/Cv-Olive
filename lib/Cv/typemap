@@ -982,6 +982,7 @@ T_CvSURFParams
 	STMT_START {
 		AV* av = newAV();
 		av_push(av, newSViv($var.extended));
+		/* av_push(av, newSViv($var.upright)); */
 		av_push(av, newSVnv($var.hessianThreshold));
 		av_push(av, newSViv($var.nOctaves));
 		av_push(av, newSViv($var.nOctaveLayers));

@@ -175,13 +175,13 @@ $object->ExtractSURF(
 	\0, my $objectKeypoints, my $objectDescriptors,
 	$storage, $params,
 	);
-bless $objectKeypoints, 'Cv::Seq::SURFPoint';
+# bless $objectKeypoints, 'Cv::Seq::SURFPoint';
 printf("Object Descriptors: %d\n", $objectDescriptors->total);
 $image->ExtractSURF(
 	\0, my $imageKeypoints, my $imageDescriptors,
 	$storage, $params,
 	);
-bless $imageKeypoints, 'Cv::Seq::SURFPoint';
+# bless $imageKeypoints, 'Cv::Seq::SURFPoint';
 printf("Image Descriptors: %d\n", $imageDescriptors->total);
 $tt = Cv->getTickCount() - $tt;
 printf("Extraction time = %gms\n", $tt / (Cv->getTickFrequency() * 1000.0));
