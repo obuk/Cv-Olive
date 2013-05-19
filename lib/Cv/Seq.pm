@@ -19,6 +19,7 @@ package Cv::Seq::Seq;
 # our @ISA = qw(Cv::Seq);
 
 { *Get = \&GetSeqElem }
+{ *Push = \&SeqPush }
 
 package Cv::Seq;
 

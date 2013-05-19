@@ -63,7 +63,7 @@ our %O;
 our %M;
 
 BEGIN {
-	$IMPORT{$_} = 1 for qw(Seq More Histogram);
+	$IMPORT{$_} = 1 for qw(Histogram More Seq);
 	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel Subdiv2D);
 	$O{$_} = 1 for qw(boxhappy);
 }
@@ -330,9 +330,39 @@ sub assoc {
 }
 
 
-sub Usage {
+sub usage {
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 	Carp::croak "Usage: ${[ caller 1 ]}[3](", join('', @_), ")";
+}
+
+
+sub named_parameter {
+	my $template = shift; 
+	my @template = @$template;
+	my %param = (); my %seen = ();
+	if (@_) {
+		if ($_[0] =~ /^-[a-z]/i) {
+			my %hash = @_;
+			while (my ($k, $v) = each %hash) {
+				$k =~ s/^-//;
+				$param{$k} = $v;
+				$seen{$k}++;
+			}
+		} else {
+			while (my ($k, $v) = splice(@template, 0, 2)) {
+				last unless @_;
+				$param{$k} = shift;
+				$seen{$k}++;
+			}
+		}
+	}
+	my %template = @template;
+	while (my ($k, $v) = each %template) {
+		next if $seen{$k};
+		$param{$k} = $v;
+	}
+	my $p = \%param;
+	# [ @{$p}{@template[ grep { ($_ & 1) == 0 } 0 .. $#template ]} ];
 }
 
 
@@ -619,7 +649,7 @@ sub Merge {
 			push(@src, shift);
 		}
 	}
-	Cv::Usage("[src0, src1, ...], dst") unless @src;
+	Cv::usage("[src0, src1, ...], dst") unless @src;
 	my $dst = shift;
 	$dst ||= $src[0]->new(&Cv::CV_MAKETYPE($src[0]->type, scalar @src));
 	push(@src, (\0) x (4 - @src));
@@ -1152,7 +1182,7 @@ sub CV_RGB { my ($r, $g, $b, $a) = @_; cvScalar($b, $g, $r, $a || 0) }
 
 sub GetTextSize {
 	shift if $_[0] eq __PACKAGE__ && @_ == 5;
-	Usage("textString, font, textSize, baseline") unless @_ == 4;
+	usage("textString, font, textSize, baseline") unless @_ == 4;
 	if (ref $_[1] eq 'Cv::Font') {
 		goto &cvGetTextSize;
 	} else {
@@ -1591,7 +1621,7 @@ sub CvtColor {
 	my $src = shift;
 	my $dst = dst(@_);
 	my $code = shift;
-	Cv::Usage("src, dst, code") unless defined $code;
+	Cv::usage("src, dst, code") unless defined $code;
 	unless ($dst) {
 		if ($code == &Cv::CV_BGR2RGB   || $code == &Cv::CV_RGB2BGR) {
 			$dst = $src->new;
@@ -1803,7 +1833,7 @@ package Cv::Arr;
 
 { *Show = \&ShowImage }
 sub ShowImage {
-	Cv::Usage("image, name, flags=CV_WINDOW_AUTOSIZE")
+	Cv::usage("image, name, flags=CV_WINDOW_AUTOSIZE")
 		unless @_ >= 1 && @_ <= 3;
 	my $image = shift;
 	my $name = shift;
@@ -1839,7 +1869,7 @@ package Cv::Arr;
 
 { *Save = \&SaveImage }
 sub SaveImage {
-	Cv::Usage("image, filename, params=0")
+	Cv::usage("image, filename, params=0")
 		unless @_ >= 2 && @_ <= 3;
 	my ($image, $filename) = splice(@_, 0, 2);
 	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
