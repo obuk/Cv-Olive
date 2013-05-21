@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 require XSLoader;
 XSLoader::load('Cv::BGCodeBookModel', $VERSION);

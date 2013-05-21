@@ -183,7 +183,6 @@ t/1intPtr.t
 t/1more-test.t
 t/1sizeof.t
 t/1version.t
-t/1xs.t
 t/2absDiff.t
 t/2add.t
 t/2addWeighted.t

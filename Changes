@@ -1,6 +1,14 @@
 Revision history for Cv.pm
 
-0.26rc - 2012-05-02
+0.28 - 2012-05-12
+     * fixed Cv::Histogram::ranges
+     * added %build_reqs
+     * renames TestTypemap.xs to t.xs 
+
+0.27 - 2012-05-05
+     * renames Test.xs TestTypemap.xs
+
+0.26 - 2012-05-02
      * separates packages: Cv::BGCodeBookModel, Cv::Histogram,
        Cv::Subdiv2D (classified as a legacy in OpenCV)
        - Cv::Pango (experimental)

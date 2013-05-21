@@ -13,7 +13,7 @@ use Cv::Seq::Point2;
 use Cv::Seq::Rect;
 use Cv::Seq::SURFPoint;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 package Cv;
 

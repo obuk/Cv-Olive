@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 require XSLoader;
 XSLoader::load('Cv::Histogram', $VERSION);
@@ -89,7 +89,7 @@ sub CreateHist {
 	} elsif (ref $self) {
 		unshift(@_, $self);	# sizes
 	}
-	Cv::Usage("sizes, type, ranges=NULL, uniform=1")
+	Cv::usage("sizes, type, ranges=NULL, uniform=1")
 		unless 2 <= @_ && @_ <= 4;
 	goto &cvCreateHist;
 }
@@ -106,7 +106,7 @@ sub DESTROY { goto &cvReleaseHist }
 =cut
 
 sub CalcBackProject {
-	Cv::Usage("hist, images, back_project") unless @_ == 3;
+	Cv::usage("hist, images, back_project") unless @_ == 3;
 	my ($hist, $images, $back_project) = splice(@_, 0, 3);
 	unshift(@_, $images, $back_project, $hist);
 	goto &cvCalcBackProject;
@@ -119,7 +119,7 @@ sub CalcBackProject {
 =cut
 
 sub CalcBackProjectPatch {
-	Cv::Usage("hist, images, dst, patch_size, method, factor") unless @_ == 6;
+	Cv::usage("hist, images, dst, patch_size, method, factor") unless @_ == 6;
 	my ($hist, $images, $dst, $patch_size) = splice(@_, 0, 4);
 	unshift(@_, $images, $dst, $patch_size, $hist);
 	goto &cvCalcBackProjectPatch;
@@ -135,7 +135,7 @@ sub CalcBackProjectPatch {
 
 sub Calc { goto &CalcHist }
 sub CalcHist {
-	Cv::Usage("hist, image, accumulate=0, mask=NULL") unless 2 <= @_ && @_ <= 4;
+	Cv::usage("hist, image, accumulate=0, mask=NULL") unless 2 <= @_ && @_ <= 4;
 	my ($hist, $image) = splice(@_, 0, 2);
 	unshift(@_, $image, $hist);
 	goto &cvCalcHist
@@ -235,7 +235,7 @@ sub ThreshHist { goto &cvThreshHist }
 sub Cv::Arr::CalcPGH { goto &cvCalcPGH }
 
 sub CalcPGH {
-	Cv::Usage("hist, contour") unless @_ == 2;
+	Cv::usage("hist, contour") unless @_ == 2;
 	my ($hist, $contour) = splice(@_, 0, 2);
 	unshift(@_, $contour, $hist);
 	goto &cvCalcPGH;
