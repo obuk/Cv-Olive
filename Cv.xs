@@ -2780,8 +2780,6 @@ POSTCALL:
 #    Feature detection and description
 # ============================================================
 
-#if _CV_VERSION() >= _VERSION(2,0,0)
-
 MODULE = Cv		PACKAGE = Cv
 CvSURFParams
 cvSURFParams(double hessianThreshold, int extended = 0)
@@ -2836,8 +2834,6 @@ OUTPUT:
 #endif
 
 #TBD# CvSeq* cvGetStarKeypoints(const CvArr* image, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams())
-
-#endif /* 2.0.0 */
 
 
 # ============================================================

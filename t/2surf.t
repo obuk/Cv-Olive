@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 7;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -16,7 +16,9 @@ if (1) {
 	my $params = cvSURFParams(my $hessianThreshold = 500, my $extended = 1);
 	is($extended, $params->[0], 'extended');
 	is($hessianThreshold, $params->[1], 'hessianThreshold');
-	$img->extractSURF(\0, my $keypoints, my $descriptors, $storage, $params);
+	my $gray = $img->cvtColor(CV_BGR2GRAY);
+	$gray->extractSURF(\0, my $keypoints, my $descriptors, $storage, $params);
+	my %got;
 	for (map {
 		+{
 			pt        => $_->[0],
@@ -29,15 +31,14 @@ if (1) {
 		# use Data::Dumper;
 		# print STDERR Data::Dumper->Dump([$_], [qw(*_)]);
 		$img->circle($_->{pt}, $_->{size}, [100, 255, 100], 1, CV_AA);
-		my $ok = 0;
 		for my $pt (@pt) {
 			my ($x0, $y0) = @$pt;
 			my ($x1, $y1) = @{$_->{pt}};
 			my $e = sqrt(($x1 - $x0)**2 + ($y1 - $y0)**2);
-			$ok++ if $_->{size} < $e;
+			$got{@$pt}++ if $_->{size} < $e;
 		}
-		ok($ok);
 	}
+	ok($got{@$_}) for @pt;
 	if ($verbose) {
 		$img->show;
 		Cv->waitKey(1000);
