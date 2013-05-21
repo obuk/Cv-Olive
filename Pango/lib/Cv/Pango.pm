@@ -102,7 +102,7 @@ sub GetTextSize {
 	$font = shift if ref $_[0] && @_ == 4;
 	$text = shift if @_ >= 3;
 	$font ||= shift if @_ >= 3;
-	Cv::Usage("textString, font, textSize, baseline") unless @_ == 2;
+	Cv::usage("textString, font, textSize, baseline") unless @_ == 2;
 	if ($font && ref $font eq 'Cv::Font') {
 		unshift(@_, $text, $font);
 		goto \&cvGetTextSize;
