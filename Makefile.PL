@@ -76,6 +76,22 @@ my @perl_h = qw(perl.h sv.h pp.h);
 	&rm('-f', $tmp);
 }
 
+# make lib/Cv/typemap
+{
+	my $src = 'typemap.in';
+	my $dst = 'lib/Cv/typemap';
+	my $tmp = 'a.map';
+	unless (&fixtypemap('-o', $tmp, $src) == 0) {
+		die "can't make typemap\n";
+	}
+	if (!-f $dst || &cmp('-s', $tmp, $dst) != 0) {
+		&mv($dst, "$dst.bak") if -f $dst;
+		&cp($tmp, $dst);
+	}
+	&rm('-f', $tmp);
+}
+
+
 my @dir = qw();
 push(@dir, qw(BGCodeBookModel));
 # push(@dir, qw(FeatureDetector));

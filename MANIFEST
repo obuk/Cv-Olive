@@ -36,7 +36,6 @@ lib/Cv/Seq/Point.pm
 lib/Cv/Seq/Point2.pm
 lib/Cv/Seq/Rect.pm
 lib/Cv/Seq/SURFPoint.pm
-lib/Cv/typemap
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -153,6 +152,7 @@ Subdiv2D/Makefile.PL
 Subdiv2D/Subdiv2D.xs
 Subdiv2D/t/Cv-Subdiv2D.t
 Subdiv2D/t/pod-coverage.t
+t.xs
 t/1config.t
 t/1const-old.t
 t/1const.t
@@ -261,6 +261,7 @@ t/2stereoSGBM.t
 t/2sub.t
 t/2subRS.t
 t/2sum.t
+t/2surf.t
 t/2threshold.t
 t/2trackbar.t
 t/2useCv-bgcode.t
@@ -291,6 +292,7 @@ t/4makeSeqHeaderForArray.t
 t/4minAreaRect.t
 t/4minEnclosingCircle.t
 t/4moments.t
+t/4namedParameters.t
 t/4overload.t
 t/4pointSeqFromMat.t
 t/4projectPoints2.t
@@ -306,13 +308,14 @@ t/9threads.t
 t/baboon.jpg
 t/hackcv.pm
 t/lena.jpg
-t.xs
 tools/checkref.pl
 tools/cleanup.sh
 tools/cmake-FreeBSD.sh
 tools/cover.sh
 tools/dumpconst-all.pl
 tools/dumpconst.pl
+tools/fixtypemap.pl
 tools/ref2pl-all.pl
 tools/ref2pl.pl
 tools/testdist.pl
+typemap.in

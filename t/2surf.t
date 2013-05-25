@@ -15,7 +15,8 @@ if (1) {
 	my $storage = Cv->createMemStorage();
 	my $params = cvSURFParams(my $hessianThreshold = 500, my $extended = 1);
 	is($extended, $params->[0], 'extended');
-	is($hessianThreshold, $params->[1], 'hessianThreshold');
+	my $i = cvVersion() >= 2.003 ? 2 : 1;
+	is($hessianThreshold, $params->[$i], 'hessianThreshold');
 	my $gray = $img->cvtColor(CV_BGR2GRAY);
 	$gray->extractSURF(\0, my $keypoints, my $descriptors, $storage, $params);
 	my %got;
@@ -28,8 +29,6 @@ if (1) {
 			hessian   => $_->[4],
 		}
 		 } @$keypoints) {
-		# use Data::Dumper;
-		# print STDERR Data::Dumper->Dump([$_], [qw(*_)]);
 		$img->circle($_->{pt}, $_->{size}, [100, 255, 100], 1, CV_AA);
 		for my $pt (@pt) {
 			my ($x0, $y0) = @$pt;
