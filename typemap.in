@@ -621,22 +621,22 @@ T_CvSURFParams
 		SV* sv = $arg; AV* av;
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 			av_len(av = (AV*)SvRV(sv)) >= 3
- +if _CV_VERSION() >= _VERSION(2,3,1)
+ .if _CV_VERSION() >= _VERSION(2,3,1)
 				+ 1
- +endif
+ .endif
 			) {
 			int i = 0;
 			SV* sv_extended         = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
- +if _CV_VERSION() >= _VERSION(2,3,1)
+ .if _CV_VERSION() >= _VERSION(2,3,1)
 			SV* sv_upright          = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
- +endif
+ .endif
 			SV* sv_hessianThreshold = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
 			SV* sv_nOctaves         = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
 			SV* sv_nOctaveLayers    = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
 			$var.extended         = SvIV(sv_extended);
- +if _CV_VERSION() >= _VERSION(2,3,1)
+ .if _CV_VERSION() >= _VERSION(2,3,1)
 			$var.upright          = SvIV(sv_upright);
- +endif
+ .endif
 			$var.hessianThreshold = SvNV(sv_hessianThreshold);
 			$var.nOctaves         = SvIV(sv_nOctaves);
 			$var.nOctaveLayers    = SvIV(sv_nOctaveLayers);
@@ -993,9 +993,9 @@ T_CvSURFParams
 	STMT_START {
 		AV* av = newAV();
 		av_push(av, newSViv($var.extended));
- +if _CV_VERSION() >= _VERSION(2,3,1)
+ .if _CV_VERSION() >= _VERSION(2,3,1)
 		av_push(av, newSViv($var.upright));
- +endif
+ .endif
 		av_push(av, newSVnv($var.hessianThreshold));
 		av_push(av, newSViv($var.nOctaves));
 		av_push(av, newSViv($var.nOctaveLayers));

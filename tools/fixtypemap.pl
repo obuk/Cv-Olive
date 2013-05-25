@@ -21,12 +21,12 @@ sub cpp {
 	my ($code, $where) = @_;
 	my @line; my @cond = (1);
 	for (split("\n", $code)) {
-		if (/\+if\s+(.*)/) {
+		if (/\.if\s+(.*)/) {
 			push(@cond, eval $1);
 			die "can't eval \"$_\" in $where\n" if $@;
-		} elsif (/\+else/) {
+		} elsif (/\.else/) {
 			$cond[-1] = !$cond[-1];
-		} elsif (/\+endif/) {
+		} elsif (/\.endif/) {
 			pop(@cond);
 		} else {
 			push(@line, $_) if $cond[-1];

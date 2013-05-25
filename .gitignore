@@ -8,6 +8,7 @@ lib/Cv/Constant.pm
 lib/Cv/perl.h
 lib/Cv/pp.h
 lib/Cv/sv.h
+lib/Cv/typemap
 pm_to_blib
 t/flipbook
 t/ref*.pm
