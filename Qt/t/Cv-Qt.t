@@ -10,9 +10,16 @@ use Cv;
 eval "use Cv::Qt qw(:all)";
 plan skip_all => "Qt required" unless !$@ && cvHasQt();
 # plan qw(no_pln);
-plan tests => 46;
+plan tests => 47;
 
 my $hasGUI = Cv->hasGUI;
+
+if (Cv->GetBuildInformation) {
+	like(cvHasQt(), qr/^QT \d\.\w+/);
+} else {
+	ok(cvHasQt());
+}
+
 
 # ============================================================
 #  CvFont cvFontQt(
