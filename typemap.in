@@ -91,6 +91,7 @@ CvStringHashNode*			T_CvPTROBJ
 const CvStringHashNode*		T_CvPTROBJ
 CvSubdiv2D*					T_CvPTROBJ
 const CvSubdiv2D*			T_CvPTROBJ
+CvStarDetectorParams		T_CvStarDetectorParams
 CvSubdiv2DPointLocation		T_IV
 CvSubdiv2DEdge				T_UV
 CvSubdiv2DPoint				T_CvSubdiv2DPoint
@@ -589,10 +590,17 @@ T_CvSubdiv2DPoint
 	STMT_START {
 		SV* sv = $arg; AV* av; int err = 0;
 		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
-			av_len(av = (AV*)SvRV(sv)) >= 2) {
+			av_len(av = (AV*)SvRV(sv)) >= 2
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+ 	 			   + 1
+ .endif
+			) {
 			SV* sv_flags = (SV*)*av_fetch(av, 0, 0);
 			SV* sv_first = (SV*)*av_fetch(av, 1, 0);
 			SV* sv_pt    = (SV*)*av_fetch(av, 2, 0); AV* av_pt;
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+			SV* sv_id    = (SV*)*av_fetch(av, 3, 0);
+ .endif
 			$var.flags = SvIV(sv_flags);
 			$var.first = SvUV(sv_fierst);
 			if (SvROK(sv_pt) && SvTYPE(SvRV(sv_pt)) == SVt_PVAV &&
@@ -602,18 +610,48 @@ T_CvSubdiv2DPoint
 				$var.pt.y = SvNV((SV*)*av_fetch(av_pt, 1, 0));
 			} else
 				err++;
-	/* TODO: OpenCV-2.0+
-			if (av_len(av_pt) >= 2) {
-				SV* sv_id = (SV*)*av_fetch((AV*)SvRV(av), 3, 0);
-				$var.id = SvIV(sv_id);
-			} else
-				err++;
-	*/
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+			$var.id = SvIV(sv_id);
+ .endif
 		} else
 			err++;
 		if (err)
 			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
 				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
+	} STMT_END
+
+T_CvStarDetectorParams
+	STMT_START {
+ .if _CV_VERSION() >= _VERSION(2,0,0)
+		SV* sv = $arg; AV* av;
+		if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
+			av_len(av = (AV*)SvRV(sv)) >= 3
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+				+ 1
+ .endif
+			) {
+			int i = 0;
+			SV* sv_maxSize                = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
+			SV* sv_responseThreshold      = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
+			SV* sv_lineThresholdProjected = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
+			SV* sv_lineThresholdBinarized = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+			SV* sv_suppressNonmaxSize     = (SV*)*av_fetch((AV*)SvRV(sv), i++, 0);
+ .endif
+			$var.maxSize                = SvIV(sv_maxSize);
+			$var.responseThreshold      = SvIV(sv_responseThreshold);
+			$var.lineThresholdProjected = SvIV(sv_lineThresholdProjected);
+			$var.lineThresholdBinarized = SvIV(sv_lineThresholdBinarized);
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+			$var.suppressNonmaxSize     = SvIV(sv_suppressNonmaxSize);
+ .endif
+		} else
+			Perl_croak(aTHX_ \"%s is not of type %s in %s\",
+				\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\");
+ .else
+		Perl_croak(aTHX_ \"%s requires OpenCV-2.0 or later in %s\",
+			\"$type\", \"$pname\");
+ .endif
 	} STMT_END
 
 T_CvSURFParams
@@ -958,9 +996,9 @@ T_CvSubdiv2DPoint
 		av_push(av_pt, newSVnv($var.pt.x));
 		av_push(av_pt, newSVnv($var.pt.y));
 		av_push(av, newRV_inc(sv_2mortal((SV*)av_pt)));
-	/* TODO: OpenCV-2.0+
+ .if _CV_VERSION() >= _VERSION(2,2,0)
 		av_push(av, newSViv($var.id));
-	*/
+ .endif
 		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
 	} STMT_END;
 
@@ -982,11 +1020,29 @@ T_CvSubdiv2DPointPtr
 			av_push(av_pt, newSVnv(${var}[i].pt.x));
 			av_push(av_pt, newSVnv(${var}[i].pt.y));
 			av_push(av_point, newRV_inc(sv_2mortal((SV*)av_pt)));
-	/* TODO: OpenCV-2.0+
+ .if _CV_VERSION() >= _VERSION(2,2,0)
 			av_push(av_point, newSViv(${var}[i].id));
-	*/
+ .endif
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_pointt)));
 		}
+	} STMT_END;
+
+T_CvStarDetectorParams
+	STMT_START {
+ .if _CV_VERSION() >= _VERSION(2,0,0)
+		AV* av = newAV();
+		av_push(av, newSViv($var.maxSize));
+		av_push(av, newSViv($var.responseThreshold));
+		av_push(av, newSViv($var.lineThresholdProjected));
+		av_push(av, newSViv($var.lineThresholdBinarized));
+ .if _CV_VERSION() >= _VERSION(2,2,0)
+		av_push(av, newSViv($var.suppressNonmaxSize));
+ .endif
+		sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+ .else
+		Perl_croak(aTHX_ \"%s requires OpenCV-2.0 or later in %s\",
+			\"$type\", \"$pname\");
+ .endif
 	} STMT_END;
 
 T_CvSURFParams

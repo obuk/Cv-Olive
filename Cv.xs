@@ -2599,93 +2599,6 @@ MODULE = Cv	PACKAGE = Cv::ContourScanner
 void
 cvSubstituteContour(CvContourScanner scanner, CvSeq* new_contour)
 
-#if 0
-
-# ============================================================
-#  imgproc. Image Processing: Planar Subdivisions
-# ============================================================
-
-MODULE = Cv	PACKAGE = Cv::Subdiv2D
-# ====================
-CvSeq*
-edges(CvSubdiv2D* subdiv)
-CODE:
-	RETVAL = (CvSeq*)subdiv->edges;
-OUTPUT:
-	RETVAL		
-
-MODULE = Cv	PACKAGE = Cv::Subdiv2D
-# ====================
-void
-cvCalcSubdivVoronoi2D(CvSubdiv2D* subdiv)
-
-void
-cvClearSubdivVoronoi2D(CvSubdiv2D* subdiv)
-
-
-MODULE = Cv	PACKAGE = Cv
-CvSubdiv2D*
-cvCreateSubdivDelaunay2D(CvRect rect, CvMemStorage* storage)
-
-
-MODULE = Cv	PACKAGE = Cv::Subdiv2D
-CvSubdiv2DPoint
-cvFindNearestPoint2D(CvSubdiv2D* subdiv, CvPoint2D32f pt)
-CODE:
-	CvSubdiv2DPoint* p = cvFindNearestPoint2D(subdiv, pt);
-	if (p) RETVAL = *p; else XSRETURN_UNDEF;
-OUTPUT:
-	RETVAL
-
-
-MODULE = Cv	PACKAGE = Cv
-CvSubdiv2DPoint
-cvSubdiv2DEdgeOrg(CvSubdiv2DEdge edge)
-CODE:
-	CvSubdiv2DPoint* p = cvSubdiv2DEdgeOrg(edge);
-	if (p) RETVAL = *p; else XSRETURN_UNDEF;
-OUTPUT:
-	RETVAL
-
-CvSubdiv2DPoint
-cvSubdiv2DEdgeDst(CvSubdiv2DEdge edge)
-CODE:
-	CvSubdiv2DPoint* p = cvSubdiv2DEdgeDst(edge);
-	if (p) RETVAL = *p; else XSRETURN_UNDEF;
-OUTPUT:
-	RETVAL
-
-CvSubdiv2DEdge
-cvSubdiv2DGetEdge(CvSubdiv2DEdge edge, CvNextEdgeType type)
-
-CvSubdiv2DEdge
-cvSubdiv2DNextEdge(CvSubdiv2DEdge edge)
-
-MODULE = Cv	PACKAGE = Cv::Subdiv2D
-CvSubdiv2DPointLocation
-cvSubdiv2DLocate(CvSubdiv2D* subdiv, CvPoint2D32f pt, OUT CvSubdiv2DEdge edge, vertex = NO_INIT)
-INPUT:
-	CvSubdiv2DPoint* &vertex = NO_INIT
-CODE:
-	RETVAL = cvSubdiv2DLocate(subdiv, pt, &edge, NULL);
-OUTPUT:
-	edge
-
-MODULE = Cv	PACKAGE = Cv
-CvSubdiv2DEdge
-cvSubdiv2DRotateEdge(CvSubdiv2DEdge edge, int rotate)
-
-
-MODULE = Cv	PACKAGE = Cv::Subdiv2D
-CvSubdiv2DPoint
-cvSubdivDelaunay2DInsert(CvSubdiv2D* subdiv, CvPoint2D32f pt)
-CODE:
-	CvSubdiv2DPoint* p = cvSubdivDelaunay2DInsert(subdiv, pt);
-	if (p) RETVAL = *p; else XSRETURN_UNDEF;
-OUTPUT:
-	RETVAL
-
-#endif
 
 # ============================================================
 #  imgproc. Image Processing: Motion Analysis and Object Tracking
@@ -2833,8 +2746,23 @@ OUTPUT:
 
 #endif
 
-#TBD# CvSeq* cvGetStarKeypoints(const CvArr* image, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams())
+#if _CV_VERSION() >= _VERSION(2,0,0)
+# if _CV_VERSION() >= _VERSION(2,2,0)
 
+CvStarDetectorParams
+cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8, int suppressNonmaxSize = 5)
+
+# else
+
+CvStarDetectorParams
+cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8)
+
+# endif
+
+CvSeq*
+cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams())
+
+#endif
 
 # ============================================================
 #  objdetect. Object Detection: Cascade Classification:
