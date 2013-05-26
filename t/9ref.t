@@ -4,7 +4,7 @@ use strict;
 # use Test::More tests => 1210;
 use Test::More qw(no_plan);
 BEGIN {
-	use_ok('Cv', -nomore);
+	use_ok('Cv', -nomore, -subdiv);
 }
 
 our %cv;

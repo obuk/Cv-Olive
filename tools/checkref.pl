@@ -8,7 +8,9 @@ use Data::Dumper;
 use lib qw(blib/lib blib/arch);
 use Cv;
 use Cv::Subdiv2D;
-eval "use Cv::Qt" if Cv->hasModule('qt');
+use Cv::Config;
+my $cf = Cv::Config->new;
+eval "use Cv::Qt" if $cf->hasqt;
 
 our %cv;
 our %file;

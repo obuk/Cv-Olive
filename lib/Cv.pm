@@ -264,6 +264,7 @@ for (
 	"Cv::MatND",
 	"Cv::MemStorage",
 	"Cv::Moments",
+	# "Cv::POSITObject",
 	"Cv::RNG",
 	"Cv::SparseMat",
 	"Cv::StereoBMState",
@@ -2034,12 +2035,12 @@ sub HasModule {
 
 sub cvHasQt {
 	my $hasQt;
-	# if (Cv->can('cvFontQt')) {
-	if (1) {
-		my %x = Cv->GetBuildInformation;
-		while (my ($k, $v) = each %{$x{GUI}}) {
-			$hasQt = $k if ($k =~ /^QT \d\.\w+$/i && $v =~ /^YES\.*/i)
-		}
+	my %x = Cv->GetBuildInformation;
+	while (my ($k, $v) = each %{$x{GUI}}) {
+		$hasQt = $k if ($k =~ /^QT \d\.\w+$/i && $v =~ /^YES\.*/i)
+	}
+	unless ($hasQt) {
+		$hasQt = 1 if Cv->can('cvFontQt');
 	}
 	$hasQt;
 }
