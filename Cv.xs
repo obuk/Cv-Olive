@@ -1366,9 +1366,6 @@ MODULE = Cv	PACKAGE = Cv::Arr
 SV *
 cvGetSeqElem(const CvSeq* seq, int index)
 CODE:
-	if (!CV_IS_SEQ(seq)) {
-		Perl_croak(aTHX_ "Cv::cvGetSeqElem: seq is not of type CvSeq");
-	}
 	RETVAL = newSVpvn_ro((char*)cvGetSeqElem(seq, index), seq->elem_size);
 OUTPUT:
 	RETVAL
