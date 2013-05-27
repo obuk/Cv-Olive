@@ -2696,10 +2696,15 @@ cvSURFParams(double hessianThreshold, int extended = 0)
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
-cvExtractSURF(const CvArr* image, const CvArr* mask, OUT CvSeq* keypoints, OUT CvSeq* descriptors, CvMemStorage* storage, CvSURFParams params, int useProvidedKeyPts = 0)
-CODE:
-#if _CV_VERSION() >= _VERSION(2,0,0)
+cvExtractSURF(const CvArr* image, const CvArr* mask, keypoints, descriptors, CvMemStorage* storage, CvSURFParams params, int useProvidedKeyPts = 0)
+INPUT:
+	CvSeq* keypoints = NO_INIT
+	CvSeq* descriptors = NO_INIT
+INIT:
+	CvSeq** descriptors_ptr = (CvSeq**) 0;
 	keypoints = (CvSeq*) 0;
+	descriptors = (CvSeq*) 0;
+#if _CV_VERSION() >= _VERSION(2,0,0)
 	if (useProvidedKeyPts) {
 		if (sv_isobject(ST(2)) && sv_derived_from(ST(2), "Cv::Seq")) {
 			keypoints = INT2PTR(CvSeq *, SvIV((SV*)SvRV(ST(2))));
@@ -2709,13 +2714,24 @@ CODE:
 		}
 	}
 #endif
-	cvExtractSURF(image, mask, &keypoints, &descriptors, storage, params
+	if (SvREF0(ST(3))) {
+		descriptors_ptr = (CvSeq**) 0;
+	} else {
+		descriptors_ptr = &descriptors;
+	}
+CODE:
+	cvExtractSURF(image, mask, &keypoints, descriptors_ptr, storage, params
 #if _CV_VERSION() >= _VERSION(2,0,0)
 		, useProvidedKeyPts
 #endif
 		);
-OUTPUT:
-	keypoints sv_setref_pv(ST(2), "Cv::Seq::SURFPoint", (void*)keypoints);
+	sv_setref_pv(ST(2), "Cv::Seq::SURFPoint", (void*)keypoints);
+	SvSETMAGIC(ST(2));
+	if (descriptors_ptr) {
+		sv_setref_pv(ST(3), "Cv::Seq", (void*)descriptors);
+		SvSETMAGIC(ST(3));
+	}
+
 
 #if HAVE_cvExtractMSER
 
