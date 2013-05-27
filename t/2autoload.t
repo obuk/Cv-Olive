@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 59;
+use Test::More tests => 60;
 use Test::Exception;
-BEGIN { use_ok('Cv', -nomore, -bg, -subdiv) }
+BEGIN { use_ok('Cv', -nomore, -seq, -bg, -subdiv) }
 
 if (1) {
 	throws_ok { Cv->NotDefined() } qr/can't call Cv::NotDefined at $0/;
@@ -46,7 +46,6 @@ ok(!defined $Cv::SparseMat::Ghost::{AUTOLOAD});
 for (&classes('Cv')) {
 	next if /^Cv::.*::Ghost$/;
 	next if /^Cv::(Constant|More)$/;
-	# next if /^Cv::Seq/;
 	my $AUTOLOAD = "${_}::AUTOLOAD";
 	is(\&{$AUTOLOAD}, \&Cv::autoload, $_);
 }

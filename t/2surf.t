@@ -20,7 +20,7 @@ if (1) {
 	my $i = cvVersion() >= 2.003 ? 2 : 1;
 	is($hessianThreshold, $params->[$i], 'hessianThreshold');
 	my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
-	$gray->show('gray');
+	$gray->show('gray') if $verbose;
 	$gray->extractSURF(\0, my $keypoints, \0, $storage, $params);
 	isa_ok($keypoints, 'Cv::Seq::SURFPoint');
 
