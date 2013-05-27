@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 8;
+# use Test::More qw(no_plan);
+use Test::More tests => 10;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -65,6 +65,6 @@ if (1) {
 
 	if ($verbose) {
 		$img->show;
-		Cv->waitKey#(1000);
+		Cv->waitKey(1000);
 	}
 }
