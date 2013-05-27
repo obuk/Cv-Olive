@@ -2696,7 +2696,7 @@ cvSURFParams(double hessianThreshold, int extended = 0)
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
-cvExtractSURF(const CvArr* image, const CvArr* mask, keypoints, descriptors, CvMemStorage* storage, CvSURFParams params, int useProvidedKeyPts = 0)
+cvExtractSURF(const CvArr* image, const CvArr* mask, keypoints, descriptors, CvMemStorage* storage, CvSURFParams params, int useProvidedKeyPts=0)
 INPUT:
 	CvSeq* keypoints = NO_INIT
 	CvSeq* descriptors = NO_INIT

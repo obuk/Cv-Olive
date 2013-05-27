@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 12;
+use Test::More tests => 13;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -21,7 +21,9 @@ if (1) {
 	is($hessianThreshold, $params->[$i], 'hessianThreshold');
 	my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
 	$gray->show('gray') if $verbose;
+	my $t0 = Cv->getTickCount();
 	$gray->extractSURF(\0, my $keypoints, \0, $storage, $params);
+	my $t1 = Cv->getTickCount() - $t0;
 	isa_ok($keypoints, 'Cv::Seq::SURFPoint');
 
 	my %got;
@@ -45,7 +47,11 @@ if (1) {
 	}
 	ok($got{@$_}) for @pt;
 
-	$gray->extractSURF(\0, $keypoints, my $descriptors, $storage, $params, 0);
+	$t0 = Cv->getTickCount();
+	$gray->extractSURF(\0, $keypoints, my $descriptors, $storage, $params, 1);
+	my $t2 = Cv->getTickCount() - $t0;
+	cmp_ok($t2, '<=', $t1);
+
 	isa_ok($descriptors, 'Cv::Seq::SURFDescriptor');
 	can_ok($descriptors, 'total');
 	can_ok($keypoints, 'total');
