@@ -13,6 +13,7 @@ use Cv::Seq::Point2;
 use Cv::Seq::Circle;
 use Cv::Seq::Rect;
 use Cv::Seq::SURFPoint;
+use Cv::Seq::SURFDescriptor;
 
 package Cv::Seq::Seq;
 

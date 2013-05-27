@@ -2728,7 +2728,7 @@ CODE:
 	sv_setref_pv(ST(2), "Cv::Seq::SURFPoint", (void*)keypoints);
 	SvSETMAGIC(ST(2));
 	if (descriptors_ptr) {
-		sv_setref_pv(ST(3), "Cv::Seq", (void*)descriptors);
+		sv_setref_pv(ST(3), "Cv::Seq::SURFDescriptor", (void*)descriptors);
 		SvSETMAGIC(ST(3));
 	}
 

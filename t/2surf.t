@@ -3,21 +3,10 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 10;
+use Test::More tests => 12;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
-
-{
-	package Cv::Seq::SURFDescriptor;
-	our $N = 128;
-	our @ISA = qw(Cv::Seq::Point);
-	sub template {
-		my $self = CORE::shift;
-		my ($t, $c) = ("f$N", $N);
-		wantarray? ($t, $c) : $t;
-	}
-}
 
 if (1) {
 	my $img = Cv::Image->new([300, 300], CV_8UC3);
@@ -33,6 +22,8 @@ if (1) {
 	my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
 	$gray->show('gray');
 	$gray->extractSURF(\0, my $keypoints, \0, $storage, $params);
+	isa_ok($keypoints, 'Cv::Seq::SURFPoint');
+
 	my %got;
 	for (map {
 		+{
@@ -55,13 +46,10 @@ if (1) {
 	ok($got{@$_}) for @pt;
 
 	$gray->extractSURF(\0, $keypoints, my $descriptors, $storage, $params, 0);
-	ok($descriptors, "expecting descriptors");
-
-	my $n = $descriptors->elem_size / 4; # elem is float
-	is($n, $Cv::Seq::SURFDescriptor::N);
-
-	bless $descriptors, 'Cv::Seq::SURFDescriptor';
-	is($descriptors->total, $keypoints->total, "descriptors");
+	isa_ok($descriptors, 'Cv::Seq::SURFDescriptor');
+	can_ok($descriptors, 'total');
+	can_ok($keypoints, 'total');
+	is($descriptors->total, $keypoints->total);
 
 	if ($verbose) {
 		$img->show;
