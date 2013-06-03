@@ -13,7 +13,7 @@ our @ISA = qw(Cv::Seq::Point);
 
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
 
-our $N = 128;
+our $N = 128;					# XXXX - extended ? 128 : 64
 
 sub template {
 	my $self = CORE::shift;
