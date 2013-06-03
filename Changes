@@ -1,5 +1,12 @@
 Revision history for Cv.pm
 
+0.29 - 2013-06-02
+
+     * added %CONFIGURE_REQUIRES, %TEST_REQUIRES with Makefile.PL
+     * make the typemap from typemap.in. Fixed the structures
+       CvSubdiv2DPoint, CvStarDetectorParams and CvSURFParams which
+       depend on the version of OpenCv.
+
 0.28 - 2013-05-12
      * fixed Cv::Histogram::ranges
      * added %build_reqs
