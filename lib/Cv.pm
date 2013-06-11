@@ -1933,7 +1933,6 @@ sub ProjectPoints2 {
 	goto &cvProjectPoints2;
 }
 
-
 package Cv::StereoBMState;
 
 { *new = \&Cv::CreateStereoBMState }
@@ -1946,6 +1945,7 @@ if (Cv->can('cvCreateStereoGCState')) {
 	*FindStereoCorrespondence = *FindCorrespondence =
 		\&FindStereoCorrespondenceGC;
 }
+
 
 package Cv::StereoSGBM;
 

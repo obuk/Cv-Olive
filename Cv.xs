@@ -3601,6 +3601,9 @@ ALIAS: Cv::cvFindFundamentalMat = 1
 void
 cvFindHomography(const CvMat* srcPoints, const CvMat* dstPoints, CvMat* H, int method=0, double ransacReprojThreshold=3, CvMat* status=NULL)
 ALIAS: Cv::cvFindHomography = 1
+POSTCALL:
+	ST(0) = ST(2);
+	XSRETURN(1);
 
 #if _CV_VERSION() < _VERSION(2,4,0)
 
