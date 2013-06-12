@@ -35,8 +35,8 @@ lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm
 lib/Cv/Seq/Point2.pm
 lib/Cv/Seq/Rect.pm
-lib/Cv/Seq/SURFPoint.pm
 lib/Cv/Seq/SURFDescriptor.pm
+lib/Cv/Seq/SURFPoint.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -284,6 +284,7 @@ t/4CvSeq-Point2.t
 t/4CvSeq-Rect.t
 t/4CvSeq-SURFPoint.t
 t/4CvVideoWriter.t
+t/4findHomography.t
 t/4fitEllipse.t
 t/4fitLine.t
 t/4getBuildInformation.t
@@ -295,6 +296,7 @@ t/4minEnclosingCircle.t
 t/4moments.t
 t/4namedParameters.t
 t/4overload.t
+t/4perspectiveTransform.t
 t/4pointSeqFromMat.t
 t/4projectPoints2.t
 t/4s_new.t

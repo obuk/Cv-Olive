@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 require XSLoader;
 XSLoader::load('Cv::Subdiv2D', $VERSION);

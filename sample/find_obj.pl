@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use lib qw(blib/lib blib/arch);
-use Cv;
+use Cv 0.30;
 use File::Basename;
 use Getopt::Long;
 
@@ -180,26 +180,10 @@ sub locatePlanarObject {
     my $n = $#$ptpairs;
 	return 0 if $n < 4;
 
-	my $pt1 = Cv::Mat->new([], CV_32FC2, map { $_->[0] } @$ptpairs);
-	my $pt2 = Cv::Mat->new([], CV_32FC2, map { $_->[1] } @$ptpairs);
-
-	my $h = Cv::Mat->new([ 3, 3 ], CV_64F);
-    Cv->findHomography($pt1, $pt2, $h, CV_RANSAC, 5);
-
-	my %H = ();
-	for my $j (0 .. 2) {
-		for my $i (0 .. 2) {
-			$H{$j, $i} = $h->getReal([int $j, int $i]);
-		}
-	}
-
-    for (my $i = 0; $i < 4; $i++) {
-        my ($x, $y) = @{$src_corners->[$i]}[0..1];
-        my $Z = 1.0 / ($H{2, 0}*$x + $H{2, 1}*$y + $H{2, 2});
-        my $X = ($H{0, 0}*$x + $H{0, 1}*$y + $H{0, 2})*$Z;
-		my $Y = ($H{1, 0}*$x + $H{1, 1}*$y + $H{1, 2})*$Z;
-        $dst_corners->[$i] = cvPoint(cvRound($X), cvRound($Y));
-    }
+	my $h = Cv->findHomography(
+		[map { $_->[0] } @$ptpairs], [map { $_->[1] } @$ptpairs],
+		CV_RANSAC, 5);
+	@{$dst_corners} = @{Cv->perspectiveTransform($src_corners, $h)};
     return 1;
 }
 

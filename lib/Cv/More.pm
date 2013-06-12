@@ -13,7 +13,7 @@ use Cv::Seq::Point2;
 use Cv::Seq::Rect;
 use Cv::Seq::SURFPoint;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 package Cv;
 
@@ -225,6 +225,36 @@ sub overload_cmp {
 	bless $l, $lc;
 	bless $r, $rc;
 	$cmp;
+}
+
+
+
+# void cvPerspectiveTransform(const CvArr* src, CvArr* dst, const CvMat* mat)
+
+sub Cv::PerspectiveTransform { goto &PerspectiveTransform }
+
+sub PerspectiveTransform {
+	my $src = shift;
+	unless (ref $src) {
+		$src = shift;
+	}
+	my $array = 0;
+	if (ref $src  eq 'ARRAY') {
+		$array++;
+		my @dims = &Cv::m_dims($src);
+		my $type = &Cv::CV_32FC($dims[-1]);
+		$src = Cv::Mat->new([], $type, $src);
+	}
+	my $mat = pop;
+	my $dst = dst(@_) || $src->new;
+	cvPerspectiveTransform($src, $dst, $mat);
+	if (wantarray) {
+		return @$dst if $Cv::O{cs};
+		local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+		Carp::carp $Cv::M{butscalar} if $Cv::O{'cs-warn'};
+	}
+	return [@$dst] if $array;
+	$dst;
 }
 
 
@@ -453,6 +483,41 @@ sub MinEnclosingCircle {
 	}
 	return $retval;
 }
+
+
+
+# ============================================================
+#  calib3d. Camera Calibration, Pose Estimation and Stereo: Camera
+#   Calibration and 3d Reconstruction
+# ============================================================
+
+package Cv::Arr;
+
+# void
+# cvFindHomography(
+#     const CvMat* srcPoints, const CvMat* dstPoints,
+#     CvMat* H, int method=0, double ransacReprojThreshold=3,
+#     CvMat* status=NULL
+# )
+
+sub Cv::FindHomography { goto &FindHomography }
+
+sub FindHomography {
+	my ($srcPoints, $dstPoints) = splice(@_, 0, 2);
+	unless (ref $srcPoints) {
+		($srcPoints, $dstPoints) = ($dstPoints, shift);
+	}
+	if (ref $srcPoints  eq 'ARRAY') {
+		my @dims = &Cv::m_dims($srcPoints);
+		my $type = &Cv::CV_32FC($dims[-1]);
+		$srcPoints = Cv::Mat->new([], $type, $srcPoints);
+		$dstPoints = Cv::Mat->new([], $type, $dstPoints);
+	}
+	my $H = dst(@_) || Cv::Mat->new([3, 3], &Cv::CV_64F);
+	unshift(@_, $srcPoints, $dstPoints, $H);
+	goto &cvFindHomography;
+}
+
 
 1;
 __END__

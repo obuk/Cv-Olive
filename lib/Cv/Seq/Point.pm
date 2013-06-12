@@ -8,7 +8,7 @@ use warnings;
 
 use Cv::Seq;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 our @ISA = qw(Cv::Seq);
 
 { no strict 'refs'; *AUTOLOAD = \&Cv::autoload; }
