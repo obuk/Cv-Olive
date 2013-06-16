@@ -40,41 +40,56 @@ my ($h, $w) = (240, 320);
 my $corners_pts = [[0, 0], [$w, 0], [$w, $h], [0, $h]];
 my $corners_mat = Cv::Mat->new([], CV_32FC2, $corners_pts);
 
-if (1) {
-	my $corners = $corners_mat->perspectiveTransform($corners_mat->new, $H);
-	isa_ok($corners, 'Cv::Mat');
+if (11) {
+	my $dst = $corners_mat->perspectiveTransform($corners_mat->new, $H);
+	isa_ok($dst, 'Cv::Mat');
 }
 
-if (2) {
-	my $corners = $corners_mat->perspectiveTransform($H);
-	isa_ok($corners, 'Cv::Mat');
+if (12) {
+	my $dst = $corners_mat->perspectiveTransform($H);
+	isa_ok($dst, 'Cv::Mat');
 }
 
-if (3) {
-	my $corners = Cv->perspectiveTransform($corners_mat, $H);
-	isa_ok($corners, 'Cv::Mat');
+if (13) {
+	$corners_mat->perspectiveTransform(my $dst, $H);
+	isa_ok($dst, 'Cv::Mat');
 }
 
-if (4) {
-	my $corners = Cv->perspectiveTransform($corners_pts, $H);
-	is(ref $corners, 'ARRAY');
+if (21) {
+	my $dst = Cv->perspectiveTransform($corners_mat, $H);
+	isa_ok($dst, 'Cv::Mat');
 }
 
-if (5) {
-	my @corners = Cv->perspectiveTransform($corners_pts, $H);
-	is(ref $corners[0], 'ARRAY');
-	is(scalar @corners, 1);
+if (22) {
+	Cv->perspectiveTransform($corners_mat, my $dst, $H);
+	isa_ok($dst, 'Cv::Mat');
 }
 
-if (6) {
-	my @corners = Cv->perspectiveTransform($corners_pts, $H);
-	is(ref $corners[0], 'ARRAY');
-	is(scalar @corners, 1);
+if (23) {
+	my $dst = Cv->perspectiveTransform($corners_pts, $H);
+	is(ref $dst, 'ARRAY');
 }
 
-if (7) {
+if (31) {
+	my @dst = Cv->perspectiveTransform($corners_pts, $H);
+	is(ref $dst[0], 'ARRAY');
+	is(scalar @dst, 1);
+}
+
+if (32) {
+	Cv->perspectiveTransform($corners_pts, my $dst, $H);
+	isa_ok($dst, 'Cv::Mat');
+}
+
+if (33) {
+	my @dst = Cv->perspectiveTransform($corners_pts, $H);
+	is(ref $dst[0], 'ARRAY');
+	is(scalar @dst, 1);
+}
+
+if (34) {
 	Cv::More->import(qw(cs));
-	my @corners = Cv->perspectiveTransform($corners_pts, $H);
-	is(ref $corners[0], 'ARRAY');
-	is(scalar @corners, scalar @$corners_pts);
+	my @dst = Cv->perspectiveTransform($corners_pts, $H);
+	is(ref $dst[0], 'ARRAY');
+	is(scalar @dst, scalar @$corners_pts);
 }

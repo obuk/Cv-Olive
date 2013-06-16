@@ -39,7 +39,7 @@ Cv->findHomography(
 	my $H = Cv::Mat->new([3, 3], CV_64F),
 	CV_RANSAC, 5);
 
-if (2) {
+if (11) {
 	my $H2 = Cv->findHomography(
 		Cv::Mat->new([], CV_32FC2, \@p1),
 		Cv::Mat->new([], CV_32FC2, \@p2),
@@ -48,17 +48,40 @@ if (2) {
 	is_deeply([$H2->m_get([])], [$H->m_get([])]);
 }
 
+if (12) {
+	Cv->findHomography(
+		Cv::Mat->new([], CV_32FC2, \@p1),
+		Cv::Mat->new([], CV_32FC2, \@p2),
+		my $H2,
+		CV_RANSAC, 5);
+	is_deeply([$H2->m_get([])], [$H->m_get([])]);
+}
 
-if (3) {
-	my $H3 = Cv->findHomography(
+if (13) {
+	my $H2 = Cv->findHomography(
+		Cv::Mat->new([], CV_32FC2, \@p1),
+		Cv::Mat->new([], CV_32FC2, \@p2),
+		CV_RANSAC, 5);
+	is_deeply([$H2->m_get([])], [$H->m_get([])]);
+}
+
+if (21) {
+	my $H2 = Cv->findHomography(
 		\@p1, \@p2,
 		Cv::Mat->new([3, 3], CV_64F),
 		CV_RANSAC, 5);
-	is_deeply([$H3->m_get([])], [$H->m_get([])]);
+	is_deeply([$H2->m_get([])], [$H->m_get([])]);
 }
 
+if (22) {
+	Cv->findHomography(
+		\@p1, \@p2,
+		my $H2,
+		CV_RANSAC, 5);
+	is_deeply([$H2->m_get([])], [$H->m_get([])]);
+}
 
-if (4) {
-	my $H4 = Cv->findHomography(\@p1, \@p2, CV_RANSAC, 5);
-	is_deeply([$H4->m_get([])], [$H->m_get([])]);
+if (23) {
+	my $H2 = Cv->findHomography(\@p1, \@p2, CV_RANSAC, 5);
+	is_deeply([$H2->m_get([])], [$H->m_get([])]);
 }
