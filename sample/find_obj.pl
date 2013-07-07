@@ -33,6 +33,7 @@ use Inline C => << '----';
 #  error "use C++"
 #endif
 
+#undef seed  /* opencv 2.4.6 */
 #include <opencv/cv.h>
 
 AV*

@@ -23,6 +23,7 @@ extern "C" {
 /* remove confincting macros */
 #undef do_open
 #undef do_close
+#undef seed                   /* opencv 2.4.6 opencv2/core/core.hpp */
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>

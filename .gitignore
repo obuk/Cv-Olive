@@ -16,10 +16,14 @@ t/ref*.pm
 *.bak
 *.bs
 *.c
+*.json
 *.o
 *.old
 *.orig
 *.rej
 *.skip
 *.tmp
+*.yml
 *~
+bugs.ini
+\.bugs*

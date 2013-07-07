@@ -18,6 +18,7 @@ fallback/Constant.pm-2.4.2
 fallback/Constant.pm-2.4.3
 fallback/Constant.pm-2.4.4
 fallback/Constant.pm-2.4.5
+fallback/Constant.pm-2.4.6
 Histogram/Histogram.xs
 Histogram/lib/Cv/Histogram.pm
 Histogram/Makefile.PL
