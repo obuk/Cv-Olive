@@ -1,10 +1,11 @@
 Revision history for Cv.pm
 
-0.30rc - 2013-06-12
+0.30rc - 2013-07-08
      * fixed cvFindHomography returns
      * supports arrref instead of CvMat for src points:
        - findHomography, perspectiveTransform
        - see sample/find_obj.pl
+     * tested with OpenCV-2.4.6, and fixed compile error
 
 0.29 - 2013-06-02
      * added %CONFIGURE_REQUIRES, %TEST_REQUIRES with Makefile.PL
