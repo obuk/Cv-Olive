@@ -186,13 +186,12 @@ BEGIN {
 	# Inline::C
 	%C = (
 		%MM,
-		AUTO_INCLUDE => join("\n", (
-								 '#undef do_open',
-								 '#undef do_close',
-								 # '#define __Inline_C',
-								 # '#include "Cv.inc"',
-								 '',
-							 )),
+		AUTO_INCLUDE => join("\n",
+							 '#undef do_open',
+							 '#undef do_close',
+							 '#define __Inline_C',
+							 '#include "Cv.inc"',
+							 '',
 		);
 }
 

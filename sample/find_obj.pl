@@ -28,13 +28,9 @@ Usage: $0 [--(no)?flann] <object_filename> <scene_filename>
 use Cv::Config;
 use Inline C => Config => %Cv::Config::C;
 use Inline C => << '----';
-
 #ifndef __cplusplus
 #  error "use C++"
 #endif
-
-#undef seed  /* opencv 2.4.6 */
-#include <opencv/cv.h>
 
 AV*
 flannFindPairs(
