@@ -2759,21 +2759,21 @@ OUTPUT:
 
 #endif
 
-#if _CV_VERSION() >= _VERSION(2,0,0)
-# if _CV_VERSION() >= _VERSION(2,2,0)
+#if _CV_VERSION() >= _VERSION(2,2,0)
 
 CvStarDetectorParams
 cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8, int suppressNonmaxSize = 5)
 
-# else
+CvSeq*
+cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams(45, 30, 10, 8, 5))
+
+#elif _CV_VERSION() >= _VERSION(2,0,0)
 
 CvStarDetectorParams
 cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8)
 
-# endif
-
 CvSeq*
-cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams())
+cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams(45, 30, 10, 8))
 
 #endif
 
