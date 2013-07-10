@@ -33,14 +33,6 @@ BEGIN {
 }
 use Inline C => Config => %Cv::Config::C;
 use Inline C => << '----';
-#undef seed  /* opencv 2.4.6 */
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-#ifndef __cplusplus
-#define __OPENCV_BACKGROUND_SEGM_HPP__
-#define __OPENCV_VIDEOSURVEILLANCE_H__
-#endif
-#include <opencv/cvaux.h>
 IplImage* myload(const char* name)
 {
 	return cvLoadImage(name, CV_LOAD_IMAGE_COLOR);
