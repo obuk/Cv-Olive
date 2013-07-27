@@ -1,0 +1,3 @@
+[submodule "Features2d"] 
+	path = Features2d
+	url = https://github.com/yuta-masuda/Cv-Features2d.git

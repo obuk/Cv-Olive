@@ -97,6 +97,7 @@ push(@dir, qw(BGCodeBookModel));
 push(@dir, qw(Histogram));
 push(@dir, qw(Subdiv2D));
 push(@dir, qw(Qt)) if $cf->hasqt;
+push(@dir, qw(Features2d)) if $cv2;
 
 WriteMakefile(
 	NAME => 'Cv',
