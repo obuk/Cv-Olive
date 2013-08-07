@@ -23,7 +23,7 @@ Cv - helps you to make something around computer vision.
 
 C<Cv> is the Perl interface to the OpenCV computer vision library that
 originally developed by Intel.  I'm making this module to use the
-computer vision more easily like a slogan of perl I<"Easy things
+computer vision more easily like a slogan of Perl I<"Easy things
 should be easy, hard things should be possible.">
 
 The features are as follows.
@@ -121,7 +121,7 @@ http://opencv.willowgarage.com/.
 
 =item *
 
-You can use C<CreateSomething()> as a constructors. 
+You can use C<CreateSomething()> as a constructor. 
 
  my $img = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
  my $mat = Cv->CreateMat([ 240, 320 ], CV_8UC3);
@@ -133,7 +133,8 @@ C<Cv-E<gt>CreateImage()>, C<Cv::Mat-E<gt>new> is
 C<Cv-E<gt>CreateMat()>.  In the calling parameters, there are some
 difference in CreateImage() and CreateMat().  But there are no
 difference in C<Cv::Something-E<gt>new>.  This is because we create
-same object without knowing about original object in the C<Cv::Arr>.
+the same object without knowing about the original object in the
+C<Cv::Arr>.
 
  my $img = Cv::Image->new([ 240, 320 ], CV_8UC3);
  my $mat = Cv::Mat->new([ 240, 320 ], CV_8UC4);
@@ -230,9 +231,9 @@ package Cv::ContourScanner;   our @ISA = qw(Cv::Seq);
 
 =item *
 
-You can use name of method, omitting "cv" from the OpenCV function
-name, and also use lowercase name beginning. For example, you can call
-C<cvCreateMat()> as:
+You can use names of method, omitting "cv" from the OpenCV function
+name, and also uses lowercase name beginning. For example, you can
+call C<cvCreateMat()> as follows:
 
  my $mat = Cv->CreateMat(240, 320, CV_8UC3);
  my $mat = Cv->createMat(240, 320, CV_8UC3);
@@ -442,7 +443,7 @@ sub dst (\@) {
 
 =item *
 
-The members of structure are same as function.
+The members of the structure are same as function.
 
  my ($c, $d) = ($img->channels, $img->depth);
  my ($h, $w) = ($img->height, $img->width);
@@ -475,9 +476,9 @@ sub COI {
 
 =item *
 
-There are functions Get() and Set(). They access an elements.  You can
-call Get() as cvGetND(), and Set() as cvSetND().  So, you have to to
-call Fill() instead of calling the cvSetND().
+There are functions Get() and Set(). They access an element.  You can
+call Get() as cvGetND(), and Set() as cvSetND().  So, you have to call
+Fill() instead of calling the cvSetND().
 
  my $x = $mat->Get($i, $j);        # cvGetND($mat, [$i, $j])
  my $x = $mat->Get(\@idx);         # cvGetND($mat, \@idx);
@@ -582,8 +583,8 @@ sub SetReal {
 
 =item *
 
-Ptr() returns a string that from specified element up to the end of
-the line.  Parameters are same as Get().
+Ptr() returns a string that from the specified element up to the end
+of the line.  Parameters are same as Get().
 
  my $str = $mat->Ptr($row, $col);  # cvPtrND($mat, [$row, $col]);
  my $str = $mat->Ptr($row);        # cvPtrND($mat, [$row]);
@@ -2131,16 +2132,17 @@ We rewrote some OpenCV samples in C<Cv>, and put them in sample/.
 =item *
 
 Threshold() updates the parameter threshold if threshold-type is
-CV_THRESH_OTSU.  It looks like perl magic.  So, you can use
+CV_THRESH_OTSU.  It looks like Perl magic.  So, you can use
 Threshold() is as follows:
 
  my $bin = $gray->threshold(my $thresh, 255, CV_THRESH_OTSU);
 
 =item *
 
-Constants used in the Perl world is converted into lib/Cv/Constant.pm
-from the header file using h2ph.  If it failed, the version of the
-installed OpenCV is checked, and copied from the fallback/.
+Constants used in the Perl world are converted into a
+lib/Cv/Constant.pm from the header file using h2ph.  If it failed, the
+version of the installed OpenCV is checked, and copied from the
+fallback/.
 
 =cut
 
@@ -2165,8 +2167,8 @@ original names C<CV_SOMETHING> because they are shorter.  (Cv-0.13)
 
 =item *
 
-Usage of the CV_SIZEOF has changed.  Write the name of structure of
-OpenCV that you want to know the size as follows. (Cv-0.13)
+Usage of the CV_SIZEOF has changed.  Write the name of the structure
+of OpenCV that you want to know the size as follows. (Cv-0.13)
 
  CV_SIZEOF('CvContour')
 
@@ -2180,7 +2182,7 @@ However, it was confusing to us, we have to change -nomore. (0.24)
 
 =head1 SEE ALSO
 
-http://github.com/obuk/Cv-Olive
+https://github.com/yuta-masuda/Cv
 
 
 =head1 AUTHOR
