@@ -96,6 +96,7 @@ my @dir = qw();
 push(@dir, qw(BGCodeBookModel));
 push(@dir, qw(Histogram));
 push(@dir, qw(Subdiv2D));
+push(@dir, qw(More));
 push(@dir, qw(Qt)) if $cf->hasqt;
 
 WriteMakefile(
