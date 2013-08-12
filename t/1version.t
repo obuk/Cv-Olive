@@ -27,6 +27,7 @@ my $cv = version->parse($Cv::VERSION);
 foreach (sort &classes('Cv')) {
 	next if /^Cv::.*::Ghost$/;
 	next if /^Cv::Constant$/;
+	next if /^Cv::More$/;
 	my $pm = join('/', split(/::/, $_)) . ".pm";
 	no warnings 'uninitialized';
 	if ($INC{$pm}) {

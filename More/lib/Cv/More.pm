@@ -9,6 +9,7 @@ Cv::More - A little more easy to using L<Cv> in Perl.
 =head1 SYNOPSIS
 
  use Cv::More qw(cs);
+ use Cv::More qw(nonzero);
 
 =cut
 
@@ -21,7 +22,22 @@ use warnings;
 # use Cv qw( );
 use Cv::Seq;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
+
+require XSLoader;
+XSLoader::load('Cv::More', $VERSION);
+
+require Exporter;
+
+our @ISA = qw(Exporter);
+
+our @EXPORT_OK = (qw(nonzero));
+
+our %EXPORT_TAGS = (
+	'all' => \@EXPORT_OK,
+	);
+
+our @EXPORT = ( );
 
 {
 	package Cv;
@@ -49,26 +65,29 @@ enabled by default. Please make a explicit if you do not use.
 
 sub import {
 	my $self = shift;
+	my @what = ();
 	for (@_) {
-		next if /^:/;			# ignore
 		if (defined $Cv::O{$_}) {
 			$Cv::O{$_} = 1;
 		} else {
-			Carp::croak join(' ', "can't import", $_, 'in', (caller 0)[3]);
+			push(@what, $_);
 		}
 	}
+	$self->export_to_level(1, $self, @what);
 }
+
 
 sub unimport {
 	my $self = shift;
+	my @what = ();
 	for (@_) {
-		next if /^:/;			# ignore
 		if (defined $Cv::O{$_}) {
 			$Cv::O{$_} = 0;
 		} else {
-			Carp::croak join(' ', "can't unimport", $_, 'in', (caller 0)[3]);
+			push(@what, $_);
 		}
 	}
+	$self->export_to_level(1, $self, @what);
 }
 
 
@@ -882,6 +901,27 @@ sub Affine {
 }
 
 } # package
+
+
+=item nonzero($array, $reverse = 0)
+
+  my @point = $array->nonzero();
+  my $nr_of_points = $array->nonzero();
+
+The nonzero() returns the all non-zero @points of the $array in the
+list context.  Each point in the @point is cvPoint1D(), cvPoint2D() or
+cvPoint3D().  In the scalar context, the nonzero() returns the number
+of points.  For example, you want to draw the circle on the $image at
+points of non-zero or greater than the $thresh, you can use nonzero()
+as follows:
+
+  $image->circle($_, ...) for $array->nonzero();
+  $image->circle($_, ...) for $array->subS($thresh)->nonzero();
+
+The flag $reverse makes reverse the sequence of indices of each point.
+
+=cut
+
 
 1;
 __END__

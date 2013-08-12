@@ -30,7 +30,6 @@ lib/Cv/Config.pm
 lib/Cv/Cv.inc
 lib/Cv/Flipbook.pm
 lib/Cv/JA.pod
-lib/Cv/More.pm
 lib/Cv/Seq.pm
 lib/Cv/Seq/Circle.pm
 lib/Cv/Seq/Point.pm
@@ -41,6 +40,12 @@ lib/Cv/Seq/SURFPoint.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+More/Changes
+More/lib/Cv/More.pm
+More/Makefile.PL
+More/More.xs
+More/t/nonzero.t
+More/t/pod-coverage.t
 ppport.h
 Qt/lib/Cv/Qt.pm
 Qt/Makefile.PL
