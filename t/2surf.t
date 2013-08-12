@@ -49,8 +49,11 @@ if (1) {
 
 	$t0 = Cv->getTickCount();
 	$gray->extractSURF(\0, $keypoints, my $descriptors, $storage, $params, 1);
-	my $t2 = Cv->getTickCount() - $t0;
-	cmp_ok($t2, '<=', $t1);
+  SKIP: {
+	  skip "test the etime if useProvidedKeyPts", 1 unless cvVersion() >= 2.000;
+	  my $t2 = Cv->getTickCount() - $t0;
+	  cmp_ok($t2, '<=', $t1);
+	}
 
 	isa_ok($descriptors, 'Cv::Seq::SURFDescriptor');
 	can_ok($descriptors, 'total');

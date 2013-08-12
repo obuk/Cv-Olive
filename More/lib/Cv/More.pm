@@ -56,7 +56,7 @@ BEGIN {
 C<Cv::More> is a package to organize some of the experimental features
 from L<Cv>. I believe it will be easier to extend the
 C<Cv>. C<Cv::More> is what separated the part of the C<Cv>. So, it is
-enabled by default. Please make a explicit if you do not use.
+enabled by default. Please make an explicit if you do not use.
 
  use Cv;              # enabled Cv::More
  use Cv -nomore;	  # disabled Cv::More
