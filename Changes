@@ -1,5 +1,9 @@
 Revision history for Cv.pm
 
+0.31rc - 2013-08-11
+     * split Cv::More
+     * add Cv::Features2d (OpenCV-2.x)
+
 0.30 - 2013-07-28
      * fixed cvFindHomography returns
      * supports arrref instead of CvMat for src points:
