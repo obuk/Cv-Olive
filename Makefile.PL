@@ -98,7 +98,7 @@ push(@dir, qw(Histogram));
 push(@dir, qw(Subdiv2D));
 push(@dir, qw(More));
 push(@dir, qw(Qt)) if $cf->hasqt;
-push(@dir, qw(Features2d)) if $cv2;
+push(@dir, qw(Features2d)) if $cf->_version >= qv(2.4.5);
 
 WriteMakefile(
 	NAME => 'Cv',
