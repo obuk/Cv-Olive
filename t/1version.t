@@ -21,6 +21,8 @@ is(scalar Cv::version, cvVersion());
 is(scalar Cv->Version, Cv::cvVersion());
 is(scalar Cv->version, cvVersion());
 
+=xxx
+
 # test our VERSION
 use version;
 my $cv = version->parse($Cv::VERSION);
@@ -51,3 +53,5 @@ sub classes {
 	}
 	@list;
 }
+
+=cut
