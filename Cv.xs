@@ -2759,21 +2759,30 @@ OUTPUT:
 
 #endif
 
+#if _CV_VERSION() >= _VERSION(2,0,0)
+
+CvStarDetectorParams
+cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8, int suppressNonmaxSize = NO_INIT)
+INIT:
+	if (items < 5) suppressNonmaxSize = 5;
+CODE:
+	RETVAL = cvStarDetectorParams(maxSize, responseThreshold, lineThresholdProjected, lineThresholdBinarized
 #if _CV_VERSION() >= _VERSION(2,2,0)
-
-CvStarDetectorParams
-cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8, int suppressNonmaxSize = 5)
-
-CvSeq*
-cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams(45, 30, 10, 8, 5))
-
-#elif _CV_VERSION() >= _VERSION(2,0,0)
-
-CvStarDetectorParams
-cvStarDetectorParams(int maxSize = 45, int responseThreshold = 30, int lineThresholdProjected = 10, int lineThresholdBinarized = 8)
+		, suppressNonmaxSize
+#endif
+		);
+OUTPUT:
+	RETVAL
 
 CvSeq*
 cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams(45, 30, 10, 8))
+INIT:
+	if (items < 3) params = 
+#if _CV_VERSION() >= _VERSION(2,2,0)
+		cvStarDetectorParams(45, 30, 10, 8, 5);
+#else
+		cvStarDetectorParams(45, 30, 10, 8);
+#endif
 
 #endif
 
