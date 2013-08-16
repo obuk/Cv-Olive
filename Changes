@@ -2,7 +2,8 @@ Revision history for Cv.pm
 
 0.31rc - 2013-08-11
      * split Cv::More
-     * add Cv::Features2d (OpenCV-2.x)
+       - add nonzero() - gets indices of each point
+     * add Cv::Features2d (OpenCV-2.4.5)
 
 0.30 - 2013-07-28
      * fixed cvFindHomography returns

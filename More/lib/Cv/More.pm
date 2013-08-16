@@ -908,7 +908,7 @@ sub Affine {
   my @point = $array->nonzero();
   my $nr_of_points = $array->nonzero();
 
-The nonzero() returns the all non-zero @points of the $array in the
+The nonzero() returns the all non-zero @point of the $array in the
 list context.  Each point in the @point is cvPoint1D(), cvPoint2D() or
 cvPoint3D().  In the scalar context, the nonzero() returns the number
 of points.  For example, you want to draw the circle on the $image at
