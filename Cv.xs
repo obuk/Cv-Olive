@@ -2,6 +2,10 @@
 
 #include "Cv.inc"
 
+#if _CV_VERSION() >= _VERSION(2,4,0)
+#  include "opencv2/nonfree/nonfree.hpp"
+#endif
+
 #define bless(st0, class, retval) \
     sv_setref_pv(st0 = sv_newmortal(), class, (void*)retval);
 
@@ -3957,3 +3961,6 @@ BOOT:
 		hv_store(Cv_SIZEOF, p->name, strlen(p->name), newSViv(p->size), 0);
 	}
 }
+#if _CV_VERSION() >= _VERSION(2,4,0)
+	initModule_nonfree();
+#endif
