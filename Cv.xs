@@ -3917,7 +3917,8 @@ CODE:
 	if (gimme == G_VOID) {
 		if (verbose) fprintf(stderr, "Context is Void\n");
 	} else if (gimme == G_SCALAR) {
-		const char *v = CV_VERSION;
+		char v[strlen(CV_VERSION)+1];
+	  	sprintf(v, "%d.%d.%d", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
 		if (verbose) fprintf(stderr, "Context is Scalar\n", v);
 		XPUSHs(sv_2mortal(newSVpvn(v, strlen(v))));
 		XSRETURN(1);
