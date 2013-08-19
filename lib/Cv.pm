@@ -64,7 +64,7 @@ our %M;
 
 BEGIN {
 	$IMPORT{$_} = 1 for qw(Histogram More Seq);
-	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel Subdiv2D);
+	$IMPORT{$_} = 0 for qw(Qt BGCodeBookModel Subdiv2D Nonfree);
 	$O{$_} = 1 for qw(boxhappy);
 }
 

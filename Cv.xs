@@ -3,7 +3,9 @@
 #include "Cv.inc"
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
-#  include "opencv2/nonfree/nonfree.hpp"
+#ifdef __cplusplus                                                      // XXXXX
+#  include "opencv2/nonfree/nonfree.hpp"                                // XXXXX
+#endif                                                                  // XXXXX
 #endif
 
 #define bless(st0, class, retval) \
@@ -2779,7 +2781,7 @@ OUTPUT:
 	RETVAL
 
 CvSeq*
-cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params=cvStarDetectorParams(45, 30, 10, 8))
+cvGetStarKeypoints(const CvArr* img, CvMemStorage* storage, CvStarDetectorParams params = NO_INIT)
 INIT:
 	if (items < 3) params = 
 #if _CV_VERSION() >= _VERSION(2,2,0)
@@ -3961,6 +3963,3 @@ BOOT:
 		hv_store(Cv_SIZEOF, p->name, strlen(p->name), newSViv(p->size), 0);
 	}
 }
-#if _CV_VERSION() >= _VERSION(2,4,0)
-	initModule_nonfree();
-#endif

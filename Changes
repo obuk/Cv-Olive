@@ -1,6 +1,6 @@
 Revision history for Cv.pm
 
-0.31rc - 2013-08-11
+0.31rc - 2013-08-20
      * split Cv::More
        - add nonzero() - gets indices of each point
      * add Cv::Features2d (OpenCV-2.4.5)
@@ -11,7 +11,6 @@ Revision history for Cv.pm
        - findHomography, perspectiveTransform
        - see sample/find_obj.pl
      * tested with OpenCV-2.4.6, and fixed compile error
-     * added Features2d (cv 2.x)
 
 0.29 - 2013-06-02
      * added %CONFIGURE_REQUIRES, %TEST_REQUIRES with Makefile.PL

@@ -98,6 +98,10 @@ More/t/s_new.t
 More/t/toArray-seq.t
 More/t/toArray.t
 More/t/transform.t
+Nonfree/lib/Cv/Nonfree.pm
+Nonfree/Makefile.PL
+Nonfree/Nonfree.xs
+Nonfree/t/Cv-Nonfree.t
 ppport.h
 Qt/lib/Cv/Qt.pm
 Qt/Makefile.PL
