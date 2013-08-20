@@ -139,6 +139,7 @@ dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 }
 
 sub MY::postamble {
+	my $TEST_FILES = join(' ', map { "$_/t/*t" } @dir);
 	"
 
 ref:
@@ -149,9 +150,13 @@ const:
 
 cover:
 	cover -delete
-	-HARNESS_PERL_SWITCHES=-MDevel::Cover make test
+	make cover_simple
+	make cover_simple TEST_FILES=\"$TEST_FILES\"
 	cover
 	find cover_db -type d |xargs chmod +rx
+
+cover_simple:
+	-HARNESS_PERL_SWITCHES=-MDevel::Cover make \$(TEST_TYPE)
 
 ";
 }
