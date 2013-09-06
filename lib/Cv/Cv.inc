@@ -93,9 +93,10 @@ typedef struct {
 	SV* callback;
 	union {
 		struct trackbar {
-			SV* value;
+			SV* userdata; /* cvCreateTrackbar2() */
 			int pos;
 			int lastpos;
+			SV* value;
 		} t;
 		struct mouse {
 			SV* userdata;

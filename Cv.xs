@@ -18,11 +18,13 @@ static void delete_callback(AV* av)
 		callback_t* callback = INT2PTR(callback_t*, SvIV(sv));
 		if (callback) {
 			if (callback->callback) SvREFCNT_dec(callback->callback);
+			if (callback->u.t.userdata) SvREFCNT_dec(callback->u.t.userdata);
 			if (callback->u.t.value) SvREFCNT_dec(callback->u.t.value);
 			safefree(callback);
 		} else {
 			Perl_croak(aTHX_ "callback is 0");
 		}
+		SvREFCNT_dec(sv);
 	}
 }
 
@@ -3065,12 +3067,14 @@ INIT:
 	RETVAL = -1;
 CODE:
 	Newx(callback, 1, callback_t);
+	bzero(callback, sizeof(callback));
 	callback->callback = 0;
 	if (onChange && SvROK(onChange) && SvTYPE(SvRV(onChange)) == SVt_PVCV) {
 		SvREFCNT_inc(callback->callback = (SV*)SvRV(onChange));
 	}
 	callback->u.t.value = 0;
 	callback->u.t.lastpos = callback->u.t.pos = 0;
+	callback->u.t.userdata = 0; /* cvCreateTrackbar2() */
 	if (SvOK(value) && SvTYPE(value) == SVt_IV) {
 		SvREFCNT_inc(callback->u.t.value = value);
 		callback->u.t.lastpos = callback->u.t.pos = SvIV(value);
@@ -3160,6 +3164,7 @@ INIT:
 	}
 CODE:
 	Newx(callback, 1, callback_t);
+	bzero(callback, sizeof(callback));
 	callback->callback = 0;
 	if (onMouse && SvROK(onMouse) && SvTYPE(SvRV(onMouse)) == SVt_PVCV) {
 		SvREFCNT_inc(callback->callback = (SV*)SvRV(onMouse));
