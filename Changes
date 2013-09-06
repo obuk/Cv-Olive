@@ -1,6 +1,9 @@
 Revision history for Cv.pm
 
-0.31rc - 2013-08-20
+0.32 - 2013-09-xx
+     * fix memoryleak of trackbar
+
+0.31 - 2013-08-20
      * split Cv::More
        - add nonzero() - gets indices of each point
      * add Cv::Features2d (OpenCV-2.4.5)
