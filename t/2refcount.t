@@ -33,10 +33,8 @@ if (3) {
 	my $mat = Cv::SparseMat->new([10, 10], CV_32FC1);
 	ok($mat);
 	is(ref $mat, 'Cv::SparseMat');
-  TODO: {
-	  local $TODO = "fix refcount (value of refcount is -1)";
-	  is($mat->refcount, 1);
-	}
+	# refcount is not used in Cv::SparseMat
+	is($mat->refcount, -1);
 	Cv::SparseMat::cvReleaseSparseMat($mat);
 	is(ref $mat, 'SCALAR');
 	throws_ok { Cv::SparseMat::refcount($mat) } qr/mat is not of type CvSparseMat \* in Cv::SparseMat::refcount at $0/;
