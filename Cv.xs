@@ -100,7 +100,7 @@ static void cb_trackbar2(int pos, VOID* userdata)
 		ENTER;
 		SAVETMPS;
 		PUSHMARK(SP);
-		EXTEND(SP, 5);
+		EXTEND(SP, 2);
 		PUSHs(sv_2mortal(newSViv(p->u.t.pos)));
 		PUSHs(p->u.m.userdata? p->u.t.userdata : &PL_sv_undef);
 		PUTBACK;
