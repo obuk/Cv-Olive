@@ -29,6 +29,7 @@ Features2d/ppport.h
 Features2d/README
 Features2d/sample/find_obj.pl
 Features2d/sample/freak_demo.pl
+Features2d/sample/harris_detector.pl
 Features2d/t/create.t
 Features2d/t/detector.t
 Features2d/t/dynamic.t
@@ -138,6 +139,7 @@ sample/distrans.pl
 sample/drawing.pl
 sample/edge.pl
 sample/facedetect.pl
+sample/fback2.pl
 sample/fback_c.pl
 sample/ffilldemo.pl
 sample/find_obj.pl
@@ -275,6 +277,7 @@ t/2cvtScale.t
 t/2cvtScaleAbs.t
 t/2cvtSeqToArray.t
 t/2dct.t
+t/2destroy.t
 t/2det.t
 t/2dft.t
 t/2div.t

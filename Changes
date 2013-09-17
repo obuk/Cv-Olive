@@ -3,6 +3,7 @@ Revision history for Cv.pm
 0.32 - 2013-09-xx
      * fix memoryleak of trackbar
      * use cvCreateTrackbar2 instead of cvCreateTrackbar if OpenCV2
+     * fix DESTROY (cvRelease*) if SvREFCNT > 1
 
 0.31 - 2013-08-20
      * split Cv::More
