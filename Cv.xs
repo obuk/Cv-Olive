@@ -194,6 +194,18 @@ static SV *unbless(SV * rv)
     return rv;
 }
 
+#define CHECK_DESTROY(sv) \
+	if (SvREFCNT(sv) > 1) { \
+		/* const char* CLASS = (const char*)sv_reftype(SvRV(sv), TRUE); \
+		fprintf(stderr, "%s::DESTROY - ignored\n", CLASS); */ \
+		XSRETURN_EMPTY; \
+	} else
+
+#define DESTROY(sv) \
+	STMT_START { \
+		CHECK_DESTROY(sv); \
+		unbless(sv); \
+	} STMT_END
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 #ifdef __cplusplus
@@ -952,7 +964,7 @@ void
 cvReleaseRNG(CvRNG* rng)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 CODE:
 	if (rng) safefree(rng);
 
@@ -979,40 +991,37 @@ POSTCALL:
 	XSRETURN(1);
 
 void
-cvReleaseData(CvArr* &arr)
+cvReleaseData(CvArr* arr)
 INIT:
-	unbless(ST(0));
+	/* can't unbless (not a DESTROY) */
 
 MODULE = Cv	PACKAGE = Cv::Image
 void
 cvReleaseImage(IplImage* &image)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Mat
 void
 cvReleaseMat(CvMat* &mat)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
-	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::MatND
 void
 cvReleaseMatND(CvMatND* &mat)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
-	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::SparseMat
 void
 cvReleaseSparseMat(CvSparseMat* &mat)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
-	// if (!(mat && mat->refcount && *mat->refcount >= 0)) XSRETURN_EMPTY;
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
@@ -1480,7 +1489,7 @@ void
 cvReleaseMemStorage(CvMemStorage* &storage)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 void
 cvRestoreMemStoragePos(CvMemStorage* storage, CvMemStoragePos pos)
@@ -1593,7 +1602,7 @@ void
 cvReleaseSeqReader(CvSeqReader* reader)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 CODE:
 	if (reader) safefree(reader);
 
@@ -1688,7 +1697,7 @@ void
 cvReleaseFont(CvFont* font)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 CODE:
 	safefree(font);
 
@@ -1864,14 +1873,14 @@ MODULE = Cv	PACKAGE = Cv
 void
 cvRelease(VOID* &structPtr)
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::FileStorage
 void
 cvReleaseFileStorage(CvFileStorage* &fs)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv
 void
@@ -2486,7 +2495,7 @@ void
 cvReleaseHuMoments(CvHuMoments* hu_moments)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 CODE:
 	safefree(hu_moments);
 
@@ -2591,7 +2600,7 @@ void
 cvReleaseMoments(CvMoments* moments)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 CODE:
 	safefree(moments);
 
@@ -2852,7 +2861,7 @@ void
 cvReleaseHaarClassifierCascade(CvHaarClassifierCascade* &cascade)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 int
 cvRunHaarClassifierCascade(CvHaarClassifierCascade* cascade, CvPoint pt, int start_stage=0)
@@ -3058,7 +3067,7 @@ void
 cvReleaseKalman(CvKalman* &kalman)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 MODULE = Cv	PACKAGE = Cv::Arr
 CvSeq*
@@ -3369,7 +3378,7 @@ void
 cvReleaseCapture(CvCapture* &capture)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 IplImage*
 cvRetrieveFrame(CvCapture* capture, int streamIdx=0)
@@ -3395,7 +3404,7 @@ void
 cvReleaseVideoWriter(CvVideoWriter* &writer)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 int
 cvWriteFrame(CvVideoWriter* writer, const IplImage* image)
@@ -3723,7 +3732,7 @@ void
 cvReleaseStereoBMState(CvStereoBMState* &state)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 
 #if _CV_VERSION() < _VERSION(2,4,0)
@@ -3733,7 +3742,7 @@ void
 cvReleaseStereoGCState(CvStereoGCState* &state)
 ALIAS: DESTROY = 1
 INIT:
-	unbless(ST(0));
+	DESTROY(ST(0));
 
 #endif
 

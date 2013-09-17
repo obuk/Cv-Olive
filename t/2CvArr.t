@@ -137,3 +137,20 @@ for my $src_class (keys %TYPENAME) {
 	}
 
 }
+
+for my $arr (
+	Cv::Mat->new([10, 10], CV_32FC1),
+	Cv::Image->new([10, 10], CV_32FC1),
+	Cv::MatND->new([10, 10], CV_32FC1),
+	) {
+	$arr->cvReleaseData;
+
+=xxx
+
+OpenCV Error: Bad argument (unrecognized or unsupported array type) in cvReleaseData
+
+=cut
+
+	$arr->cvReleaseData;
+	$arr->DESTROY;
+}
