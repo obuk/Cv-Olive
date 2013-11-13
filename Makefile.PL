@@ -4,9 +4,8 @@ use 5.008008;
 use ExtUtils::MakeMaker;
 
 our %PREREQ_PM = (
-	'ExtUtils::ParseXS'   => '2.210',
+	'ExtUtils::ParseXS'   => '2.190',
 	'version'             => '0.770',
-	# 'ExtUtils::PkgConfig' => '1.120',
 	'Test::Number::Delta' => '1.030',
 	'Test::Exception'     => '0.310',
 	$^O eq 'cygwin' ? ('ExtUtils::MM_Cygwin' => '6.620') : (),
@@ -96,11 +95,9 @@ push(@dir, qw(More));
 push(@dir, qw(Qt)) if $cf->hasqt;
 push(@dir, qw(Nonfree));
 
-eval "use Data::Structure::Util";
-unless ($@) {
-	if ($cf->cc =~ /\+\+/) {
-		push(@dir, qw(Features2d)) if $cf->_version >= qv(2.4.5);
-	}
+if ($cf->_version >= qv(2.4.5) && $cf->cc =~ /\+\+/) {
+	eval "use Data::Structure::Util";
+	push(@dir, qw(Features2d)) unless $@;
 }
 
 WriteMakefile(
