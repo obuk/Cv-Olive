@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-use Test::Exception;
 use version;
 BEGIN { use_ok('Cv', -nomore) }
 
@@ -43,19 +42,24 @@ if (2) {
 	is($dst, $result);
 }
 
-if (10) {
-	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
-	throws_ok { $image->matchTemplate; } qr/Usage: Cv::Arr::cvMatchTemplate\(image, templ, result, method\) at $0/;
-}
 
-if (11) {
-	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
-	my $templ = Cv::Mat->new([480, 640], CV_8UC1)->zero;
-	throws_ok { $image->matchTemplate($templ); } qr/OpenCV Error:/;
-}
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
 
-if (12) {
-	my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
-	my $templ = Cv::Mat->new([24 + 1, 32 + 1], CV_8UC1)->zero;
-	throws_ok { $image->matchTemplate($templ, -1); } qr/OpenCV Error:/;
+	{
+		my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
+		throws_ok { $image->matchTemplate; } qr/Usage: Cv::Arr::cvMatchTemplate\(image, templ, result, method\) at $0/;
+	}
+
+	{
+		my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
+		my $templ = Cv::Mat->new([480, 640], CV_8UC1)->zero;
+		throws_ok { $image->matchTemplate($templ); } qr/OpenCV Error:/;
+	}
+
+	{
+		my $image = Cv::Mat->new([240, 320], CV_8UC1)->zero;
+		my $templ = Cv::Mat->new([24 + 1, 32 + 1], CV_8UC1)->zero;
+		throws_ok { $image->matchTemplate($templ, -1); } qr/OpenCV Error:/;
+	}
 }

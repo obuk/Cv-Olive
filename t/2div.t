@@ -2,10 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 5;
-use Test::Number::Delta within => 1e-7;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-7";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 5;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -14,7 +19,7 @@ BEGIN { use_ok('Cv', -nomore) }
 
 my $src1 = Cv::Mat->new([ 3 ], CV_32FC1);
 
-if (1) {
+{
 	my $src2 = $src1->new;
 	$src1->set([0], [rand]);
 	$src1->set([1], [rand]);
@@ -35,7 +40,7 @@ if (1) {
 		);
 }
 
-if (2) {
+{
 	my $src2 = $src1->new;
 	$src1->set([0], [rand]);
 	$src1->set([1], [rand]);
@@ -56,11 +61,11 @@ if (2) {
 		);
 }
 
-if (10) {
-	throws_ok { $src1->Div(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvDiv\(src1, src2, dst, scale=1\) at $0/;
-}
 
-if (12) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { $src1->Div(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvDiv\(src1, src2, dst, scale=1\) at $0/;
 	throws_ok { $src1->Div(\0) } qr/OpenCV Error:/;
 }
 

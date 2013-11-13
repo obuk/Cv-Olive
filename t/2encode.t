@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 236;
-use Test::Exception;
+
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -57,7 +57,13 @@ SKIP: {
 		}
 	}
 
-	throws_ok { Cv::Arr::cvEncodeImage() } qr/Usage: Cv::Arr::cvEncodeImage\(arr, ext, params\) at $0/;
 
-	throws_ok { $img->encodeImage(".xxx") } qr/OpenCV Error:/;
+  SKIP: {
+	  skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	  throws_ok { Cv::Arr::cvEncodeImage() } qr/Usage: Cv::Arr::cvEncodeImage\(arr, ext, params\) at $0/;
+
+	  throws_ok { $img->encodeImage(".xxx") } qr/OpenCV Error:/;
+	}
 }
+

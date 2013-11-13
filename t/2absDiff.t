@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 15;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -53,20 +52,24 @@ if (4) {
 }
 
 
-# broken new
-if (10) {
-	my $src2 = $src->new;
-	$src->fill([ 21, 22, 23, 24 ]);
-	$src2->fill([ 11, 12, 13, 14 ]);
-	no warnings 'redefine';
-	local *Cv::Mat::new = sub { undef };
-	throws_ok { $src->absDiff($src2) } qr/dst is not of type CvArr \* in Cv::Arr::cvAbsDiff at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
 
-# OpenCV Error:
-if (11) {
-	my $src2 = $src->new;
-	$src->fill([ 21, 22, 23, 24 ]);
-	$src2->fill([ 11, 12, 13, 14 ]);
-	throws_ok { $src->absDiff($src2, \0) } qr/OpenCV Error:/;
+	# broken new
+	{
+		my $src2 = $src->new;
+		$src->fill([ 21, 22, 23, 24 ]);
+		$src2->fill([ 11, 12, 13, 14 ]);
+		no warnings 'redefine';
+		local *Cv::Mat::new = sub { undef };
+		throws_ok { $src->absDiff($src2) } qr/dst is not of type CvArr \* in Cv::Arr::cvAbsDiff at $0/;
+	}
+
+	# OpenCV Error:
+	{
+		my $src2 = $src->new;
+		$src->fill([ 21, 22, 23, 24 ]);
+		$src2->fill([ 11, 12, 13, 14 ]);
+		throws_ok { $src->absDiff($src2, \0) } qr/OpenCV Error:/;
+	}
 }

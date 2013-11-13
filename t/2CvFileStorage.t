@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 25;
-use Test::Exception;
+# use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -66,19 +66,24 @@ if (8) {
 	}
 }
 
-if (10) {
-	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
-	throws_ok { $fs->Read($fs->getFileNodeByName(\0, "lena")) } qr/type_name unknown in Cv::FileStorage::Read at $0/;
-}
-
-if (11) {
-	local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
-	throws_ok { $fs->ReadByName(\0, "lena") } qr/type_name unknown in Cv::FileStorage::Read at $0/;
-}
-
-unlink($yml);
 
 SKIP: {
-	skip "opencv-2.x", 1 unless cvVersion() >= 2.004;
-	throws_ok { Cv->OpenFileStorage('', 0) } qr/OpenCV Error:/;
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
+
+	{
+		local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
+		throws_ok { $fs->Read($fs->getFileNodeByName(\0, "lena")) } qr/type_name unknown in Cv::FileStorage::Read at $0/;
+	}
+
+	{
+		local $Cv::CLASS{&CV_TYPE_NAME_IMAGE} = undef;
+		throws_ok { $fs->ReadByName(\0, "lena") } qr/type_name unknown in Cv::FileStorage::Read at $0/;
+	}
+
+	unlink($yml);
+
+  SKIP: {
+	  skip "opencv-2.x", 1 unless cvVersion() >= 2.004;
+	  throws_ok { Cv->OpenFileStorage('', 0) } qr/OpenCV Error:/;
+	}
 }

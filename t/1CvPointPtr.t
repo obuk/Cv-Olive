@@ -10,21 +10,22 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 10;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my ($x, $y) = map { (int rand 65536) } 0..1;
 
-if (1) {
+{
 	my $arr = Cv::cvPointPtr($x, $y);
 	is(ref $arr, 'ARRAY');
 	is(scalar @$arr, 1);
 	is_deeply($arr, [ [ $x, $y ] ]);
 
-	{
-		my $arr2 = Cv::CvPointPtr($arr->[0]);
-		is_deeply($arr2, $arr);
-	}
+	my $arr2 = Cv::CvPointPtr($arr->[0]);
+	is_deeply($arr2, $arr);
+}
+
+SKIP: {
+	skip "Test::Exception required", 5 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvPointPtr([]) } qr/pt is not of type CvPoint in Cv::CvPointPtr at $0/;
 

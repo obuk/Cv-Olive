@@ -4,13 +4,14 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 45;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $class = 'Cv::SparseMat';
 
 # structure member: $obj->{structure_member}
-if (1) {
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
+
 	my $arr = $class->new(my $sizes = [240, 320], my $type = CV_8UC3);
 	isa_ok($arr, $class);
 
@@ -41,5 +42,8 @@ if (2) {
 		is_deeply(\@sizes, $_->{sizes}, "${class}->getDims(\@sizes)");
 	}
 	
-	throws_ok { $class->new([-1, -1], CV_8UC3) } qr/OpenCV Error:/;
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	  throws_ok { $class->new([-1, -1], CV_8UC3) } qr/OpenCV Error:/;
+	}
 }

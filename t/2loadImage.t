@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 13;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 use File::Basename;
@@ -66,22 +65,27 @@ my $verbose = Cv->hasGUI;
 	}
 }
 
-{
-	throws_ok { Cv->loadImage } qr/Usage: Cv::cvLoadImage\(filename, iscolor=CV_LOAD_IMAGE_COLOR\) at $0/;
-}
 
-{
-	throws_ok { Cv->loadImageM } qr/Usage: Cv::cvLoadImageM\(filename, iscolor=CV_LOAD_IMAGE_COLOR\) at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 6 unless eval "use Test::Exception";
 
-{
-	my $x;
-	lives_ok { $x = Cv->loadImage("path-to-not-exist") };
-	is($x, undef);
-}
+	{
+		throws_ok { Cv->loadImage } qr/Usage: Cv::cvLoadImage\(filename, iscolor=CV_LOAD_IMAGE_COLOR\) at $0/;
+	}
 
-{
-	my $x;
-	lives_ok { $x = Cv->loadImageM("path-to-not-exist") };
-	is($x, undef);
+	{
+		throws_ok { Cv->loadImageM } qr/Usage: Cv::cvLoadImageM\(filename, iscolor=CV_LOAD_IMAGE_COLOR\) at $0/;
+	}
+
+	{
+		my $x;
+		lives_ok { $x = Cv->loadImage("path-to-not-exist") };
+		is($x, undef);
+	}
+
+	{
+		my $x;
+		lives_ok { $x = Cv->loadImageM("path-to-not-exist") };
+		is($x, undef);
+	}
 }

@@ -2,10 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 8;
-use Test::Number::Delta within => 1e-5;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-5";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 8;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -31,7 +36,9 @@ if (2) {
 	delta_ok($dst->getReal(2), pow2($src->getReal(2)));
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	throws_ok { $src->pow() } qr/Usage: Cv::Arr::cvPow\(src, dst, power\) at $0/;
 }
 

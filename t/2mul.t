@@ -3,9 +3,15 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 5;
-use Test::Number::Delta within => 1e-7;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-7";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 5;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -56,11 +62,11 @@ if (2) {
 		);
 }
 
-if (10) {
-	throws_ok { $src1->Mul(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvMul\(src1, src2, dst, scale=1\) at $0/;
-}
 
-if (12) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { $src1->Mul(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvMul\(src1, src2, dst, scale=1\) at $0/;
 	throws_ok { $src1->Mul(\0) } qr/OpenCV Error:/;
 }
 

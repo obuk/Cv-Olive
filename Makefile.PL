@@ -3,18 +3,14 @@
 use 5.008008;
 use ExtUtils::MakeMaker;
 
-our %CONFIGURE_REQUIRES = (
-	'ExtUtils::ParseXS'   => '2.220',
-	'ExtUtils::PkgConfig' => '1.120',
-	$^O eq 'cygwin' ? ('ExtUtils::MM_Cygwin' => '6.620') : (),
-);
-
-our %TEST_REQUIRES = (
+our %PREREQ_PM = (
+	'ExtUtils::ParseXS'   => '2.210',
+	'version'             => '0.770',
+	# 'ExtUtils::PkgConfig' => '1.120',
 	'Test::Number::Delta' => '1.030',
 	'Test::Exception'     => '0.310',
-	);
-
-our %PREREQ_PM = ( %CONFIGURE_REQUIRES );
+	$^O eq 'cygwin' ? ('ExtUtils::MM_Cygwin' => '6.620') : (),
+);
 
 use lib qw(inc);
 use Devel::CheckLib;
@@ -99,8 +95,12 @@ push(@dir, qw(Subdiv2D));
 push(@dir, qw(More));
 push(@dir, qw(Qt)) if $cf->hasqt;
 push(@dir, qw(Nonfree));
-if ($cf->cc =~ /\+\+/) {
-	push(@dir, qw(Features2d)) if $cf->_version >= qv(2.4.5);
+
+eval "use Data::Structure::Util";
+unless ($@) {
+	if ($cf->cc =~ /\+\+/) {
+		push(@dir, qw(Features2d)) if $cf->_version >= qv(2.4.5);
+	}
 }
 
 WriteMakefile(
@@ -108,8 +108,6 @@ WriteMakefile(
 	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
 	ABSTRACT_FROM => "lib/Cv.pm",
 	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
-	CONFIGURE_REQUIRES => \%CONFIGURE_REQUIRES,
-	TEST_REQUIRES => \%TEST_REQUIRES,
 	PREREQ_PM => \%PREREQ_PM,
 	%Cv::Config::MM,
 	INC => '-I.',
@@ -129,7 +127,7 @@ WriteMakefile(
 sub MY::dynamic {
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
+dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(BASEEXT).bs
 	$(NOECHO) $(NOOP)
 	@if [ $(FULLEXT) = Cv -a -f t.xs ]; then \
 		make INST_ARCHLIB=t BASEEXT=t FULLEXT=Cv/t dynamic; \

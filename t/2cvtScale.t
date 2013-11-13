@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 8;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
@@ -35,12 +34,17 @@ sub CvtScale {
 	$x * $scale + $shift;
 }
 
-if (10) {
-	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
-	throws_ok { $arr->cvtScale(1, 0, 1) } qr/Usage: Cv::Arr::cvConvertScale\(src, dst, scale=1, shift=0\) at $0/;
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $arr = Cv::Mat->new([240, 320], CV_8UC3);
+		throws_ok { $arr->cvtScale(1, 0, 1) } qr/Usage: Cv::Arr::cvConvertScale\(src, dst, scale=1, shift=0\) at $0/;
+	}
+
+	{
+		my $arr = Cv::Mat->new([240, 320], CV_8UC3);
+		throws_ok { $arr->cvtScale($arr->new([120, 160])) } qr/OpenCV Error:/;
+	}
 }
 
-if (11) {
-	my $arr = Cv::Mat->new([240, 320], CV_8UC3);
-	throws_ok { $arr->cvtScale($arr->new([120, 160])) } qr/OpenCV Error:/;
-}

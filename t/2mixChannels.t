@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
@@ -20,11 +19,12 @@ if (1) {
 	is($rgba->get(0, 0)->[3], $alpha->get(0, 0)->[0]);
 }
 
-if (10) {
-	throws_ok { Cv->mixChannels; } qr/Usage: Cv::cvMixChannels\(src, dst, fromTo\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { Cv->mixChannels; } qr/Usage: Cv::cvMixChannels\(src, dst, fromTo\) at $0/;
+
 	my $rgba = Cv::Mat->new([100, 100], CV_8UC4);
 	my $bgr = $rgba->new(CV_8UC1);
 	my $alpha = $rgba->new(CV_8UC1);

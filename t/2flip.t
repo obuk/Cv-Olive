@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 11;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -42,10 +41,10 @@ if (3) {
 	is_deeply($dst->get([1, 0]), $src->get([0, 1]));
 }
 
-if (10) {
-	throws_ok { $src->flip(0, 0) } qr/Usage: Cv::Arr::cvFlip\(src, dst=NULL, flipMode=0\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { $src->flip(0, 0) } qr/Usage: Cv::Arr::cvFlip\(src, dst=NULL, flipMode=0\) at $0/;
 	throws_ok { $src->flip($src->new(CV_16SC1)) } qr/OpenCV Error:/;
 }

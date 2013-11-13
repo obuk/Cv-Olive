@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 10;
-use Test::Exception;
 use version;
 
 BEGIN {
@@ -13,7 +12,7 @@ BEGIN {
 	use_ok('Cv::Config');
 }
 
-if (1) {
+{
 	# no warnings;
 	local $ENV{CC} = undef;
 	local $ENV{CXX} = undef;
@@ -29,7 +28,7 @@ if (1) {
 	cmp_ok(version->parse($cf->version), '>=', $min);
 }
 
-if (2) {
+{
 	# no warnings;
 	my $dynamic_lib = 0;
 	my @cxx = ();
@@ -51,7 +50,7 @@ if (2) {
 	diag("cxx: ", join(' ', @cxx));
 }
 
-if (3) {
+{
 	# no warnings;
 	local %Cv::Config::opencv = ();
 	my $include = '/path/to/include';
@@ -63,13 +62,13 @@ if (3) {
 }
 
 # Cv-0.25
-if (4) {
-	# no warnings;
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	my $cf = eval { new Cv::Config };
 	lives_ok { $cf->hasqt };
 }
 
-if (5) {
+{
 	my $lib = '/usr/local/lib';
 	for (
 		[ "$lib/libopencv_core-2.4.so", "-L$lib -lopencv_core" ],

@@ -10,16 +10,17 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 6;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my @floatPtr = unpack("f*", pack("f*", map { rand 1 } 1 .. 100));
 
-if (1) {
-	{
-		my $floatPtr = Cv::floatPtr(\@floatPtr);
-		is_deeply($floatPtr, \@floatPtr);
-	}
+{
+	my $floatPtr = Cv::floatPtr(\@floatPtr);
+	is_deeply($floatPtr, \@floatPtr);
+}
+
+SKIP: {
+	skip "Test::Exception required", 4 unless eval "use Test::Exception";
 
 	throws_ok { Cv::floatPtr({}) } qr/values is not of type float \* in Cv::floatPtr at $0/;
 
@@ -30,7 +31,7 @@ if (1) {
 
 	{
 		no warnings 'numeric';
-		my $x; lives_ok { $x = Cv::floatPtr([1, '2x', 3]) };
+		my $x = lives_ok { Cv::floatPtr([1, '2x', 3]) };
 		is_deeply($x, [1, 2, 3]);
 	}
 }

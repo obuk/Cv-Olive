@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 575;
-use Test::Exception;
+# use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 
@@ -19,7 +19,7 @@ AbsDiff Add And Or Sub Xor
 
 )) {
 
-	if (1) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -33,7 +33,7 @@ AbsDiff Add And Or Sub Xor
 		is($av[2], $src2, "$xs-1.2");
 	}
 
-	if (2) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -47,7 +47,7 @@ AbsDiff Add And Or Sub Xor
 		is($av[2], $val2, "$xs-2.2");
 	}
 
-	if (3) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -64,7 +64,7 @@ AbsDiff Add And Or Sub Xor
 		is($ret,   $dst,  "$xs-3.r");
 	}
 
-	if (4) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -81,19 +81,24 @@ AbsDiff Add And Or Sub Xor
 		is($ret,   undef, "$xs-4.r");
 	}
 
-	if (10) {
-		no strict 'refs';
-		my $cv = "Cv::Arr::cv${xs}";
-		throws_ok { &$cv() } qr/Usage: $cv/;
-	}
 
-	if (11) {
-		my $src1 = Cv::Mat->new([ 10, 10 ], CV_32FC1);
-		my $src2 = Cv::Mat->new([ 11, 11 ], CV_32FC1);
-		my $dst  = Cv::Mat->new([ 12, 12 ], CV_32FC1);
-		no strict 'refs';
-		my $cv = "Cv::Arr::cv${xs}";
-		throws_ok { &$cv($src1, $src2, $dst) } qr/OpenCV Error:/;
+  SKIP: {
+	  skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	  {
+		  no strict 'refs';
+		  my $cv = "Cv::Arr::cv${xs}";
+		  throws_ok { &$cv() } qr/Usage: $cv/;
+	  }
+
+	  {
+		  my $src1 = Cv::Mat->new([ 10, 10 ], CV_32FC1);
+		  my $src2 = Cv::Mat->new([ 11, 11 ], CV_32FC1);
+		  my $dst  = Cv::Mat->new([ 12, 12 ], CV_32FC1);
+		  no strict 'refs';
+		  my $cv = "Cv::Arr::cv${xs}";
+		  throws_ok { &$cv($src1, $src2, $dst) } qr/OpenCV Error:/;
+	  }
 	}
 }
 
@@ -122,7 +127,7 @@ PyrMeanShiftFiltering PyrSegmentation Threshold Canny
 			skip "no $xs", 10;
 		}
 
-		if (1) {
+		{
 			my @av;
 			no warnings;
 			no strict 'refs';
@@ -134,7 +139,7 @@ PyrMeanShiftFiltering PyrSegmentation Threshold Canny
 			is($av[1], $src1, "$xs-11.1");
 		}
 
-		if (3) {
+		{
 			my @av;
 			no warnings;
 			no strict 'refs';
@@ -149,7 +154,7 @@ PyrMeanShiftFiltering PyrSegmentation Threshold Canny
 			is($ret,   $dst,  "$xs-13.r");
 		}
 
-		if (4) {
+		{
 			my @av;
 			no warnings;
 			no strict 'refs';
@@ -164,10 +169,12 @@ PyrMeanShiftFiltering PyrSegmentation Threshold Canny
 			is($ret,   undef, "$xs-14.r");
 		}
 
-		if (10) {
-			no strict 'refs';
-			my $cv = "Cv::Arr::cv${xs}";
-			throws_ok { &$cv() } qr/Usage: $cv/;
+	  SKIP: {
+		  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+
+		  no strict 'refs';
+		  my $cv = "Cv::Arr::cv${xs}";
+		  throws_ok { &$cv() } qr/Usage: $cv/;
 		}
 	}
 }
@@ -184,7 +191,7 @@ foreach my $xs (
 	qw(SubRS Inpaint),
 ) {
 
-	if (1) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -198,7 +205,7 @@ foreach my $xs (
 		is($av[2], $src2, "$xs-21.2");
 	}
 
-	if (3) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -215,7 +222,7 @@ foreach my $xs (
 		is($ret,   $dst,  "$xs-23.r");
 	}
 
-	if (4) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -232,10 +239,12 @@ foreach my $xs (
 		is($ret,   undef, "$xs-24.r");
 	}
 
-	if (10) {
-		no strict 'refs';
-		my $cv = "Cv::Arr::cv${xs}";
-		throws_ok { &$cv() } qr/Usage: $cv/;
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+
+	  no strict 'refs';
+	  my $cv = "Cv::Arr::cv${xs}";
+	  throws_ok { &$cv() } qr/Usage: $cv/;
 	}
 
 }
@@ -252,7 +261,7 @@ InRange
 
 )) {
 
-	if (1) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -269,7 +278,7 @@ InRange
 		isa_ok($av[4], ref $src, "$xs-31.4");
 	}
 
-	if (2) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -287,7 +296,7 @@ InRange
 		is($av[4], $dst,   "$xs-32.4");
 	}
 
-	if (3) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -304,7 +313,7 @@ InRange
 		isa_ok($av[4], ref $src, "$xs-33.4");
 	}
 
-	if (4) {
+	{
 		my @av;
 		no warnings;
 		no strict 'refs';
@@ -322,10 +331,12 @@ InRange
 		is($av[4], $dst,   "$xs-34.4");
 	}
 
-	if (10) {
-		no strict 'refs';
-		my $cv = "Cv::Arr::cv${xs}";
-		throws_ok { &$cv() } qr/Usage: $cv/;
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+
+	  no strict 'refs';
+	  my $cv = "Cv::Arr::cv${xs}";
+	  throws_ok { &$cv() } qr/Usage: $cv/;
 	}
 
 }

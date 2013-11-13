@@ -2,10 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 11;
-use Test::Number::Delta within => 1e-1;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-1";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 11;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -65,12 +70,17 @@ if (2) {
 	delta_ok(\@stdDev, [ (1.0) x $ch ]);
 }
 
-if (10) {
-	my $rng = Cv->RNG;
-	throws_ok { $rng->arr } qr/Usage: Cv::RNG::cvArr\(rng, arr, distType, param1, param2\) at $0/;
-}
 
-if (11) {
-	my $rng = Cv->RNG;
-	throws_ok { $rng->arr(1,2,3,4) } qr/arr is not of type CvArr \* in Cv::RNG::cvRandArr at $0/;
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $rng = Cv->RNG;
+		throws_ok { $rng->arr } qr/Usage: Cv::RNG::cvArr\(rng, arr, distType, param1, param2\) at $0/;
+	}
+
+	{
+		my $rng = Cv->RNG;
+		throws_ok { $rng->arr(1,2,3,4) } qr/arr is not of type CvArr \* in Cv::RNG::cvRandArr at $0/;
+	}
 }

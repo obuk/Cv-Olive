@@ -10,18 +10,19 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 9;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my ($x, $y) = map { int rand 65536 } 0..1;
 my $pt = cvPoint($x, $y);
 is_deeply($pt, [ $x, $y ]);
 
-if (1) {
-	{
-		my $pt2 = Cv::CvPoint($pt);
-		is_deeply($pt2, $pt);
-	}
+{
+	my $pt2 = Cv::CvPoint($pt);
+	is_deeply($pt2, $pt);
+}
+
+SKIP: {
+	skip "Test::Exception required", 5 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvPoint([]) } qr/pt is not of type CvPoint in Cv::CvPoint at $0/;
 
@@ -37,14 +38,13 @@ if (1) {
 		my $x; lives_ok { $x = Cv::CvPoint(['1x', '2y']) };
 		is_deeply($x, [ 1, 2 ]);
 	}
+}
 
-	eval "use Time::Piece";
-	if ($@) {
-		ok(1);
-	} else {
-		my $t1 = Time::Piece->strptime("2012-01-01", "%Y-%m-%d");
-		my $t2 = Time::Piece->strptime("2012-01-02", "%Y-%m-%d");
-		my $pt2 = Cv::CvPoint([$t2 - $t1, 0]);
-		is_deeply($pt2, [ $t2 - $t1, 0 ]);
-	}
+SKIP: {
+	 skip "Time::Piece required", 1 unless eval "use Time::Piece";
+	 
+	 my $t1 = Time::Piece->strptime("2012-01-01", "%Y-%m-%d");
+	 my $t2 = Time::Piece->strptime("2012-01-02", "%Y-%m-%d");
+	 my $pt2 = Cv::CvPoint([$t2 - $t1, 0]);
+	 is_deeply($pt2, [ $t2 - $t1, 0 ]);
 }

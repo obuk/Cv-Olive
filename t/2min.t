@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 18;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 use List::Util qw(min);
 
@@ -65,19 +64,16 @@ if (4) {
 	is($dst->getReal(2), min($src->getReal(2), $value));
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 5 unless eval "use Test::Exception";
+
 	throws_ok { $src->min(0, 0, 0) } qr/Usage: Cv::Arr::cvMinS\(src, value, dst\) at $0/;
 	throws_ok { $src->min($src, 0, 0) } qr/Usage: Cv::Arr::cvMin\(src1, src2, dst\) at $0/;
-}
 
-if (11) {
 	throws_ok { $src->min([1]) } qr/src2 is not of type CvArr \* in Cv::Arr::cvMin at $0/;
-}
 
-if (12) {
 	throws_ok { $src->min(0, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
-}
 
-if (13) {
 	throws_ok { $src->min($src->new, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
 }

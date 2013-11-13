@@ -10,7 +10,6 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 17;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my @val = unpack("d*", pack("d*", map { rand 1 } 0..3));
@@ -32,22 +31,24 @@ is_deeply($scalar, \@val);
 	is_deeply($sc, [ @val[0 .. 2], 0 ]);
 }
 
-TODO: {
-	local $TODO = "usage";
-
-	throws_ok { Cv::cvScalar() } qr/Usage: Cv::cvScalar\(val0, val1=0, val2=0, val3=0\) at $0/;
-
-	throws_ok { Cv::cvScalar(1, 2, 3, 4, 5) } qr/Usage: Cv::cvScalar\(val0, val1=0, val2=0, val3=0\) at $0/;
+{
+	my $sc = Cv::CvScalar($scalar);
+	is_deeply($sc, $scalar);
 }
 
-if (1) {
-	{
-		my $sc = Cv::CvScalar($scalar);
-		is_deeply($sc, $scalar);
-	}
+SKIP: {
+	skip "Test::Exception required", 11 unless eval "use Test::Exception";
 
 	{
 		throws_ok { Cv::CvScalar() } qr/Usage: Cv::CvScalar\(scalar\) at $0/;
+	}
+
+  TODO: {
+	  local $TODO = "usage";
+
+	  throws_ok { Cv::cvScalar() } qr/Usage: Cv::cvScalar\(val0, val1=0, val2=0, val3=0\) at $0/;
+
+	  throws_ok { Cv::cvScalar(1, 2, 3, 4, 5) } qr/Usage: Cv::cvScalar\(val0, val1=0, val2=0, val3=0\) at $0/;
 	}
 
 	{

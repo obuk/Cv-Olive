@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 4;
-use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 SKIP: {
@@ -15,5 +14,10 @@ SKIP: {
 	is(scalar Cv->hasModule('core'), 1);
 	is(scalar Cv->hasModule('Core'), 0);
 	diag("OpenCV modules: ", join(", ", Cv->hasModule));
-	throws_ok { Cv->fontQt } qr/can't call Cv::fontQt/;
+
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	  throws_ok { Cv->fontQt } qr/can't call Cv::fontQt/;
+	}
 }
+

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 35;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -48,10 +47,15 @@ for my $class (qw(Cv::Mat Cv::MatND Cv::Image)) {
 	}
 
 	# SvREADONLY_on
-	throws_ok { substr($rawData, 0, 1) = 'x'; } qr/Modification of a read-only value attempted at $0/;
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	  throws_ok { substr($rawData, 0, 1) = 'x'; } qr/Modification of a read-only value attempted at $0/;
+	}
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	my $class = qw(Cv::SparseMat);
 	my $mat = $class->new([320, 240], CV_8UC3);
 	throws_ok { $mat->getRawData(my $rawData, my $rawStep, my $rawSize) } qr/OpenCV Error:/;

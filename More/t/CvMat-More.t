@@ -4,13 +4,7 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 65;
-use Test::Exception;
 BEGIN { use_ok('Cv') }
-
-if (1) {
-	my $x; lives_ok { $x = Cv::Mat->new([], CV_32FC1) };
-	is($x, undef);
-}
 
 if (2) {
 	my $arr = Cv::Mat->new([], CV_32FC1, [1]);
@@ -191,16 +185,27 @@ if (16) {
 	is($arr->type, CV_8UC3);
 }
 
-if (17) {
-	my $x; lives_ok { $x = Cv::Mat->new([], CV_8UC1, []) };
-	is($x, undef);
+
+SKIP: {
+	skip "Test::Exception required", 6 unless eval "use Test::Exception";
+
+	{
+		my $x; lives_ok { $x = Cv::Mat->new([], CV_32FC1) };
+		is($x, undef);
+	}
+
+	{
+		my $x; lives_ok { $x = Cv::Mat->new([], CV_8UC1, []) };
+		is($x, undef);
+	}
+
+	{
+		my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
+		throws_ok { $arr->set([ 3, 3 ], [ 1, 2 ]) } qr/OpenCV Error:/;
+	}
+
+	{
+		throws_ok { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) } qr/OpenCV Error:/;
+	}
 }
 
-if (21) {
-	my $arr = Cv::Mat->new([ 3, 3 ], CV_16SC2);
-	throws_ok { $arr->set([ 3, 3 ], [ 1, 2 ]) } qr/OpenCV Error:/;
-}
-
-if (22) {
-	throws_ok { Cv::Mat->new([], CV_32FC1, [1, 1], [2, 2, 2], [3, 3]) } qr/OpenCV Error:/;
-}

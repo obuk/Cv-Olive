@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 28;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -93,19 +92,24 @@ if (8) {
 
 
 SKIP: {
-	skip "need OpenCV-2.0+", 1 unless cvVersion() >= 2.0;
-	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	lives_ok { $src->GetRows(10, 10) };
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
+
+  SKIP: {
+	  skip "need OpenCV-2.0+", 1 unless cvVersion() >= 2.0;
+	  my $src = Cv::Mat->new([240, 320], CV_8UC3);
+	  lives_ok { $src->GetRows(10, 10) };
+	}
+
+	{
+		my $src = Cv::Mat->new([240, 320], CV_8UC3);
+		throws_ok { $src->GetRows(10, 0) } qr/OpenCV Error:/;
+	}
+
+	{
+		my $src = Cv::Mat->new([240, 320], CV_8UC3);
+		no warnings 'redefine';
+		local *Cv::Mat::new = sub { undef };
+		throws_ok { $src->GetRows(100, 200) } qr/submat is not of type CvMat \* in Cv::Arr::cvGetRows at $0/;
+	}
 }
 
-if (11) {
-	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	throws_ok { $src->GetRows(10, 0) } qr/OpenCV Error:/;
-}
-
-if (13) {
-	my $src = Cv::Mat->new([240, 320], CV_8UC3);
-	no warnings 'redefine';
-	local *Cv::Mat::new = sub { undef };
-	throws_ok { $src->GetRows(100, 200) } qr/submat is not of type CvMat \* in Cv::Arr::cvGetRows at $0/;
-}

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 5;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -32,12 +31,18 @@ if (2) {
 	ok($det == 0);
 }
 
-if (10) {
-	my $src = Cv::Mat->new([2], CV_32FC1);
-	throws_ok { $src->inv(1, 2) } qr/Usage: Cv::Arr::cvInv\(src, dst, method=CV_LU\) at $0/;
+
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $src = Cv::Mat->new([2], CV_32FC1);
+		throws_ok { $src->inv(1, 2) } qr/Usage: Cv::Arr::cvInv\(src, dst, method=CV_LU\) at $0/;
+	}
+
+	{
+		my $src = Cv::Mat->new([2], CV_32FC1);
+		throws_ok { $src->inv } qr/OpenCV Error:/;
+	}
 }
 
-if (11) {
-	my $src = Cv::Mat->new([2], CV_32FC1);
-	throws_ok { $src->inv } qr/OpenCV Error:/;
-}

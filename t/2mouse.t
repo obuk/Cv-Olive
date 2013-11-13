@@ -5,7 +5,6 @@ use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 3;
 BEGIN { use_ok('Cv', -nomore) }
-use Test::Exception;
 
 my $verbose = Cv->hasGUI;
 
@@ -56,9 +55,12 @@ SKIP: {
 		$img->rectangle([$x, $y], [$x+$w, $y+$h], $color, -1);
 	}
 	$img->showImage($win);
-	if (10) {
-		throws_ok { Cv->setMouseCallback } qr/Usage: Cv::cvSetMouseCallback\(windowName, onMouse= NO_INIT, userdata= NO_INIT\) at $0/;
+
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	  throws_ok { Cv->setMouseCallback } qr/Usage: Cv::cvSetMouseCallback\(windowName, onMouse= NO_INIT, userdata= NO_INIT\) at $0/;
 	}
+
 	Cv->setMouseCallback($win, \&onMouse);
 	while ($remaining >= 0) {
 		my $text = sprintf("remaining: %.1fs", $remaining / 1000);

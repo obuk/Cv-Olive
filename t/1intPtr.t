@@ -8,18 +8,19 @@ BEGIN {
 	eval { use Cv -nomore };
 	eval { require XSLoader; XSLoader::load('Cv::t', $Cv::VERSION) };
 	plan skip_all => "no Cv/t.so" if $@;
-	plan tests => 6;
+	plan tests => 5;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my @intPtr = map { int rand 65536 } 1 .. 100;
 
-if (1) {
-	{
-		my $intPtr = Cv::intPtr(\@intPtr);
-		is_deeply($intPtr, \@intPtr);
-	}
+{
+	my $intPtr = Cv::intPtr(\@intPtr);
+	is_deeply($intPtr, \@intPtr);
+}
+
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
 
 	throws_ok { Cv::intPtr({}) } qr/values is not of type int \* in Cv::intPtr at $0/;
 
@@ -30,7 +31,7 @@ if (1) {
 
 	{
 		no warnings 'numeric';
-		my $x; lives_ok { $x = Cv::intPtr([1, '2x', 3]) };
+		my $x = lives_ok { Cv::intPtr([1, '2x', 3]) };
 		is_deeply($x, [1, 2, 3]);
 	}
 }

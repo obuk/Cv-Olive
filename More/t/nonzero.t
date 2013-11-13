@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 44;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 BEGIN { use_ok('Cv::More', 0.31, qw(nonzero)) }
 
@@ -97,17 +96,22 @@ if (4.3) {
 	is($nz, 7);
 }
 
-if (10) {
-	my $arr = Cv::Mat->new([100, 100], CV_8UC2);
-	throws_ok { my @nz = nonzero($arr) } qr/Unsupported format/;
-}
 
-if (11) {
-	my $arr = Cv::MatND->new([10, 10, 10, 10], CV_8UC1);
-	throws_ok { my @nz = nonzero($arr); } qr/Unsupported format/;
-}
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
 
-if (12) {
-	my $arr = Cv::SparseMat->new([10, 10, 10, 10], CV_8UC1);
-	throws_ok { my @nz = nonzero($arr); } qr/Bad argument/;
+	{
+		my $arr = Cv::Mat->new([100, 100], CV_8UC2);
+		throws_ok { my @nz = nonzero($arr) } qr/Unsupported format/;
+	}
+
+	{
+		my $arr = Cv::MatND->new([10, 10, 10, 10], CV_8UC1);
+		throws_ok { my @nz = nonzero($arr); } qr/Unsupported format/;
+	}
+
+	{
+		my $arr = Cv::SparseMat->new([10, 10, 10, 10], CV_8UC1);
+		throws_ok { my @nz = nonzero($arr); } qr/Bad argument/;
+	}
 }

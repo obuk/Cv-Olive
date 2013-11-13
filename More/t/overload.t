@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 24;
-use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 for my $type (CV_8UC3, CV_16SC4, CV_32SC2, CV_32FC2, CV_64FC1) {
@@ -38,5 +37,10 @@ if (1) {
 	my $mat2 = $mat1->new;
 	ok($mat1 != $mat2);
 	ok($mat1 ne $mat2);
-	throws_ok { $mat1++ } qr/Operation \"\+\+\": no method found, argument in overloaded package Cv::Mat at $0/;
+
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	  throws_ok { $mat1++ } qr/Operation \"\+\+\": no method found, argument in overloaded package Cv::Mat at $0/;
+	}
 }
+

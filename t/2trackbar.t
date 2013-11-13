@@ -5,7 +5,6 @@ use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 2;
 BEGIN { use_ok('Cv', -nomore) }
-use Test::Exception;
 
 my $verbose = Cv->hasGUI;
 my $window = $0;

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 17;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -64,6 +63,8 @@ if (7) {
 	is($sizes[1], $src->cols);
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	throws_ok { Cv::Arr::GetDims(1) } qr/arr is not of type CvArr \* in Cv::Arr::cvGetDims at $0/;
 }

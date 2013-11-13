@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -101,10 +100,10 @@ if (1) {
 
 }
 
-if (10) {
-	throws_ok { Cv::Arr::cvGetSubRect } qr/Usage: Cv::Arr::cvGetSubRect\(arr, submat, rect\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { Cv::Arr::cvGetSubRect } qr/Usage: Cv::Arr::cvGetSubRect\(arr, submat, rect\) at $0/;
 	throws_ok { Cv::Arr::cvGetSubRect(1, 2, 3) } qr/arr is not of type CvArr \* in Cv::Arr::cvGetSubRect at $0/;
 }

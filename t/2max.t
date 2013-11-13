@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 18;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 use List::Util qw(max);
 
@@ -65,19 +64,16 @@ if (4) {
 	is($dst->getReal(2), max($src->getReal(2), $value));
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 5 unless eval "use Test::Exception";
+
 	throws_ok { $src->max(0, 0, 0) } qr/Usage: Cv::Arr::cvMaxS\(src, value, dst\) at $0/;
 	throws_ok { $src->max($src, 0, 0) } qr/Usage: Cv::Arr::cvMax\(src1, src2, dst\) at $0/;
-}
 
-if (11) {
 	throws_ok { $src->max([1]) } qr/src2 is not of type CvArr \* in Cv::Arr::cvMax at $0/;
-}
 
-if (12) {
 	throws_ok { $src->max(0, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
-}
 
-if (13) {
 	throws_ok { $src->max($src->new, $src->new(CV_32FC1)) } qr/OpenCV Error:/;
 }

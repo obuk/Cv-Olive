@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 10;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
@@ -54,11 +53,11 @@ if (1) {
 }
 
 
-if (10) {
-	throws_ok { Cv::Arr::cvGEMM } qr/Usage: Cv::Arr::cvGEMM\(src1, src2, alpha, src3, beta, dst, tABC=0\) at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
 
-if (11) {
+	throws_ok { Cv::Arr::cvGEMM } qr/Usage: Cv::Arr::cvGEMM\(src1, src2, alpha, src3, beta, dst, tABC=0\) at $0/;
+
 	my $a = Cv->createMat(2, 2, CV_64FC1);
 	my $b = Cv->createMat(2, 3, CV_64FC1);
 	throws_ok { $a->matMul($b) } qr/OpenCV Error:/;

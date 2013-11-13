@@ -2,17 +2,22 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 5;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-4";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 5;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
-use Test::Number::Delta within => 1e-4;
-use Test::Exception;
 
 # ------------------------------------------------------------
 # void cvCrossProduct(const CvArr* src1, const CvArr* src2, CvArr* dst)
 # ------------------------------------------------------------
 
-if (1) {
+{
 	my $A = Cv::Mat->new([3], CV_32FC1);
 	my $B = $A->new;
 	my ($ax, $ay, $az) = map { rand } 1 .. 3;
@@ -32,7 +37,7 @@ if (1) {
 		);
 }
 
-if (2) {
+{
 	my $A = Cv::Mat->new([1], CV_32FC3);
 	my $B = $A->new;
 	my ($ax, $ay, $az) = map { rand } 1 .. 3;
@@ -47,12 +52,17 @@ if (2) {
 		);
 }
 
-if (10) {
-	my $A = Cv::Mat->new([1], CV_32FC3);
-	throws_ok { $A->crossProduct(0, 0, 0) } qr/Usage: Cv::Arr::cvCrossProduct\(src1, src2, dst\) at $0/;
-}
 
-if (11) {
-	my $A = Cv::Mat->new([1], CV_32FC3);
-	throws_ok { $A->crossProduct() } qr/src2 is not of type CvArr \* in Cv::Arr::cvCrossProduct at $0/;
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $A = Cv::Mat->new([1], CV_32FC3);
+		throws_ok { $A->crossProduct(0, 0, 0) } qr/Usage: Cv::Arr::cvCrossProduct\(src1, src2, dst\) at $0/;
+	}
+
+	{
+		my $A = Cv::Mat->new([1], CV_32FC3);
+		throws_ok { $A->crossProduct() } qr/src2 is not of type CvArr \* in Cv::Arr::cvCrossProduct at $0/;
+	}
 }

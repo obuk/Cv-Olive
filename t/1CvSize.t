@@ -10,18 +10,19 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 8;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my ($width, $height) = map { int rand 16384 } 0..1;
 my $size = Cv::cvSize($width, $height);
 is_deeply($size, [$width, $height]);
 
-if (1) {
-	{
-		my $size2 = Cv::CvSize($size);
-		is_deeply($size2, $size);
-	}
+{
+	my $size2 = Cv::CvSize($size);
+	is_deeply($size2, $size);
+}
+
+SKIP: {
+	skip "Test::Exception required", 5 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvSize([]) } qr/size is not of type CvSize in Cv::CvSize at $0/;
 

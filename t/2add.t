@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 15;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -14,7 +13,7 @@ BEGIN { use_ok('Cv', -nomore) }
 
 my $src = Cv::Mat->new([ 3 ], CV_32SC1);
 
-if (1) {
+{
 	my $src2 = $src->new;
 	$src->set([0], [int rand 1000]);
 	$src->set([1], [int rand 1000]);
@@ -28,7 +27,7 @@ if (1) {
 	is($dst->getReal(2), add($src->getReal(2), $src2->getReal(2)));
 }
 
-if (2) {
+{
 	my $src2 = $src->new;
 	$src->set([0], [int rand 1000]);
 	$src->set([1], [int rand 1000]);
@@ -42,7 +41,7 @@ if (2) {
 	is($dst->getReal(2), add($src->getReal(2), $src2->getReal(2)));
 }
 
-if (3) {
+{
 	$src->set([0], [int rand 1000]);
 	$src->set([1], [int rand 1000]);
 	$src->set([2], [int rand 1000]);
@@ -53,7 +52,7 @@ if (3) {
 	is($dst->getReal(2), add($src->getReal(2), $value));
 }
 
-if (4) {
+{
 	$src->set([0], [int rand 1000]);
 	$src->set([1], [int rand 1000]);
 	$src->set([2], [int rand 1000]);
@@ -64,11 +63,12 @@ if (4) {
 	is($dst->getReal(2), add($src->getReal(2), $value));
 }
 
-if (10) {
-	throws_ok { $src->add(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvAdd\(src1, src2, dst, mask=NULL\) at $0/;
-}
 
-if (12) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { $src->add(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvAdd\(src1, src2, dst, mask=NULL\) at $0/;
+
 	throws_ok { $src->add(\0) } qr/OpenCV Error:/;
 }
 

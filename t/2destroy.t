@@ -2,35 +2,39 @@
 
 use strict;
 use warnings;
-# use Test::More (tests => 4);
-use Test::More qw(no_plan);
-use Test::Exception;
+# use Test::More qw(no_plan);
+use Test::More tests => 9;
 BEGIN { use_ok('Cv', -nomore) }
 
-if (1) {
-	my $mat = Cv::Image->new([10, 10], CV_8UC3);
-	my $ref = \$mat;
-	lives_ok { $mat->DESTROY };
-	lives_ok { $mat->DESTROY };
+SKIP: {
+	skip "Test::Exception required", 8 unless eval "use Test::Exception";
+
+	{
+		my $mat = Cv::Image->new([10, 10], CV_8UC3);
+		my $ref = \$mat;
+		lives_ok { $mat->DESTROY };
+		lives_ok { $mat->DESTROY };
+	}
+
+	{
+		my $mat = Cv::Mat->new([10, 10], CV_32FC1);
+		my $ref = \$mat;
+		lives_ok { $mat->DESTROY };
+		lives_ok { $mat->DESTROY };
+	}
+
+	{
+		my $mat = Cv::MatND->new([10, 10], CV_32FC1);
+		my $ref = \$mat;
+		lives_ok { $mat->DESTROY };
+		lives_ok { $mat->DESTROY };
+	}
+
+	{
+		my $mat = Cv::SparseMat->new([10, 10], CV_32FC1);
+		my $ref = \$mat;
+		lives_ok { $mat->DESTROY };
+		lives_ok { $mat->DESTROY };
+	}
 }
 
-if (1) {
-	my $mat = Cv::Mat->new([10, 10], CV_32FC1);
-	my $ref = \$mat;
-	lives_ok { $mat->DESTROY };
-	lives_ok { $mat->DESTROY };
-}
-
-if (1) {
-	my $mat = Cv::MatND->new([10, 10], CV_32FC1);
-	my $ref = \$mat;
-	lives_ok { $mat->DESTROY };
-	lives_ok { $mat->DESTROY };
-}
-
-if (1) {
-	my $mat = Cv::SparseMat->new([10, 10], CV_32FC1);
-	my $ref = \$mat;
-	lives_ok { $mat->DESTROY };
-	lives_ok { $mat->DESTROY };
-}
