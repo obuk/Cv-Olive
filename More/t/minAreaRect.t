@@ -2,9 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 3;
-use Test::Number::Delta within => 1e-15;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-15";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 3;
+	}
+}
 BEGIN { use_ok('Cv') }
 
 sub box_ok {

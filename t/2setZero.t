@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 12;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 use File::Basename;
@@ -56,7 +55,10 @@ if (1) {
 	is($sum->[$_], 0) for @channels;
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
+
 	my $arr = Cv->createMat(240, 320, CV_8UC3);
 	throws_ok { $arr->setZero({}) } qr/Usage: Cv::Arr::cvSetZero\(arr\) at $0/;
 }

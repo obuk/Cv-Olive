@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 33;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -65,6 +64,9 @@ for my $n (1..4) {
 	if ($n == 1) {
 		is($m->getReal($i), $v->[0]);
 	} else {
-		throws_ok { $m->getReal($i) } qr/OpenCV Error:/;
+	  SKIP: {
+		  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+		  throws_ok { $m->getReal($i) } qr/OpenCV Error:/;
+		}
 	}
 }

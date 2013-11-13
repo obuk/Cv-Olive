@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 3;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -21,7 +20,7 @@ for my $i (0 .. $src->rows - 1) {
 	}
 }
 
-if (1) {
+{
 	my $dct = $src->DCT(CV_DXT_INVERSE);
 	if ($verbose) {
 		$dct->show("dct");
@@ -29,7 +28,7 @@ if (1) {
 	}
 }
 
-if (2) {
+{
 	my $dct = $src->DCT($src->new, CV_DXT_INVERSE);
 	if ($verbose) {
 		$dct->show("dct");
@@ -37,10 +36,16 @@ if (2) {
 	}
 }
 
-if (10) {
-	throws_ok { $src->DCT() } qr/Usage: Cv::Arr::cvDCT\(src, dst, flags\) at $0/;
+
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		throws_ok { $src->DCT() } qr/Usage: Cv::Arr::cvDCT\(src, dst, flags\) at $0/;
+	}
+
+	{
+		throws_ok { $src->DCT(\0, CV_DXT_FORWARD) } qr/OpenCV Error:/;
+	}
 }
 
-if (11) {
-	throws_ok { $src->DCT(\0, CV_DXT_FORWARD) } qr/OpenCV Error:/;
-}

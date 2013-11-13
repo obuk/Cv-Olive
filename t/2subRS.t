@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 5;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -31,7 +30,10 @@ if (2) {
 	is_deeply($dst->get([0, 1]), [ 1,  0, -1, -2]);
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
+
 	my $src = Cv::Mat->new([1, 2], &CV_32FC4);
 	throws_ok { $src->subRS } qr/value is not of type CvScalar in Cv::Arr::cvSubRS at $0/;
 }

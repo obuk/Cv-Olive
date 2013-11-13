@@ -2,10 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 42;
-use Test::Number::Delta within => 1e-7;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-7";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 42;
+	}
+}
 use POSIX;
 BEGIN { use_ok('Cv', -nomore) }
 

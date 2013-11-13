@@ -10,18 +10,19 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 10;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my ($x, $y, $width, $height) = map { int rand 16384 } 0..3;
 my $rect = Cv::cvRect($x, $y, $width, $height);
 is_deeply($rect, [$x, $y, $width, $height]);
 
-if (1) {
-	{
-		my $rect2 = Cv::CvRect($rect);
-		is_deeply($rect2, $rect);
-	}
+{
+	my $rect2 = Cv::CvRect($rect);
+	is_deeply($rect2, $rect);
+}
+
+SKIP: {
+	skip "Test::Exception required", 7 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvRect([]) } qr/rect is not of type CvRect in Cv::CvRect at $0/;
 

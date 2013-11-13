@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
@@ -35,14 +34,18 @@ if (2) {
 	is($r, 0);
 }
 
-if (10) {
-	my $A = Cv::Mat->new([2, 2], CV_32FC1);
-	throws_ok { $A->solve } qr/Usage: Cv::Arr::cvSolve\(src1, src2, dst, method=CV_LU\) at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
 
-if (11) {
-	my $A = Cv::Mat->new([2, 2], CV_32FC1);
-	my $B = Cv::Mat->new([2], CV_32FC1);
-	my $X = Cv::Mat->new([2], CV_16SC1);
-	throws_ok { $A->solve($B, $X) } qr/OpenCV Error:/;
+	{
+		my $A = Cv::Mat->new([2, 2], CV_32FC1);
+		throws_ok { $A->solve } qr/Usage: Cv::Arr::cvSolve\(src1, src2, dst, method=CV_LU\) at $0/;
+	}
+
+	{
+		my $A = Cv::Mat->new([2, 2], CV_32FC1);
+		my $B = Cv::Mat->new([2], CV_32FC1);
+		my $X = Cv::Mat->new([2], CV_16SC1);
+		throws_ok { $A->solve($B, $X) } qr/OpenCV Error:/;
+	}
 }

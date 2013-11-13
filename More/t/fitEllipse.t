@@ -2,12 +2,17 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 16;
-use Test::Number::Delta within => 1e-1;
-use Test::Exception;
-BEGIN { use_ok('Cv') }
 use List::Util qw(sum min max);
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-1";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 16;
+	}
+}
+BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
 
@@ -80,18 +85,22 @@ sub aa {
 
 
 # Cv-0.19
-throws_ok { my @list = Cv->FitEllipse } qr/Usage: Cv::Arr::FitEllipse2\(points\) at $0/;
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
+	throws_ok { my @list = Cv->FitEllipse } qr/Usage: Cv::Arr::FitEllipse2\(points\) at $0/;
 
-my $pts3 = [[1, 2], [2, 3], [3, 4]];
-my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
+	my $pts3 = [[1, 2], [2, 3], [3, 4]];
+	my $pts5 = [[1, 2], [2, 3], [3, 4], [5, 6], [7, 8]];
 
-throws_ok { my @list = Cv->FitEllipse($pts3) } qr/OpenCV Error:/;
+	throws_ok { my @list = Cv->FitEllipse($pts3) } qr/OpenCV Error:/;
 
-Cv::More->unimport(qw(cs cs-warn));
-Cv::More->import(qw(cs-warn));
+	Cv::More->unimport(qw(cs cs-warn));
+	Cv::More->import(qw(cs-warn));
 
-{
-	no warnings 'redefine';
-	local *Carp::carp = \&Carp::croak;
-	throws_ok { my @line = Cv->FitEllipse($pts5); } qr/called in list context, but returning scaler at $0/;
+	{
+		no warnings 'redefine';
+		local *Carp::carp = \&Carp::croak;
+		throws_ok { my @line = Cv->FitEllipse($pts5); } qr/called in list context, but returning scaler at $0/;
+	}
 }
+

@@ -4,34 +4,27 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 60;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore, -seq, -bg, -subdiv) }
 
-if (1) {
-	throws_ok { Cv->NotDefined() } qr/can't call Cv::NotDefined at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 11 unless eval "use Test::Exception";
 
-if (2) {
+	throws_ok { Cv->NotDefined() } qr/can't call Cv::NotDefined at $0/;
+
 	{ package Cv; sub Foo { } }
 	throws_ok { Cv->FOO() } qr/can't call Cv::FOO at $0/;
 	lives_ok  { Cv->Foo() };
 	lives_ok  { Cv->foo() };
 	throws_ok { Cv->fOO() } qr/can't call Cv::fOO at $0/;
-}
 
-if (3) {
 	{ package Cv; sub BAR { } }
 	lives_ok  { Cv->BAR() };
 	throws_ok { Cv->Bar() } qr/can't call Cv::Bar at $0/;
 	lives_ok  { Cv->bar() };
 	lives_ok  { Cv->bAR() };
-}
 
-if (4) {
 	throws_ok { Cv->cvmGet() } qr/can't call Cv::cvmGet at $0/;
-}
 
-if (5) {
 	my $cv = bless [], 'Cv';
 	throws_ok { $cv->alloc() } qr/class name needed at $0/;
 }

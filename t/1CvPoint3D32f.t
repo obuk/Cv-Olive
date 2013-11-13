@@ -10,18 +10,19 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 8;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my ($x, $y, $z) = unpack("f*", pack("f*", map { rand 1 } 0..2));
 my $pt = cvPoint3D32f($x, $y, $z);
 is_deeply($pt, [ $x, $y, $z ]);
 
-if (1) {
-	{
-		my $pt2 = Cv::CvPoint3D32f($pt);
-		is_deeply($pt2, $pt);
-	}
+{
+	my $pt2 = Cv::CvPoint3D32f($pt);
+	is_deeply($pt2, $pt);
+}
+
+SKIP: {
+	skip "Test::Exception required", 5 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvPoint3D32f([]) } qr/pt is not of type CvPoint3D32f in Cv::CvPoint3D32f at $0/;
 

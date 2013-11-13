@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 89;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $class = 'Cv::Image';
@@ -21,11 +20,15 @@ if (1) {
 	$arr->origin(0);
 	is($arr->origin, 0);
 
-	throws_ok { ${class}->new([240, 320], 7) } qr/OpenCV Error:/;
+  SKIP: {
+	  skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	  throws_ok { ${class}->new([240, 320], 7) } qr/OpenCV Error:/;
+	}
 }
 
 # type: $class->new([ $rows, $cols ], $type);
-if (2) {
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	throws_ok { $class->new([-1, -1], CV_8UC3) } qr/OpenCV Error:/;
 }
 

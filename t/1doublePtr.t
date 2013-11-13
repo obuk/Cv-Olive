@@ -8,18 +8,19 @@ BEGIN {
 	eval { use Cv -nomore };
 	eval { require XSLoader; XSLoader::load('Cv::t', $Cv::VERSION) };
 	plan skip_all => "no Cv/t.so" if $@;
-	plan tests => 6;
+	plan tests => 5;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my @doublePtr = unpack("d*", pack("d*", map { rand 1 } 1 .. 100));
 
-if (1) {
-	{
-		my $doublePtr = Cv::doublePtr(\@doublePtr);
-		is_deeply($doublePtr, \@doublePtr);
-	}
+{
+	my $doublePtr = Cv::doublePtr(\@doublePtr);
+	is_deeply($doublePtr, \@doublePtr);
+}
+
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
 
 	throws_ok { Cv::doublePtr({}) } qr/values is not of type double \* in Cv::doublePtr at $0/;
 
@@ -30,7 +31,7 @@ if (1) {
 
 	{
 		no warnings 'numeric';
-		my $x; lives_ok { $x = Cv::doublePtr([1, '2x', 3]) };
+		my $x = lives_ok { Cv::doublePtr([1, '2x', 3]) };
 		is_deeply($x, [1, 2, 3]);
 	}
 }

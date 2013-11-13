@@ -2,7 +2,6 @@
 
 use strict;
 use Test::More;
-use Test::Exception;
 BEGIN {
 	plan skip_all => "Inline::C required"
 		unless eval "use Inline; 1";
@@ -26,7 +25,11 @@ if ($verbose) {
 	Cv->waitKey(1000);
 }
 
-throws_ok { myload() } qr/Usage: main::myload\(name\)/;
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
+	throws_ok { myload() } qr/Usage: main::myload\(name\)/;
+}
 
 BEGIN {
 	use_ok('Cv::Config');

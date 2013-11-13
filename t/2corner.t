@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 12;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -60,7 +59,7 @@ $gray2thermo->set([$_], $gray2thermo[$_]) for 0 .. $#gray2thermo;
 
 my $blockSize = 3;
 
-if (1) {
+{
 	my $corner = $arr->CornerEigenValsAndVecs($blockSize, 7)
 		->resize($arr->sizes);
 	$corner->minMaxLoc(my $min, my $max);
@@ -78,7 +77,7 @@ if (1) {
 	}
 }
 
-if (2) {
+{
 	my $corner = $arr->CornerHarris($blockSize, 3, 0.04)
 		->resize($arr->sizes);
 	$corner->minMaxLoc(my $min, my $max);
@@ -104,7 +103,7 @@ if (2) {
 	}
 }
 
-if (3) {
+{
 	my $corner = $arr->CornerMinEigenVal($blockSize, 3)
 		->resize($arr->sizes);
 	$corner->minMaxLoc(my $min, my $max);
@@ -135,7 +134,9 @@ if ($verbose) {
 }
 
 
-if (10) {
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
+
 	throws_ok { $arr->CornerEigenValsAndVecs } qr/Usage: Cv::Arr::cvCornerEigenValsAndVecs\(image, eigenvv, blockSize, aperture_size=3\) at $0/;
 
 	throws_ok { $arr->CornerHarris } qr/Usage: Cv::Arr::cvCornerHarris\(image, harris_dst, blockSize, aperture_size=3, k=0\.04\) at $0/;

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 2;
-use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 my $verbose = Cv->hasGUI;
@@ -67,12 +66,15 @@ sub color {
 
 
 # Cv-0.19
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 
-Cv::More->unimport(qw(cs));
-Cv::More->import(qw(cs-warn));
+	Cv::More->unimport(qw(cs));
+	Cv::More->import(qw(cs-warn));
 
-if (11) {
-	no warnings 'redefine';
-	local *Carp::carp = \&Carp::croak; # capturing carp as croak
-	throws_ok { my @retval = Cv->boundingRect([10, 20], [10, 30]) } qr/called in list context, but returning scaler at $0/;
+	{
+		no warnings 'redefine';
+		local *Carp::carp = \&Carp::croak; # capturing carp as croak
+		throws_ok { my @retval = Cv->boundingRect([10, 20], [10, 30]) } qr/called in list context, but returning scaler at $0/;
+	}
 }

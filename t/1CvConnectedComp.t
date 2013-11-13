@@ -8,9 +8,8 @@ BEGIN {
 	eval { use Cv -nomore };
 	eval { require XSLoader; XSLoader::load('Cv::t', $Cv::VERSION) };
 	plan skip_all => "no Cv/t.so" if $@;
-	plan tests => 16;
+	plan tests => 15;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $area = int rand 16384;
@@ -18,20 +17,22 @@ my $value = [ map { (int rand 16384) + 0.5 } 0..3 ];
 my $rect = [ map { int rand 16384 } 0..3 ];
 my $contour = Cv::Seq->new(CV_8UC4);
 
-if (1) {
-	{
-		my $cc = Cv::cvConnectedComp($area, $value, $rect, $contour);
-		is($cc->[0], $area);
-		is_deeply($cc->[1], $value);
-		is_deeply($cc->[2], $rect);
-		# is($cc->[3], $contour);
+{
+	my $cc = Cv::cvConnectedComp($area, $value, $rect, $contour);
+	is($cc->[0], $area);
+	is_deeply($cc->[1], $value);
+	is_deeply($cc->[2], $rect);
+	# is($cc->[3], $contour);
 
-		my $cc2 = Cv::CvConnectedComp($cc);
-		is($cc2->[0], $cc->[0]);
-		is_deeply($cc2->[1], $cc->[1]);
-		is_deeply($cc2->[2], $cc->[2]);
-		# is($out->[3], $cc->[3]);
-	}
+	my $cc2 = Cv::CvConnectedComp($cc);
+	is($cc2->[0], $cc->[0]);
+	is_deeply($cc2->[1], $cc->[1]);
+	is_deeply($cc2->[2], $cc->[2]);
+	# is($out->[3], $cc->[3]);
+}
+
+SKIP:  {
+	skip "Test::Exception required", 8 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvConnectedComp([]) } qr/cc is not of type CvConnectedComp in Cv::CvConnectedComp at $0/;
 
@@ -48,7 +49,7 @@ if (1) {
 
 	{
 		no warnings 'numeric';
-		my $x; lives_ok { $x = Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
+		my $x = lives_ok { Cv::CvConnectedComp(['1x', $value, $rect, $contour]) };
 		is($x->[0], 1);
 		is_deeply($x->[1], $value);
 		is_deeply($x->[2], $rect);

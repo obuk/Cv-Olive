@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 13;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $stor = Cv::MemStorage->new();
@@ -30,6 +29,7 @@ if (2) {
 	is($s->len, length($hw));
 }
 
-if (10) {
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	throws_ok { $stor->allocString() } qr/Usage: Cv::MemStorage::cvAllocString\(storage, ptr, len=-1\) at $0/;
 }

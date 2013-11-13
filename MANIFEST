@@ -97,7 +97,6 @@ More/t/namedParameters.t
 More/t/nonzero.t
 More/t/overload.t
 More/t/perspectiveTransform.t
-More/t/pod-coverage.t
 More/t/pointSeqFromMat.t
 More/t/projectPoints2.t
 More/t/s_new.t
@@ -139,7 +138,6 @@ sample/distrans.pl
 sample/drawing.pl
 sample/edge.pl
 sample/facedetect.pl
-sample/fback2.pl
 sample/fback_c.pl
 sample/ffilldemo.pl
 sample/find_obj.pl
@@ -345,10 +343,8 @@ t/2xor.t
 t/9flipbook.t
 t/9inlineC.t
 t/9pod.t
-t/9ref.t
 t/9threads.t
 t/baboon.jpg
-t/hackcv.pm
 t/lena.jpg
 tools/checkref.pl
 tools/cleanup.sh

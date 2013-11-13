@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 13;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -64,18 +63,23 @@ foreach (
 	is(&sumInrange, $_->{Sum});
 }
 
-if (10) {
-	my $src = Cv::Mat->new([240, 320], CV_8UC1);
-	my $lower = Cv::Mat->new([240, 320], CV_8UC2);
-	my $upper = Cv::Mat->new([240, 320], CV_8UC2);
-	throws_ok { $src->inRange($lower, $upper) } qr/OpenCV Error:/;
-}
 
-if (11) {
-	my $src = Cv::Mat->new([240, 320], CV_32FC1);
-	my $lower = Cv::Mat->new([240, 320], CV_32FC1);
-	my $upper = Cv::Mat->new([240, 320], CV_32FC1);
-	lives_ok { $src->inRange($lower, $upper) };
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $src = Cv::Mat->new([240, 320], CV_8UC1);
+		my $lower = Cv::Mat->new([240, 320], CV_8UC2);
+		my $upper = Cv::Mat->new([240, 320], CV_8UC2);
+		throws_ok { $src->inRange($lower, $upper) } qr/OpenCV Error:/;
+	}
+
+	{
+		my $src = Cv::Mat->new([240, 320], CV_32FC1);
+		my $lower = Cv::Mat->new([240, 320], CV_32FC1);
+		my $upper = Cv::Mat->new([240, 320], CV_32FC1);
+		lives_ok { $src->inRange($lower, $upper) };
+	}
 }
 
 sub makeImage {

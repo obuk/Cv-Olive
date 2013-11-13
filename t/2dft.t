@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 3;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -42,10 +41,14 @@ if (1) {
 	}
 }
 
-if (10) {
-	throws_ok { $src->DFT() } qr/Usage: Cv::Arr::cvDFT\(src, dst, flags, nonzeroRows=0\) at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
 
-if (11) {
-	throws_ok { $src->DFT(\0, CV_DXT_FORWARD) } qr/OpenCV Error:/;
+	{
+		throws_ok { $src->DFT() } qr/Usage: Cv::Arr::cvDFT\(src, dst, flags, nonzeroRows=0\) at $0/;
+	}
+
+	{
+		throws_ok { $src->DFT(\0, CV_DXT_FORWARD) } qr/OpenCV Error:/;
+	}
 }

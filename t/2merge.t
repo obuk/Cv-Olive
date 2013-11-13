@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 172;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
@@ -78,13 +77,17 @@ if (1) {
 	}
 }
 
-if (10) {
-	throws_ok { Cv->Merge; } qr/Usage: Cv::Arr::Merge\(\[src0, src1, \.\.\.\], dst\) at $0/;
-	my $cv = bless [], 'Cv';
-	throws_ok { $cv->Merge; } qr/Usage: Cv::Arr::Merge\(\[src0, src1, \.\.\.\], dst\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 4 unless eval "use Test::Exception";
+
+	throws_ok { Cv->Merge; } qr/Usage: Cv::Arr::Merge\(\[src0, src1, \.\.\.\], dst\) at $0/;
+
+	{
+		my $cv = bless [], 'Cv';
+		throws_ok { $cv->Merge; } qr/Usage: Cv::Arr::Merge\(\[src0, src1, \.\.\.\], dst\) at $0/;
+	}
+
 	my $x = Cv::Mat->new([320, 240], CV_8UC1);
 	my ($b, $g, $r, $a) = ($x->new, $x->new, $x->new, $x->new);
 	throws_ok { Cv->Merge($b, $g, $r, $a, $x->new) } qr/OpenCV Error:/;

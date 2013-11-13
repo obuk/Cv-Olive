@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Cwd qw(abs_path);
 use File::Basename;
-use ExtUtils::PkgConfig;
+# use ExtUtils::PkgConfig;
 use version;
 
 our $VERSION = '0.30';
@@ -170,7 +170,13 @@ sub version {
 
 
 BEGIN {
-	%opencv = ExtUtils::PkgConfig->find('opencv');
+	# %opencv = ExtUtils::PkgConfig->find('opencv');
+	foreach my $key (qw(cflags libs modversion)) {
+		no warnings 'uninitialized';
+		chop(my $value = `pkg-config opencv --$key`) or die $!;
+		$opencv{$key} = $value;
+	}
+ 
 	my $cf = __PACKAGE__->new;
 
 	# ExtUtils::MakeMaker

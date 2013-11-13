@@ -2,9 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 35;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Exception";
+	if ($@) {
+		plan skip_all => "Test::Exception";
+	} else {
+		plan tests => 35;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 use Data::Dumper;

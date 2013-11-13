@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 15;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -64,11 +63,11 @@ if (4) {
 	is($dst->getReal(2), And($src->getReal(2), $value));
 }
 
-if (10) {
-	throws_ok { $src->and(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvAnd\(src1, src2, dst, mask=NULL\) at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
 
-if (12) {
+	throws_ok { $src->and(0, 0, 0, 0) } qr/Usage: Cv::Arr::cvAnd\(src1, src2, dst, mask=NULL\) at $0/;
+
 	throws_ok { $src->and(\0) } qr/OpenCV Error:/;
 }
 

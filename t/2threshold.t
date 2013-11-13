@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 use File::Basename;
@@ -32,6 +31,8 @@ if ($verbose) {
 	Cv->WaitKey(1000);
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	throws_ok { $image->Threshold } qr/Usage: Cv::Arr::cvThreshold\(src, dst, threshold, maxValue, thresholdType\) at $0/;
 }

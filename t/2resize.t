@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 23;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # my $dst = $src->resize([rows, cols]);
@@ -59,12 +58,18 @@ if (4) {
 	is($src->cols, 2 * $cols);
 }
 
-if (10) {
-	my $src = Cv::Mat->new([100, 10], CV_8UC3);
-	throws_ok { $src->resize(1, 2, 3) } qr/Usage: Cv::Arr::cvResize\(src, dst, interpolation=CV_INTER_LINEAR\) at $0/;
+
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $src = Cv::Mat->new([100, 10], CV_8UC3);
+		throws_ok { $src->resize(1, 2, 3) } qr/Usage: Cv::Arr::cvResize\(src, dst, interpolation=CV_INTER_LINEAR\) at $0/;
+	}
+
+	{
+		my $src = Cv::Mat->new([100, 10], CV_8UC3);
+		throws_ok { $src->resize(\0) } qr/OpenCV Error:/;
+	}
 }
 
-if (11) {
-	my $src = Cv::Mat->new([100, 10], CV_8UC3);
-	throws_ok { $src->resize(\0) } qr/OpenCV Error:/;
-}

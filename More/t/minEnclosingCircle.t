@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 12;
-use Test::Exception;
 BEGIN { use_ok('Cv') }
 
 sub xy {
@@ -56,18 +55,22 @@ if (12) {
 
 
 # Cv-0.19
-if (21) {
-	Cv::More->unimport(qw(cs cs-warn));
-	Cv::More->import(qw(cs-warn));
-	no warnings 'redefine';
-	local *Carp::carp = \&Carp::croak;
-	throws_ok { my @line = Cv->minEnclosingCircle(\@points); } qr/called in list context, but returning scaler at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
 
-if (22) {
-	Cv::More->unimport(qw(cs cs-warn));
-	Cv::More->import(qw(cs));
-	no warnings 'redefine';
-	local *Carp::carp = \&Carp::croak;
-	lives_ok { my @line = Cv->minEnclosingCircle(\@points); is(@line, 2); };
+	{
+		Cv::More->unimport(qw(cs cs-warn));
+		Cv::More->import(qw(cs-warn));
+		no warnings 'redefine';
+		local *Carp::carp = \&Carp::croak;
+		throws_ok { my @line = Cv->minEnclosingCircle(\@points); } qr/called in list context, but returning scaler at $0/;
+	}
+
+	{
+		Cv::More->unimport(qw(cs cs-warn));
+		Cv::More->import(qw(cs));
+		no warnings 'redefine';
+		local *Carp::carp = \&Carp::croak;
+		lives_ok { my @line = Cv->minEnclosingCircle(\@points); is(@line, 2); };
+	}
 }

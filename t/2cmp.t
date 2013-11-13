@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 6;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 # ------------------------------------------------------------
@@ -12,7 +11,7 @@ BEGIN { use_ok('Cv', -nomore) }
 #  void cvCmpS(const CvArr* src, double value, CvArr* dst, int cmpOp)
 # ------------------------------------------------------------
 
-if (1) {
+{
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
 	$src->roi([0, 0, 10, 10]); $src->zero;
 	$src->resetROI();
@@ -22,7 +21,7 @@ if (1) {
 	is($c1, $c2);
 }
 
-if (2) {
+{
 	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
 	$src->roi([0, 0, 10, 10]); $src->zero;
 	$src->resetROI();
@@ -33,17 +32,22 @@ if (2) {
 	is($c1, $c2);
 }
 
-if (10) {
-	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
-	throws_ok { $src->cmp } qr/Usage: Cv::Arr::cvCmpS\(src, value, dst, cmpOp\) at $0/;
-}
 
-if (11) {
-	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
-	throws_ok { $src->cmp(0, -1) } qr/OpenCV Error:/;
-}
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
 
-if (12) {
-	my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
-	throws_ok { $src->cmp(Cv::Image->new([10, 10], CV_8UC1), CV_CMP_EQ) } qr/OpenCV Error:/;
+	{
+		my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
+		throws_ok { $src->cmp } qr/Usage: Cv::Arr::cvCmpS\(src, value, dst, cmpOp\) at $0/;
+	}
+
+	{
+		my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
+		throws_ok { $src->cmp(0, -1) } qr/OpenCV Error:/;
+	}
+
+	{
+		my $src = Cv::Image->new([100, 100], CV_8UC1)->fill([1]);
+		throws_ok { $src->cmp(Cv::Image->new([10, 10], CV_8UC1), CV_CMP_EQ) } qr/OpenCV Error:/;
+	}
 }

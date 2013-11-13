@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 7;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 use File::Basename;
@@ -35,10 +34,9 @@ SKIP: {
 	ok(!$saved);
 }
 
-if (10) {
-	throws_ok { $arr->saveImage } qr/Usage: Cv::Arr::SaveImage\(image, filename, params=0\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+	throws_ok { $arr->saveImage } qr/Usage: Cv::Arr::SaveImage\(image, filename, params=0\) at $0/;
 	throws_ok { $arr->saveImage('xxx') } qr/OpenCV Error:/;
 }

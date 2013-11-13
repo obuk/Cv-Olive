@@ -2,10 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 10;
-use Test::Number::Delta within => 1e-7;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-7";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 10;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -75,10 +80,10 @@ if (1) {
 	}
 }
 
-if (10) {
-	throws_ok { Cv->GetPerspectiveTransform } qr/Usage: Cv::cvGetPerspectiveTransform\(src, dst, mapMatrix\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { Cv->GetPerspectiveTransform } qr/Usage: Cv::cvGetPerspectiveTransform\(src, dst, mapMatrix\) at $0/;
 	throws_ok { Cv->GetPerspectiveTransform(1, 2) } qr/src is not of type CvPoint2D32f \* in Cv::cvGetPerspectiveTransform at $0/;
 }

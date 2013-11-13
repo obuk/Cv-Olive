@@ -2,10 +2,15 @@
 
 use strict;
 use warnings;
-# use Test::More qw(no_plan);
-use Test::More tests => 20;
-use Test::Number::Delta within => 1e-7;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-7";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 20;
+	}
+}
 BEGIN { use_ok('Cv', -nomore) }
 
 #  Cv->getRotationMatrix2D($center, $angle, $scale, $map);
@@ -70,10 +75,11 @@ if (4) {
 	delta_ok($b, $scale * sin($angle * $rad));
 }
 
-if (10) {
-	throws_ok { Cv->GetRotationMatrix2D } qr/Usage: Cv::cvGetRotationMatrix2D\(center, angle, scale, mapMatrix\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { Cv->GetRotationMatrix2D } qr/Usage: Cv::cvGetRotationMatrix2D\(center, angle, scale, mapMatrix\) at $0/;
+
 	throws_ok { Cv->cvGetRotationMatrix2D(1, 2, 3) } qr/center is not of type CvPoint2D32f in Cv::cv2DRotationMatrix at $0/;
 }

@@ -3,9 +3,16 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 8;
-use Test::Number::Delta within => 1e-15;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-15";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 8;
+	}
+}
+
 BEGIN { use_ok('Cv', -nomore) }
 
 sub box_ok {
@@ -31,35 +38,36 @@ sub box_ok {
 	# goto &Test::More::is_deeply;
 }
 
-if (1) {
+{
 	Cv::cvBoxPoints([ [ 1, 1 ], [ 2, 2 ], 90.0 ], my $p);
 	box_ok($p, [ [0, 0], [2, 0], [2, 2], [0, 2] ]);
 }
 
-if (2) {
+{
 	my @p = Cv->BoxPoints([ [ 1, 1 ], [ 2, 2 ], 90.0 ]);
 	box_ok(\@p, [ [0, 0], [2, 0], [2, 2], [0, 2] ]);
 }
 
-if (4) {
+{
 	Cv->BoxPoints([ [ 1, 1 ], [ 2, 2 ], 90.0 ], \my @p);
 	box_ok(\@p, [ [0, 0], [2, 0], [2, 2], [0, 2] ]);
 }
 
-if (5) {
+{
 	Cv->BoxPoints([ [ 1, 1 ], [ 2, 2 ], 90.0 ], my $p);
 	box_ok($p, [ [0, 0], [2, 0], [2, 2], [0, 2] ]);
 }
 
-if (6) {
+{
 	my $p = Cv->BoxPoints([ [ 1, 1 ], [ 2, 2 ], 90.0 ]);
 	box_ok($p, [ [0, 0], [2, 0], [2, 2], [0, 2] ]);
 }
 
-if (10) {
-	throws_ok { cvBoxPoints() } qr/Usage: Cv::cvBoxPoints\(box, pts\) at $0/;
-}
 
-if (11) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	throws_ok { cvBoxPoints() } qr/Usage: Cv::cvBoxPoints\(box, pts\) at $0/;
+
 	throws_ok { cvBoxPoints([], my $pts) } qr/box is not of type CvBox2D in Cv::cvBoxPoints at $0/;
 }

@@ -10,7 +10,6 @@ BEGIN {
 	plan skip_all => "no Cv/t.so" if $@;
 	plan tests => 10;
 }
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my ($type, $max_iter) = map { int rand 65536 } 1 .. 2;
@@ -18,11 +17,13 @@ my ($epsilon) = map { int rand 10 } 3;
 my $term = cvTermCriteria($type, $max_iter, $epsilon);
 is_deeply($term, [$type, $max_iter, $epsilon]);
 
-if (1) {
-	{
-		my $term2 = Cv::CvTermCriteria($term);
-		is_deeply($term2, $term);
-	}
+{
+	my $term2 = Cv::CvTermCriteria($term);
+	is_deeply($term2, $term);
+}
+
+SKIP: {
+	skip "Test::Exception required", 7 unless eval "use Test::Exception";
 
 	throws_ok { Cv::CvTermCriteria({}) } qr/term is not of type CvTermCriteria in Cv::CvTermCriteria at $0/;
 

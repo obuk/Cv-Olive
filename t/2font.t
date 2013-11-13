@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 3;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 my $verbose = Cv->hasGUI;
@@ -21,6 +20,8 @@ if (1) {
 	}
 }
 
-if (10) {
+
+SKIP: {
+	skip "Test::Exception required", 1 unless eval "use Test::Exception";
 	throws_ok { Cv->InitFont } qr/Usage: Cv::cvInitFont\(fontFace, hscale, vscale, shear=0, thickness=1, lineType=8\) at $0/;
 }

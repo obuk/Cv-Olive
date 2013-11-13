@@ -4,7 +4,6 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 31;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nomore) }
 
 use File::Basename;
@@ -12,7 +11,7 @@ use File::Basename;
 my $lena = dirname($0) . "/lena.jpg";
 my $verbose = Cv->hasGUI;
 
-if (1) {
+{
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
 	if ($verbose) {
@@ -49,7 +48,7 @@ if (1) {
 	}
 }
 
-if (2) {
+{
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
 	my $gray = $image->cvtColor(
@@ -61,7 +60,7 @@ if (2) {
 	}
 }
 
-if (3) {
+{
 	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
 	isa_ok($image, 'Cv::Image');
 	my $gray = $image->cvtColor(CV_BGR2RGB);
@@ -71,14 +70,18 @@ if (3) {
 	}
 }
 
-if (10) {
-	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
-	isa_ok($image, 'Cv::Image');
-	throws_ok { $image->cvtColor } qr/Usage: Cv::Arr::CvtColor\(src, dst, code\) at $0/;
-}
+SKIP: {
+	skip "Test::Exception required", 4 unless eval "use Test::Exception";
 
-if (11) {
-	my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
-	isa_ok($image, 'Cv::Image');
-	throws_ok { $image->cvtColor(-1) } qr/dst is not of type CvArr \* in Cv::Arr::cvCvtColor at $0/;
+	{
+		my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
+		isa_ok($image, 'Cv::Image');
+		throws_ok { $image->cvtColor } qr/Usage: Cv::Arr::CvtColor\(src, dst, code\) at $0/;
+	}
+
+	{
+		my $image = Cv->loadImage($lena, CV_LOAD_IMAGE_COLOR);
+		isa_ok($image, 'Cv::Image');
+		throws_ok { $image->cvtColor(-1) } qr/dst is not of type CvArr \* in Cv::Arr::cvCvtColor at $0/;
+	}
 }

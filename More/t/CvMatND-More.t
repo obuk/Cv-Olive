@@ -4,10 +4,10 @@ use strict;
 use warnings;
 # use Test::More qw(no_plan);
 use Test::More tests => 84;
-use Test::Exception;
 BEGIN { use_ok('Cv') }
 
-if (1) {
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
 	my $x; lives_ok { $x = Cv::MatND->new([], CV_32FC1) };
 	is($x, undef);
 }
@@ -199,11 +199,16 @@ if (16) {
 }
 
 
-if (21) {
-	my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
-	throws_ok { $arr->set([ 3, 3 ], [ 1, 2 ]) } qr/OpenCV Error:/;
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my $arr = Cv::MatND->new([ 3, 3 ], CV_16SC2);
+		throws_ok { $arr->set([ 3, 3 ], [ 1, 2 ]) } qr/OpenCV Error:/;
+	}
+
+	{
+		throws_ok { Cv::MatND->new([], CV_8UC1, []) } qr/OpenCV Error:/;
+	}
 }
 
-if (22) {
-	throws_ok { Cv::MatND->new([], CV_8UC1, []) } qr/OpenCV Error:/;
-}
