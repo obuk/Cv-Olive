@@ -95,6 +95,7 @@ sub dumpsub {
 		$body =~ s/(\d+(\.\d+)?)\s+\&\s*'f'/$1/g;
 		$body =~ s/\s*\bno warnings;\s+/ /;
 		$body =~ s/;\s*}/ }/g;
+		$body =~ s/\s*BEGIN\s*{.*\${\^WARNING_BITS}[^\}]*}\s*/ /g;
 		push(@subs, "sub $_ $body");
 		$ignore{$_} = 1;
 	}
