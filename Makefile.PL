@@ -4,6 +4,10 @@ use 5.008008;
 use ExtUtils::MakeMaker;
 
 our %PREREQ_PM = (
+	'File::Slurp'         => '9999.19',
+	'File::Spec::Functions' => '3.48_01',
+	'File::Temp'          => '0.2304',
+	'Parse::CommandLine'  => '0.02',
 	'ExtUtils::ParseXS'   => '2.190',
 	'version'             => '0.770',
 	'Test::Number::Delta' => '1.030',
@@ -93,11 +97,12 @@ push(@dir, qw(Histogram));
 push(@dir, qw(Subdiv2D));
 push(@dir, qw(More));
 push(@dir, qw(Qt)) if $cf->hasqt;
-push(@dir, qw(Nonfree));
+push(@dir, qw(Nonfree)) if $cf->hasnonfree;
 
 if ($cf->_version >= qv(2.4.5) && $cf->cc =~ /\+\+/) {
-	eval "use Data::Structure::Util";
-	push(@dir, qw(Features2d)) unless $@;
+	if (eval "use Data::Structure::Util; 1" && $cf->hasnonfree) {
+		push(@dir, qw(Features2d));
+	}
 }
 
 WriteMakefile(

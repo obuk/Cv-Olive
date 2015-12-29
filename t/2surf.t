@@ -3,12 +3,13 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 13;
-BEGIN { use_ok('Cv', -nonfree) }
+use Test::More tests => 12;
+use Cv;
 
 my $verbose = Cv->hasGUI;
 
-if (1) {
+SKIP: {
+	skip "no nonfree", 12 unless eval "use Cv::Nonfree; 1";
 	my $img = Cv::Image->new([300, 300], CV_8UC3);
 	my @pt = ([100, 100], [100, 200], [200, 200], [200, 100]);
 	$img->polyLine([\@pt], -1, [ 100, 200, 200], 1, CV_AA);

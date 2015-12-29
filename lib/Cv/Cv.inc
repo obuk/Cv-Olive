@@ -44,6 +44,12 @@ extern "C" {
 #  ifdef __OPENCV_OLD_CV_H__
 #    include <opencv2/opencv.hpp>
 #  endif
+#  if _CV_VERSION() >= _VERSION(2,4,0)
+#    include "opencv2/opencv_modules.hpp"                               // XXXXX
+#    ifdef HAVE_OPENCV_NONFREE
+#      include "opencv2/nonfree/nonfree.hpp"                            // XXXXX
+#    endif                                                              // XXXXX
+#  endif
 #else
 #  if _CV_VERSION() >= _VERSION(2,4,0)
 #    include <opencv2/photo/photo_c.h>

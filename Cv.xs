@@ -2,12 +2,6 @@
 
 #include "Cv.inc"
 
-#if _CV_VERSION() >= _VERSION(2,4,0)
-#ifdef __cplusplus                                                      // XXXXX
-#  include "opencv2/nonfree/nonfree.hpp"                                // XXXXX
-#endif                                                                  // XXXXX
-#endif
-
 #define bless(st0, class, retval) \
     sv_setref_pv(st0 = sv_newmortal(), class, (void*)retval);
 

@@ -2,12 +2,6 @@
 
 #include "Cv.inc"
 
-#if _CV_VERSION() >= _VERSION(2,4,0)
-#ifdef __cplusplus                                                      // XXXXX
-#  include "opencv2/nonfree/nonfree.hpp"                                // XXXXX
-#endif                                                                  // XXXXX
-#endif
-
 MODULE = Cv::Nonfree		PACKAGE = Cv::Nonfree
 
 # ============================================================
@@ -15,8 +9,6 @@ MODULE = Cv::Nonfree		PACKAGE = Cv::Nonfree
 # ============================================================
 
 BOOT:
-#if _CV_VERSION() >= _VERSION(2,4,0)
-#ifdef __cplusplus                                                      // XXXXX
-	initModule_nonfree();                                               // XXXXX
-#endif                                                                  // XXXXX
+#ifdef HAVE_OPENCV_NONFREE
+	initModule_nonfree();
 #endif

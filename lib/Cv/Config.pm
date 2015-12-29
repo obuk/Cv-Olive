@@ -116,38 +116,81 @@ sub ccflags {
 sub hasqt {
 	my $self = shift;
 	unless (defined $self->{hasqt}) {
-		my $c = "/tmp/cv$$.c";
-		warn "Compiling $c to check you have qt.\n" if $verbose;
-		my $CC = $self->cc;
-		my $CCFLAGS = $self->ccflags;
-		my $LIBS = join(' ', @{$self->libs});
-		if (my $dynamic_lib = $self->dynamic_lib) {
-			if ($dynamic_lib->{OTHERLDFLAGS}) {
-				$LIBS .= " " . $dynamic_lib->{OTHERLDFLAGS};
-			}
-		}
-		if (open C, ">$c") {
-			print C <<"----";
+		$self->{hasqt} = do {
+			$self->run_c(<<END, 'to check you have qt');
 #include <stdio.h>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
-main()
+int main()
 {
-	CvFont font = cvFontQt("Times");
-	exit(0);
+  CvFont font = cvFontQt("Times");
+  exit(0);
 }
-----
-	;
-			close C;
-			warn "$CC $CCFLAGS -o a.exe $c $LIBS\n" if $verbose;
-			chop(my $v = `$CC $CCFLAGS -o a.exe $c $LIBS 2>/dev/null && ./a.exe`);
-			$self->{hasqt} = $? == 0;
-			unlink($c, 'a.exe');
-		} else {
-			die "$0: can't open $c.\n";
-		}
+END
+			$? == 0;
+		};
 	}
 	$self->{hasqt};
+}
+
+sub hasnonfree {
+	my $self = shift;
+	unless (defined $self->{hasnonfree}) {
+		$self->{hasnonfree} = do {
+			my $output = $self->run_c(<<END);
+#include <stdio.h>
+#include <opencv/cv.h>
+#include <opencv2/opencv_modules.hpp>
+int main()
+{
+#ifdef HAVE_OPENCV_NONFREE
+  printf("yes\\n");
+  exit(0);
+#else
+  exit(1);
+#endif
+}
+END
+			$? == 0 && $output;
+		};
+	}
+	$self->{hasnonfree};
+}
+
+
+use File::Slurp qw/ write_file /;
+use File::Spec::Functions qw/ catdir /;
+use File::Temp qw/ tempdir /;
+use Parse::CommandLine;
+
+sub run_c {
+	my $self = shift;
+	my $option = { src => '.c++', out => '.out' };
+	if (ref $_[0]) {
+		my $x = shift;
+		$option->{$_} = $x->{$_} for keys %$x;
+	}
+	my $code = shift;
+	my $hint = shift || '';
+	my $child_error = 0;
+	my $output;
+	{
+		local $?;
+		my $tempdir = tempdir(CLEANUP => 1);
+		my $src = catdir $tempdir, join('', 'cv', $$, $option->{src});
+		my $out = catdir $tempdir, join('', 'a', $option->{out});
+		warn join(' ', "Compiling $src", $hint), "\n" if $verbose;
+		write_file($src, $code) or croak "$0: can't write $src.\n";
+		my @compile = (
+			$self->cc, $src, '-o', $out,
+			map { parse_command_line($_) } $opencv{cflags}, $opencv{libs},
+		);
+		warn "@compile\n" if $verbose;
+		system @compile;
+		$output = `$out` if ($child_error = $?) == 0;
+	}
+	$? = $child_error;
+	$output;
 }
 
 
