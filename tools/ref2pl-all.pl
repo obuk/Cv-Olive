@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 my %flags = (
     '1.0.0' => '-htm',

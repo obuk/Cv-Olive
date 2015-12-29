@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 # Tracking of rotating point.  Rotation speed is constant.  Both state
