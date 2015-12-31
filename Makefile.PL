@@ -97,8 +97,6 @@ if ($cf->_version >= qv(2.4.5) && $cf->cc =~ /\+\+/) {
 
 -f "$_/cpanfile" or ln('-s', '../cpanfile', $_) for @dir;
 
-ln(-s, '../cpanfile', $_) for @dir;
-
 WriteMakefile(
 	NAME => 'Cv',
 	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
