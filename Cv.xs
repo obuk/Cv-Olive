@@ -180,7 +180,10 @@ static SV *unbless(SV * rv)
     SvREFCNT_dec(SvSTASH(sv));
     SvSTASH(sv) = NULL;
     SvOBJECT_off(sv);
-    if (SvTYPE(sv) != SVt_PVIO) PL_sv_objcount--;
+	// perldelta
+#if PERL_VERSION <= 18
+	if (SvTYPE(sv) != SVt_PVIO) PL_sv_objcount--;
+#endif
     SvAMAGIC_off(rv);
 #ifdef SvUNMAGIC
     SvUNMAGIC(sv);
@@ -2320,7 +2323,7 @@ double
 cvContourArea(const CvArr* contour, CvSlice slice=CV_WHOLE_SEQ, int oriented=0)
 CODE:
 	RETVAL = cvContourArea(contour, slice=CV_WHOLE_SEQ
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 		, oriented
 #endif
 		);
@@ -2908,7 +2911,7 @@ OUTPUT:
 	status
 	track_error
 
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 
 void
 cvCalcOpticalFlowFarneback(const CvArr* prev, const CvArr* next, CvArr* flow, double pyr_scale, int levels, int winsize, int iterations, int poly_n, double poly_sigma, int flags);
@@ -3270,7 +3273,7 @@ CvMat*
 cvEncodeImage(const CvArr* arr, const char* ext, int* params)
 CODE:
     int i = length(params) & ~1;
-#if _CV_VERSION() >= _VERSION(2,4,4)
+#if _CV_VERSION() >= _VERSION(2,4,4) || _CV_VERSION() < _VERSION(2,0,1) // xxxxx
 	if (params) params[i] = 0;
 	RETVAL = cvEncodeImage(ext, arr, params);
 #else
@@ -3419,7 +3422,7 @@ cvCalibrateCamera2(const CvMat* objectPoints, const CvMat* imagePoints, const Cv
 ALIAS: Cv::cvCalibrateCamera2 = 1
 CODE:
 	RETVAL = 
-#if _CV_VERSION() < _VERSION(2,0,0)
+#if _CV_VERSION() < _VERSION(2,0,1) // xxxxx
 	0;
 #endif
 	cvCalibrateCamera2(objectPoints, imagePoints, pointCounts, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags
@@ -3546,7 +3549,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 
 int
 trySmallerWindows(CvStereoBMState* state, int value = NO_INIT)
@@ -3671,7 +3674,7 @@ C_ARGS: left, right, dispLeft, dispRight, state, useDisparityGuess
 
 #endif
 
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 
 MODULE = Cv	PACKAGE = Cv::Arr
 void
@@ -3750,7 +3753,7 @@ cvStereoCalibrate(const CvMat* objectPoints, const CvMat* imagePoints1, const Cv
 ALIAS: Cv::cvStereoCalibrate = 1
 CODE:
 	RETVAL = 
-#if _CV_VERSION() < _VERSION(2,0,0)
+#if _CV_VERSION() < _VERSION(2,0,1) // xxxxx
 	0;
 #endif
 	cvStereoCalibrate(objectPoints, imagePoints1, imagePoints2, pointCounts, cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2, imageSize, R, T, E, F, term_crit, flags);
@@ -3762,7 +3765,7 @@ cvStereoRectify(const CvMat* cameraMatrix1, const CvMat* cameraMatrix2, const Cv
 ALIAS: Cv::cvStereoRectify = 1
 CODE:
 	cvStereoRectify(cameraMatrix1, cameraMatrix2, distCoeffs1, distCoeffs2, imageSize, R, T, R1, R2, P1, P2, Q, flags
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 		, alpha, newImageSize, &roi1, &roi2
 #endif
 		);
@@ -3775,7 +3778,7 @@ void
 cvUndistort2(const CvArr* src, CvArr* dst, const CvMat* cameraMatrix, const CvMat* distCoeffs, const CvMat* newCameraMatrix = NULL)
 CODE:
 	cvUndistort2(src, dst, cameraMatrix, distCoeffs
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 		, newCameraMatrix
 #endif
 		);
@@ -3791,7 +3794,7 @@ MODULE = Cv	PACKAGE = Cv::StereoSGBM
 # ====================
 
 #ifdef __cplusplus
-#if _CV_VERSION() >= _VERSION(2,0,0)
+#if _CV_VERSION() >= _VERSION(2,0,1) // xxxxx
 
 StereoSGBM*
 StereoSGBM::new()
