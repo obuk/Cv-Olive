@@ -26,3 +26,4 @@ t/ref*.pm
 *.yml
 *~
 *.tar.gz
+*/cpanfile

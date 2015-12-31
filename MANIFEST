@@ -125,7 +125,6 @@ sample/calibration.pl
 sample/calibration.txt
 sample/camshiftdemo.pl
 sample/capture.pl
-sample/chamfer.pl
 sample/contours.pl
 sample/convexhull-arr.pl
 sample/convexhull-seq.pl
@@ -359,10 +358,4 @@ tools/testdist.pl
 typemap.in
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-BGCodeBookModel/cpanfile
-Histogram/cpanfile
-More/cpanfile
-Nonfree/cpanfile
-Qt/cpanfile
-Subdiv2D/cpanfile
 cpanfile
