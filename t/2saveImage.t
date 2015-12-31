@@ -24,7 +24,7 @@ if (1) {
 }
 
 SKIP: {
-	skip "return value if v1", 1 unless cvVersion() >= 2.000;
+	skip "saveImage return value", 1 unless cvVersion() >= 2.000001;
 	my $out = dirname($0) . "/tmp.jpg";
 	rmdir($out);
 	unlink($out);

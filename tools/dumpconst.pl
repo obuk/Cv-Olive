@@ -129,7 +129,7 @@ sub h2ph {
 	mkdirhier(dirname($ph));
     # system("h2ph <$h >$ph");
 	open PH, ">$ph" or die "$0: can't open $ph";
-	open H2PH, "h2ph <$h |" or die "$0: can't h2ph $h";
+	open H2PH, "h2ph -d $tmpdir <$h |" or die "$0: can't h2ph $h";
 	while (<H2PH>) {
 		my $ec = s/\brequire\s+\'([^\']+)\'/eval { $& } || eval { require \'opencv\/$1\' }/;
 		print PH;

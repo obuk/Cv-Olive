@@ -14,10 +14,13 @@ plan tests => 47;
 
 my $hasGUI = Cv->hasGUI;
 
-if (Cv->GetBuildInformation) {
-	like(cvHasQt(), qr/^QT \d\.\w+/);
-} else {
-	ok(cvHasQt());
+SKIP: {
+	skip "cvGetBuildInformation?", 1 if $^O eq 'freebsd';
+	if (Cv->GetBuildInformation) {
+		like(cvHasQt(), qr/^QT \d\.\w+/);
+	} else {
+		ok(cvHasQt());
+	}
 }
 
 

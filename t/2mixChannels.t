@@ -6,7 +6,11 @@ use warnings;
 use Test::More tests => 7;
 BEGIN { use_ok('Cv', -nomore) }
 
-if (1) {
+SKIP: {
+	skip "MixChannels 2.0.0", 4 if Cv->version == 2.00000;
+
+# OpenCV Error: Assertion failed (src_count == dst_count && src_count == pair_count) in cvMixChannels at t/2mixChannels.t line 15
+
 	my $rgba = Cv::Mat->new([100, 100], CV_8UC4);
 	my $bgr = $rgba->new(CV_8UC3);
 	my $alpha = $rgba->new(CV_8UC1);

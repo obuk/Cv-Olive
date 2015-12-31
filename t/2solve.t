@@ -3,7 +3,16 @@
 use strict;
 use warnings;
 # use Test::More qw(no_plan);
-use Test::More tests => 7;
+use Test::More;
+BEGIN {
+	eval "use Test::Number::Delta within => 1e-3";
+	if ($@) {
+		plan skip_all => "Test::Number::Delta";
+	} else {
+		plan tests => 7;
+	}
+}
+
 BEGIN { use_ok('Cv', -nomore) }
 
 if (1) {
@@ -22,8 +31,8 @@ if (1) {
 	my $X = Cv::Mat->new([2], CV_32FC1);
 	my $r = $A->Solve($B, $X);
 	is($r, 1);
-	is($X->getReal(0), $x);
-	is($X->getReal(1), $y);
+	delta_ok($X->getReal(0), $x);
+	delta_ok($X->getReal(1), $y);
 }
 
 if (2) {

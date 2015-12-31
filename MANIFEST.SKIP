@@ -18,3 +18,4 @@ lib/Cv/Constant\.pm$
 lib/Cv/typemap$
 pm_to_blib
 t/ref*.pm$
+^Cv-.*tar.gz

@@ -10,8 +10,8 @@ my $verbose = Cv->hasGUI;
 
 my $K = 10;
 
-my ($fx, $fy) = (640, 480);
-my ($cx, $cy) = (320, 240);
+my ($fx, $fy) = (320, 240);
+my ($cx, $cy) = ($fx/2, $fy/2);
 my $cmat = Cv::Mat->new([], CV_32FC1,
 	[ $fx,   0, $cx ],
 	[   0, $fy, $cy ],

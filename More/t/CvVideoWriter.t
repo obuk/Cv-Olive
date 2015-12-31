@@ -2,21 +2,19 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More tests => 5;
+use Test::More tests => 6;
 BEGIN { use_ok('Cv') }
 
 SKIP: {
-	my $cap = Cv->captureFromCAM(0);
-	skip "can't capture #0", 3 unless $cap;
-	my $frame = $cap->query;
-	skip "can't query #0", 3 unless $frame;
+	skip "Cv->captureFromCAM - cvVersion", 5 unless cvVersion() >= 2.000001;
+	ok my $cap = Cv->captureFromCAM(0);
+	ok my $frame = $cap->query;
 	my $fourcc;
 	for (qw(DIVX HFYU DRAC XVID X264 MP1V)) {
 		my $v = eval { Cv->createVideoWriter("a.avi", $_, 30, $frame->size) };
 		$fourcc = $_, last if $v && !$@;
 	}
-	skip "can't query #0", 3 unless $fourcc;
+	skip "Cv->createVideoWriter - fourcc)", 3 unless $fourcc;
 	my $v1 = Cv->createVideoWriter("a.avi", $fourcc, 30, $frame->size);
 	isa_ok($v1, 'Cv::VideoWriter');
 	my $v2 = Cv->createVideoWriter("a.avi", $fourcc, 30, $frame->size);

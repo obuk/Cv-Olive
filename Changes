@@ -1,8 +1,12 @@
 Revision history for Cv.pm
 
+0.34 - 2015-12-31
+     * remove PL_sv_objcount
+	 * use cpanfile
+
 0.33 - 2015-12-30
-	 * fix shebang
-	 * fix nonfree
+     * fix shebang
+     * fix nonfree
 
 0.32 - 2013-09-19
      * fix memoryleak of trackbar

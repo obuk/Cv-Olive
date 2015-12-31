@@ -25,5 +25,4 @@ t/ref*.pm
 *.tmp
 *.yml
 *~
-bugs.ini
-\.bugs*
+*.tar.gz
