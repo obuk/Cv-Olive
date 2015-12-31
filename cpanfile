@@ -1,15 +1,31 @@
 # -*- mode: perl -*-
 
-requires 'ExtUtils::MakeMaker' => '7.1';
-requires 'File::Spec::Functions' => '3.48_01';
-requires 'File::Temp' => '0.2304';
-requires 'ExtUtils::ParseXS' => '2.190';
-requires 'version' => '0.770';
+my $prereq_pm = sub {
+    requires 'B::Deparse' => 0;
+    requires 'Cwd' => '3.60';
+    requires 'Devel::CheckLib' => '1.05';
+    requires 'Data::Structure::Util' => '0.16';
+    requires 'ExtUtils::MakeMaker' => '7.10';
+    requires 'ExtUtils::ParseXS' => '3.30';
+    requires 'File::Basename' => 0;
+    requires 'File::Spec::Functions' => '3.60';
+    requires 'File::Temp' => '0.2304';
+    requires 'Getopt::Long' => '2.48';
+    requires 'Scalar::Util' => '1.42';
+    requires 'version' => '0.9912';
+    if ($^O eq 'cygwin') {
+        requires 'ExtUtils::MM_Cygwin' => '6.620';
+    }
+};
 
-test_requires 'Test::More' => '1.001014';
-test_requires 'Test::Number::Delta' => '1.030';
-test_requires 'Test::Exception' => '0.310';
+on 'configure' => $prereq_pm;
+on 'build' => $prereq_pm;
 
-if ($^O eq 'cygwin') {
-	requires 'ExtUtils::MM_Cygwin' => '6.620';
-}
+on 'test' => sub {
+    requires 'List::Util' => '1.42';
+    requires 'POSIX' => 0;
+    requires 'Test::Exception' => '0.43';
+    requires 'Test::More' => '1.001014';
+    requires 'Test::Number::Delta' => '1.06';
+    requires 'Time::HiRes' => '1.9728';
+};

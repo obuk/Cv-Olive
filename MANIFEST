@@ -51,7 +51,6 @@ Histogram/lib/Cv/Histogram.pm
 Histogram/Makefile.PL
 Histogram/t/Cv-Histogram.t
 Histogram/t/pod-coverage.t
-inc/Devel/CheckLib.pm
 lib/Cv.pm
 lib/Cv/Config.pm
 lib/Cv/Cv.inc

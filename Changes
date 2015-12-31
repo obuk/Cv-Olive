@@ -2,7 +2,7 @@ Revision history for Cv.pm
 
 0.34 - 2015-12-31
      * remove PL_sv_objcount
-	 * use cpanfile
+	 * use cpanfile, and unbundle Devel/CheckLib.pm
 
 0.33 - 2015-12-30
      * fix shebang

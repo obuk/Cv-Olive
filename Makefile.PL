@@ -2,8 +2,6 @@
 
 use 5.008008;
 use ExtUtils::MakeMaker::CPANfile;
-
-use lib qw(inc);
 use Devel::CheckLib;
 my $cv1 = check_lib(lib => 'cv');			# OpenCV-1.x
 my $cv2 = check_lib(lib => 'opencv_core');	# OpenCV-2.x
