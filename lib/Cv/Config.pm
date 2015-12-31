@@ -8,10 +8,11 @@ use warnings;
 use Carp;
 use Cwd qw(abs_path);
 use File::Basename;
-# use ExtUtils::PkgConfig;
+use File::Spec::Functions qw/ catdir /;
+use File::Temp qw/ tempdir /;
 use version;
 
-our $VERSION = '0.30';
+our $VERSION = '0.34';
 
 our %opencv;
 our %MM;
@@ -158,11 +159,6 @@ END
 }
 
 
-use File::Slurp qw/ write_file /;
-use File::Spec::Functions qw/ catdir /;
-use File::Temp qw/ tempdir /;
-use Parse::CommandLine;
-
 sub run_c {
 	my $self = shift;
 	my $option = { src => '.c++', out => '.out' };
@@ -180,13 +176,15 @@ sub run_c {
 		my $src = catdir $tempdir, join('', 'cv', $$, $option->{src});
 		my $out = catdir $tempdir, join('', 'a', $option->{out});
 		warn join(' ', "Compiling $src", $hint), "\n" if $verbose;
-		write_file($src, $code) or croak "$0: can't write $src.\n";
+		if (open my $fd, ">", $src) {
+			print $fd $code;
+			close $fd;
+		}
 		my @compile = (
-			$self->cc, $src, '-o', $out,
-			map { parse_command_line($_) } $opencv{cflags}, $opencv{libs},
+			$self->cc, $src, '-o', $out, $opencv{cflags}, $opencv{libs},
 		);
 		warn "@compile\n" if $verbose;
-		system @compile;
+		system "@compile";
 		$output = `$out` if ($child_error = $?) == 0;
 	}
 	$? = $child_error;

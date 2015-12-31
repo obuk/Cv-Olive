@@ -1,19 +1,7 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
 use 5.008008;
-use ExtUtils::MakeMaker;
-
-our %PREREQ_PM = (
-	'File::Slurp'         => '9999.19',
-	'File::Spec::Functions' => '3.48_01',
-	'File::Temp'          => '0.2304',
-	'Parse::CommandLine'  => '0.02',
-	'ExtUtils::ParseXS'   => '2.190',
-	'version'             => '0.770',
-	'Test::Number::Delta' => '1.030',
-	'Test::Exception'     => '0.310',
-	$^O eq 'cygwin' ? ('ExtUtils::MM_Cygwin' => '6.620') : (),
-);
+use ExtUtils::MakeMaker::CPANfile;
 
 use lib qw(inc);
 use Devel::CheckLib;
@@ -24,6 +12,7 @@ check_lib_or_exit(lib => 'opencv_core') unless $cv1 + $cv2;
 use lib qw(lib);
 eval "use Cv::Config";
 if ($@) {
+	warn $@, "\n";
 	warn "=" x 60, "\n";
 	warn "See README to install this module\n";
 	warn "=" x 60, "\n";
@@ -33,6 +22,7 @@ if ($@) {
 my $cf = new Cv::Config;
 
 my @perl_h = qw(perl.h sv.h pp.h);
+my @perl_h_patched = ();
 
 # patch CORE/*ph
 {
@@ -110,7 +100,6 @@ WriteMakefile(
 	VERSION_FROM => "lib/Cv.pm", # finds $VERSION
 	ABSTRACT_FROM => "lib/Cv.pm",
 	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
-	PREREQ_PM => \%PREREQ_PM,
 	%Cv::Config::MM,
 	INC => '-I.',
 	XSOPT => '-C++ -hiertype',

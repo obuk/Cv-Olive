@@ -357,3 +357,12 @@ tools/ref2pl-all.pl
 tools/ref2pl.pl
 tools/testdist.pl
 typemap.in
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+BGCodeBookModel/cpanfile
+Histogram/cpanfile
+More/cpanfile
+Nonfree/cpanfile
+Qt/cpanfile
+Subdiv2D/cpanfile
+cpanfile
