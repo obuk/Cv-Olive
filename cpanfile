@@ -5,6 +5,7 @@ my $prereq_pm = sub {
     requires 'Cwd' => '3.60';
     requires 'Devel::CheckLib' => '1.05';
     requires 'Data::Structure::Util' => '0.16';
+    requires 'ExtUtils::MakeMaker::CPANfile' => '0.07';
     requires 'ExtUtils::MakeMaker' => '7.10';
     requires 'ExtUtils::ParseXS' => '3.30';
     requires 'File::Basename' => 0;

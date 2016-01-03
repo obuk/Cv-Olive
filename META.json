@@ -1,0 +1,70 @@
+{
+   "abstract" : "helps you to make something around computer vision.",
+   "author" : [
+      "MASUDA Yuta <yuta.cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cv",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "B::Deparse" : "0",
+            "Cwd" : "3.60",
+            "Data::Structure::Util" : "0.16",
+            "Devel::CheckLib" : "1.05",
+            "ExtUtils::MakeMaker" : "7.10",
+            "ExtUtils::MakeMaker::CPANfile" : "0.07",
+            "ExtUtils::ParseXS" : "3.30",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "3.60",
+            "File::Temp" : "0.2304",
+            "Getopt::Long" : "2.48",
+            "List::Util" : "1.42",
+            "POSIX" : "0",
+            "Scalar::Util" : "1.42",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.001014",
+            "Test::Number::Delta" : "1.06",
+            "Time::HiRes" : "1.9728",
+            "version" : "0.9912"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "B::Deparse" : "0",
+            "Cwd" : "3.60",
+            "Data::Structure::Util" : "0.16",
+            "Devel::CheckLib" : "1.05",
+            "ExtUtils::MakeMaker" : "7.10",
+            "ExtUtils::MakeMaker::CPANfile" : "0.07",
+            "ExtUtils::ParseXS" : "3.30",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "3.60",
+            "File::Temp" : "0.2304",
+            "Getopt::Long" : "2.48",
+            "Scalar::Util" : "1.42",
+            "version" : "0.9912"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.34",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}
