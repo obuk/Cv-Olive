@@ -2,12 +2,13 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 5;
 BEGIN { use_ok('Cv') }
 
 SKIP: {
-	skip "Cv->captureFromCAM - cvVersion", 5 unless cvVersion() >= 2.000001;
-	ok my $cap = Cv->captureFromCAM(0);
+	skip "Cv->captureFromCAM - cvVersion", 4 unless cvVersion() >= 2.000001;
+	my $cap = Cv->captureFromCAM(0);
+	skip "Cv->captureFromCAM - camera", 4 unless $cap;
 	ok my $frame = $cap->query;
 	my $fourcc;
 	for (qw(DIVX HFYU DRAC XVID X264 MP1V)) {
