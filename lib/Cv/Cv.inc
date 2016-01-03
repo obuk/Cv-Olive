@@ -15,15 +15,15 @@ extern "C" {
 }
 #endif
 
-/* #define NEED_sv_2pv_nolen */
+#define NEED_sv_2pv_nolen_GLOBAL
 #include "ppport.h"
 
 #endif  /* __Inlin_C */
 
-/* remove confincting macros */
+/* remove conflicting macros - RT#110197 */
 #undef do_open
 #undef do_close
-#undef seed                   /* opencv 2.4.6 opencv2/core/core.hpp */
+#undef seed
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
