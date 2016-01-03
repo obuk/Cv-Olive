@@ -1,5 +1,11 @@
 Revision history for Cv.pm
 
+0.35 - 2016-01-03
+	 * fixes RT#110197
+	 * opencv: 2.0.0, 2.4.11
+	 * perl: 5.8 thru 5.22
+     * to install: cpanm https://github.com/obuk/Cv-Olive.git
+
 0.34 - 2015-12-31
      * remove PL_sv_objcount
 	 * use cpanfile, and unbundle Devel/CheckLib.pm
