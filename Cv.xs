@@ -2295,7 +2295,7 @@ INPUT:
 INIT:
 	int length(pts) = 4;
 	pts = (CvPoint2D32f*)alloca(sizeof(CvPoint2D32f) * length(pts));
-	sv_setsv(ST(1), newRV((SV*)newAV())); // XXXXX
+	sv_setsv(ST(1), newRV_inc((SV*)newAV())); // XXXXX
 OUTPUT:
 	pts
 
@@ -2382,7 +2382,7 @@ INIT:
 	int length(line) = cn * 2;
 	line = (float*)alloca(sizeof(float)*6);
 	if (SvTYPE(ST(5)) == SVt_NULL) {
-		sv_setsv(ST(5), newRV((SV*)newAV()));
+		sv_setsv(ST(5), newRV_inc((SV*)newAV()));
 	}
 OUTPUT:
 	line
